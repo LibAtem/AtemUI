@@ -1,15 +1,9 @@
-[submodule "server/LibAtem"]
-	path = server/LibAtem
-	url = https://github.com/LibAtem/LibAtem.git
-[submodule "server/AtemServer/LibAtem.Discovery"]
-	path = server/AtemServer/LibAtem.Discovery
-	url = https://github.com/LibAtem/LibAtem.Discovery.git
-[submodule "server/LibAtem.Discovery"]
-	path = server/LibAtem.Discovery
-	url = https://github.com/LibAtem/LibAtem.Discovery.git
 [submodule "LibAtem.Discovery"]
 	path = LibAtem.Discovery
 	url = https://github.com/LibAtem/LibAtem.Discovery.git
 [submodule "LibAtem"]
 	path = LibAtem
 	url = https://github.com/LibAtem/LibAtem.git
+[submodule "LibAtem.DeviceProfile"]
+	path = LibAtem.DeviceProfile
+	url = https://github.com/LibAtem/LibAtem.DeviceProfile.git
