@@ -1,0 +1,97 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+import Griddle, { plugins, GriddleProps } from 'griddle-react'
+
+interface BootstrapFilterProps {
+  setFilter: (value: string) => void
+  style?: React.CSSProperties
+  className?: string
+}
+
+class BootstrapFilter extends React.Component<BootstrapFilterProps> {
+  static propTypes = {
+    setFilter: PropTypes.func,
+    style: PropTypes.object,
+    className: PropTypes.string
+  }
+
+  setFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.props.setFilter(e.target.value)
+  }
+
+  render() {
+    return (
+      <label>
+        Search:
+        <input
+          type="text"
+          name="filter"
+          placeholder="Filter"
+          onChange={this.setFilter}
+          style={this.props.style}
+          className={this.props.className}
+        />
+      </label>
+    )
+  }
+}
+
+const styleConfig = {
+  classNames: {
+    Filter: 'form-control input-sm',
+    Table: 'table table-bordered table-hover dataTable',
+    TableHeading: '',
+    TableBody: '',
+    PageDropDown: 'form-control input-sm',
+    NextButton: 'paginate_button next',
+    PreviousButton: 'paginate_button previous',
+    Pagination: 'dataTables_paginate paging_simple_numbers'
+  }
+}
+
+const BootstrapLayout = ({ Table, Pagination, Filter, SettingsWrapper }: any) => {
+  return (
+    <div className="dataTables_wrapper form-inline dt-bootstrap">
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="dataTables_length">
+            <SettingsWrapper />
+          </div>
+        </div>
+        <div className="col-sm-6">
+          <div className="dataTables_filter">
+            <Filter />
+          </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-cm-12">
+          <Table />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-sm-5"></div>
+        <div className="col-sm-7">
+          <Pagination />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export class GriddleGrid<T> extends React.Component<GriddleProps<T>> {
+  render() {
+    return (
+      <Griddle
+        {...this.props}
+        data={this.props.data}
+        plugins={this.props.plugins}
+        styleConfig={styleConfig}
+        components={{
+          Filter: BootstrapFilter as any,
+          Layout: BootstrapLayout
+        }}
+      />
+    )
+  }
+}
