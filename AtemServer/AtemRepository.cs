@@ -62,14 +62,13 @@ namespace AtemServer
 
             discovery = new AtemDiscoveryService();
             discovery.OnDeviceSeen += OnDeviceSeen;
-            // discovery.OnDeviceLost += OnDeviceLost;
+            discovery.OnDeviceLost += OnDeviceLost;
         }
 
         private void OnDeviceSeen(object sender, AtemDeviceInfo info)
         {
             // TODO - should this use deviceId?
             var id = string.Format("{0}:{1}", info.Address, info.Port);
-
             lock (devices)
             {
                 if (devices.TryGetValue(id, out AtemDevice device))
@@ -83,14 +82,28 @@ namespace AtemServer
                 else
                 {
                     devices[id] = new AtemDevice(info);
+                    Log.InfoFormat("Discovered device: {0}", info.ToString());
                 }
             }
-            Console.WriteLine("Seen: " + info.ToString());
-
         }
-        // private void OnDeviceLost(object sender, AtemDeviceInfo info) {
-        //     Console.WriteLine("Seen: " + info.ToString());
-        // }
+        private void OnDeviceLost(object sender, AtemDeviceInfo info) {
+            var id = string.Format("{0}:{1}", info.Address, info.Port);
+
+            lock (devices)
+            {
+                if (devices.TryGetValue(id, out AtemDevice device))
+                {
+                    Log.InfoFormat("Lost device: {0}", info.ToString());
+
+                    if (!device.Remember)
+                    {
+                        devices.Remove(id);
+                        
+                        dbDevices.Delete(id); // Ensure its not in the db (it shouldnt be)
+                    }
+                }
+            }
+        }
 
         public List<AtemDevice> ListDevices()
         {
