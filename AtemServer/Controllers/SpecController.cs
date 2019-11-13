@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using LibAtem.Commands.MixEffects;
 using LibAtem.Common;
@@ -47,9 +46,10 @@ namespace AtemServer.Controllers
                 AudioMonitor = true,
                 VideoModes = new VideoModeSet()
                 {
-                    DownConvertAbove = VideoModeStandard.SDI3G,
+                    SupportedModes = {},
+                    /*DownConvertAbove = VideoModeStandard.SDI3G,
                     MaximumSupported = VideoModeStandard.SDI6G,
-                    MinimumSupported = VideoModeStandard.SDISD,
+                    MinimumSupported = VideoModeStandard.SDISD,*/
                     MaxFrames = new MaxFramesSet()
                     {
                         _720 = 1000,

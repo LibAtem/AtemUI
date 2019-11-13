@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Serialization;
+using LibAtem;
 using LibAtem.Commands;
 using LibAtem.Common;
 using LibAtem.DeviceProfile;
@@ -41,6 +42,8 @@ namespace AtemServer.Controllers
         public string FullName { get; set; }
         public string Name { get; set; }
         
+        public ProtocolVersion InitialVersion { get; set; }
+        
         public bool IsValid { get; set; }
         
         public List<CommandProperty> Properties { get; set; }
@@ -77,75 +80,84 @@ namespace AtemServer.Controllers
         {
             var res = new CommandsSpec();
 
-            foreach (var cmd in CommandManager.GetAllTypes())
+            foreach (var cmdSet in CommandManager.GetAllTypes())
             {
-                var spec = res.Commands[cmd.Value.FullName] = new CommandSpec
+                foreach (var cmd in cmdSet.Value)
                 {
-                    FullName = cmd.Value.FullName,
-                    Name = cmd.Value.Name
-                };
-
-                if (typeof(SerializableCommandBase).GetTypeInfo().IsAssignableFrom(cmd.Value))
-                {
-                    spec.IsValid = true;
-
-                    foreach (PropertyInfo prop in cmd.Value.GetProperties(
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                    var spec = res.Commands[cmd.Item2.FullName] = new CommandSpec
                     {
-                        // If prop cannot be deserialized, then ignore
-                        if (!prop.CanWrite || prop.GetSetMethod() == null)
-                            continue;
+                        FullName = cmd.Item2.FullName,
+                        Name = cmd.Item2.Name,
+                        InitialVersion = cmd.Item1
+                    };
 
-                        if (prop.GetCustomAttribute<NoSerializeAttribute>() != null)
-                            continue;
-                        
-                        //TODO
-                        var resProp = new CommandProperty
+                    if (typeof(SerializableCommandBase).GetTypeInfo().IsAssignableFrom(cmd.Item2))
+                    {
+                        spec.IsValid = true;
+
+                        foreach (PropertyInfo prop in cmd.Item2.GetProperties(
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                         {
-                            Name = prop.Name,
-                            IsId = prop.GetCustomAttributes<CommandIdAttribute>().Any()
-                        };
-                        
-                        if (prop.GetCustomAttribute<BoolAttribute>() != null)
-                        {
-                            resProp.Type = CommandPropertyType.Bool;
-                        }
-                        else if (prop.GetCustomAttribute<Enum8Attribute>() != null || prop.GetCustomAttribute<Enum16Attribute>() != null || prop.GetCustomAttribute<Enum32Attribute>() != null)
-                        {
-                            resProp.Type = prop.PropertyType.GetCustomAttribute<FlagsAttribute>() != null ? CommandPropertyType.Flags : CommandPropertyType.Enum;
+                            // If prop cannot be deserialized, then ignore
+                            if (!prop.CanWrite || prop.GetSetMethod() == null)
+                                continue;
 
-                           /* string mappedTypeName = TypeMappings.MapType(prop.PropertyType.FullName);
-                            Type mappedType = prop.PropertyType;
-                            if (mappedTypeName != mappedType.FullName && mappedTypeName.IndexOf("System.") != 0)
-                                mappedType = GetType(mappedTypeName);
+                            if (prop.GetCustomAttribute<NoSerializeAttribute>() != null)
+                                continue;
 
-
-                            foreach (object val in Enum.GetValues(mappedType))
+                            //TODO
+                            var resProp = new CommandProperty
                             {
-                                string id = val.ToString();
-                                var xmlAttr = mappedType.GetMember(val.ToString())[0].GetCustomAttribute<XmlEnumAttribute>();
-                                if (xmlAttr != null)
-                                    id = xmlAttr.Name;
+                                Name = prop.Name,
+                                IsId = prop.GetCustomAttributes<CommandIdAttribute>().Any()
+                            };
 
-                                if (!AvailabilityChecker.IsAvailable(profile, val))
-                                    continue;
+                            if (prop.GetCustomAttribute<BoolAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.Bool;
+                            }
+                            else if (prop.GetCustomAttribute<Enum8Attribute>() != null ||
+                                     prop.GetCustomAttribute<Enum16Attribute>() != null ||
+                                     prop.GetCustomAttribute<Enum32Attribute>() != null)
+                            {
+                                resProp.Type = prop.PropertyType.GetCustomAttribute<FlagsAttribute>() != null
+                                    ? CommandPropertyType.Flags
+                                    : CommandPropertyType.Enum;
 
-                                // TODO check value is available for usage location
-                                xmlField.Values.Add(new MacroFieldValueSpec()
-                                {
-                                    Id = id,
-                                    Name = val.ToString(),
-                                });
-                            }*/
+                                /* string mappedTypeName = TypeMappings.MapType(prop.PropertyType.FullName);
+                                 Type mappedType = prop.PropertyType;
+                                 if (mappedTypeName != mappedType.FullName && mappedTypeName.IndexOf("System.") != 0)
+                                     mappedType = GetType(mappedTypeName);
+     
+     
+                                 foreach (object val in Enum.GetValues(mappedType))
+                                 {
+                                     string id = val.ToString();
+                                     var xmlAttr = mappedType.GetMember(val.ToString())[0].GetCustomAttribute<XmlEnumAttribute>();
+                                     if (xmlAttr != null)
+                                         id = xmlAttr.Name;
+     
+                                     if (!AvailabilityChecker.IsAvailable(profile, val))
+                                         continue;
+     
+                                     // TODO check value is available for usage location
+                                     xmlField.Values.Add(new MacroFieldValueSpec()
+                                     {
+                                         Id = id,
+                                         Name = val.ToString(),
+                                     });
+                                 }*/
+                            }
+                            else
+                            {
+                                SetNumericProps(profile, cmd.Item2, resProp, prop);
+                            }
+
+                            spec.Properties.Add(resProp);
                         }
-                        else
-                        {
-                            SetNumericProps(profile, cmd.Value, resProp, prop);
-                        }
-                        
-                        spec.Properties.Add(resProp);
                     }
                 }
+
                 /*
                 var xmlOp = new MacroOperationSpec() {Id = op.Key.ToString()};
                 res.Operations.Add(xmlOp);
@@ -279,7 +291,7 @@ namespace AtemServer.Controllers
 
         private static T GetDefaultForField<T>(DeviceProfile profile, Type cmdType, CommandProperty field)
         {
-            return (T) AvailabilityChecker.GetMaxForCommandProperty(profile, string.Format("{0}.{1}", cmdType.Name, field.Name));
+            return (T) AvailabilityChecker.GetMaxForCommandProperty(profile, $"{cmdType.Name}.{field.Name}");
         }
     }
 }

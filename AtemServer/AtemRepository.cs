@@ -184,8 +184,6 @@ namespace AtemServer
                     
                     return true;
                 }
-
-                return false;
             }
         }
         
