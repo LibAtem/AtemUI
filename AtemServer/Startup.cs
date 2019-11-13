@@ -27,7 +27,7 @@ namespace AtemServer
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "ClientApp/build";
+                configuration.RootPath = "client/build";
             });
 
             services.AddCors(options =>
@@ -67,7 +67,7 @@ namespace AtemServer
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "../client";
                 
                 if (env.IsDevelopment())
                 {
