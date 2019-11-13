@@ -158,8 +158,19 @@ namespace AtemServer
 
             lock (devices)
             {
-                if (!devices.TryGetValue(id, out AtemDevice device))
+                if (devices.TryGetValue(id, out AtemDevice device))
                 {
+                    device.Remember = true;
+                    device.Enabled = true;
+
+
+                    dbDevices.Upsert(id, device);
+                    
+                    // startup connection
+                    SetupConnection(device);
+                    
+                    return true;
+                } else {
                     var doc = devices[id] = new AtemDevice(new AtemDeviceInfo(id, "", DateTime.MinValue, address, port, new List<string>()))
                     {
                         Remember = true, // Remember anything created manually

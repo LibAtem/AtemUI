@@ -4,7 +4,7 @@ import React from 'react'
 import './App.css'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { Navbar, Nav, Form, Button, FormControl, Container } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
 
 function App() {
@@ -12,11 +12,13 @@ function App() {
     <Router>
       <div>
         <Navbar bg="dark" variant="dark">
-          <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+          <LinkContainer to="/">
+            <Navbar.Brand>Atem UI</Navbar.Brand>
+          </LinkContainer>
           <Nav className="mr-auto">
-            <LinkContainer to="/">
+            <IndexLinkContainer to="/">
               <Nav.Link>Home</Nav.Link>
-            </LinkContainer>
+            </IndexLinkContainer>
             <LinkContainer to="/about">
               <Nav.Link>About</Nav.Link>
             </LinkContainer>
