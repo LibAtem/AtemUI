@@ -1,0 +1,48 @@
+name: .NET Core
+
+on: [push]
+
+jobs:
+  build-win10:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build with dotnet
+      run: |
+        cd AtemServer
+        dotnet publish -o "$(pwd)/dist" -c Release -r win10-x64
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: AtemServer-win10
+        path: AtemServer/dist
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build with dotnet
+      run: |
+        cd AtemServer
+        dotnet publish -o "$(pwd)/dist" -c Release -r linux-x64
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: AtemServer-linux
+        path: AtemServer/dist
