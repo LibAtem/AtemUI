@@ -13,9 +13,6 @@ Coming soon
 
 ### Related Projects
 * ATEM Client library [LibAtem](https://github.com/LibAtem/LibAtem)
-* ATEM Client XML Parsing [LibAtem.XmlState](https://github.com/LibAtem/LibAtem.XmlState)
-* ATEM Client profile helper [LibAtem.DeviceProfile](https://github.com/LibAtem/LibAtem.DeviceProfile)
-* ATEM Client comparison tests [LibAtem.ComparisonTests](https://github.com/LibAtem/LibAtem.ComparisonTests)
 
 ### Credits
 This builds on the work done by the following projects:
