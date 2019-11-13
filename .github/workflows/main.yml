@@ -13,6 +13,20 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: client/node_modules
+        key: ${{ runner.OS }}-client-${{ hashFiles('**/client/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.OS }}-client-
+          ${{ runner.OS }}-
+
     - name: Build with dotnet
       run: |
         cd AtemServer
@@ -33,6 +47,20 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: client/node_modules
+        key: ${{ runner.OS }}-client-${{ hashFiles('**/client/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.OS }}-client-
+          ${{ runner.OS }}-
+
     - name: Build with dotnet
       run: |
         cd AtemServer
