@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { Navbar, Nav, Form, Button, FormControl, Container } from 'react-bootstrap'
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
+import { ManualCommandsPage } from './ManualCommands'
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
             <IndexLinkContainer to="/">
               <Nav.Link>Home</Nav.Link>
             </IndexLinkContainer>
-            <LinkContainer to="/about">
-              <Nav.Link>About</Nav.Link>
+            <LinkContainer to="/commands">
+              <Nav.Link>Manual Commands</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/devices">
               <Nav.Link>Devices</Nav.Link>
@@ -36,8 +37,8 @@ function App() {
           <Route exact path="/">
             <Home />
           </Route>
-          <Route path="/about">
-            <About />
+          <Route path="/commands">
+            <ManualCommandsPage />
           </Route>
           <Route path="/devices">
             <DevicesPage />
@@ -55,22 +56,6 @@ function Home() {
   return (
     <Container>
       <h2>Home</h2>
-    </Container>
-  )
-}
-
-function About() {
-  return (
-    <Container>
-      <h2>About</h2>
-    </Container>
-  )
-}
-
-function Dashboard() {
-  return (
-    <Container>
-      <h2>Dashboard</h2>
     </Container>
   )
 }
