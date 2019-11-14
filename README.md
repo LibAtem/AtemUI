@@ -14,13 +14,6 @@ Coming soon
 ### Related Projects
 * ATEM Client library [LibAtem](https://github.com/LibAtem/LibAtem)
 
-### Credits
-This builds on the work done by the following projects:
-* http://skaarhoj.com/fileadmin/BMDPROTOCOL.html
-* https://github.com/peschuster/wireshark-atem-dissector
-
 ### License
 
 AtemUI is distributed under the GNU Lesser General Public License LGPLv3 or higher, see the file LICENSE for details.
-
-
