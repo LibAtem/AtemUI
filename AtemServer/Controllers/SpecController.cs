@@ -1,19 +1,24 @@
-using System.Collections.Generic;
+using System;
 using LibAtem.Commands.MixEffects;
 using LibAtem.Common;
 using LibAtem.DeviceProfile;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Newtonsoft.Json;
 
 namespace AtemServer.Controllers
 {
     [Route("api/[controller]")]
-    //[Produces("application/xml")]
     public class SpecController : Controller
     {
+        private readonly AtemRepository _repo;
+
         //private readonly Lazy<CommandsSpec> _cachedSpec;
 
-        public SpecController()
+        public SpecController(AtemRepository repo)
         {
+            _repo = repo;
+            
             // Force the assembly to be loaded
             new MixEffectCutCommand();
 
@@ -21,9 +26,25 @@ namespace AtemServer.Controllers
             //_cachedSpec = new Lazy<CommandsSpec>(() => SpecGenerator.CompileData());
         }
         
-        // GET api/values
         [HttpGet]
-        public CommandsSpec Get()
+        [Route("{id}")]
+        public JsonResult Get(string id)
+        {
+            var client = _repo.GetConnection(id);
+            if (client == null)
+            {
+                throw new Exception("Device not found");
+            }
+            
+            var settings = JsonSerializerSettingsProvider.CreateSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
+            
+            return new JsonResult(SpecGenerator.CompileData(client.Profile), settings);
+        }
+        
+        /*
+        [HttpGet]
+        public JsonResult Get()
         {
             //var profile = DeviceProfileRepository.GetSystemProfile(DeviceProfileType.Atem2ME4K);
             var profile = new DeviceProfile()
@@ -49,7 +70,7 @@ namespace AtemServer.Controllers
                     SupportedModes = {},
                     /*DownConvertAbove = VideoModeStandard.SDI3G,
                     MaximumSupported = VideoModeStandard.SDI6G,
-                    MinimumSupported = VideoModeStandard.SDISD,*/
+                    MinimumSupported = VideoModeStandard.SDISD,*\/
                     MaxFrames = new MaxFramesSet()
                     {
                         _720 = 1000,
@@ -95,7 +116,11 @@ namespace AtemServer.Controllers
                     VuMeters = true
                 }
             };
-            return SpecGenerator.CompileData(profile);
-        }
+
+            var settings = JsonSerializerSettingsProvider.CreateSerializerSettings();
+            settings.NullValueHandling = NullValueHandling.Ignore;
+            
+            return new JsonResult(SpecGenerator.CompileData(profile), settings);
+        }*/
     }
 }

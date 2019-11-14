@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Serialization;
 using LibAtem;
 using LibAtem.Commands;
-using LibAtem.Common;
 using LibAtem.DeviceProfile;
-using LibAtem.MacroOperations;
 using LibAtem.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace AtemServer.Controllers
 {
@@ -19,17 +18,19 @@ namespace AtemServer.Controllers
             this.Commands = new Dictionary<string, CommandSpec>();
         }
         
-        public Dictionary<string, CommandSpec> Commands { get; set; }
-        // TODO
+        public Dictionary<string, CommandSpec> Commands { get; }
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum CommandPropertyType
-    { // TODO - format as string
+    {
         Int,
         Double,
         Bool,
         Enum,
         Flags,
+        String,
+        ByteArray,
     }
 
     public class CommandSpec
@@ -42,11 +43,17 @@ namespace AtemServer.Controllers
         public string FullName { get; set; }
         public string Name { get; set; }
         
-        public ProtocolVersion InitialVersion { get; set; }
+        public ProtocolVersion? InitialVersion { get; set; }
         
         public bool IsValid { get; set; }
         
-        public List<CommandProperty> Properties { get; set; }
+        public List<CommandProperty> Properties { get; }
+    }
+
+    public class CommandEnumOption
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class CommandProperty
@@ -56,9 +63,11 @@ namespace AtemServer.Controllers
         
         public CommandPropertyType Type { get; set; }
         
-        public int Min { get; set; }
-        public int Max { get; set; }
-        public double Scale { get; set; }
+        public int? Min { get; set; }
+        public int? Max { get; set; }
+        public double? Scale { get; set; }
+        
+        public IReadOnlyList<CommandEnumOption> Options { get; set; }
     }
     
     public class SpecGenerator
@@ -105,7 +114,6 @@ namespace AtemServer.Controllers
                             if (prop.GetCustomAttribute<NoSerializeAttribute>() != null)
                                 continue;
 
-                            //TODO
                             var resProp = new CommandProperty
                             {
                                 Name = prop.Name,
@@ -123,30 +131,36 @@ namespace AtemServer.Controllers
                                 resProp.Type = prop.PropertyType.GetCustomAttribute<FlagsAttribute>() != null
                                     ? CommandPropertyType.Flags
                                     : CommandPropertyType.Enum;
-
-                                /* string mappedTypeName = TypeMappings.MapType(prop.PropertyType.FullName);
-                                 Type mappedType = prop.PropertyType;
-                                 if (mappedTypeName != mappedType.FullName && mappedTypeName.IndexOf("System.") != 0)
-                                     mappedType = GetType(mappedTypeName);
-     
-     
-                                 foreach (object val in Enum.GetValues(mappedType))
+                                
+                                 var options = new List<CommandEnumOption>();
+                                 foreach (object val in Enum.GetValues(prop.PropertyType))
                                  {
-                                     string id = val.ToString();
-                                     var xmlAttr = mappedType.GetMember(val.ToString())[0].GetCustomAttribute<XmlEnumAttribute>();
-                                     if (xmlAttr != null)
-                                         id = xmlAttr.Name;
-     
                                      if (!AvailabilityChecker.IsAvailable(profile, val))
                                          continue;
      
                                      // TODO check value is available for usage location
-                                     xmlField.Values.Add(new MacroFieldValueSpec()
+                                     options.Add(new CommandEnumOption
                                      {
-                                         Id = id,
+                                         Id = (int) val,
                                          Name = val.ToString(),
                                      });
-                                 }*/
+                                 }
+
+                                 resProp.Options = options;
+                            }
+                            else if (prop.GetCustomAttribute<StringAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.String;
+                            }
+                            else if (prop.GetCustomAttribute<StringLengthAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.String;
+                                resProp.Max = (int) prop.GetCustomAttribute<StringLengthAttribute>().MaxLength;
+                            }
+                            else if (prop.GetCustomAttribute<ByteArrayAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.ByteArray;
+                                resProp.Max = (int) prop.GetCustomAttribute<ByteArrayAttribute>().Length;
                             }
                             else
                             {
@@ -157,66 +171,6 @@ namespace AtemServer.Controllers
                         }
                     }
                 }
-
-                /*
-                var xmlOp = new MacroOperationSpec() {Id = op.Key.ToString()};
-                res.Operations.Add(xmlOp);
-                
-                IEnumerable<PropertyInfo> props = op.Value.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(prop => prop.GetCustomAttribute<NoSerializeAttribute>() == null)
-                    .OrderBy(prop => prop.GetCustomAttribute<SerializeAttribute>()?.StartByte ?? 999);
-
-                foreach (PropertyInfo prop in props)
-                {
-                    var fieldAttr = prop.GetCustomAttribute<MacroFieldAttribute>();
-                    if (fieldAttr == null)
-                        continue;
-
-                    var xmlField = new MacroFieldSpec()
-                    {
-                        Id = fieldAttr.Id,
-                        Name = fieldAttr.Name,
-                        IsId = prop.GetCustomAttribute<CommandIdAttribute>() != null
-                    };
-                    xmlOp.Fields.Add(xmlField);
-
-                    if (prop.GetCustomAttribute<BoolAttribute>() != null)
-                    {
-                        xmlField.Type = MacroFieldType.Bool;
-                    }
-                    else if (prop.GetCustomAttribute<Enum8Attribute>() != null || prop.GetCustomAttribute<Enum16Attribute>() != null || prop.GetCustomAttribute<Enum32Attribute>() != null)
-                    {
-                        xmlField.Type = prop.PropertyType.GetCustomAttribute<FlagsAttribute>() != null ? MacroFieldType.Flags : MacroFieldType.Enum;
-
-                        string mappedTypeName = TypeMappings.MapType(prop.PropertyType.FullName);
-                        Type mappedType = prop.PropertyType;
-                        if (mappedTypeName != mappedType.FullName && mappedTypeName.IndexOf("System.") != 0)
-                            mappedType = GetType(mappedTypeName);
-
-
-                        foreach (object val in Enum.GetValues(mappedType))
-                        {
-                            string id = val.ToString();
-                            var xmlAttr = mappedType.GetMember(val.ToString())[0].GetCustomAttribute<XmlEnumAttribute>();
-                            if (xmlAttr != null)
-                                id = xmlAttr.Name;
-
-                            if (!AvailabilityChecker.IsAvailable(profile, val))
-                                continue;
-
-                            // TODO check value is available for usage location
-                            xmlField.Values.Add(new MacroFieldValueSpec()
-                            {
-                                Id = id,
-                                Name = val.ToString(),
-                            });
-                        }
-                    }
-                    else
-                    {
-                        SetNumericProps(profile, op.Key, xmlField, prop);
-                    }
-                }*/
             }
 
             return res;
@@ -285,8 +239,16 @@ namespace AtemServer.Controllers
                 field.Max = (int) (GetDefaultForField<uint?>(profile, cmdType, field) ?? (uint) Math.Pow(2, 8) - 1);
                 return;
             }
+            var int32 = prop.GetCustomAttribute<Int32Attribute>();
+            if (int32 != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = Int32.MinValue;
+                field.Max = Int32.MaxValue;
+                return;
+            }
 
-            throw new Exception(string.Format("Unknown field type: {0}.{1}", field.Name, prop.Name));
+            throw new Exception(string.Format("Unknown field type: {0}.{1} in {2}", field.Name, prop.Name, cmdType.Name));
         }
 
         private static T GetDefaultForField<T>(DeviceProfile profile, Type cmdType, CommandProperty field)

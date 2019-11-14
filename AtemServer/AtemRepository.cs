@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using LibAtem.DeviceProfile;
 using log4net;
 using LibAtem.Net;
 using LibAtem.Discovery;
@@ -21,6 +22,23 @@ namespace AtemServer
             return AtemDeviceExt.Id(info.Address, info.Port);
         }
     }
+
+    public class AtemClientExt
+    {
+        private readonly DeviceProfileHandler _profile;
+        
+        public AtemClientExt(AtemClient client)
+        {
+            _profile = new DeviceProfileHandler();
+            
+            Client = client;
+            Client.OnReceive += _profile.HandleCommands;
+        }
+        
+        public AtemClient Client { get; }
+
+        public DeviceProfile Profile => _profile.Profile;
+    }
     public class AtemDevice
     {
         public AtemDeviceInfo Info { get; set; }
@@ -31,7 +49,7 @@ namespace AtemServer
         
         [BsonIgnore]
         [JsonIgnore]
-        public AtemClient Client { get; set; }
+        public AtemClientExt Client { get; set; }
 
         public AtemDevice(AtemDeviceInfo info)
         {
@@ -85,10 +103,10 @@ namespace AtemServer
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClient(device.Info.Address);
+                device.Client = new AtemClientExt(new AtemClient(device.Info.Address));
                 // TODO setup listeners for stuff
             } else if (!device.Enabled && device.Client != null) {
-                device.Client.Dispose();
+                device.Client.Client.Dispose();
                 device.Client = null;
             }
         }
@@ -144,7 +162,7 @@ namespace AtemServer
             }
         }
         
-        public AtemClient GetConnection(string id)
+        public AtemClientExt GetConnection(string id)
         {
             lock (devices)
             {
