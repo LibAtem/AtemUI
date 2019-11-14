@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AtemServer.Hubs;
 
 namespace AtemServer
 {
@@ -20,7 +21,9 @@ namespace AtemServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(new AtemRepository());
+            services.AddSignalR();
+            
+            services.AddSingleton<AtemRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -57,6 +60,11 @@ namespace AtemServer
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseCors("AllowAllOrigins");
+            
+            app.UseSignalR(options =>
+            {
+                options.MapHub<DevicesHub>("/hub");
+            });
 
             app.UseMvc(routes =>
             {

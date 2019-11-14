@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using AtemServer.Hubs;
 using LibAtem.DeviceProfile;
 using log4net;
 using LibAtem.Net;
 using LibAtem.Discovery;
 using LiteDB;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 
 namespace AtemServer
@@ -70,6 +72,8 @@ namespace AtemServer
         private readonly Dictionary<string, AtemDevice> devices;
 
         private readonly AtemDiscoveryService discovery;
+        
+        private readonly IHubContext<DevicesHub> context_;
 
         static AtemRepository()
         {
@@ -81,11 +85,13 @@ namespace AtemServer
             );
         }
 
-        public AtemRepository()
+        public AtemRepository(IHubContext<DevicesHub> context)
         {
             db = new LiteDatabase(@"MyData.db");
             dbDevices = db.GetCollection<AtemDevice>("devices");
             devices = new Dictionary<string, AtemDevice>();
+
+            context_ = context;
 
             // Load up old devices
             foreach (AtemDevice device in dbDevices.FindAll())
@@ -129,6 +135,8 @@ namespace AtemServer
                     devices[id] = new AtemDevice(info);
                     Log.InfoFormat("Discovered device: {0}", info.ToString());
                 }
+
+                context_.Clients.All.SendAsync("devices", ListDevices());
             }
         }
         private void OnDeviceLost(object sender, AtemDeviceInfo info)
@@ -150,11 +158,13 @@ namespace AtemServer
                     
                     // Ensure device is in expected state
                     SetupConnection(device);
+                    
+                    context_.Clients.All.SendAsync("devices", ListDevices());
                 }
             }
         }
 
-        public List<AtemDevice> ListDevices()
+        public IReadOnlyList<AtemDevice> ListDevices()
         {
             lock (devices)
             {
@@ -170,7 +180,7 @@ namespace AtemServer
             }
         }
 
-        public bool AddDevice(string address, int port)
+        public Tuple<bool, IReadOnlyList<AtemDevice>> AddDevice(string address, int port)
         {
             var id = AtemDeviceExt.Id(address, port);
 
@@ -186,8 +196,6 @@ namespace AtemServer
                     
                     // startup connection
                     SetupConnection(device);
-                    
-                    return true;
                 } else {
                     var doc = devices[id] = new AtemDevice(new AtemDeviceInfo(id, "", DateTime.MinValue, address, port, new List<string>()))
                     {
@@ -199,18 +207,19 @@ namespace AtemServer
                     
                     // startup connection
                     SetupConnection(doc);
-                    
-                    return true;
                 }
+                
+                return Tuple.Create(true, ListDevices());
             }
         }
         
-        public bool ForgetDevice(string address, int port)
+        public Tuple<bool, IReadOnlyList<AtemDevice>> ForgetDevice(string address, int port)
         {
             var id = AtemDeviceExt.Id(address, port);
 
             lock (devices)
             {
+                var changed = false;
                 if (devices.TryGetValue(id, out AtemDevice device))
                 {
                     // shutdown the connection
@@ -218,19 +227,21 @@ namespace AtemServer
                     SetupConnection(device);
                     
                     dbDevices.Delete(id);
-                    return devices.Remove(id);
+                    changed = devices.Remove(id);
                 }
+                
+                return Tuple.Create(changed, ListDevices());
             }
 
-            return false;
         }
         
-        public bool SetDeviceEnabled(string address, int port, bool enabled)
+        public Tuple<bool, IReadOnlyList<AtemDevice>> SetDeviceEnabled(string address, int port, bool enabled)
         {
             var id = AtemDeviceExt.Id(address, port);
 
             lock (devices)
             {
+                var changed = false;
                 if (devices.TryGetValue(id, out AtemDevice device))
                 {
                     // Set state
@@ -243,10 +254,11 @@ namespace AtemServer
 
                     // Ensure connection state
                     SetupConnection(device);
-                    return true;
+                    
+                    changed = true;
                 }
 
-                return false;
+                return Tuple.Create(changed, ListDevices());
             }
         }
 

@@ -1,19 +1,16 @@
 import React from 'react'
 import { Container, Table, ButtonGroup, Button, Modal, Form, Row, Col } from 'react-bootstrap'
-import ReactPolling from 'react-polling'
 import { AtemDeviceInfo } from './types'
 import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faCheck, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons'
-import update from 'immutability-helper'
+import { DeviceManagerContext } from '../DeviceManager'
 
 interface DevicesTableProps {
+  connection: signalR.HubConnection
   devices: AtemDeviceInfo[]
 
   isDiscoveredDevices: boolean
-
-  onChangeDevice: (dev: AtemDeviceInfo, diff: Partial<Pick<AtemDeviceInfo, 'enabled' | 'remember'>>) => void
-  onForgetDevice: (dev: AtemDeviceInfo) => void
 }
 
 class DevicesTable extends React.Component<DevicesTableProps> {
@@ -86,90 +83,48 @@ class DevicesTable extends React.Component<DevicesTableProps> {
   }
 
   private onRememberDevice(dev: AtemDeviceInfo) {
-    console.log(`Devices: Adding ${dev}`)
+    console.log(`Devices: Adding`, dev)
 
-    fetch('/api/devices', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        address: dev.info.address,
-        port: dev.info.port
-      })
-    })
+    this.props.connection
+      .send('deviceAdd', dev.info.address, dev.info.port)
       .then(() => {
-        // Track it on the state
-        this.props.onChangeDevice(dev, {
-          remember: true
-        })
+        console.log('Devices: add')
       })
       .catch(e => {
         console.log('Devices: Failed to remember', e)
       })
   }
   private onEnableDevice(dev: AtemDeviceInfo) {
-    console.log(`Devices: Enabling ${dev}`)
+    console.log(`Devices: Enabling`, dev)
 
-    fetch('/api/devices/enable', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        address: dev.info.address,
-        port: dev.info.port
-      })
-    })
+    this.props.connection
+      .send('deviceEnabled', dev.info.address, dev.info.port, true)
       .then(() => {
-        // Track it on the state
-        this.props.onChangeDevice(dev, {
-          enabled: true
-        })
+        console.log('Devices: enabled')
       })
       .catch(e => {
         console.log('Devices: Failed to enable', e)
       })
   }
   private onDisableDevice(dev: AtemDeviceInfo) {
-    console.log(`Devices: Disabling ${dev}`)
+    console.log(`Devices: Disabling`, dev)
 
-    fetch('/api/devices/disable', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        address: dev.info.address,
-        port: dev.info.port
-      })
-    })
+    this.props.connection
+      .send('deviceEnabled', dev.info.address, dev.info.port, false)
       .then(() => {
-        // Track it on the state
-        this.props.onChangeDevice(dev, {
-          enabled: false
-        })
+        console.log('Devices: disabled')
       })
       .catch(e => {
         console.log('Devices: Failed to disable', e)
       })
   }
   private onForgetDevice(dev: AtemDeviceInfo) {
-    console.log(`Devices: Forgetting ${dev}`)
+    console.log(`Devices: Forgetting`, dev)
 
-    fetch('/api/devices', {
-      method: 'DELETE',
-      headers: {
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        address: dev.info.address,
-        port: dev.info.port
-      })
-    })
+    this.props.connection
+      .send('deviceForget', dev.info.address, dev.info.port)
       .then(() => {
-        // Track it on the state
-        this.props.onForgetDevice(dev)
+        console.log('Devices: forget')
       })
       .catch(e => {
         console.log('Devices: Failed to forget', e)
@@ -178,7 +133,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
 }
 
 interface DevicesState {
-  devices: AtemDeviceInfo[]
+  // devices: AtemDeviceInfo[]
 
   showAddModal: boolean
   addAddress: string
@@ -186,11 +141,15 @@ interface DevicesState {
 }
 
 export class DevicesPage extends React.Component<{}, DevicesState> {
+  // declare context: React.ContextType<typeof DeviceManagerContext>
+  context!: React.ContextType<typeof DeviceManagerContext>
+  static contextType = DeviceManagerContext
+
   constructor(props: {}) {
     super(props)
 
     this.state = {
-      devices: [],
+      // devices: [],
       showAddModal: false,
       addAddress: '',
       addPort: 9910
@@ -198,52 +157,38 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
   }
 
   render() {
+    const { devices, signalR } = this.context
+
+    const discoveredDevices = devices.filter(d => !d.remember)
+    const mainDevices = devices.filter(d => d.remember)
+
+    if (!signalR) {
+      return (
+        <Container>
+          <h2>Devices</h2>
+
+          <p>Not connected</p>
+        </Container>
+      )
+    }
+
     return (
       <Container>
         <h2>Devices</h2>
 
-        <ReactPolling
-          url={'/api/devices'}
-          method={'GET'}
-          interval={1000}
-          onSuccess={data => {
-            this.setState({ devices: data })
-            return true
-          }}
-          render={({ isPolling }) => {
-            if (isPolling) {
-              const discoveredDevices = this.state.devices.filter(d => !d.remember)
-              const mainDevices = this.state.devices.filter(d => d.remember)
-              return (
-                <div>
-                  <h2>Main devices</h2>
-                  <DevicesTable
-                    devices={mainDevices}
-                    isDiscoveredDevices={false}
-                    onChangeDevice={this.onChangeDevice}
-                    onForgetDevice={this.onForgetDevice}
-                  />
+        <div>
+          <h2>Main devices</h2>
+          <DevicesTable connection={signalR} devices={mainDevices} isDiscoveredDevices={false} />
 
-                  <h2>Discovered devices</h2>
-                  <DevicesTable
-                    devices={discoveredDevices}
-                    isDiscoveredDevices={true}
-                    onChangeDevice={this.onChangeDevice}
-                    onForgetDevice={this.onForgetDevice}
-                  />
+          <h2>Discovered devices</h2>
+          <DevicesTable connection={signalR} devices={discoveredDevices} isDiscoveredDevices={true} />
 
-                  {this.renderAddModal()}
-                </div>
-              )
-            } else {
-              return <div>Device polling stopped...</div>
-            }
-          }}
-        />
+          {this.renderAddModal(signalR)}
+        </div>
       </Container>
     )
   }
-  private renderAddModal() {
+  private renderAddModal(connection: signalR.HubConnection) {
     const handleClose = () => this.setState({ showAddModal: false })
     const handleShow = () => this.setState({ showAddModal: true })
 
@@ -267,36 +212,10 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
           return
         }
 
-        fetch('/api/devices', {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            address,
-            port
-          })
-        })
+        connection
+          .send('deviceAdd', address, port)
           .then(() => {
-            // Track it on the state
-            this.setState({
-              devices: update(this.state.devices, {
-                $push: [
-                  {
-                    info: {
-                      name: `${address}:${port}`,
-                      deviceId: `${address}:${port}`,
-                      lastSeen: '',
-                      address: address,
-                      port: port,
-                      strings: []
-                    },
-                    remember: true,
-                    enabled: true
-                  }
-                ]
-              })
-            })
+            console.log('Devices: added')
           })
           .catch(e => {
             console.log('Devices: Failed to add', e)
@@ -348,29 +267,5 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
         </Modal>
       </div>
     )
-  }
-
-  private matchDeviceId(dev1: AtemDeviceInfo, dev2: AtemDeviceInfo) {
-    return dev1.info.address !== dev2.info.address && dev1.info.port !== dev2.info.port
-  }
-
-  private onChangeDevice(dev: AtemDeviceInfo, diff: Partial<AtemDeviceInfo>) {
-    this.setState({
-      devices: this.state.devices.map(d => {
-        if (this.matchDeviceId(d, dev)) {
-          return {
-            ...d,
-            ...dev
-          }
-        } else {
-          return d
-        }
-      })
-    })
-  }
-  private onForgetDevice(dev: AtemDeviceInfo) {
-    this.setState({
-      devices: this.state.devices.filter(d => this.matchDeviceId(d, dev))
-    })
   }
 }
