@@ -11,18 +11,25 @@ import { DeviceManagerContext, DeviceContext } from './DeviceManager'
 import * as signalR from '@aspnet/signalr'
 import { AtemDeviceInfo } from './Devices/types'
 
-export default class App extends React.Component<{}, DeviceContext> {
+interface AppState extends DeviceContext {
+  connected: boolean
+  hasConnected: boolean
+}
+
+export default class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props)
 
     this.state = {
       signalR: undefined,
-      devices: []
+      devices: [],
+
+      connected: false,
+      hasConnected: false
     }
   }
 
   componentDidMount() {
-    console.log('lets get socket stuff running')
     const connection = new signalR.HubConnectionBuilder().withUrl('/hub').build()
 
     connection.on('messageReceived', (username: string, message: string) => {
@@ -34,16 +41,40 @@ export default class App extends React.Component<{}, DeviceContext> {
       this.setState({ devices })
     })
 
-    connection.start().catch(err => console.error(err))
-    ;(window as any).conn2 = connection
+    connection.onclose(err => {
+      if (err) {
+        console.log('SignalR connection error:', err)
+      }
+
+      this.setState({
+        connected: false
+      })
+    })
     this.setState({
       signalR: connection
     })
+    ;(window as any).conn2 = connection
+
+    connection
+      .start()
+      .then(() => {
+        console.log('SignalR connected')
+        this.setState({
+          connected: true,
+          hasConnected: true
+        })
+      })
+      .catch(err => console.error('Connection failed', err))
   }
 
   render() {
+    const { hasConnected, connected } = this.state
     return (
       <DeviceManagerContext.Provider value={this.state}>
+        <div id="not-connected-overlay" style={{ display: connected ? 'none' : 'block' }}>
+          <img src="/loading.svg" alt="connecting spinner" />
+          <p>Connecting...</p>
+        </div>
         <Router>
           <div>
             <Navbar bg="dark" variant="dark">
@@ -67,17 +98,21 @@ export default class App extends React.Component<{}, DeviceContext> {
               </Form>
             </Navbar>
 
-            <Switch>
-              <Route exact path="/">
-                <Home />
-              </Route>
-              <Route path="/commands">
-                <ManualCommandsPage />
-              </Route>
-              <Route path="/devices">
-                <DevicesPage />
-              </Route>
-            </Switch>
+            {hasConnected ? (
+              <Switch>
+                <Route exact path="/">
+                  <Home />
+                </Route>
+                <Route path="/commands">
+                  <ManualCommandsPage />
+                </Route>
+                <Route path="/devices">
+                  <DevicesPage />
+                </Route>
+              </Switch>
+            ) : (
+              ''
+            )}
           </div>
         </Router>
       </DeviceManagerContext.Provider>
