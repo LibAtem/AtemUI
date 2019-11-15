@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using AtemServer.Hubs;
+using LibAtem;
 using LibAtem.DeviceProfile;
 using log4net;
 using LibAtem.Net;
@@ -35,9 +36,14 @@ namespace AtemServer
             
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
+            Client.OnConnection += sender => { Connected = true; };
+            Client.OnDisconnect += sender => { Connected = false; };
         }
         
         public AtemClient Client { get; }
+        
+        public bool Connected { get; private set; }
+        public string Version => Client?.ConnectionVersion?.ToVersionString();
 
         public DeviceProfile Profile => _profile.Profile;
     }
@@ -52,6 +58,9 @@ namespace AtemServer
         [BsonIgnore]
         [JsonIgnore]
         public AtemClientExt Client { get; set; }
+
+        public bool Connected => Client?.Connected ?? false;
+        public string Version => Client?.Version;
 
         public AtemDevice(AtemDeviceInfo info)
         {
@@ -109,8 +118,10 @@ namespace AtemServer
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClientExt(new AtemClient(device.Info.Address));
+                device.Client = new AtemClientExt(new AtemClient(device.Info.Address, false));
                 // TODO setup listeners for stuff
+                
+                device.Client.Client.Connect();
             } else if (!device.Enabled && device.Client != null) {
                 device.Client.Client.Dispose();
                 device.Client = null;

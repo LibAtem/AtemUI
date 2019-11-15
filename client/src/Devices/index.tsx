@@ -15,6 +15,19 @@ interface DevicesTableProps {
 
 class DevicesTable extends React.Component<DevicesTableProps> {
   render() {
+    const getStatusString = (dev: AtemDeviceInfo) => {
+      if (!dev.enabled) {
+        return ''
+      } else {
+        let str = dev.connected ? 'Connected' : 'Disconnected'
+
+        if (dev.version) {
+          str += ` - ${dev.version}`
+        }
+
+        return str
+      }
+    }
     /*
         Perhaps the tables should include some stuff like protocol versions?
     */
@@ -24,6 +37,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
           <tr>
             <td>Name</td>
             <td>Address</td>
+            <td>Status</td>
             <td>Last Seen</td>
             <td></td>
           </tr>
@@ -35,6 +49,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
               <td>
                 {dev.info.address}:{dev.info.port}
               </td>
+              <td>{getStatusString(dev)}</td>
               <td>{moment(dev.info.lastSeen).format('HH:mm:ss DD-MM-YYYY')}</td>
               <td>{this.renderButtons(dev)}</td>
             </tr>

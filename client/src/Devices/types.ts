@@ -10,4 +10,7 @@ export interface AtemDeviceInfo {
   }
   enabled: boolean
   remember: boolean
+
+  connected: boolean
+  version?: string
 }
