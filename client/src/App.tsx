@@ -8,18 +8,31 @@ import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
 import { ManualCommandsPage } from './ManualCommands'
 import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManager'
-import * as signalR from '@aspnet/signalr'
+import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
+enum ConnectionStatus {
+  Disconnected,
+  Connected,
+  Reconnecting
+}
+
 interface AppState extends DeviceContext {
-  connected: boolean
-  hasConnected: boolean
+  connected: ConnectionStatus
+  // hasConnected: boolean
 }
 
 function isDeviceAvailable(dev: AtemDeviceInfo) {
   return dev.remember && dev.enabled
+}
+
+class SignalRRetryPolicy implements signalR.IRetryPolicy {
+  nextRetryDelayInMilliseconds(retryContext: signalR.RetryContext): number {
+    // Swift retries. This assumes it will be used on a local network
+    return Math.min(1000 + retryContext.previousRetryCount * 1000, 10)
+  }
 }
 
 export default class App extends React.Component<{}, AppState> {
@@ -31,13 +44,17 @@ export default class App extends React.Component<{}, AppState> {
       devices: [],
       activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
 
-      connected: false,
-      hasConnected: false
+      connected: ConnectionStatus.Disconnected
+      // hasConnected: false
     }
   }
 
   componentDidMount() {
-    const connection = new signalR.HubConnectionBuilder().withUrl('/hub').build()
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl('/hub')
+      .configureLogging(signalR.LogLevel.Information)
+      .withAutomaticReconnect(new SignalRRetryPolicy())
+      .build()
 
     connection.on('messageReceived', (username: string, message: string) => {
       console.log(username, message)
@@ -58,13 +75,27 @@ export default class App extends React.Component<{}, AppState> {
       this.setState(mutation as any)
     })
 
+    connection.onreconnecting(err => {
+      if (err) {
+        console.log('SignalR connection error:', err)
+      }
+
+      this.setState({
+        connected: ConnectionStatus.Reconnecting
+      })
+    })
+    connection.onreconnected(() => {
+      this.setState({
+        connected: ConnectionStatus.Connected
+      })
+    })
     connection.onclose(err => {
       if (err) {
         console.log('SignalR connection error:', err)
       }
 
       this.setState({
-        connected: false
+        connected: ConnectionStatus.Disconnected
       })
     })
     this.setState({
@@ -77,8 +108,8 @@ export default class App extends React.Component<{}, AppState> {
       .then(() => {
         console.log('SignalR connected')
         this.setState({
-          connected: true,
-          hasConnected: true
+          connected: ConnectionStatus.Connected
+          // hasConnected: true
         })
       })
       .catch(err => console.error('Connection failed', err))
@@ -114,10 +145,13 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const { hasConnected, connected } = this.state
+    const { connected } = this.state
     return (
       <DeviceManagerContext.Provider value={this.state}>
-        <div id="not-connected-overlay" style={{ display: connected ? 'none' : 'block' }}>
+        <div
+          id="not-connected-overlay"
+          style={{ display: connected === ConnectionStatus.Connected ? 'none' : 'block' }}
+        >
           <img src="/loading.svg" alt="connecting spinner" />
           <p>Connecting...</p>
         </div>
@@ -147,7 +181,7 @@ export default class App extends React.Component<{}, AppState> {
               </Form>
             </Navbar>
 
-            {hasConnected ? (
+            {connected !== ConnectionStatus.Disconnected ? (
               <Switch>
                 <Route exact path="/">
                   <Home />

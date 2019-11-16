@@ -101,7 +101,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
     console.log(`Devices: Adding`, dev)
 
     this.props.connection
-      .send('deviceAdd', dev.info.address, dev.info.port)
+      .invoke('deviceAdd', dev.info.address, dev.info.port)
       .then(() => {
         console.log('Devices: add')
       })
@@ -113,7 +113,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
     console.log(`Devices: Enabling`, dev)
 
     this.props.connection
-      .send('deviceEnabled', dev.info.address, dev.info.port, true)
+      .invoke('deviceEnabled', dev.info.address, dev.info.port, true)
       .then(() => {
         console.log('Devices: enabled')
       })
@@ -125,7 +125,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
     console.log(`Devices: Disabling`, dev)
 
     this.props.connection
-      .send('deviceEnabled', dev.info.address, dev.info.port, false)
+      .invoke('deviceEnabled', dev.info.address, dev.info.port, false)
       .then(() => {
         console.log('Devices: disabled')
       })
@@ -137,7 +137,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
     console.log(`Devices: Forgetting`, dev)
 
     this.props.connection
-      .send('deviceForget', dev.info.address, dev.info.port)
+      .invoke('deviceForget', dev.info.address, dev.info.port)
       .then(() => {
         console.log('Devices: forget')
       })
@@ -228,7 +228,7 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
         }
 
         connection
-          .send('deviceAdd', address, port)
+          .invoke('deviceAdd', address, port)
           .then(() => {
             console.log('Devices: added')
           })
