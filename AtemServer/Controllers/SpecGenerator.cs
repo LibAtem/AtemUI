@@ -195,6 +195,15 @@ namespace AtemServer.Controllers
                 return;
             }
 
+            var uint16d = prop.GetCustomAttribute<UInt16DAttribute>();
+            if (uint16d != null)
+            {
+                field.Type = CommandPropertyType.Double;
+                field.Min = (int) uint16d.ScaledMin;
+                field.Max = (int) uint16d.ScaledMax;
+                field.Scale = uint16d.Scale;
+                return;
+            }
             var int16d = prop.GetCustomAttribute<Int16DAttribute>();
             if (int16d != null)
             {

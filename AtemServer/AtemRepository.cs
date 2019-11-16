@@ -8,6 +8,8 @@ using LibAtem.DeviceProfile;
 using log4net;
 using LibAtem.Net;
 using LibAtem.Discovery;
+using LibAtem.State;
+using LibAtem.State.Builder;
 using LiteDB;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -29,15 +31,55 @@ namespace AtemServer
     public class AtemClientExt
     {
         private readonly DeviceProfileHandler _profile;
+
+        private readonly AtemState _state;
         
         public AtemClientExt(AtemClient client)
         {
             _profile = new DeviceProfileHandler();
+            _state = new AtemState();
             
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
             Client.OnConnection += sender => { Connected = true; };
             Client.OnDisconnect += sender => { Connected = false; };
+
+            Client.OnReceive += (sender, commands) =>
+            {
+                var changedPaths = new List<string>();
+                var errors = new List<string>();
+                lock (_state)
+                {
+                    foreach (var command in commands)
+                    {
+                        var res = AtemStateBuilder.Update(_state, command);
+                        changedPaths.AddRange(res.ChangedPaths);
+
+                        if (!res.Success)
+                        {
+                            if (res.Errors.Count > 0)
+                            {
+                                errors.AddRange(res.Errors);
+                            }
+                            else
+                            {
+                                errors.Add($"Failed to update state for {command.GetType().Name}");
+                            }
+                        }
+                        
+                    }
+                }
+                
+                // TODO
+            };
+        }
+
+        public AtemState GetState()
+        {
+            lock (_state)
+            {
+                return _state.Clone();
+            }
         }
         
         public AtemClient Client { get; }

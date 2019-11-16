@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LibAtem\LibAtem.DeviceProfile\LibAtem.DeviceProfile.csproj" />
     <ProjectReference Include="..\LibAtem\LibAtem.Discovery\LibAtem.Discovery.csproj" />
+    <ProjectReference Include="..\LibAtem\LibAtem.State\LibAtem.State.csproj" />
     <ProjectReference Include="..\LibAtem\LibAtem\LibAtem.csproj" />
   </ItemGroup>
 

@@ -4,3 +4,7 @@ export function prettyDecimal(value: number) {
     .replace(new RegExp('[0]+$'), '')
     .replace(new RegExp('[.]+$'), '')
 }
+
+export function literal<T>(o: T): T {
+  return o
+}

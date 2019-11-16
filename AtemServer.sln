@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem.Discovery", "LibAte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem.DeviceProfile", "LibAtem\LibAtem.DeviceProfile\LibAtem.DeviceProfile.csproj", "{B019D4D1-F598-47F5-80E6-6141CCED33E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem.State", "LibAtem\LibAtem.State\LibAtem.State.csproj", "{78576036-46E4-4920-8A92-E923F2610B81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,5 +88,17 @@ Global
 		{B019D4D1-F598-47F5-80E6-6141CCED33E6}.Release|x64.Build.0 = Release|Any CPU
 		{B019D4D1-F598-47F5-80E6-6141CCED33E6}.Release|x86.ActiveCfg = Release|Any CPU
 		{B019D4D1-F598-47F5-80E6-6141CCED33E6}.Release|x86.Build.0 = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|x64.Build.0 = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Debug|x86.Build.0 = Debug|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|x64.ActiveCfg = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|x64.Build.0 = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|x86.ActiveCfg = Release|Any CPU
+		{78576036-46E4-4920-8A92-E923F2610B81}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

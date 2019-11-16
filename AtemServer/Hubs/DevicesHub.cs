@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using LibAtem.Commands;
+using LibAtem.State;
 using Newtonsoft.Json;
 
 namespace AtemServer.Hubs
@@ -81,7 +82,7 @@ namespace AtemServer.Hubs
             return typesMap.TryGetValue(fullName, out Type value) ? value : null;
         }
         
-        public async Task commandSend(string deviceId, string commandName, string propertiesStr)
+        public async Task CommandSend(string deviceId, string commandName, string propertiesStr)
         {
             Console.WriteLine("Attempting to send {0} to {1} ({2})", commandName, deviceId, propertiesStr);
             // TODO
@@ -104,6 +105,17 @@ namespace AtemServer.Hubs
             
             client.Client.SendCommand(cmd);
 
+        }
+
+        public Task<AtemState> StateGet(string deviceId)
+        {
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            return Task.FromResult(client.GetState());
         }
         
         public async Task NewMessage(long username, string message)

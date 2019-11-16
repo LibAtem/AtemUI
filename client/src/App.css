@@ -18,3 +18,56 @@ div#not-connected-overlay p {
     color: #ddd;
     font-size: 2em;
 }
+
+/** Tree view **/
+.toggle-icon {
+    display: inline-block;
+}
+
+.toggle-icon-symbol {
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    line-height: 2rem;
+}
+
+.tree-item-group {
+    list-style-type: none;
+    padding-left: 0;
+    border-top: 1px solid #ccc;
+    text-align: left;
+    /* width: 100vw; */
+}
+
+.tree-item {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    color: #333;
+    background: none;
+    border-bottom: 1px solid #ccc;
+    box-shadow: none;
+    z-index: unset;
+    position: relative;
+}
+
+.tree-item--active {
+    color: white;
+    background: #179ed3;
+    border-bottom: none;
+}
+
+.tree-item--focused {
+    box-shadow: 0 0 5px 0 #222;
+    z-index: 999;
+}
+
+.search {
+    padding: 1rem 1.5rem;
+    border: none;
+    width: 100%;
+}
+
+.compact-tree .tree-item {
+    padding-top: 0;
+    padding-bottom: 0;
+}

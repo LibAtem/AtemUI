@@ -2,7 +2,7 @@ import React from 'react'
 import { Container, Form, Col, Row, FormControl, FormControlProps, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from '../Commands'
+import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from './types'
 import Select from 'react-select'
 import update from 'immutability-helper'
 import ToggleSwitch from 'bootstrap-switch-button-react'
@@ -20,7 +20,11 @@ export class ManualCommandsPage extends React.Component {
         <h2>Manual Commands</h2>
 
         {device ? (
-          <ManualCommandsPage2 key={this.context.activeDeviceId || ''} device={device} signalR={this.context.signalR} />
+          <ManualCommandsPageInner
+            key={this.context.activeDeviceId || ''}
+            device={device}
+            signalR={this.context.signalR}
+          />
         ) : (
           <p>No device selected</p>
         )}
@@ -29,19 +33,19 @@ export class ManualCommandsPage extends React.Component {
   }
 }
 
-interface CommandsProps2 {
+interface ManualCommandsPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
 }
-interface CommandsState2 {
+interface ManualCommandsPageInnerState {
   hasConnected: boolean
   commandsSpec: CommandSpecSet['commands'] | null
 
   selectedCommand: { label: string; value: string } | null
 }
 
-class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2> {
-  constructor(props: CommandsProps2) {
+class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerProps, ManualCommandsPageInnerState> {
+  constructor(props: ManualCommandsPageInnerProps) {
     super(props)
 
     this.state = {
@@ -55,8 +59,7 @@ class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2
     }
   }
 
-  loadCommandsSpec(props: CommandsProps2) {
-    // TODO
+  loadCommandsSpec(props: ManualCommandsPageInnerProps) {
     fetch(`/api/spec/${GetDeviceId(props.device)}`)
       .then(res => res.json())
       .then((data: CommandSpecSet) => {
@@ -73,8 +76,8 @@ class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2
       })
   }
 
-  componentDidUpdate(prevProps: CommandsProps2, prevState: CommandsState2) {
-    // Should we reload the commandsSpec
+  componentDidUpdate(prevProps: ManualCommandsPageInnerProps) {
+    // Should we reload the commandsSpec?
     if (
       prevProps.device.version !== this.props.device.version || // Firmware is now different
       (!this.state.hasConnected && this.props.device.connected) // Device first connection
@@ -84,7 +87,7 @@ class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2
         commandsSpec: null,
         hasConnected: true
       })
-      // now reload
+      // now reload it
       this.loadCommandsSpec(this.props)
     }
   }

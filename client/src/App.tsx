@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-rangeslider/lib/index.css'
+// import 'react-simple-tree-menu/dist/main.css'
 
 import React, { FormEvent } from 'react'
 import './App.css'
@@ -11,6 +12,7 @@ import { ManualCommandsPage } from './ManualCommands'
 import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManager'
 import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
+import { StateViewerPage } from './State'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
@@ -192,6 +194,9 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
                 <Route path="/devices">
                   <DevicesPage />
+                </Route>
+                <Route path="/state">
+                  <StateViewerPage />
                 </Route>
               </Switch>
             ) : (
