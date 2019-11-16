@@ -1,10 +1,13 @@
-import React, { FormEvent } from 'react'
+import React from 'react'
 import { Container, Form, Col, Row, FormControl, FormControlProps, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from '../Commands'
 import Select from 'react-select'
 import update from 'immutability-helper'
+import ToggleSwitch from 'bootstrap-switch-button-react'
+import Slider from 'react-rangeslider'
+import { prettyDecimal } from '../util'
 
 export class ManualCommandsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -141,11 +144,17 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
 
     if (props.spec) {
       props.spec.properties.forEach(prop => {
-        //
         switch (prop.type) {
           case CommandPropertyType.Enum:
             const first = prop.options && prop.options[0] ? prop.options[0].id : undefined
             defaultValues[prop.name] = first || 0
+            break
+          case CommandPropertyType.Bool:
+            defaultValues[prop.name] = false
+            break
+          case CommandPropertyType.Int:
+          case CommandPropertyType.Double:
+            defaultValues[prop.name] = prop.min || 0
             break
           default:
             console.log('todo')
@@ -217,8 +226,15 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
 
   private renderProperty(spec: CommandProperty, change: (propName: string, value: any) => void, value: any) {
     switch (spec.type) {
+      case CommandPropertyType.Flags:
+        return <CommandBuilderFlagsProperty spec={spec} change={change} value={value as number} />
       case CommandPropertyType.Enum:
         return <CommandBuilderEnumProperty spec={spec} change={change} value={value as number} />
+      case CommandPropertyType.Bool:
+        return <CommandBuilderBoolProperty spec={spec} change={change} value={value as boolean} />
+      case CommandPropertyType.Int:
+      case CommandPropertyType.Double:
+        return <CommandBuilderSliderProperty spec={spec} change={change} value={value as number} />
       default:
         return <p>Unknown type</p>
     }
@@ -238,12 +254,15 @@ class CommandBuilderEnumProperty extends React.Component<CommandBuilderPropertyP
       return <p>Invalid property</p>
     }
 
-    const onChange = (e: FormEvent<FormControl & FormControlProps>) => {
-      this.props.change(spec.name, parseInt(e.currentTarget.value || '', 10))
-    }
-
     return (
-      <Form.Control as="select" placeholder={spec.name} value={this.props.value + ''} onChange={onChange}>
+      <Form.Control
+        as="select"
+        placeholder={spec.name}
+        value={this.props.value + ''}
+        onChange={e => {
+          this.props.change(spec.name, parseInt(e.currentTarget.value || '', 10))
+        }}
+      >
         {spec.options.map((v, i) => (
           <option key={i} value={v.id}>
             {v.name}
@@ -251,5 +270,114 @@ class CommandBuilderEnumProperty extends React.Component<CommandBuilderPropertyP
         ))}
       </Form.Control>
     )
+  }
+}
+class CommandBuilderBoolProperty extends React.Component<CommandBuilderPropertyProps<boolean>> {
+  render() {
+    return (
+      <ToggleSwitch
+        checked={this.props.value}
+        onlabel=" "
+        onstyle="success"
+        offlabel=" "
+        onChange={(checked: boolean) => {
+          this.props.change(this.props.spec.name, checked)
+        }}
+      />
+    )
+  }
+}
+class CommandBuilderFlagsProperty extends React.Component<CommandBuilderPropertyProps<number>> {
+  render() {
+    const { spec } = this.props
+    if (!spec.options) {
+      return <p>Invalid property</p>
+    }
+
+    return spec.options
+      .filter(v => v.id !== 0)
+      .map(v => {
+        return (
+          <div key={v.id}>
+            <span>{v.name}: </span>
+            <ToggleSwitch
+              checked={(this.props.value & v.id) !== 0}
+              onlabel=" "
+              onstyle="success"
+              offlabel=" "
+              onChange={(checked: boolean) => {
+                const newValue = checked ? this.props.value | v.id : this.props.value ^ v.id
+                this.props.change(this.props.spec.name, newValue)
+              }}
+            />
+          </div>
+        )
+      })
+  }
+}
+class CommandBuilderSliderProperty extends React.Component<CommandBuilderPropertyProps<number>> {
+  render() {
+    const { spec } = this.props
+    if (spec.min === undefined || spec.max === undefined) {
+      return <p>Invalid property</p>
+    }
+    if (spec.type === CommandPropertyType.Double && spec.scale === undefined) {
+      return <p>Invalid property</p>
+    }
+
+    let min = spec.min
+    let max = spec.max
+    let value = this.props.value
+    const scale = spec.scale
+    let step = 1
+
+    if (scale) {
+      min /= scale
+      max /= scale
+      value /= scale
+      step /= scale
+    }
+
+    console.log(min, max, value, scale, step)
+
+    const horizontalLabels: any = {}
+    horizontalLabels[min] = min
+    horizontalLabels[0] = 0
+    horizontalLabels[max] = max
+
+    const change = (val: number) => {
+      if (val < min) val = min
+      if (val > max) val = max
+      if (scale) val *= scale
+      this.props.change(spec.name, val)
+      //   const updDat = { data: {} }
+      //   updDat.data[spec.$.id] = { $set: val }
+      //   this.setState(update(this.state, updDat))
+    }
+
+    return [
+      <Slider
+        key={0}
+        min={min}
+        max={max}
+        step={step}
+        labels={horizontalLabels}
+        onChange={change}
+        value={value}
+        format={prettyDecimal}
+      />,
+      <br key={1} />,
+      <Form.Control
+        key={2}
+        type="number"
+        placeholder={spec.name}
+        min={min}
+        max={max}
+        value={prettyDecimal(value)}
+        onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+          change(parseInt(e.currentTarget.value || '', 10))
+        }}
+      />
+    ]
   }
 }

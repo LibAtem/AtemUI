@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'react-rangeslider/lib/index.css'
 
 import React, { FormEvent } from 'react'
 import './App.css'
