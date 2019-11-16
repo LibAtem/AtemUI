@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react'
-import { Container, Form, Col, Row, FormControl, FormControlProps } from 'react-bootstrap'
+import { Container, Form, Col, Row, FormControl, FormControlProps, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from '../Commands'
@@ -17,7 +17,7 @@ export class ManualCommandsPage extends React.Component {
         <h2>Manual Commands</h2>
 
         {device ? (
-          <ManualCommandsPage2 key={this.context.activeDeviceId || ''} device={device} />
+          <ManualCommandsPage2 key={this.context.activeDeviceId || ''} device={device} signalR={this.context.signalR} />
         ) : (
           <p>No device selected</p>
         )}
@@ -28,6 +28,7 @@ export class ManualCommandsPage extends React.Component {
 
 interface CommandsProps2 {
   device: AtemDeviceInfo
+  signalR: signalR.HubConnection | undefined
 }
 interface CommandsState2 {
   hasConnected: boolean
@@ -86,7 +87,7 @@ class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2
   }
 
   render() {
-    const { device } = this.props
+    const { device, signalR } = this.props
     const { hasConnected, commandsSpec, selectedCommand } = this.state
 
     if (!hasConnected) {
@@ -104,21 +105,27 @@ class ManualCommandsPage2 extends React.Component<CommandsProps2, CommandsState2
 
     return (
       <div>
-        <p>Device: {JSON.stringify(device)}</p>
-
         <Select
           value={selectedCommand}
           onChange={v => this.setState({ selectedCommand: v as any })}
           options={options}
         />
 
-        <CommandBuilder key={selectedCommand ? selectedCommand.value : ''} spec={selectedCommandSpec} />
+        <CommandBuilder
+          key={selectedCommand ? selectedCommand.value : ''}
+          device={device}
+          signalR={signalR}
+          spec={selectedCommandSpec}
+        />
       </div>
     )
   }
 }
 
 interface CommandBuilderProps {
+  device: AtemDeviceInfo
+  signalR: signalR.HubConnection | undefined
+
   spec: CommandSpec | undefined
 }
 interface CommandBuilderState {
@@ -179,9 +186,33 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
               </Form.Group>
             )
           })}
+
+          <Button
+            variant="primary"
+            onClick={() => this.sendCommand()}
+            disabled={!this.props.device.connected || !this.props.signalR || !spec}
+          >
+            Send
+          </Button>
         </Form>
       </div>
     )
+  }
+
+  private sendCommand() {
+    const { device, signalR, spec } = this.props
+    if (device.connected && signalR && spec) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('CommandSend', devId, spec.fullName, JSON.stringify(this.state.values))
+        .then(() => {
+          console.log('ManualCommands: sent')
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
+    }
   }
 
   private renderProperty(spec: CommandProperty, change: (propName: string, value: any) => void, value: any) {
@@ -201,13 +232,6 @@ interface CommandBuilderPropertyProps<T> {
   change: (propName: string, value: T) => void
 }
 class CommandBuilderEnumProperty extends React.Component<CommandBuilderPropertyProps<number>> {
-  // componentDidMount() {
-  //   const { value, spec, change } = this.props
-  //   if (value === undefined && spec.options && spec.options.length > 0) {
-  //     // Set a default value
-  //     change(spec.name, spec.options[0].id)
-  //   }
-  // }
   render() {
     const { spec } = this.props
     if (!spec.options) {

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using LibAtem.Commands;
+using Newtonsoft.Json;
 
 namespace AtemServer.Hubs
 {
@@ -57,6 +59,52 @@ namespace AtemServer.Hubs
             return SendMutateResponse(repo_.SetDeviceEnabled(address, port, enabled), "Enabled");
         }
         #endregion Devices
+
+        private static IReadOnlyDictionary<string, Type> typesMap;
+
+        private static Type TranslateToType(string fullName)
+        {
+            if (typesMap == null)
+            {
+                var newTypesMap = new Dictionary<string, Type>();
+                foreach (var commandSet in CommandManager.GetAllTypes())
+                {
+                    foreach (var (_, cmd) in commandSet.Value)
+                    {
+                        newTypesMap[cmd.FullName] = cmd;
+                    }
+                }
+
+                typesMap = newTypesMap;
+            }
+
+            return typesMap.TryGetValue(fullName, out Type value) ? value : null;
+        }
+        
+        public async Task commandSend(string deviceId, string commandName, string propertiesStr)
+        {
+            Console.WriteLine("Attempting to send {0} to {1} ({2})", commandName, deviceId, propertiesStr);
+            // TODO
+            //return SendMutateResponse(repo_.AddDevice(address, port), "Add");
+            Type type = TranslateToType(commandName);
+            if (type == null)
+            {
+                throw new Exception("Bad type");
+            }
+
+            ICommand cmd = (ICommand)JsonConvert.DeserializeObject(propertiesStr, type);
+            Console.WriteLine("Got obj {0}", cmd);
+
+            // Now try to send this command
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+            
+            client.Client.SendCommand(cmd);
+
+        }
         
         public async Task NewMessage(long username, string message)
         {
