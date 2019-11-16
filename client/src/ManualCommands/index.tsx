@@ -338,8 +338,6 @@ class CommandBuilderSliderProperty extends React.Component<CommandBuilderPropert
       step /= scale
     }
 
-    console.log(min, max, value, scale, step)
-
     const horizontalLabels: any = {}
     horizontalLabels[min] = min
     horizontalLabels[0] = 0
