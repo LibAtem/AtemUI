@@ -114,7 +114,7 @@ namespace AtemServer.Hubs
             {
                 throw new Exception("Bad deviceId");
             }
-
+            
             return Task.FromResult(client.GetState());
         }
         

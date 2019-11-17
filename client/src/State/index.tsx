@@ -14,7 +14,7 @@ export class StateViewerPage extends React.Component {
     const device = GetActiveDevice(this.context)
     return (
       <Container>
-        <h2>Manual Commands</h2>
+        <h2>Device State</h2>
 
         {device ? (
           <StateViewerPageInner
@@ -100,8 +100,6 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
 
     return (
       <div>
-        {JSON.stringify(state, undefined, 4)}
-
         <TreeMenu
           data={transformStateToTree(state, [])}
           onClickItem={() => {}}
