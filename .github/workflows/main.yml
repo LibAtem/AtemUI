@@ -2,6 +2,9 @@ name: .NET Core
 
 on: [push]
 
+env:
+  IMAGE_NAME: atemserver
+
 jobs:
   build-win10:
     runs-on: ubuntu-latest
@@ -70,3 +73,51 @@ jobs:
       with:
         name: AtemServer-linux
         path: AtemServer/dist
+
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: client/node_modules
+        key: ${{ runner.OS }}-docker-${{ hashFiles('**/client/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.OS }}-docker-
+          ${{ runner.OS }}-
+
+    - name: Build with dotnet
+      run: |
+        cd AtemServer
+        dotnet publish -o "$(pwd)/dist" -c Release
+    - name: Build Docker Image
+      run: |
+        docker build -t atemserver-image .
+    - name: Log into registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+    - name: Push image
+      run: |
+        REPOSITORY=$(echo "${{ github.repository }}" | awk '{print tolower($0)}')
+        IMAGE_ID=docker.pkg.github.com/$REPOSITORY/$IMAGE_NAME
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "master" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag atemserver-image $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
