@@ -56,7 +56,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
           ))}
           {this.props.devices.length === 0 ? (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
+              <td colSpan={5} style={{ textAlign: 'center' }}>
                 No devices
               </td>
             </tr>
