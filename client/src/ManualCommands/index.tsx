@@ -215,7 +215,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
     const { device, signalR, spec } = this.props
     if (device.connected && signalR && spec) {
       const devId = GetDeviceId(device)
-
+      console.log(this.state.values)
       signalR
         .invoke('CommandSend', devId, spec.fullName, JSON.stringify(this.state.values))
         .then(() => {

@@ -84,6 +84,7 @@ namespace AtemServer.Hubs
         
         public async Task CommandSend(string deviceId, string commandName, string propertiesStr)
         {
+
             Console.WriteLine("Attempting to send {0} to {1} ({2})", commandName, deviceId, propertiesStr);
             // TODO
             //return SendMutateResponse(repo_.AddDevice(address, port), "Add");
@@ -104,7 +105,6 @@ namespace AtemServer.Hubs
             }
             
             client.Client.SendCommand(cmd);
-
         }
 
         public Task<AtemState> StateGet(string deviceId)
@@ -114,13 +114,28 @@ namespace AtemServer.Hubs
             {
                 throw new Exception("Bad deviceId");
             }
-            
+
+
             return Task.FromResult(client.GetState());
         }
-        
+
+        public async void SendState(string deviceId)
+        {
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            await Clients.All.SendAsync("state", client.GetState());
+  
+        }
+
         public async Task NewMessage(long username, string message)
         {
             await Clients.All.SendAsync("messageReceived", username, message);
         }
+
+        
     }
 }

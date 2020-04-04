@@ -33,18 +33,21 @@ namespace AtemServer
         private readonly DeviceProfileHandler _profile;
 
         private readonly AtemState _state;
-        
-        public AtemClientExt(AtemClient client)
+        private readonly IHubContext<DevicesHub> context_;
+
+
+        public AtemClientExt(AtemClient client, IHubContext<DevicesHub> _context)
         {
             _profile = new DeviceProfileHandler();
             _state = new AtemState();
-            
+            context_ = _context;
+
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
             Client.OnConnection += sender => { Connected = true; };
             Client.OnDisconnect += sender => { Connected = false; };
 
-            Client.OnReceive += (sender, commands) =>
+            Client.OnReceive += async (sender, commands) =>
             {
                 var changedPaths = new List<string>();
                 var errors = new List<string>();
@@ -69,15 +72,26 @@ namespace AtemServer
                         
                     }
                 }
-                
-                // TODO
+
+
+                SendState(); //Send State to All clients // This wont work if clients are on different devices.
+
+
             };
         }
+
+        public void SendState()
+        {
+            context_.Clients.All.SendAsync("state", GetState());
+
+        }
+
 
         public AtemState GetState()
         {
             lock (_state)
             {
+                
                 return _state.Clone();
             }
         }
@@ -160,7 +174,7 @@ namespace AtemServer
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClientExt(new AtemClient(device.Info.Address, false));
+                device.Client = new AtemClientExt(new AtemClient(device.Info.Address, false), context_);
                 // TODO setup listeners for stuff
                 
                 device.Client.Client.Connect();

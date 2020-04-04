@@ -9,6 +9,7 @@ import { Navbar, Nav, Form, Button, FormControl, Container, FormControlProps } f
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
 import { ManualCommandsPage } from './ManualCommands'
+import { ControlPage } from './Control'
 import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManager'
 import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
@@ -24,6 +25,7 @@ enum ConnectionStatus {
 
 interface AppState extends DeviceContext {
   connected: ConnectionStatus
+
   // hasConnected: boolean
 }
 
@@ -38,19 +40,17 @@ class SignalRRetryPolicy implements signalR.IRetryPolicy {
   }
 }
 
+
 export default class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
-    super(props)
 
-    this.state = {
+    state = {
       signalR: undefined,
-      devices: [],
+      devices: [] as AtemDeviceInfo[],
       activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
-
+      currentState:null,
       connected: ConnectionStatus.Disconnected
       // hasConnected: false
     }
-  }
 
   componentDidMount() {
     const connection = new signalR.HubConnectionBuilder()
@@ -65,8 +65,6 @@ export default class App extends React.Component<{}, AppState> {
 
     connection.on('devices', (devices: AtemDeviceInfo[]) => {
       console.log('Devices update:', devices)
-      const mutation: Partial<AppState> = { devices }
-
       const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
       if (currentDevice && !isDeviceAvailable(currentDevice)) {
         console.log('Forget activeDevice')
@@ -74,8 +72,11 @@ export default class App extends React.Component<{}, AppState> {
         // mutation.activeDeviceId = null
         // TODO - is this desired behaviour?
       }
+      this.setState({devices:devices})
+    })
 
-      this.setState(mutation as any)
+    connection.on("state",(state: any)=>{
+      this.setState({currentState:state})
     })
 
     connection.onreconnecting(err => {
@@ -159,7 +160,7 @@ export default class App extends React.Component<{}, AppState> {
           <p>Connecting...</p>
         </div>
         <Router>
-          <div>
+          <div className="full">
             <Navbar bg="dark" variant="dark">
               <LinkContainer to="/">
                 <Navbar.Brand>Atem UI</Navbar.Brand>
@@ -170,6 +171,9 @@ export default class App extends React.Component<{}, AppState> {
                 </IndexLinkContainer>
                 <LinkContainer to="/commands">
                   <Nav.Link>Manual Commands</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/control">
+                  <Nav.Link>Control</Nav.Link>
                 </LinkContainer>
                 <LinkContainer to="/state">
                   <Nav.Link>State</Nav.Link>
@@ -191,6 +195,9 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
                 <Route path="/commands">
                   <ManualCommandsPage />
+                </Route>
+                <Route path="/control">
+                  <ControlPage  />
                 </Route>
                 <Route path="/devices">
                   <DevicesPage />

@@ -14,6 +14,11 @@ div#not-connected-overlay {
     text-align: center;
 }
 
+.full{
+    margin:0;
+    height:100%;
+}
+
 div#not-connected-overlay p {
     color: #ddd;
     font-size: 2em;
@@ -70,4 +75,8 @@ div#not-connected-overlay p {
 .compact-tree .tree-item {
     padding-top: 0;
     padding-bottom: 0;
+}
+#root{
+    margin:0;
+    height:100%;
 }
