@@ -1,23 +1,13 @@
 import React from 'react'
 import './control.css'
-
-import { Container, Form, Col, Row, FormControl, FormControlProps, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from './types'
-import Select from 'react-select'
-import update from 'immutability-helper'
-import ToggleSwitch from 'bootstrap-switch-button-react'
-import Slider from 'react-rangeslider'
-import { prettyDecimal } from '../util'
-import App from '../App'
-import { StateManagerContext } from '../StateManager'
+
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
 
   static contextType = DeviceManagerContext
-
 
   render() {
     // console.log("CONTEXT", this.context)
@@ -25,13 +15,12 @@ export class ControlPage extends React.Component {
     return (
       <div className="page">
 
-
         {device ? (
           <ControlPageInner
 
             key={this.context.activeDeviceId || ''}
             device={device}
-            currentState ={this.context.currentState}
+            currentState={this.context.currentState}
             // currentState={this.state.currentState}
             signalR={this.context.signalR}
           />
@@ -46,12 +35,12 @@ export class ControlPage extends React.Component {
 interface ControlPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState:any
+  currentState: any
 }
 interface ControlPageInnerState {
   hasConnected: boolean
   state: any | null
-  currentState:any
+  currentState: any
 }
 
 class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPageInnerState> {
@@ -59,7 +48,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     super(props)
 
     // console.log("STAAATE:",this.props)
-    
+
     this.state = {
       hasConnected: props.device.connected,
       state: props.currentState,
@@ -70,8 +59,6 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       this.loadDeviceState(props)
     }
   }
-
-  
 
 
   loadDeviceState(props: ControlPageInnerProps) {
@@ -89,13 +76,13 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
   }
 
-  private sendCommand(value: any) {
+  private sendCommand(command: string, value: any) {
     const { device, signalR } = this.props
     if (device.connected && signalR) {
       const devId = GetDeviceId(device)
 
       signalR
-        .invoke('CommandSend', devId, "LibAtem.Commands.MixEffects.ProgramInputSetCommand", JSON.stringify(value))
+        .invoke('CommandSend', devId, command, JSON.stringify(value))
         .then((res) => {
           console.log('ManualCommands: sent')
           console.log(res)
@@ -124,69 +111,131 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
   }
 
-  ProgramMix(item: String) {
-    this.sendCommand({ Index: 0, Source: Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()) })
-    this.reeload()
+  ProgramMix(item: number) {
+    this.sendCommand("LibAtem.Commands.MixEffects.ProgramInputSetCommand", { Index: 0, Source: item })
   }
 
-  reeload(){
-    this.loadDeviceState(this.props)
+  PreviewMix(item: number) {
+    this.sendCommand("LibAtem.Commands.MixEffects.PreviewInputSetCommand", { Index: 0, Source: item })
   }
+
+
 
   render() {
-    const { device,currentState, signalR } = this.props
+    const { device, currentState, signalR } = this.props
     const { hasConnected } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>
     } else if (!currentState) {
-      return <p>Loading spec...</p>
+      return <p>Loading state...</p>
     }
-    var state= currentState
+    var state = currentState
     const programSource = state.mixEffects[0].sources.program
+    const previewSource = state.mixEffects[0].sources.preview
     const inputs = state.settings.inputs
 
     var myKeys = Object.keys(inputs).filter(x => x.includes("input"))
     console.log(this.state)
-    var buttons = myKeys.map(item =>
-      item.includes(programSource) ? <div key={item} onClick={() => this.ProgramMix(item)} className="atem-button atem-button-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onClick={() => this.ProgramMix(item)} className="atem-button">{inputs[(item)].properties.shortName}</div>
-
-
+    var programButtons = myKeys.map(item =>
+      item.includes(programSource) ? <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red atem-button-red-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red">{inputs[(item)].properties.shortName}</div>
     )
 
+    var blkProgram = (programSource == 0) ? <div onMouseDown={() => this.ProgramMix(0)} className="atem-button atem-button-red-active">Blk</div> : <div onMouseDown={() => this.ProgramMix(0)} className="atem-button atem-button-red">Blk</div>
+    var barsProgram = (programSource == 1000) ? <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button atem-button-red-active">Bars</div> : <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button atem-button-red">Bars</div>
+    var col1Program = (programSource == 2001) ? <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button atem-button-red-active">Col1</div> : <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button atem-button-red">Col1</div>
+    var mp1Program = (programSource == 3010) ? <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button atem-button-red-active">MP1</div> : <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button atem-button-red">MP1</div>
+    var mp2Program = (programSource == 3020) ? <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button atem-button-red-active">MP2</div> : <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button atem-button-red">MP2</div>
+
+
+    var previewButtons = myKeys.map(item =>
+      item.includes(previewSource) ? <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green atem-button-green-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green">{inputs[(item)].properties.shortName}</div>
+    )
+
+    var blkPreview = (previewSource == 0) ? <div onMouseDown={() => this.PreviewMix(0)} className="atem-button atem-button-green-active">Blk</div> : <div onMouseDown={() => this.PreviewMix(0)} className="atem-button atem-button-green">Blk</div>
+    var barsPreview = (previewSource == 1000) ? <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button atem-button-green-active">Bars</div> : <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button atem-button-green">Bars</div>
+    var col1Preview = (previewSource == 2001) ? <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button atem-button-green-active">Col1</div> : <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button atem-button-green">Col1</div>
+    var mp1Preview = (previewSource == 3010) ? <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button atem-button-green-active">MP1</div> : <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button atem-button-green">MP1</div>
+    var mp2Preview = (previewSource == 3020) ? <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button atem-button-green-active">MP2</div> : <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button atem-button-green">MP2</div>
     return (
       <div id="page-wrapper">
         <div className="box" id="Program">
           <div className="box-title">Program</div>
           <div className="box-inner">
+            <div className="box-inner-inputs">
 
-            {buttons}
-            <div onClick={() => this.reeload()} className="atem-button atem-button-active">Re</div>
+              {programButtons}
+              {/* <div className="atem-button atem-button-green-active">Re</div> */}
 
+            </div>
+            <div className="box-inner-mid">
+              {blkProgram}
+              {barsProgram}
+
+            </div>
+            <div className="box-inner-rest">
+
+              {col1Program}
+              <div></div>
+              {mp1Program}
+              {mp2Program}
+            </div>
           </div>
 
         </div>
-        <div id="Preview"></div>
-        <div id="Next"></div>
-        <div id="Transition"></div>
-        <div id="DSK"></div>
-        <div id="FTB"></div>
+
+        <div className="box" id="Next">
+          <div className="box-title">Next Transition</div>
+          <div className="box-inner"></div>
+        </div>
+        <div className="box" id="Transition">
+          <div className="box-title">Transition Style</div>
+          <div className="box-inner">
+
+          </div>
+        </div>
+
+      
+
+        
+      <div className="box" id="Preview">
+        <div className="box-title">Preview</div>
+        <div className="box-inner">
+          <div className="box-inner-inputs">
+
+            {previewButtons}
+            {/* <div className="atem-button atem-button-green-active">Re</div> */}
+
+          </div>
+          <div className="box-inner-mid">
+            {blkPreview}
+            {barsPreview}
+
+          </div>
+          <div className="box-inner-rest">
+
+            {col1Preview}
+            <div></div>
+            {mp1Preview}
+            {mp2Preview}
+          </div>
+        </div>
 
       </div>
-      // <div>
-      //   <Select
-      //     value={selectedCommand}
-      //     onChange={v => this.setState({ selectedCommand: v as any })}
-      //     options={options}
-      //   />
 
-      //   <CommandBuilder
-      //     key={selectedCommand ? selectedCommand.value : ''}
-      //     device={device}
-      //     signalR={signalR}
-      //     spec={selectedCommandSpec}
-      //   />
-      // </div>
+      <div className="box" id="Next">
+        <div className="box-title">Next Transition</div>
+        <div className="box-inner"></div>
+      </div>
+      <div className="box" id="Transition">
+        <div className="box-title">Transition Style</div>
+        <div className="box-inner">
+
+        </div>
+      </div>
+
+
+      </div >
     )
   }
 }

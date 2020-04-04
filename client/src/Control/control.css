@@ -16,8 +16,11 @@ html {
     margin: 0;
     height: 100%;
     display: grid;
+    grid-template-areas:"Program Next b"
+    "Preview Transition d";
     grid-template-columns: 3fr 1fr 1fr;
     grid-template-rows: 1fr 1fr;
+
     
 }
 
@@ -28,11 +31,6 @@ html {
     margin: auto;
     border-radius: 5px;
     border: 1.5px solid #191919;
-    /* display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 3em; */
 }
 
 .box-inner {
@@ -41,11 +39,49 @@ html {
     height: auto;
     width: auto;
     display: grid;
-    row-gap: 50px;
+    column-gap: 15px;
+    /* margin: 20px; */
+    padding:20px;
+    /* grid-template-rows: 1fr 1fr; */
+
+    grid-template-columns: 1fr 55px 120px;
+}
+
+.box-inner-inputs {
+    position: relative;
+
+    height: auto;
+    width: auto;
+    display: grid;
+    row-gap: 40px;
     column-gap: 7px;
-    margin: 20px;
+    /* margin: 20px; */
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)) 55px 55px 55px;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+}
+
+.box-inner-rest {
+    position: relative;
+    height: auto;
+    width: auto;
+    display: grid;
+    row-gap: 40px;
+    column-gap: 7px;
+    /* margin: 20px; */
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 55px 55px ;
+}
+
+.box-inner-mid {
+    position: relative;
+    height: auto;
+    width: auto;
+    display: grid;
+    row-gap: 40px;
+    column-gap: 7px;
+    /* margin: 20px; */
+    grid-template-rows: 1fr 1fr;
+    /* grid-template-columns: 55px 55px 55px; */
 }
 
 .box-title {
@@ -56,7 +92,21 @@ html {
     font-size: 13px;
 }
 
-#Program {}
+#Program {
+    grid-area:Program
+}
+
+#Preview {
+    grid-area:Preview
+}
+
+#Next{
+    grid-area:Next
+}
+
+#Transition{
+    grid-area:Transition
+}
 
 .atem-button {
     height: 50px;
@@ -74,9 +124,7 @@ html {
     user-select: none;
 }
 
-
-
-.atem-button:active {
+.button-red:active{
     background: #b10000;
     border: 1px solid #363636;
     -webkit-box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
@@ -85,11 +133,31 @@ html {
     background: radial-gradient(circle, rgb(170, 79, 79) 0%, rgb(173, 0, 0) 82%, rgb(153, 0, 0) 100%);
 }
 
-.atem-button-active {
+.button-green:active{
+    background: #2ca10e;
+    border: 1px solid #363636;
+    -webkit-box-shadow: 0px 3px 25px -9px rgb(72, 255, 0);
+    -moz-box-shadow: 0px 3px 25px -9px rgb(30, 255, 0);
+    box-shadow: 0px 3px 25px -9px rgb(51, 255, 0);
+    background: radial-gradient(circle, rgb(94, 170, 79) 0%, rgb(20, 173, 0) 82%,rgb(13, 153, 0)) 100%);
+}
+
+
+
+.atem-button-red-active {
     background: #ff0000;
     background: radial-gradient(circle, rgba(255,135,135,1) 0%, rgba(255,0,0,1) 82%, rgba(255,0,0,1) 100%);
     border: 1px solid #363636;
     -webkit-box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
     -moz-box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
     box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
+}
+
+.atem-button-green-active {
+    background: #00f100;
+    background: radial-gradient(circle, rgb(159, 255, 135) 0%, rgb(60, 255, 0) 82%, rgb(81, 255, 0) 100%);
+    border: 1px solid #363636;
+    -webkit-box-shadow: 0px 3px 25px -9px rgb(72, 255, 0);
+    -moz-box-shadow: 0px 3px 25px -9px rgb(30, 255, 0);
+    box-shadow: 0px 3px 25px -9px rgb(51, 255, 0);
 }
