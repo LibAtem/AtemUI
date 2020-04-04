@@ -132,6 +132,19 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 2, Selection: selection })
   }
 
+  SetStyle(id:string){
+    console.log(id)
+    this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, Style: id })
+  }
+
+  Cut(){
+    this.sendCommand("LibAtem.Commands.MixEffects.MixEffectCutCommand", { Index: 0})
+  }
+
+  PreviewTrans(prev : boolean){
+    this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPreviewSetCommand", { Index: 0, PreviewTransition: prev})
+  }
+
 
   dec2bin(dec: number) {
     return (dec >>> 0).toString(2);
@@ -164,7 +177,6 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     var mp1Program = (programSource == 3010) ? <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button button-red atem-button-red-active">MP1</div> : <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button button-red atem-button-red">MP1</div>
     var mp2Program = (programSource == 3020) ? <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button button-red atem-button-red-active">MP2</div> : <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button button-red atem-button-red">MP2</div>
 
-
     var previewButtons = myKeys.map(item =>
       item.includes(previewSource) ? <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green atem-button-green-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green">{inputs[(item)].properties.shortName}</div>
     )
@@ -189,6 +201,16 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       keys.push((keysState[i+1]=="1") ? <div onMouseDown={() => this.SetKey(x+1)} className="atem-button button-yellow atem-button-yellow-active">KEY{i+1}</div> : <div onMouseDown={() => this.SetKey(x+1)} className="atem-button button-yellow atem-button-yellow">KEY{i+1}</div>)
     }
 
+    var style = [] ;
+    var styleNames =[["MIX","0"],["DIP","1"],["WIPE","2"],["STING","4"],["DVE","3"]] //Styles have 3 and 4 ids swapped
+
+   for (var i = 0; i < 5; i++) {
+      const x = styleNames[i][1];
+
+      style.push((state.mixEffects[0].transition.properties.style==x) ? <div onMouseDown={() => this.SetStyle(x)} className="atem-button button-yellow atem-button-yellow-active">{styleNames[i][0]}</div> : <div onMouseDown={() => this.SetStyle(x)} className="atem-button button-yellow atem-button-yellow">{styleNames[i][0]}</div>)
+    }
+
+    var prevTrans = state.mixEffects[0].transition.properties.style?<div onMouseDown={() => this.PreviewTrans(false)} className="atem-button button-red-active button-red two-lines" style={{fontSize:"13px"}}>PREV TRANS</div> : <div onMouseDown={() => this.PreviewTrans(true)} className="atem-button button-red two-lines" style={{fontSize:"13px"}}>PREV TRANS</div>
 
 
     return (
@@ -221,7 +243,11 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
         </div>
         <div className="box" id="Transition">
           <div className="box-title">Transition Style</div>
-          <div className="box-inner">
+          <div className="box-transition">
+            {style}
+            <div onMouseDown={() => this.Cut()} className="atem-button button-grey ">CUT</div>
+            <div></div>
+            <div onMouseDown={() => this.Cut()} className="atem-button button-red two-lines" style={{fontSize:"13px"}}>PREV TRANS</div>
           </div>
         </div>
         <div className="box" id="Preview">
