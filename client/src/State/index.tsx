@@ -20,6 +20,7 @@ export class StateViewerPage extends React.Component {
           <StateViewerPageInner
             key={this.context.activeDeviceId || ''}
             device={device}
+            currentState={this.context.currentState}
             signalR={this.context.signalR}
           />
         ) : (
@@ -33,6 +34,7 @@ export class StateViewerPage extends React.Component {
 interface StateViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
+  currentState: any
 }
 interface StateViewerPageInnerState {
   hasConnected: boolean
@@ -89,19 +91,19 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
   }
 
   render() {
-    const { device, signalR } = this.props
+    const { device, signalR, currentState } = this.props
     const { hasConnected, state } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>
-    } else if (!state) {
+    } else if (!currentState) {
       return <p>Loading state...</p>
     }
 
     return (
       <div>
         <TreeMenu
-          data={transformStateToTree(state, [])}
+          data={transformStateToTree(currentState, [])}
           onClickItem={() => {}}
           matchSearch={props => {
             // This is bad and doesnt show the parents of the results, so it is hard to read..

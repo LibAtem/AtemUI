@@ -18,7 +18,7 @@ html {
     display: grid;
     grid-template-areas:"Program Next b"
     "Preview Transition d";
-    grid-template-columns: 3fr 1fr 1fr;
+    grid-template-columns: 3fr 330px 1fr;
     grid-template-rows: 1fr 1fr;
 
     
@@ -26,7 +26,7 @@ html {
 
 .box {
     background: #202020;
-    height: 200px;
+    height: 170px;
     width: 90%;
     margin: auto;
     border-radius: 5px;
@@ -41,11 +41,25 @@ html {
     display: grid;
     column-gap: 15px;
     /* margin: 20px; */
-    padding:20px;
+    padding:10px;
     /* grid-template-rows: 1fr 1fr; */
 
     grid-template-columns: 1fr 55px 120px;
 }
+
+.box-transition {
+    position: relative;
+    top: -15px;
+    height: auto;
+    width: auto;
+    display: grid;
+    /* column-gap: 15px; */
+    row-gap: 40px;
+    padding:10px;
+    grid-template-columns: 55px 55px 55px 55px 55px;
+    grid-template-rows: 1fr 1fr;
+}
+
 
 .box-inner-inputs {
     position: relative;
@@ -124,6 +138,12 @@ html {
     user-select: none;
 }
 
+.two-lines{
+    font-size: 15px;
+    line-height: 20px;
+    padding-top:5px;
+}
+
 .button-red:active{
     background: #b10000;
     border: 1px solid #363636;
@@ -139,9 +159,17 @@ html {
     -webkit-box-shadow: 0px 3px 25px -9px rgb(72, 255, 0);
     -moz-box-shadow: 0px 3px 25px -9px rgb(30, 255, 0);
     box-shadow: 0px 3px 25px -9px rgb(51, 255, 0);
-    background: radial-gradient(circle, rgb(94, 170, 79) 0%, rgb(20, 173, 0) 82%,rgb(13, 153, 0)) 100%);
+    background: radial-gradient(circle, rgb(118, 177, 102) 0%, rgb(42, 175, 1) 82%, rgb(55, 172, 1) 100%);
 }
 
+.button-yellow:active{
+    background: #a1920e;
+    border: 1px solid #363636;
+    -webkit-box-shadow: 0px 3px 25px -9px rgb(255, 238, 0);
+    -moz-box-shadow: 0px 3px 25px -9px rgb(229, 255, 0);
+    box-shadow: 0px 3px 25px -9px rgb(238, 255, 0);
+    background: radial-gradient(circle, rgb(195, 196, 144) 0%, rgb(175, 172, 1) 82%, rgb(169, 172, 1) 100%);
+}
 
 
 .atem-button-red-active {
@@ -160,4 +188,13 @@ html {
     -webkit-box-shadow: 0px 3px 25px -9px rgb(72, 255, 0);
     -moz-box-shadow: 0px 3px 25px -9px rgb(30, 255, 0);
     box-shadow: 0px 3px 25px -9px rgb(51, 255, 0);
+}
+
+.atem-button-yellow-active {
+    background: #f1ed00;
+    background: radial-gradient(circle, rgb(255, 250, 174) 0%, rgb(255, 208, 0) 82%, rgb(255, 187, 0) 100%);
+    border: 1px solid #363636;
+    -webkit-box-shadow: 0px 3px 25px -9px rgb(251, 255, 0);
+    -moz-box-shadow: 0px 3px 25px -9px rgb(251, 255, 0);
+    box-shadow: 0px 3px 25px -9px rgb(208, 255, 0);
 }

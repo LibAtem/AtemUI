@@ -64,7 +64,7 @@ export default class App extends React.Component<{}, AppState> {
     })
 
     connection.on('devices', (devices: AtemDeviceInfo[]) => {
-      console.log('Devices update:', devices)
+      //console.log('Devices update:', devices)
       const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
       if (currentDevice && !isDeviceAvailable(currentDevice)) {
         console.log('Forget activeDevice')
@@ -76,6 +76,7 @@ export default class App extends React.Component<{}, AppState> {
     })
 
     connection.on("state",(state: any)=>{
+      console.log(state)
       this.setState({currentState:state})
     })
 

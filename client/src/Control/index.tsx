@@ -84,6 +84,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       signalR
         .invoke('CommandSend', devId, command, JSON.stringify(value))
         .then((res) => {
+          console.log(value)
           console.log('ManualCommands: sent')
           console.log(res)
         })
@@ -119,6 +120,23 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     this.sendCommand("LibAtem.Commands.MixEffects.PreviewInputSetCommand", { Index: 0, Source: item })
   }
 
+  OnAir(mixEffectIndex: number, KeyerIndex: number, state: boolean) {
+    this.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyOnAirSetCommand", { MixEffectIndex: mixEffectIndex, KeyerIndex: KeyerIndex, OnAir: state })
+  }
+
+  // Convert to binary, swap out bit, convert back
+  SetKey(id: number){
+    var dec = this.dec2bin(this.props.currentState.mixEffects[0].transition.properties.selection).padStart(5, '0').split("").reverse();
+    dec[id] = (dec[id] == "0" ?  "1" : "0")
+    var selection = parseInt(dec.reverse().join(""),2)
+    this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 2, Selection: selection })
+  }
+
+
+  dec2bin(dec: number) {
+    return (dec >>> 0).toString(2);
+  }
+
 
 
   render() {
@@ -136,49 +154,93 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     const inputs = state.settings.inputs
 
     var myKeys = Object.keys(inputs).filter(x => x.includes("input"))
-    console.log(this.state)
     var programButtons = myKeys.map(item =>
       item.includes(programSource) ? <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red atem-button-red-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red">{inputs[(item)].properties.shortName}</div>
     )
 
-    var blkProgram = (programSource == 0) ? <div onMouseDown={() => this.ProgramMix(0)} className="atem-button atem-button-red-active">Blk</div> : <div onMouseDown={() => this.ProgramMix(0)} className="atem-button atem-button-red">Blk</div>
-    var barsProgram = (programSource == 1000) ? <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button atem-button-red-active">Bars</div> : <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button atem-button-red">Bars</div>
-    var col1Program = (programSource == 2001) ? <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button atem-button-red-active">Col1</div> : <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button atem-button-red">Col1</div>
-    var mp1Program = (programSource == 3010) ? <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button atem-button-red-active">MP1</div> : <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button atem-button-red">MP1</div>
-    var mp2Program = (programSource == 3020) ? <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button atem-button-red-active">MP2</div> : <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button atem-button-red">MP2</div>
+    var blkProgram = (programSource == 0) ? <div onMouseDown={() => this.ProgramMix(0)} className="atem-button button-red atem-button-red-active">Blk</div> : <div onMouseDown={() => this.ProgramMix(0)} className="atem-button button-red atem-button-red">Blk</div>
+    var barsProgram = (programSource == 1000) ? <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button button-red atem-button-red-active">Bars</div> : <div onMouseDown={() => this.ProgramMix(1000)} className="atem-button button-red atem-button-red">Bars</div>
+    var col1Program = (programSource == 2001) ? <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button button-red atem-button-red-active">Col1</div> : <div onMouseDown={() => this.ProgramMix(2001)} className="atem-button button-red atem-button-red">Col1</div>
+    var mp1Program = (programSource == 3010) ? <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button button-red atem-button-red-active">MP1</div> : <div onMouseDown={() => this.ProgramMix(3010)} className="atem-button button-red atem-button-red">MP1</div>
+    var mp2Program = (programSource == 3020) ? <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button button-red atem-button-red-active">MP2</div> : <div onMouseDown={() => this.ProgramMix(3020)} className="atem-button button-red atem-button-red">MP2</div>
 
 
     var previewButtons = myKeys.map(item =>
       item.includes(previewSource) ? <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green atem-button-green-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.PreviewMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-green">{inputs[(item)].properties.shortName}</div>
     )
 
-    var blkPreview = (previewSource == 0) ? <div onMouseDown={() => this.PreviewMix(0)} className="atem-button atem-button-green-active">Blk</div> : <div onMouseDown={() => this.PreviewMix(0)} className="atem-button atem-button-green">Blk</div>
-    var barsPreview = (previewSource == 1000) ? <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button atem-button-green-active">Bars</div> : <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button atem-button-green">Bars</div>
-    var col1Preview = (previewSource == 2001) ? <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button atem-button-green-active">Col1</div> : <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button atem-button-green">Col1</div>
-    var mp1Preview = (previewSource == 3010) ? <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button atem-button-green-active">MP1</div> : <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button atem-button-green">MP1</div>
-    var mp2Preview = (previewSource == 3020) ? <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button atem-button-green-active">MP2</div> : <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button atem-button-green">MP2</div>
+    var blkPreview = (previewSource == 0) ? <div onMouseDown={() => this.PreviewMix(0)} className="atem-button button-green atem-button-green-active">Blk</div> : <div onMouseDown={() => this.PreviewMix(0)} className="atem-button button-green atem-button-green">Blk</div>
+    var barsPreview = (previewSource == 1000) ? <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button button-green atem-button-green-active">Bars</div> : <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button button-green atem-button-green">Bars</div>
+    var col1Preview = (previewSource == 2001) ? <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button button-green atem-button-green-active">Col1</div> : <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button button-green atem-button-green">Col1</div>
+    var mp1Preview = (previewSource == 3010) ? <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button button-green atem-button-green-active">MP1</div> : <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button button-green atem-button-green">MP1</div>
+    var mp2Preview = (previewSource == 3020) ? <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button button-green atem-button-green-active">MP2</div> : <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button button-green atem-button-green">MP2</div>
+
+    var onAirs = [];
+    for (var i = 0; i < state.mixEffects[0].keyers.length; i++) {
+      const x = i
+      onAirs.push((state.mixEffects[0].keyers[i].onAir) ? <div onMouseDown={() => this.OnAir(0, x, false)} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.OnAir(0, x, true)} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
+    }
+
+    var keysState = this.dec2bin(state.mixEffects[0].transition.properties.selection).split("").reverse().join(""); //get binary of state and reverse it for iterating 
+    var keys = [] ;
+    keys.push((keysState[0]=="1") ? <div onMouseDown={() => this.SetKey(0)} className="atem-button button-yellow atem-button-yellow-active">BKGD</div> : <div onMouseDown={() => this.SetKey(0)} className="atem-button button-yellow atem-button-yellow">BKGD</div>)
+    for (var i = 0; i < state.mixEffects[0].keyers.length; i++) {
+      const x = i
+      keys.push((keysState[i+1]=="1") ? <div onMouseDown={() => this.SetKey(x+1)} className="atem-button button-yellow atem-button-yellow-active">KEY{i+1}</div> : <div onMouseDown={() => this.SetKey(x+1)} className="atem-button button-yellow atem-button-yellow">KEY{i+1}</div>)
+    }
+
+
+
     return (
       <div id="page-wrapper">
         <div className="box" id="Program">
           <div className="box-title">Program</div>
           <div className="box-inner">
             <div className="box-inner-inputs">
-
               {programButtons}
-              {/* <div className="atem-button atem-button-green-active">Re</div> */}
-
             </div>
             <div className="box-inner-mid">
               {blkProgram}
               {barsProgram}
-
             </div>
             <div className="box-inner-rest">
-
               {col1Program}
               <div></div>
               {mp1Program}
               {mp2Program}
+            </div>
+          </div>
+        </div>
+        <div className="box" id="Next">
+          <div className="box-title">Next Transition</div>
+          <div className="box-transition">
+            <div></div>
+            {onAirs}
+            {keys}
+          </div>
+        </div>
+        <div className="box" id="Transition">
+          <div className="box-title">Transition Style</div>
+          <div className="box-inner">
+          </div>
+        </div>
+        <div className="box" id="Preview">
+          <div className="box-title">Preview</div>
+          <div className="box-inner">
+            <div className="box-inner-inputs">
+              {previewButtons}
+            </div>
+            <div className="box-inner-mid">
+              {blkPreview}
+              {barsPreview}
+
+            </div>
+            <div className="box-inner-rest">
+
+              {col1Preview}
+              <div></div>
+              {mp1Preview}
+              {mp2Preview}
             </div>
           </div>
 
@@ -194,45 +256,6 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
           </div>
         </div>
-
-      
-
-        
-      <div className="box" id="Preview">
-        <div className="box-title">Preview</div>
-        <div className="box-inner">
-          <div className="box-inner-inputs">
-
-            {previewButtons}
-            {/* <div className="atem-button atem-button-green-active">Re</div> */}
-
-          </div>
-          <div className="box-inner-mid">
-            {blkPreview}
-            {barsPreview}
-
-          </div>
-          <div className="box-inner-rest">
-
-            {col1Preview}
-            <div></div>
-            {mp1Preview}
-            {mp2Preview}
-          </div>
-        </div>
-
-      </div>
-
-      <div className="box" id="Next">
-        <div className="box-title">Next Transition</div>
-        <div className="box-inner"></div>
-      </div>
-      <div className="box" id="Transition">
-        <div className="box-title">Transition Style</div>
-        <div className="box-inner">
-
-        </div>
-      </div>
 
 
       </div >
