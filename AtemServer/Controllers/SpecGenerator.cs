@@ -195,6 +195,15 @@ namespace AtemServer.Controllers
                 return;
             }
 
+            var uint32range = prop.GetCustomAttribute<UInt32RangeAttribute>();
+            if (uint32range != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = uint32range.Min;
+                field.Max = uint32range.Max;
+                return;
+            }
+
             var uint16d = prop.GetCustomAttribute<UInt16DAttribute>();
             if (uint16d != null)
             {
@@ -256,6 +265,16 @@ namespace AtemServer.Controllers
                 field.Max = Int32.MaxValue;
                 return;
             }
+            var int64 = prop.GetCustomAttribute<Int64Attribute>();
+            if (int64 != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = Int32.MinValue;
+                field.Max = Int32.MaxValue;
+                //Fix this
+                return;
+            }
+
 
             throw new Exception(string.Format("Unknown field type: {0}.{1} in {2}", field.Name, prop.Name, cmdType.Name));
         }

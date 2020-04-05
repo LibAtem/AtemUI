@@ -101,9 +101,11 @@ html {
     position: relative;
     top: -25px;
     left: 5px;
-    color: #7c7c7c;
+    color: #707070;
     font-size: 13px;
 }
+
+
 
 #Program {
     grid-area:Program
@@ -119,6 +121,26 @@ html {
 
 #Transition{
     grid-area:Transition
+}
+
+.rate{
+    height: 50px;
+    width:50px;
+    line-height: 20px;
+    text-align: center;
+    color: #6d6d6d;
+
+}
+
+.rate-input{
+    width:100%;
+    text-align: center;
+    margin:auto;
+    border-radius:8px;
+    height:30px;
+    background:black;
+    color:rgb(235, 125, 0);
+    border: 1px solid #181818;
 }
 
 .atem-button {
