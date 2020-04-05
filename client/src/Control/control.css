@@ -8,30 +8,87 @@ html {
 
 .page{
     margin: 0;
-    height: 90%;
+    /* height: 90%; */
     background: #2e2e2e;
 }
 
+
 #page-wrapper {
     margin: 0;
-    height: 100%;
+    height: auto;
     display: grid;
-    grid-template-areas:"Program Next b"
-    "Preview Transition d";
-    grid-template-columns: 3fr 330px 1fr;
+    grid-template-areas:"Program Next DSK"
+    "Preview Transition FTB";
+    padding:3%;
+    column-gap: 3%;
+    grid-template-columns: 3fr 290px 125px;
     grid-template-rows: 1fr 1fr;
-
+    row-gap: 50px;
     
 }
+
+@media only screen and (max-width: 960px) {
+    #page-wrapper {
+ 
+        grid-template-areas:"Program Program"
+        "Preview Preview"
+         "Transition Next"
+         "DSK FTB";
+        padding:3%;
+        column-gap: 3%;
+        grid-template-columns: 1fr 1fr ;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+        row-gap: 50px;
+        
+    }
+  }
+  @media only screen and (max-width: 650px) {
+    #page-wrapper {
+ 
+        grid-template-areas:"Program Program"
+        "Preview Preview"
+         "Transition Transition"
+         "Next Next"
+         "DSK FTB";
+        padding:3%;
+        column-gap: 3%;
+        grid-template-columns: 1fr 1fr ;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+        row-gap: 50px;
+        
+    }
+  }
 
 .box {
     background: #202020;
     height: 170px;
-    width: 90%;
+    width: 100%;
     margin: auto;
     border-radius: 5px;
     border: 1.5px solid #191919;
 }
+
+
+.box-dsk{
+    display:grid;
+    grid-template-columns: 55px 55px;
+    grid-template-rows: 55px 55px 55px 55px;
+    column-gap: 0px;
+    position: relative;
+    top: -15px;
+    padding:10px;
+}
+
+.box-ftb{
+    display:grid;
+    grid-template-columns: 55px 55px;
+    /* grid-template-rows: 55px 55px 55px 55px; */
+    column-gap: 0px;
+    position: relative;
+    top: -15px;
+    padding:10px;
+}
+
 
 .box-inner {
     position: relative;
@@ -68,11 +125,13 @@ html {
     width: auto;
     display: grid;
     row-gap: 40px;
-    column-gap: 7px;
+    column-gap: 0.3%;
     /* margin: 20px; */
     grid-template-rows: 1fr 1fr;
     grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
 }
+
+
 
 .box-inner-rest {
     position: relative;
@@ -106,7 +165,6 @@ html {
 }
 
 
-
 #Program {
     grid-area:Program
 }
@@ -123,14 +181,30 @@ html {
     grid-area:Transition
 }
 
+#DSK{
+    height:240px;
+    grid-area: DSK;
+}
+
+#FTB{
+    height:75px;
+    grid-area:FTB
+}
+
+
 .rate{
     height: 50px;
     width:50px;
     line-height: 20px;
     text-align: center;
     color: #6d6d6d;
-
 }
+
+.rate-input::placeholder{
+    color:rgb(235, 125, 0);
+    opacity:1;
+}
+
 
 .rate-input{
     width:100%;
@@ -209,6 +283,26 @@ html {
     -webkit-box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
     -moz-box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
     box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);
+}
+
+/* Flash class and keyframe animation */
+.flashit{
+    -webkit-animation: flash linear 1s infinite;
+    animation: flash linear 0.7s infinite;
+}
+@-webkit-keyframes flash {
+    0% { background: radial-gradient(circle, rgba(255,135,135,1) 0%, rgba(255,0,0,1) 82%, rgba(255,0,0,1) 100%); 
+        box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);} 
+    50% { background: radial-gradient(circle, rgb(255, 255, 255) 0%, rgb(190, 190, 190) 90%, rgb(167, 167, 167) 100%); 
+        box-shadow:none; } 
+
+}
+@keyframes flash {
+    0% { background: radial-gradient(circle, rgba(255,135,135,1) 0%, rgba(255,0,0,1) 82%, rgba(255,0,0,1) 100%); 
+        box-shadow: 0px 3px 25px -9px rgba(255, 0, 0, 1);} 
+    50% { background: radial-gradient(circle, rgb(255, 255, 255) 0%, rgb(190, 190, 190) 90%, rgb(167, 167, 167) 100%); 
+    box-shadow:none; } 
+    
 }
 
 .atem-button-green-active {

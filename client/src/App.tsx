@@ -76,7 +76,7 @@ export default class App extends React.Component<{}, AppState> {
     })
 
     connection.on("state",(state: any)=>{
-      console.log(state)
+      // console.log(state)
       this.setState({currentState:state})
     })
 

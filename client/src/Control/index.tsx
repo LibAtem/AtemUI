@@ -2,6 +2,7 @@ import React from 'react'
 import './control.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import OutsideClickHandler from 'react-outside-click-handler';
 
 
 export class ControlPage extends React.Component {
@@ -10,7 +11,6 @@ export class ControlPage extends React.Component {
   static contextType = DeviceManagerContext
 
   render() {
-    // console.log("CONTEXT", this.context)
     const device = GetActiveDevice(this.context)
     return (
       <div className="page">
@@ -46,9 +46,6 @@ interface ControlPageInnerState {
 class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPageInnerState> {
   constructor(props: ControlPageInnerProps) {
     super(props)
-
-    // console.log("STAAATE:",this.props)
-
     this.state = {
       hasConnected: props.device.connected,
       state: props.currentState,
@@ -86,7 +83,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
         .then((res) => {
           console.log(value)
           console.log('ManualCommands: sent')
-          console.log(res)
+          console.log(command)
         })
         .catch(e => {
           console.log('ManualCommands: Failed to send', e)
@@ -153,7 +150,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     return (dec >>> 0).toString(2);
   }
 
-  checkRateInput(e: React.KeyboardEvent<HTMLDivElement>, id :string) {
+  validRate(e: React.KeyboardEvent<HTMLDivElement>, id: string) {
     var input = document.getElementById(id) as HTMLInputElement //Work out what the input will be
     if (((e.keyCode >= 96) && (e.keyCode <= 105)) || ((e.keyCode >= 48) && (e.keyCode <= 57)) || (e.keyCode == 59)) {
       if (input) {
@@ -162,9 +159,9 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
         var value = input.value.split("")
         var newChar = String.fromCharCode((96 <= e.keyCode && e.keyCode <= 105) ? e.keyCode - 48 : e.keyCode)
         newChar = ((newChar == ";") ? ":" : newChar)
-        value.splice(startPos, endPos - startPos, newChar) 
+        value.splice(startPos, endPos - startPos, newChar)
         if (value.includes(";") || value.includes(":")) { //Check if it is valid
-          if (!value.join("").match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) {
+          if (!value.join("").match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) { //This can be expanded to do all checks
             if (e.preventDefault) e.preventDefault();
           }
         } else {
@@ -173,18 +170,74 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
           }
         }
       }
-    }
-    else if (e.keyCode != 8 && e.keyCode != 37 && e.keyCode != 39 && e.keyCode != 46 && e.keyCode != 13) { //Allow special keys
+    } else if (e.keyCode != 8 && e.keyCode != 37 && e.keyCode != 39 && e.keyCode != 46) { //Allow special keys
       if (e.preventDefault) e.preventDefault();
     }
   }
-  
-  framesToRate(frames:number){
-    console.log(frames)
-    var framesRemaining = frames%25
-    var seconds =  Math.floor(frames/25);
-   
-    return seconds.toString()+":"+framesRemaining.toString().padStart(2,"0")
+
+  transitionRate(e: React.KeyboardEvent<HTMLDivElement>, id: string, style: number) {
+
+    if (e.keyCode == 13) {
+      this.setTransitionRate(style, id)
+    } else {
+      this.validRate(e, id)
+    }
+
+  }
+
+  ftbRate(id: string, index: number) {
+    var input = document.getElementById(id) as HTMLInputElement
+    if (input.value != "") {
+      this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+      input.value = ""
+    }
+  }
+
+  ftbRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
+    if (e.keyCode == 13) {
+      this.ftbRate(id,index)
+    } else {
+      this.validRate(e, id)
+    }
+  }
+
+  dskRate(id: string, index: number) {
+    var input = document.getElementById(id) as HTMLInputElement
+    if (input.value != "") {
+      this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+      input.value = ""
+    }
+  }
+
+  dskRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
+    if (e.keyCode == 13) {
+      this.dskRate(id,index)
+    } else {
+      this.validRate(e, id)
+    }
+  }
+
+  framesToRate(frames: number) {
+    var framesRemaining = frames % 25
+    var seconds = Math.floor(frames / 25);
+
+    return seconds.toString() + ":" + framesRemaining.toString().padStart(2, "0")
+  }
+
+  setTransitionRate(style: number, id: string) {
+    var input = document.getElementById(id) as HTMLInputElement
+    var styleName = ["Mix", "Dip", "Wipe", "DVE"]
+    if (input) {
+      if (input.value != "") {
+        if (style == 4) {
+          this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 256, MixRate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+        } else {
+          this.sendCommand("LibAtem.Commands.MixEffects.Transition.Transition" + styleName[style] + "SetCommand", { Index: 0, Mask: 1, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+        }
+        input.value = ""
+      }
+    }
+
   }
 
 
@@ -250,8 +303,29 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     var prevTrans = (state.mixEffects[0].transition.properties.preview) ? <div onMouseDown={() => this.PreviewTrans(false)} className="atem-button atem-button-red-active button-red two-lines" style={{ fontSize: "13px" }}>PREV TRANS</div> : <div onMouseDown={() => this.PreviewTrans(true)} className="atem-button button-red two-lines" style={{ fontSize: "13px" }}>PREV TRANS</div>
     var auto = (state.mixEffects[0].transition.position.inTransition) ? <div onMouseDown={() => this.Auto()} className="atem-button atem-button-red-active button-red">AUTO</div> : <div onMouseDown={() => this.Auto()} className="atem-button button-red">AUTO</div>
 
-    var autoRate = <div className="rate"> Rate <input value={this.framesToRate(state.mixEffects[0].transition.position.remainingFrames)} onKeyDown={(e) => this.checkRateInput(e,"autoRate")} id="autoRate" className="rate-input" ></input></div>
+    var autoRate = (state.mixEffects[0].transition.properties.style == 4 || state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.setTransitionRate(state.mixEffects[0].transition.properties.style, "autoRate") }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].transition.position.remainingFrames)} onKeyDown={(e) => this.transitionRate(e, "autoRate", state.mixEffects[0].transition.properties.style)} id="autoRate" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.setTransitionRate(state.mixEffects[0].transition.properties.style, "autoRate") }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].transition.position.remainingFrames)} onKeyDown={(e) => this.transitionRate(e, "autoRate", state.mixEffects[0].transition.properties.style)} id="autoRate" className="rate-input" ></input></div></OutsideClickHandler>
+    // 
 
+    var dsk = [];
+    dsk.push((state.downstreamKeyers[0].properties.tie) ? <div className="atem-button button-yellow atem-button-yellow-active" onMouseDown={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand",{Index:0,Tie:false})}>TIE</div> : <div className="atem-button button-yellow "onMouseDown={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand",{Index:0,Tie:true})}>TIE</div>)
+    dsk.push((state.downstreamKeyers[1].properties.tie) ? <div className="atem-button button-yellow atem-button-yellow-active" onMouseDown={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand",{Index:1,Tie:false})}>TIE</div> : <div className="atem-button button-yellow " onMouseDown={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand",{Index:1,Tie:true})}>TIE</div>)
+    dsk.push(( state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[0].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk0", 0)} id="dsk0" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk0",0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[0].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk0", 0)} id="dsk0" className="rate-input" ></input></div></OutsideClickHandler>)
+    dsk.push(( state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk1", 1) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[1].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk1", 1)} id="dsk1" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk1",1) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[1].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk1", 1)} id="dsk1" className="rate-input" ></input></div></OutsideClickHandler>)
+    dsk.push((state.downstreamKeyers[0].state.onAir) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand",{Index:0,OnAir:false})} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand",{Index:0,OnAir:true})} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
+    dsk.push((state.downstreamKeyers[1].state.onAir) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand",{Index:1,OnAir:false})} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand",{Index:1,OnAir:true})} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
+    dsk.push((state.downstreamKeyers[0].state.isAuto) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command",{Index:0})} className="atem-button atem-button-red-active button-red">AUTO</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command",{Index:0})} className="atem-button button-red">AUTO</div>)
+    dsk.push((state.downstreamKeyers[1].state.isAuto) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command",{"Index": 1,"IsTowardsOnAir": false})} className="atem-button atem-button-red-active button-red">AUTO</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command",{Index: 1,IsTowardsOnAir: false})} className="atem-button button-red">AUTO</div>)
+
+    var ftb=[];
+    ftb.push(( state.mixEffects[0].fadeToBlack.status.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ftb0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ftb0", 0)} id="ftb0" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ftb0",0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ftb0", 0)} id="ftb0" className="rate-input" ></input></div></OutsideClickHandler>)
+    if(state.mixEffects[0].fadeToBlack.status.isFullyBlack){
+      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand",{Index:0})} className="atem-button atem-button-red-active flashit button-red">FTB</div> )
+    }else if(state.mixEffects[0].fadeToBlack.status.inTransition){
+      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand",{Index:0})} className="atem-button atem-button-red-active button-red">FTB</div> )
+    }else{
+      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand",{Index:0})} className="atem-button button-red">FTB</div> )
+    }
+    
     return (
       <div id="page-wrapper">
         <div className="box" id="Program">
@@ -290,7 +364,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
             {auto}
             {autoRate}
 
-            
+
 
 
           </div>
@@ -317,14 +391,16 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
         </div>
 
-        <div className="box" id="Next">
-          <div className="box-title">Next Transition</div>
-          <div className="box-inner"></div>
+        <div className="box" id="DSK">
+          <div className="box-title">DSK1 	&nbsp;	&nbsp;  DSK2</div>
+          <div className="box-dsk">
+            {dsk}
+          </div>
         </div>
-        <div className="box" id="Transition">
-          <div className="box-title">Transition Style</div>
-          <div className="box-inner">
-
+        <div className="box" id="FTB">
+          <div className="box-title">Fade to Black</div>
+          <div className="box-ftb">
+            {ftb}
           </div>
         </div>
 
