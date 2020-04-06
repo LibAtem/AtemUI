@@ -6,13 +6,15 @@ export interface DeviceContext {
   devices: AtemDeviceInfo[]
   activeDeviceId: string | null
   currentState:any
+  currentProfile:any
 }
 
 export const DeviceManagerContext = React.createContext<DeviceContext>({
   signalR: undefined,
   devices: [],
   activeDeviceId: null,
-  currentState: null
+  currentState: null,
+  currentProfile: null
 })
 
 export function GetDeviceId(dev: AtemDeviceInfo) {

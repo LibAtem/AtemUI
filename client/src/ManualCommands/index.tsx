@@ -63,7 +63,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
     fetch(`/api/spec/${GetDeviceId(props.device)}`)
       .then(res => res.json())
       .then((data: CommandSpecSet) => {
-        console.log('Commands: Got new spec')
+        // console.log('Commands: Got new spec',data.commands)
         this.setState({
           commandsSpec: data.commands
         })

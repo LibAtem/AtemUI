@@ -131,6 +131,18 @@ namespace AtemServer.Hubs
   
         }
 
+        public async void SendProfile(string deviceId)
+        {
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            await Clients.All.SendAsync("profile", client.GetProfile());
+
+        }
+
         public async Task NewMessage(long username, string message)
         {
             await Clients.All.SendAsync("messageReceived", username, message);

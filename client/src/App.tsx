@@ -10,6 +10,7 @@ import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
 import { ManualCommandsPage } from './ManualCommands'
 import { ControlPage } from './Control'
+import { ControlSettingsPage } from './ControlSettings'
 import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManager'
 import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
@@ -44,27 +45,55 @@ class SignalRRetryPolicy implements signalR.IRetryPolicy {
 export default class App extends React.Component<{}, AppState> {
 
     state = {
-      signalR: undefined,
+    signalR:  new signalR.HubConnectionBuilder()
+    .withUrl('/hub')
+    .configureLogging(signalR.LogLevel.Information)
+    .withAutomaticReconnect(new SignalRRetryPolicy())
+    .build(),
       devices: [] as AtemDeviceInfo[],
       activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
-      currentState:null,
+    currentState: null,
+    currentProfile: null,
       connected: ConnectionStatus.Disconnected
       // hasConnected: false
     }
+ updateProfile(){
+  if (this.state.signalR && this.state.activeDeviceId) {
+    this.state.signalR
+      .invoke<object>('SendProfile', this.state.activeDeviceId)
+      .then(profile => {
+        console.log('ProfileUpdate: Got profile')
+        // this.setState({
+        //   state: state
+        // })
+        this.setState({currentProfile:profile})
+
+      })
+      .catch(err => {
+        console.error('ProfileUpdate: Failed to load profile:', err)
+        
+        this.setState({currentProfile:null})
+      })
+  }
+}
 
   componentDidMount() {
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl('/hub')
-      .configureLogging(signalR.LogLevel.Information)
-      .withAutomaticReconnect(new SignalRRetryPolicy())
-      .build()
+
+  
+
+  if(this.state.signalR){
+    const connection = this.state.signalR
+  
+  
+
+    
 
     connection.on('messageReceived', (username: string, message: string) => {
       console.log(username, message)
     })
 
     connection.on('devices', (devices: AtemDeviceInfo[]) => {
-      //console.log('Devices update:', devices)
+      console.log('Devices update:', devices)
       const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
       if (currentDevice && !isDeviceAvailable(currentDevice)) {
         console.log('Forget activeDevice')
@@ -72,12 +101,17 @@ export default class App extends React.Component<{}, AppState> {
         // mutation.activeDeviceId = null
         // TODO - is this desired behaviour?
       }
-      this.setState({devices:devices})
+      this.setState({ devices: devices })
     })
 
-    connection.on("state",(state: any)=>{
+    connection.on("state", (state: any) => {
       // console.log(state)
-      this.setState({currentState:state})
+      this.setState({ currentState: state })
+    })
+
+    connection.on("profile", (profile: any) => {
+      console.log("Profile", profile)
+      this.setState({ currentProfile: profile })
     })
 
     connection.onreconnecting(err => {
@@ -106,7 +140,7 @@ export default class App extends React.Component<{}, AppState> {
     this.setState({
       signalR: connection
     })
-    ;(window as any).conn2 = connection
+      ; (window as any).conn2 = connection
 
     connection
       .start()
@@ -116,9 +150,11 @@ export default class App extends React.Component<{}, AppState> {
           connected: ConnectionStatus.Connected
           // hasConnected: true
         })
+        this.updateProfile()
       })
       .catch(err => console.error('Connection failed', err))
   }
+}
 
   renderDeviceSelection() {
     const availableDevices = this.state.devices.filter(isDeviceAvailable)
@@ -130,6 +166,25 @@ export default class App extends React.Component<{}, AppState> {
         activeDeviceId: id || null
       })
       if (id) {
+        console.log("here",id)
+       if (this.state.signalR) {
+          this.state.signalR
+            .invoke<object>('SendProfile', id)
+            .then(profile => {
+              console.log('ProfileUpdate: Got profile')
+              // this.setState({
+              //   state: state
+              // })
+              this.setState({currentProfile:profile})
+              
+            })
+            .catch(err => {
+              console.error('ProfileUpdate: Failed to load profile:', err)
+              
+              this.setState({currentProfile:null})
+            })
+        }
+ 
         // TODO - does this behave ok with multiple tabs?
         window.localStorage.setItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID, id)
       } else {
@@ -176,6 +231,9 @@ export default class App extends React.Component<{}, AppState> {
                 <LinkContainer to="/control">
                   <Nav.Link>Control</Nav.Link>
                 </LinkContainer>
+                <LinkContainer to="/settings">
+                  <Nav.Link>Settings</Nav.Link>
+                </LinkContainer>
                 <LinkContainer to="/state">
                   <Nav.Link>State</Nav.Link>
                 </LinkContainer>
@@ -198,7 +256,10 @@ export default class App extends React.Component<{}, AppState> {
                   <ManualCommandsPage />
                 </Route>
                 <Route path="/control">
-                  <ControlPage  />
+                  <ControlPage />
+                </Route>
+                <Route path="/settings">
+                  <ControlSettingsPage />
                 </Route>
                 <Route path="/devices">
                   <DevicesPage />

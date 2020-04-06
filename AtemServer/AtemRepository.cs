@@ -80,6 +80,23 @@ namespace AtemServer
             };
         }
 
+
+        public void SendProfile()
+        {
+            context_.Clients.All.SendAsync("profile", GetProfile());
+
+        }
+
+
+        public DeviceProfile GetProfile()
+        {
+            lock (_profile)
+            {
+                return _profile.Profile;
+            }
+        }
+
+
         public void SendState()
         {
             context_.Clients.All.SendAsync("state", GetState());
@@ -137,7 +154,6 @@ namespace AtemServer
         private readonly Dictionary<string, AtemDevice> devices;
 
         private readonly AtemDiscoveryService discovery;
-        
         private readonly IHubContext<DevicesHub> context_;
 
         static AtemRepository()

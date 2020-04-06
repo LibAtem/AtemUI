@@ -188,7 +188,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
   ftbRate(id: string, index: number) {
     var input = document.getElementById(id) as HTMLInputElement
     if (input.value != "") {
-      this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+      this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
       input.value = ""
     }
   }
@@ -204,7 +204,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
   dskRate(id: string, index: number) {
     var input = document.getElementById(id) as HTMLInputElement
     if (input.value != "") {
-      this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+      this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
       input.value = ""
     }
   }
@@ -217,10 +217,15 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
   }
 
-  framesToRate(frames: number) {
-    var framesRemaining = frames % 25
-    var seconds = Math.floor(frames / 25);
+  rateToFrames(rate:string){
+    var fps = [30,25,30,25,50,60,25,30,24,24,25,30,50][this.props.currentState.settings.videoMode]
+    return parseInt(rate.replace(":", "").padStart(4, "0").substr(0, 2)) * fps + parseInt(rate.replace(":", "").padStart(4, "0").substr(2, 3))
+  }
 
+  framesToRate(frames: number) {
+    var fps = [30,25,30,25,50,60,25,30,24,24,25,30,50][this.props.currentState.settings.videoMode]
+    var framesRemaining = frames % fps
+    var seconds = Math.floor(frames / fps);
     return seconds.toString() + ":" + framesRemaining.toString().padStart(2, "0")
   }
 
@@ -230,9 +235,9 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     if (input) {
       if (input.value != "") {
         if (style == 4) {
-          this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 256, MixRate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+          this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 256, MixRate: Math.min(this.rateToFrames(input.value), 250) })
         } else {
-          this.sendCommand("LibAtem.Commands.MixEffects.Transition.Transition" + styleName[style] + "SetCommand", { Index: 0, Mask: 1, Rate: Math.min(parseInt(input.value.replace(":", "").padStart(4, "0").substr(0, 2)) * 25 + parseInt(input.value.replace(":", "").padStart(4, "0").substr(2, 3)), 250) })
+          this.sendCommand("LibAtem.Commands.MixEffects.Transition.Transition" + styleName[style] + "SetCommand", { Index: 0, Mask: 1, Rate: Math.min(this.rateToFrames(input.value), 250) })
         }
         input.value = ""
       }
