@@ -62,12 +62,8 @@ export default class App extends React.Component<{}, AppState> {
     this.state.signalR
       .invoke<object>('SendProfile', this.state.activeDeviceId)
       .then(profile => {
-        console.log('ProfileUpdate: Got profile')
-        // this.setState({
-        //   state: state
-        // })
+        console.log('ProfileUpdate: Got profile',profile)
         this.setState({currentProfile:profile})
-
       })
       .catch(err => {
         console.error('ProfileUpdate: Failed to load profile:', err)
@@ -107,11 +103,6 @@ export default class App extends React.Component<{}, AppState> {
     connection.on("state", (state: any) => {
       // console.log(state)
       this.setState({ currentState: state })
-    })
-
-    connection.on("profile", (profile: any) => {
-      console.log("Profile", profile)
-      this.setState({ currentProfile: profile })
     })
 
     connection.onreconnecting(err => {
@@ -171,16 +162,11 @@ export default class App extends React.Component<{}, AppState> {
           this.state.signalR
             .invoke<object>('SendProfile', id)
             .then(profile => {
-              console.log('ProfileUpdate: Got profile')
-              // this.setState({
-              //   state: state
-              // })
-              this.setState({currentProfile:profile})
-              
+              console.log('ProfileUpdate: Got profile',profile)
+              this.setState({currentProfile:profile})          
             })
             .catch(err => {
               console.error('ProfileUpdate: Failed to load profile:', err)
-              
               this.setState({currentProfile:null})
             })
         }

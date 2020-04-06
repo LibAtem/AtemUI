@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using LibAtem.Commands;
 using LibAtem.State;
 using Newtonsoft.Json;
+using LibAtem.DeviceProfile;
 
 namespace AtemServer.Hubs
 {
@@ -131,7 +132,7 @@ namespace AtemServer.Hubs
   
         }
 
-        public async void SendProfile(string deviceId)
+        public Task<DeviceProfile> SendProfile(string deviceId)
         {
             var client = repo_.GetConnection(deviceId);
             if (client == null)
@@ -139,7 +140,7 @@ namespace AtemServer.Hubs
                 throw new Exception("Bad deviceId");
             }
 
-            await Clients.All.SendAsync("profile", client.GetProfile());
+            return Task.FromResult(client.GetProfile());
 
         }
 
