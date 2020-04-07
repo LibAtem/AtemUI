@@ -15,6 +15,7 @@ import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManage
 import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
 import { StateViewerPage } from './State'
+import { DeviceProfileViewerPage } from './DeviceProfile'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
@@ -223,6 +224,9 @@ export default class App extends React.Component<{}, AppState> {
                 <LinkContainer to="/state">
                   <Nav.Link>State</Nav.Link>
                 </LinkContainer>
+                <LinkContainer to="/profile">
+                  <Nav.Link>Profile</Nav.Link>
+                </LinkContainer>
                 <LinkContainer to="/devices">
                   <Nav.Link>Devices</Nav.Link>
                 </LinkContainer>
@@ -252,6 +256,9 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
                 <Route path="/state">
                   <StateViewerPage />
+                </Route>
+                <Route path="/profile">
+                  <DeviceProfileViewerPage />
                 </Route>
               </Switch>
             ) : (

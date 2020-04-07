@@ -3,10 +3,12 @@ import './control.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import OutsideClickHandler from 'react-outside-click-handler';
-import { Container, Table, ButtonGroup, Button, Modal, Form, Row, Col, Navbar, Nav } from 'react-bootstrap'
+import { Container, Table, ButtonGroup, Button, Modal, Form, Row, Col, Navbar, Nav, FormControl, FormControlProps } from 'react-bootstrap'
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
 import { Switch, Route } from 'react-router';
 import { createSecureContext } from 'tls';
+import { prettyDecimal } from '../util';
+import Slider from 'react-rangeslider';
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -172,6 +174,8 @@ interface GeneralSettingsState {
   videoMode:number
   multiViewMode:number
   downConvertMode:number
+  clip1Length: number
+  clip2Length: number
   
   // currentProfile:any
 }
@@ -184,7 +188,9 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
       currentState: props.currentState,
       videoMode:props.currentState.settings.videoMode,
       multiViewMode:0,
-      downConvertMode:0
+      downConvertMode:0,
+      clip1Length:0,
+      clip2Length:0
       // currentProfile:props.currentProfile
     }
   
@@ -259,6 +265,7 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
     <Form.Control defaultValue={this.state.multiViewMode}  onChange={(e)=>this.changeMultiViewMode(e)} disabled={(multiViewModes[currentState.settings.videoMode].length == 1)} as="select">
     {multiviewMode}
     </Form.Control>
+    <small id="emailHelp" className="form-text text-muted">Not implemented correctly as can't test.</small>
     </Col>
   </Form.Group>
   <Form.Group as={Row} controlId="exampleForm.ControlSelect1">
@@ -272,16 +279,149 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
     </Form.Control>
     </Col>
   </Form.Group>
-  <Button variant="primary" >
+  <Button onClick={()=>this.sendCommand("LibAtem.Commands.Media.MediaPoolSettingsSetCommand",{MaxFrames:[450,450]})} variant="primary" >
     Set
   </Button>
 
 </Form>
 <h3>Media Pool</h3>
+<small id="emailHelp" className="form-text text-muted">There are 900 frames to share between the clips</small>
 
+<Form.Group as={Row}>
+<Form.Label column sm="4" >Clip 1 Length:</Form.Label>
+<Col sm="6">
+<Slider
+        key={0}
+        min={0}
+        max={900}
+        step={1}
+        // labels={"horizontalLabels"}
+        onChange={ (v)=>{  
+          this.setState({
+          clip1Length: v,
+          clip2Length: 900- v
+        })}}
+        value={this.state.clip1Length}
+        // defaultValue={0}
+        format={prettyDecimal}
+      />
+      <br key={1} />
+      </Col>
+      <Col sm="2">
+      <Form.Control
+        key={2}
+        type="number"
+        placeholder={""}
+        min={0}
+        max={900}
+        value={prettyDecimal(this.state.clip1Length)}
+        onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+          if(e.currentTarget.value){
+          this.setState({
+           
+            clip1Length: parseInt(e.currentTarget.value),
+            clip2Length: 900-parseInt(e.currentTarget.value)
+          })
+        }
+        }}
+      />
+      </Col>
+      </Form.Group>
+      <Form.Group as={Row}>
+<Form.Label column sm="4" >Clip 2 Length:</Form.Label>
+<Col sm="6">
+<Slider
+        key={0}
+        min={0}
+        max={900}
+        step={1}
+        // labels={"horizontalLabels"}
+        onChange={ (v)=>{  
+          this.setState({
+          clip2Length: v,
+          clip1Length: 900- v
+        })}}
+        value={this.state.clip2Length}
+        // defaultValue={0}
+        format={prettyDecimal}
+      />
+      <br key={1} />
+      </Col>
+      <Col sm="2">
+      <Form.Control
+        key={2}
+        type="number"
+        placeholder={""}
+        min={0}
+        max={900}
+        value={prettyDecimal(this.state.clip2Length)}
+        onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+          if(e.currentTarget.value){
+          this.setState({
+           
+            clip2Length: parseInt(e.currentTarget.value),
+            clip1Length: 900-parseInt(e.currentTarget.value)
+          })
+        }
+        }}
+      />
+      </Col>
+      </Form.Group>
 <h3>Camera Control</h3>
 </Container>
     )
+  }
+}
+
+
+interface SliderInnerState {
+  min:number
+  max:number
+  value: number
+  scale:number
+  change: (propName: string, value: number) => void
+  // change: (propName: string, value: T) => void
+}
+
+class SliderInnerState extends React.Component<SliderInnerState> {
+
+ 
+  render() {
+    
+    
+
+
+    let min = this.props.min
+    let max = this.props.max
+    let value = this.props.value
+    const scale = this.props.scale
+    let step = 1
+
+    if (scale) {
+      min /= scale
+      max /= scale
+      value /= scale
+      step /= scale
+    }
+
+    const horizontalLabels: any = {}
+    horizontalLabels[min] = min
+    horizontalLabels[0] = 0
+    horizontalLabels[max] = max
+
+    const change = (val: number) => {
+      if (val < min) val = min
+      if (val > max) val = max
+      if (scale) val *= scale
+      this.props.change("aa", val)
+      //   const updDat = { data: {} }
+      //   updDat.data[spec.$.id] = { $set: val }
+      //   this.setState(update(this.state, updDat))
+    }
+
+    return [
+     
+    ]
   }
 }
 
