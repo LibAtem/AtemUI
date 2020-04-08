@@ -81,13 +81,6 @@ namespace AtemServer
         }
 
 
-        public void SendProfile()
-        {
-            context_.Clients.All.SendAsync("profile", GetProfile());
-
-        }
-
-
         public DeviceProfile GetProfile()
         {
             lock (_profile)
