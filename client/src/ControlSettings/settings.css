@@ -1,0 +1,31 @@
+.maxW{
+    max-width:800px;
+}
+
+.multiViewGrid{
+display:grid;
+grid-template-columns: 1fr 1fr;
+grid-template-rows:300px 300px;
+column-gap: 5px;
+row-gap:5px;
+/* background:red; */
+}
+
+.multiViewSubGrid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows:1fr 1fr;
+    column-gap: 5px;
+    row-gap:5px;
+}
+
+.mutliViewItem{
+ background:#dfdfdf;
+ border-radius:5px;
+ padding:10%;
+ padding-top:30%;
+}
+
+.programPreview{
+    text-align: center;
+}

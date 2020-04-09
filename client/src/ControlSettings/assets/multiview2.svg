@@ -1,0 +1,21 @@
+<svg width="40" height="30" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect x="-1" y="-1" width="42" height="32" id="canvas_background" fill="none"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="1.388896" y="15.494452" width="18" height="10" id="svg_1" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="20.833333" y="15.47223" width="18" height="10" id="svg_2" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="1.611118" y="2.421015" width="8" height="5" id="svg_7" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="11" y="2.371014" width="8" height="5" id="svg_9" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="1.611118" y="8.632195" width="8" height="5" id="svg_10" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="11" y="8.582193" width="8" height="5" id="svg_11" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="21.044105" y="2.421015" width="8" height="5" id="svg_12" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="30.432986" y="2.371014" width="8" height="5" id="svg_13" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="21.044105" y="8.632195" width="8" height="5" id="svg_14" rx="1"/>
+  <rect fill="#fff" stroke="#0f0f00" stroke-width="1.5" stroke-opacity="0" fill-opacity="null" x="30.432986" y="8.582193" width="8" height="5" id="svg_15" rx="1"/>
+ </g>
+</svg>
