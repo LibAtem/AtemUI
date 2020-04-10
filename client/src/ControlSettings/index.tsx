@@ -610,7 +610,7 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
         <Form.Group as={Row} >
           <Form.Label column sm="1" >{parseInt(j) + 1}</Form.Label>
           <Col sm="6">
-            <Form.Control id={"long" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.longName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} />
+            <Form.Control id={"long" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.longName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.longName} />
           </Col>
           <Col sm="5">
             <Form.Control id={"short" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} />
@@ -673,7 +673,7 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
         <Form.Group as={Row} >
           <Form.Label column sm="1" >{parseInt(j) + 1}</Form.Label>
           <Col sm="6">
-            <Form.Control id={"long" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.longName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} />
+            <Form.Control id={"long" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.longName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.longName} />
           </Col>
           <Col sm="5">
             <Form.Control id={"short" + j} type="text" placeholder={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} defaultValue={this.props.currentState.settings.inputs[outputs[j]].properties.shortName} />
