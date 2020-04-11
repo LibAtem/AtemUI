@@ -569,17 +569,21 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
       if (long && short) { }
-      if (long.value != "" && short.value != "" && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
+      if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 7, LongName: long.value, ShortName: short.value, ExternalPortType: parseInt(port.value) })
-      } else if (long.value != "" && short.value != "") {
+      } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 3, LongName: long.value, ShortName: short.value })
-      } else if (long.value != "" && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
+      } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 5, LongName: long.value, ExternalPortType: parseInt(port.value) })
-      } else if (short.value != "" && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
+      } else if (short.value != this.props.currentState.settings.inputs["input"+index].properties.shortValue && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 6, ShortName: short.value, ExternalPortType: parseInt(port.value) })
-      } else if (long.value != "") {
+      } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 1, LongName: long.value })
-      } else if (short.value != "") {
+      } else if (short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 2, ShortName: short.value })
       } else if (port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 4, ExternalPortType: parseInt(port.value) })
