@@ -99,6 +99,25 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
   }
 
+  public updateLabel(name:string,id:number) {
+    const { device, signalR } = this.props
+    if (device.connected && signalR) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('updateLabel', devId,name,id)
+        .then((res) => {
+          // console.log(value)
+          console.log('ManualCommands: sent')
+          // console.log(command)
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
+    }
+
+  }
+
 
   componentDidUpdate(prevProps: ControlSettingsPageInnerProps) {
     // Should we reload the commandsSpec
@@ -154,7 +173,8 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
         currentState={this.props.currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile}
-        sendCommand={this.sendCommand} />
+        sendCommand={this.sendCommand}
+        updateLabel={this.updateLabel} />
 
     }
 
@@ -243,6 +263,25 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
 
   }
 
+  private updateLable() {
+    const { device, signalR } = this.props
+    if (device.connected && signalR) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('updateLabel', devId)
+        .then((res) => {
+          // console.log(value)
+          console.log('ManualCommands: sent')
+          // console.log(command)
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
+    }
+
+  }
+
   changeVideoMode(event: any) {
     this.setState({ videoMode: event.target.value });
   }
@@ -307,7 +346,7 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               </Form.Control>
             </Col>
           </Form.Group>
-          <Button onClick={() => this.sendCommand("LibAtem.Commands.Media.MediaPoolSettingsSetCommand", { MaxFrames: [450, 450] })} variant="primary" >
+          <Button onClick={() => this.updateLable()} variant="primary" >
             Set
   </Button>
 
@@ -407,6 +446,7 @@ interface LabelSettingsProps {
   currentState: any
   currentProfile: any
   sendCommand: any
+  updateLabel :any 
 }
 interface LabelSettingsState {
   page: number
@@ -441,6 +481,26 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
 
   }
 
+  public updateLable(name:string,id:number) {
+    const signalR = this.signalR
+    const device = this.device
+    if (device.connected && signalR) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('updateLabel', devId,name,id)
+        .then((res) => {
+          // console.log(value)
+          console.log('ManualCommands: sent')
+          // console.log(command)
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
+    }
+
+  }
+
   render() {
 
     var content = <></>
@@ -451,7 +511,8 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
         currentState={this.props.currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile}
-        sendCommand={this.sendCommand} />
+        sendCommand={this.sendCommand}
+        updateLabel={this.updateLable} />
     } else if (this.state.page == 1) {
 
       content = <OutputLabelSettings
@@ -461,6 +522,7 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile}
         sendCommand={this.sendCommand}
+        updateLabel={this.updateLable}
       />
 
     } else if (this.state.page == 2) {
@@ -471,7 +533,8 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
         currentState={this.props.currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile}
-        sendCommand={this.sendCommand} />
+        sendCommand={this.sendCommand}
+        updateLabel={this.updateLable} />
 
     }
 
@@ -590,11 +653,13 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
       if (long && short) { }
-      if (long.value != "" && short.value != "") {
+      if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName && short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 3, LongName: long.value, ShortName: short.value })
-      } else if (long.value != "") {
+      } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 1, LongName: long.value })
-      } else if (short.value != "") {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
+      } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 2, ShortName: short.value })
       }
 
@@ -653,11 +718,13 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
       if (long && short) { }
-      if (long.value != "" && short.value != "") {
+      if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName && short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 3, LongName: long.value, ShortName: short.value })
-      } else if (long.value != "") {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
+      } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
+        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 1, LongName: long.value })
-      } else if (short.value != "") {
+      } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 2, ShortName: short.value })
       }
 

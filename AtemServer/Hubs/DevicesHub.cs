@@ -1,18 +1,20 @@
+using LibAtem.Commands;
+using LibAtem.DeviceProfile;
+using LibAtem.Net.DataTransfer;
+using LibAtem.State;
+using LibAtem.Util.Media;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
-using LibAtem.Commands;
-using LibAtem.State;
-using Newtonsoft.Json;
-using LibAtem.DeviceProfile;
 
 namespace AtemServer.Hubs
 {
     public class DevicesHub : Hub
     {
         private readonly AtemRepository repo_;
-        
+
         public DevicesHub(AtemRepository repo)
         {
             repo_ = repo;
@@ -50,12 +52,12 @@ namespace AtemServer.Hubs
         {
             return SendMutateResponse(repo_.AddDevice(address, port), "Add");
         }
-        
+
         public Task DeviceForget(string address, int port)
         {
             return SendMutateResponse(repo_.ForgetDevice(address, port), "Forget");
         }
-        
+
         public Task DeviceEnabled(string address, int port, bool enabled)
         {
             return SendMutateResponse(repo_.SetDeviceEnabled(address, port, enabled), "Enabled");
@@ -82,7 +84,7 @@ namespace AtemServer.Hubs
 
             return typesMap.TryGetValue(fullName, out Type value) ? value : null;
         }
-        
+
         public async Task CommandSend(string deviceId, string commandName, string propertiesStr)
         {
 
@@ -104,8 +106,35 @@ namespace AtemServer.Hubs
             {
                 throw new Exception("Bad deviceId");
             }
-            
+
             client.Client.SendCommand(cmd);
+            //updateLabel(deviceId);
+
+        }
+
+
+        public async Task updateLabel(string deviceId, string name, uint id)
+        {
+
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+            
+
+            var job = new UploadMultiViewJob(id, AtemFrame.FromYCbCr(name, MultiViewImage.Make(name)), uploadResult);
+
+
+            client.Client.DataTransfer.QueueJob(job);
+        }
+
+        
+
+        public void uploadResult(bool result)
+        {
+            //... do something
+            Console.WriteLine("Sucess? {0}", result);
         }
 
         public Task<AtemState> StateGet(string deviceId)
@@ -129,7 +158,7 @@ namespace AtemServer.Hubs
             }
 
             await Clients.All.SendAsync("state", client.GetState());
-  
+
         }
 
         public Task<DeviceProfile> SendProfile(string deviceId)
@@ -149,6 +178,6 @@ namespace AtemServer.Hubs
             await Clients.All.SendAsync("messageReceived", username, message);
         }
 
-        
+
     }
 }
