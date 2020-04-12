@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace AtemServer.Hubs
@@ -113,23 +114,51 @@ namespace AtemServer.Hubs
         }
 
 
-        public async Task updateLabel(string deviceId, string name, uint id)
+        public void updateLabel(string deviceId, string name, uint id)
         {
-
             var client = repo_.GetConnection(deviceId);
             if (client == null)
             {
                 throw new Exception("Bad deviceId");
             }
             
-
             var job = new UploadMultiViewJob(id, AtemFrame.FromYCbCr(name, MultiViewImage.Make(name)), uploadResult);
-
 
             client.Client.DataTransfer.QueueJob(job);
         }
 
-        
+     /*   public void addImage(string deviceId, string name, uint id)
+        {
+            var client = repo_.GetConnection(deviceId);
+            if (client == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            var data = new byte[8294400];
+            var img720 = new Bitmap(1920, 1080);
+            Graphics drawing = Graphics.FromImage(img720);
+            drawing.Clear(Color.Blue);
+
+            for (int i = 0; i < img720.Width; i++)
+            {
+                for (int j = 0; j < img720.Height; j++)
+                {
+                    Color pixel = img720.GetPixel(i, j);
+                    data[(i + (1920 * j)) * 4] = pixel.R;
+                    data[(i + (1920 * j)) * 4+1] = pixel.G;
+                    data[(i + (1920 * j)) * 4+2] = pixel.B;
+                    data[(i + (1920 * j)) * 4+3] = pixel.A;
+
+                }
+            }
+           var job = new UploadMediaStillJob(8, AtemFrame.FromRGBA(name, data,ColourSpace.BT709), uploadResult);
+
+            client.Client.DataTransfer.QueueJob(job);
+        }*/
+
+
+
 
         public void uploadResult(bool result)
         {

@@ -16,7 +16,7 @@ import * as signalR from '@microsoft/signalr'
 import { AtemDeviceInfo } from './Devices/types'
 import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
-
+import { UploadMediaPage } from './UploadMedia'
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
 enum ConnectionStatus {
@@ -230,6 +230,9 @@ export default class App extends React.Component<{}, AppState> {
                 <LinkContainer to="/devices">
                   <Nav.Link>Devices</Nav.Link>
                 </LinkContainer>
+                <LinkContainer to="/media">
+                  <Nav.Link>Media</Nav.Link>
+                </LinkContainer>
               </Nav>
               <Form inline>
                 {this.renderDeviceSelection()}
@@ -259,6 +262,9 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
                 <Route path="/profile">
                   <DeviceProfileViewerPage />
+                </Route>
+                <Route path="/media">
+                  <UploadMediaPage/>
                 </Route>
               </Switch>
             ) : (
