@@ -19,6 +19,48 @@ export class UploadMediaPage extends React.Component {
   fileInput = React.createRef() as RefObject<HTMLInputElement>
   static contextType = DeviceManagerContext
 
+
+  render() {
+    const device = GetActiveDevice(this.context)
+
+    return (
+      <Container>
+
+        {device ? (
+          <MediaPageInner
+
+            key={this.context.activeDeviceId || ''}
+            device={device}
+            currentState={this.context.currentState}
+            currentProfile={this.context.currentProfile}
+            // currentState={this.state.currentState}
+            signalR={this.context.signalR}
+          />
+        ) : (
+            <p>No device selected</p>
+          )}
+      </Container>
+    )
+  }
+}
+
+interface MediaPageInnerProps {
+  device: AtemDeviceInfo
+  signalR: signalR.HubConnection | undefined
+  currentState: any
+  currentProfile: any
+}
+interface MediaPageInnerState {
+  hasConnected: boolean
+  images: any
+  // currentState: any
+
+}
+class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInnerState> {
+  state ={
+    hasConnected: this.props.device.connected,
+    images:{} as any
+  }
   // This function accepts three arguments, the URL of the image to be 
   // converted, the mime type of the Base64 image to be output, and a 
   // callback function that will be called with the data URL as its argument 
@@ -64,7 +106,7 @@ export class UploadMediaPage extends React.Component {
 
   sendBase64ToServer (name: string, base64: string) {
     
-    var device = GetActiveDevice(this.context)
+    var device = this.props.device
     if(device){
       var id = GetDeviceId(device)
     
@@ -128,25 +170,84 @@ changeImage(input:any) {
   }
 }
 
+getImages(){
+  var imageArray = []
+  for(var i in this.props.currentState.mediaPool.stills){
+    if (this.props.currentState.mediaPool.stills[i].isUsed){
+      if(!this.state.images[this.props.currentState.mediaPool.stills[i].hash]){
+        console.log("image not found:"+ this.props.currentState.mediaPool.stills[i].hash)
+        this.getImage(this.props.currentState.mediaPool.stills[i].hash)
+        
+      }
+    }
+  }
+}
+
+getImage (name: string) {
+    
+  var device = this.props.device
+  if(device){
+    var id = GetDeviceId(device)
+  var parentThis = this
+  var httpGet = new XMLHttpRequest(),
+    path = "http://127.0.0.1:5000/api2/download/"+id,
+    data =JSON.stringify({hash:name});
+
+    httpGet.onreadystatechange = function (err) {
+    if (httpGet.readyState == 4 && httpGet.status == 200) {
+      // console.log(httpGet.responseText);
+      if(httpGet.responseText!="Not Downloaded" && httpGet.responseText!="Not Present"){
+        console.log("yes")
+        parentThis.state.images[name]=httpGet.responseText
+        console.log(parentThis.state.images)
+      }else if(httpGet.responseText=="Not Downloaded"){
+          console.log("not downloaded")
+      }
+      else if(httpGet.responseText!="Not Present"){
+        console.log("not present")
+    }else
+        {
+        console.log("No")
+      }
+    } else {
+      // console.log(err);
+    }
+  };
+
+  httpGet.open("POST", path, true);
+  httpGet.setRequestHeader('Content-Type', 'application/json')
+  httpGet.send(data);
+}
+};
+
   // Call the function with the provided values. The mime type could also be png
   // or webp
 
   //uploadImage(imgsrc, name, 'image/jpeg')
  /* <button onClick={()=>this.uploadImage("/img1.png", "image", 'image/jpeg')}>UP</button> */
   render() {
-    const device = GetActiveDevice(this.context)
 
+    if(!this.props.currentState){
+      return(<p>Waiting for state</p>)
+    }
+    var imagearray = this.getImages()
+    var imgs =[]
+    for(var i in this.props.currentState.mediaPool.stills){
+      if (this.props.currentState.mediaPool.stills[i].isUsed){
+        if(this.state.images[this.props.currentState.mediaPool.stills[i].hash]){
+          imgs.push(<img src ={"data:image/jpg;base64,"+this.state.images[this.props.currentState.mediaPool.stills[i].hash]}></img>)
+        }
+      }
+    }
     return (
       <Container>
 
-        {device ? (
           <div>
            <input onChange={(e)=>this.changeImage(e.currentTarget)}type="file" id="filetag"></input>
            <img src="" id="preview"></img>
            </div>
-        ) : (
-            <p>No device selected</p>
-          )}
+           {imgs}
+    
       </Container>
     )
   }

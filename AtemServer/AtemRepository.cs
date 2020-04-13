@@ -13,6 +13,14 @@ using LibAtem.State.Builder;
 using LiteDB;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using AtemServer.Controllers;
+using LibAtem.Net.DataTransfer;
+using LibAtem.Common;
+using LibAtem.Util.Media;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Drawing.Imaging;
 
 namespace AtemServer
 {
@@ -31,7 +39,7 @@ namespace AtemServer
     public class AtemClientExt
     {
         private readonly DeviceProfileHandler _profile;
-
+        private readonly List<MediaPoolImage> _images;
         private readonly AtemState _state;
         private readonly IHubContext<DevicesHub> context_;
 
@@ -41,7 +49,7 @@ namespace AtemServer
             _profile = new DeviceProfileHandler();
             _state = new AtemState();
             context_ = _context;
-
+            _images = new List<MediaPoolImage>();
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
             Client.OnConnection += sender => { Connected = true; };
@@ -69,7 +77,48 @@ namespace AtemServer
                                 errors.Add($"Failed to update state for {command.GetType().Name}");
                             }
                         }
+
                         
+                        
+                    }
+                }
+
+                for (var i = 0; i < _state.MediaPool.Stills.Count; i++)
+                {
+                    if (_state.MediaPool.Stills[i].IsUsed)
+                    {
+                        if (_images.Where(p => p.Hash.SequenceEqual(_state.MediaPool.Stills[i].Hash)).ToList().Count == 0)
+                        {
+                            MediaPoolImage im = new MediaPoolImage();
+                            im.Hash = _state.MediaPool.Stills[i].Hash;
+                            im.Downloaded = false;
+                            _images.Add(im);
+
+                            var job = new DownloadMediaStillJob((uint)i, VideoModeResolution._1080, ((AtemFrame frame) => {
+                                
+                                Console.WriteLine("Downloaded");
+                                byte[] data = frame.GetRGBA(ColourSpace.BT709);
+                                Bitmap pic = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                                for (int x = 0; x < 1920; x++)
+                                {
+                                    for (int y = 0; y < 1080; y++)
+                                    {
+                                        int arrayIndex = (y * 1920 + x)*4;
+                                        Color c = Color.FromArgb(data[arrayIndex+3], data[arrayIndex],data[arrayIndex + 1],data[arrayIndex + 2]);
+                                        pic.SetPixel(x, y, c);
+                                    }
+                                }
+                                //pic.Save("output.jpg", ImageFormat.Jpeg);  // Or Png
+                                MemoryStream ms = new MemoryStream();
+                                pic.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                                im.Base64 = Convert.ToBase64String(ms.ToArray());
+                                im.Downloaded = true;
+
+                            }));
+                            Client.DataTransfer.QueueJob(job);
+                        }
                     }
                 }
 
@@ -105,7 +154,25 @@ namespace AtemServer
                 return _state.Clone();
             }
         }
-        
+
+        public MediaPoolImage GetImage(string Name)
+        {
+
+            
+                byte[] bytes = Convert.FromBase64String(Name);
+
+            var imageList = _images.Where(p => (p.Hash.SequenceEqual(bytes))).ToList();
+                if (imageList.Count == 1)
+                {
+                    return imageList[0];
+                }
+
+                return null;
+ 
+
+            
+        }
+
         public AtemClient Client { get; }
         
         public bool Connected { get; private set; }

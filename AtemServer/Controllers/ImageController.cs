@@ -21,6 +21,11 @@ namespace AtemServer.Controllers
         public string image { get; set; }
     }
 
+    public class hashData
+    {
+        public string hash { get; set; }
+    }
+
     [Route("api2/")]
     public class ImageConroller : Controller
     {
@@ -39,17 +44,37 @@ namespace AtemServer.Controllers
             //_cachedSpec = new Lazy<CommandsSpec>(() => SpecGenerator.CompileData());
         }
         
-        [HttpGet]
-        [Route("{id}")]
-        public String Get(string id)
+        [HttpPost]
+        [Route("download/{id}")]
+        public String Get(string id, [FromBody] hashData data)
         {
-            var client = _repo.GetConnection(id);
-            if (client == null)
+            if (data !=null)
             {
-                throw new Exception("Device not found");
-            }          
-            
-            return "sucess";
+                var client = _repo.GetConnection(id);
+                if (client == null)
+                {
+                    throw new Exception("Device not found");
+                }
+                /* client._images*/
+                var image = client.GetImage(data.hash);
+                if (image != null)
+                {
+                    if (image.Downloaded)
+                    {
+                        return image.Base64;
+                    }
+                    else
+                    {
+                        return "Not Downloaded";
+                    }
+
+                }
+                else
+                {
+                    return "Not Present";
+                }
+            }
+            return "No data";
         }
 
         [HttpPost]
@@ -150,6 +175,7 @@ namespace AtemServer.Controllers
 
         public void uploadResult(bool result)
         {
+            
             //... do something
             Console.WriteLine("Sucess? {0}", result);
         }
