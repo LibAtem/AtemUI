@@ -11,11 +11,12 @@ import { prettyDecimal } from '../util';
 import PropTypes from 'prop-types';
 import Slider from 'react-rangeslider';
 import { STATUS_CODES } from 'http';
-
+import remove from './assets/remove.svg';
+import './media.css'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
-  
+
   fileInput = React.createRef() as RefObject<HTMLInputElement>
   static contextType = DeviceManagerContext
 
@@ -24,7 +25,7 @@ export class UploadMediaPage extends React.Component {
     const device = GetActiveDevice(this.context)
 
     return (
-      <Container>
+        <div>
 
         {device ? (
           <MediaPageInner
@@ -39,7 +40,7 @@ export class UploadMediaPage extends React.Component {
         ) : (
             <p>No device selected</p>
           )}
-      </Container>
+      </div>
     )
   }
 }
@@ -57,9 +58,9 @@ interface MediaPageInnerState {
 
 }
 class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInnerState> {
-  state ={
+  state = {
     hasConnected: this.props.device.connected,
-    images:{} as any
+    images: {} as any
   }
   // This function accepts three arguments, the URL of the image to be 
   // converted, the mime type of the Base64 image to be output, and a 
@@ -78,7 +79,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     // has cross-origin headers properly set
 
     img.crossOrigin = 'Anonymous'
-    
+
     // Because image loading is asynchronous, we define an event listening function that will be called when the image has been loaded
     img.onload = function () {
       console.log("aa12")
@@ -104,151 +105,273 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   // Here we define the function that will send the request to the server. 
   // It will accept the image name, and the base64 data as arguments
 
-  sendBase64ToServer (name: string, base64: string) {
-    
+  sendBase64ToServer(name: string, base64: string) {
+
     var device = this.props.device
-    if(device){
+    if (device) {
       var id = GetDeviceId(device)
-    
-    var httpPost = new XMLHttpRequest(),
-      path = "http://127.0.0.1:5000/api2/"+id+"/"+ name,
-      data = JSON.stringify({ image: base64 });
-    httpPost.onreadystatechange = function (err) {
-      if (httpPost.readyState == 4 && httpPost.status == 200) {
-        console.log(httpPost.responseText);
-      } else {
-        console.log(err);
-      }
-    };
-    // Set the content type of the request to json since that's what's being sent
-  
-    // httpPost.setHeader('Content-Type', 'application/json');
-    httpPost.open("POST", path, true);
-    httpPost.setRequestHeader('Content-Type', 'application/json')
-    httpPost.send(data);
-  }
+
+      var httpPost = new XMLHttpRequest(),
+        path = "http://127.0.0.1:5000/api2/" + id + "/" + name,
+        data = JSON.stringify({ image: base64 });
+      httpPost.onreadystatechange = function (err) {
+        if (httpPost.readyState == 4 && httpPost.status == 200) {
+          console.log(httpPost.responseText);
+        } else {
+          console.log(err);
+        }
+      };
+      // Set the content type of the request to json since that's what's being sent
+
+      // httpPost.setHeader('Content-Type', 'application/json');
+      httpPost.open("POST", path, true);
+      httpPost.setRequestHeader('Content-Type', 'application/json')
+      httpPost.send(data);
+    }
   };
 
   // This wrapper function will accept the name of the image, the url, and the 
   // image type and perform the request
 
-  uploadImage(src:string, name:string, type:string) {
-    var parentThis=this
- 
-    this.convertToBase64(src, type, function (data:string) {
+  uploadImage(src: string, name: string, type: string) {
+    var parentThis = this
+
+    this.convertToBase64(src, type, function (data: string) {
       console.log("button Pressed")
       parentThis.sendBase64ToServer(name, data);
-      
+
     });
   };
 
-//   var fileTag = document.getElementById("filetag"),
-//   preview = document.getElementById("preview");
-    
-// fileTag.addEventListener("change", function() {
-//   changeImage(this);
-// });
+  //   var fileTag = document.getElementById("filetag"),
+  //   preview = document.getElementById("preview");
 
-changeImage(input:any) {
-  var reader;
-  var parentThis = this
-  console.log(input)
-  if (input.files && input.files[0]) {
-    reader = new FileReader();
+  // fileTag.addEventListener("change", function() {
+  //   changeImage(this);
+  // });
 
-    reader.onload = function(e:any) {
-      var result = e.originalTarget.result 
-      if(result){
-        console.log(result)
-        parentThis.sendBase64ToServer("Test",result)
+  changeImage(input: any) {
+    var reader;
+    var parentThis = this
+    console.log(input)
+    if (input.files && input.files[0]) {
+      reader = new FileReader();
+
+      reader.onload = function (e: any) {
+        var result = e.originalTarget.result
+        if (result) {
+          console.log(result)
+          parentThis.sendBase64ToServer("Test", result)
+        }
+        // console.log(result.readAsDataURL())
+        // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
       }
-      // console.log(result.readAsDataURL())
-      // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
-    }
 
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-getImages(){
-  var imageArray = []
-  for(var i in this.props.currentState.mediaPool.stills){
-    if (this.props.currentState.mediaPool.stills[i].isUsed){
-      if(!this.state.images[this.props.currentState.mediaPool.stills[i].hash]){
-        console.log("image not found:"+ this.props.currentState.mediaPool.stills[i].hash)
-        this.getImage(this.props.currentState.mediaPool.stills[i].hash)
-        
-      }
+      reader.readAsDataURL(input.files[0]);
     }
   }
-}
 
-getImage (name: string) {
-    
-  var device = this.props.device
-  if(device){
-    var id = GetDeviceId(device)
-  var parentThis = this
-  var httpGet = new XMLHttpRequest(),
-    path = "http://127.0.0.1:5000/api2/download/"+id,
-    data =JSON.stringify({hash:name});
+  getImages() {
+    var imageArray = []
+    for (var i in this.props.currentState.mediaPool.stills) {
+      if (this.props.currentState.mediaPool.stills[i].isUsed) {
+        if (!this.state.images[this.props.currentState.mediaPool.stills[i].hash]) {
+          console.log("image not found:" + this.props.currentState.mediaPool.stills[i].hash)
+          this.getImage(this.props.currentState.mediaPool.stills[i].hash)
 
-    httpGet.onreadystatechange = function (err) {
-    if (httpGet.readyState == 4 && httpGet.status == 200) {
-      // console.log(httpGet.responseText);
-      if(httpGet.responseText!="Not Downloaded" && httpGet.responseText!="Not Present"){
-        console.log("yes")
-        parentThis.state.images[name]=httpGet.responseText
-        console.log(parentThis.state.images)
-      }else if(httpGet.responseText=="Not Downloaded"){
-          console.log("not downloaded")
+        }
       }
-      else if(httpGet.responseText!="Not Present"){
-        console.log("not present")
-    }else
-        {
-        console.log("No")
-      }
-    } else {
-      // console.log(err);
+    }
+  }
+
+  getImage(name: string) {
+
+    var device = this.props.device
+    if (device) {
+      var id = GetDeviceId(device)
+      var parentThis = this
+      var httpGet = new XMLHttpRequest(),
+        path = "http://127.0.0.1:5000/api2/download/" + id,
+        data = JSON.stringify({ hash: name });
+
+      httpGet.onreadystatechange = function (err) {
+        if (httpGet.readyState == 4 && httpGet.status == 200) {
+          // console.log(httpGet.responseText);
+          if (httpGet.responseText != "Not Downloaded" && httpGet.responseText != "Not Present") {
+            console.log("yes")
+            parentThis.state.images[name] = httpGet.responseText
+            console.log(parentThis.state.images)
+          } else if (httpGet.responseText == "Not Downloaded") {
+            console.log("not downloaded")
+          }
+          else if (httpGet.responseText != "Not Present") {
+            console.log("not present")
+          } else {
+            console.log("No")
+          }
+        } else {
+          // console.log(err);
+        }
+      };
+
+      httpGet.open("POST", path, true);
+      httpGet.setRequestHeader('Content-Type', 'application/json')
+      httpGet.send(data);
     }
   };
 
-  httpGet.open("POST", path, true);
-  httpGet.setRequestHeader('Content-Type', 'application/json')
-  httpGet.send(data);
-}
-};
+  
+  public sendCommand(command: string, value: any) {
+    const { device, signalR } = this.props
+    if (device.connected && signalR) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('CommandSend', devId, command, JSON.stringify(value))
+        .then((res) => {
+          console.log(value)
+          console.log('ManualCommands: sent')
+          console.log(command)
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
+    }
+
+  }
+
+  allowDrop(ev:any) {
+    ev.preventDefault();
+  }
+
+  drop(ev:any,mp:number) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("id");
+    console.log(data)
+    this.sendCommand("LibAtem.Commands.Media.MediaPlayerSourceSetCommand",{Index:mp,Mask:3,SourceType: 1,StillIndex:data})
+    //ev.target.appendChild(document.getElementById(data));
+  }
+
+  drag(ev:any,id:number) {
+    ev.dataTransfer.setData("id", id);
+  }
+  
 
   // Call the function with the provided values. The mime type could also be png
   // or webp
 
-  //uploadImage(imgsrc, name, 'image/jpeg')
- /* <button onClick={()=>this.uploadImage("/img1.png", "image", 'image/jpeg')}>UP</button> */
-  render() {
-
-    if(!this.props.currentState){
-      return(<p>Waiting for state</p>)
-    }
-    var imagearray = this.getImages()
-    var imgs =[]
-    for(var i in this.props.currentState.mediaPool.stills){
-      if (this.props.currentState.mediaPool.stills[i].isUsed){
-        if(this.state.images[this.props.currentState.mediaPool.stills[i].hash]){
-          imgs.push(<img src ={"data:image/jpg;base64,"+this.state.images[this.props.currentState.mediaPool.stills[i].hash]}></img>)
-        }
-      }
-    }
-    return (
-      <Container>
-
-          <div>
+   /* <div>
            <input onChange={(e)=>this.changeImage(e.currentTarget)}type="file" id="filetag"></input>
            <img src="" id="preview"></img>
            </div>
-           {imgs}
+           {imgs} */
+
+
+
+  //uploadImage(imgsrc, name, 'image/jpeg')
+  /* <button onClick={()=>this.uploadImage("/img1.png", "image", 'image/jpeg')}>UP</button> */
+  render() {
+
+    if (!this.props.currentState) {
+      return (<p>Waiting for state</p>)
+    }
+    var imagearray = this.getImages()
+    var imgs = []
+    for (var i in this.props.currentState.mediaPool.stills) {
+      const mp = []
+      if(this.props.currentState.mediaPlayers[0].source.sourceType==1 && this.props.currentState.mediaPlayers[0].source.sourceIndex==i && this.props.currentState.mediaPlayers[1].source.sourceType==1 && this.props.currentState.mediaPlayers[1].source.sourceIndex==i){ 
+        if(this.props.currentState.mixEffects[0].sources.program==3010){
+        mp.push(<div className="mp1 mp-program">1</div>)
+       }else if(this.props.currentState.mixEffects[0].sources.preview==3010){
+        mp.push(<div className="mp1 mp-preview">1</div>)
+       }else{
+        mp.push(<div className="mp1">1</div>)
+       }
+       if(this.props.currentState.mixEffects[0].sources.program==3020){
+        mp.push(<div className="mp2 mp-program">2</div>)
+       }else if(this.props.currentState.mixEffects[0].sources.preview==3020){
+        mp.push(<div className="mp2 mp-preview">2</div>)
+       }else{
+        mp.push(<div className="mp2">2</div>)
+       }
+      }else if(this.props.currentState.mediaPlayers[0].source.sourceType==1 && this.props.currentState.mediaPlayers[0].source.sourceIndex==i){
+        if(this.props.currentState.mixEffects[0].sources.program==3010){
+          mp.push(<div className="mp1 mp-program">1</div>)
+         }else if(this.props.currentState.mixEffects[0].sources.preview==3010){
+          mp.push(<div className="mp1 mp-preview">1</div>)
+         }else{
+          mp.push(<div className="mp1">1</div>)
+         }
+      }else if(this.props.currentState.mediaPlayers[1].source.sourceType==1 && this.props.currentState.mediaPlayers[1].source.sourceIndex==i){
+        if(this.props.currentState.mixEffects[0].sources.program==3020){
+          mp.push(<div className="mp1 mp-program">2</div>)
+         }else if(this.props.currentState.mixEffects[0].sources.preview==3020){
+          mp.push(<div className="mp1 mp-preview">2</div>)
+         }else{
+          mp.push(<div className="mp1">2</div>)
+         }
+      }
+      if (this.props.currentState.mediaPool.stills[i].isUsed) {
+        if (this.state.images[this.props.currentState.mediaPool.stills[i].hash]) {
+
+          const x= i;
+         
+
+          imgs.push(
+            <div className="image" >
+            <div className="x" onClick={()=>this.sendCommand("LibAtem.Commands.Media.MediaPoolClearStillCommand",{Index:x})}>
+              <img className = "remove" src={remove}></img>
+            </div>
+            {mp}
+            <div className="inner">
+            <img className ="drag" onDragStart={(event)=>this.drag(event,parseInt(x))} draggable={true} src={"data:image/jpg;base64," + this.state.images[this.props.currentState.mediaPool.stills[i].hash]} width="100%"></img>
+            </div>
+            <div className="nameTag">{parseInt(i)+1 +"  " + this.props.currentState.mediaPool.stills[i].filename}</div>
+          </div>
+          )
+     
+        }
+      }else{
+        imgs.push(<div className="image" draggable={true}>
+          {mp}
+        <div className="inner">
+          <div className ="emptyInner">{parseInt(i)+1}</div>
+          
+        </div>
+      </div>)
+      }
+    }
+
+    var mediaPlayers = []
+    for (var i in this.props.currentState.mediaPlayers) {
+      const x = i;
+      if(this.props.currentState.mediaPlayers[i].source.sourceType==1 && this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].isUsed && this.state.images[this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].hash]){
+        mediaPlayers.push(    <div className="current">
+        <div className="heading">
+          No Media Assigned
+        </div>
+        <div className="current-inner" onDrop={(event)=>this.drop(event,parseInt(x))} onDragOver={(event)=>this.allowDrop(event)}>
+          <img src={"data:image/jpg;base64," + this.state.images[this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].hash]} width="100%"></img>
+        </div>
+      </div>)
+      }
+
+    }
     
-      </Container>
+
+    return (  
+      <div id="mediaContainer">
+        <div id="clips">
+          {imgs}
+        </div>
+
+        <div id="current">
+          <div id="media-heading">Media Players</div>
+          {mediaPlayers}
+        </div>
+     
+
+      </div>
     )
   }
 }
