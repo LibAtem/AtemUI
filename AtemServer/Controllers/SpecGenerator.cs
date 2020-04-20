@@ -31,6 +31,8 @@ namespace AtemServer.Controllers
         Flags,
         String,
         ByteArray,
+        IntArray
+
     }
 
     public class CommandSpec
@@ -161,6 +163,11 @@ namespace AtemServer.Controllers
                             {
                                 resProp.Type = CommandPropertyType.ByteArray;
                                 resProp.Max = (int) prop.GetCustomAttribute<ByteArrayAttribute>().Length;
+                            }
+                            else if (prop.GetCustomAttribute<UInt16ListAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.IntArray;
+                                //resProp.Count = (int)prop.GetCustomAttribute<UInt16ListAttribute>().Count;
                             }
                             else
                             {

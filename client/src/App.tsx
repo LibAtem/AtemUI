@@ -17,6 +17,7 @@ import { AtemDeviceInfo } from './Devices/types'
 import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
+import { AudioPage } from './Audio'
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
 enum ConnectionStatus {
@@ -233,6 +234,9 @@ export default class App extends React.Component<{}, AppState> {
                 <LinkContainer to="/media">
                   <Nav.Link>Media</Nav.Link>
                 </LinkContainer>
+                <LinkContainer to="/audio">
+                  <Nav.Link>Audio</Nav.Link>
+                </LinkContainer>
               </Nav>
               <Form inline>
                 {this.renderDeviceSelection()}
@@ -265,6 +269,9 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
                 <Route path="/media">
                   <UploadMediaPage/>
+                </Route>
+                <Route path="/audio">
+                  <AudioPage/>
                 </Route>
               </Switch>
             ) : (
