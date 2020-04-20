@@ -5,13 +5,14 @@
       }
     
     #clips {
-        /* height: 100%; */
+        height: 100vh;
         display: grid;
         grid-template-columns: repeat(auto-fit, 200px);
         grid-template-rows: repeat(auto-fit, 112px);
-        padding: 10px;
+        padding: 20px;
         row-gap: 40px;
         column-gap: 20px;
+        overflow-y: scroll;
     }
 
     .inner {
@@ -107,8 +108,9 @@
 
     #current {
         background: #f1f1f1;
-
+        height:100vh;
         display: grid;
+        overflow: hidden;
         grid-template-rows: 1fr 300px 300px 1fr;
     }
 
@@ -159,4 +161,8 @@
         margin-top:25px;
         color: #c0c0c0; 
 
+    }
+
+    .lower{
+        margin-top:70px; 
     }

@@ -95,26 +95,33 @@ namespace AtemServer
                             _images.Add(im);
 
                             var job = new DownloadMediaStillJob((uint)i, VideoModeResolution._1080, ((AtemFrame frame) => {
-                                
-                                Console.WriteLine("Downloaded");
-                                byte[] data = frame.GetRGBA(ColourSpace.BT709);
-                                Bitmap pic = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                                for (int x = 0; x < 1920; x++)
+                                if (frame != null)
                                 {
-                                    for (int y = 0; y < 1080; y++)
-                                    {
-                                        int arrayIndex = (y * 1920 + x)*4;
-                                        Color c = Color.FromArgb(data[arrayIndex+3], data[arrayIndex],data[arrayIndex + 1],data[arrayIndex + 2]);
-                                        pic.SetPixel(x, y, c);
-                                    }
-                                }
-                                //pic.Save("output.jpg", ImageFormat.Jpeg);  // Or Png
-                                MemoryStream ms = new MemoryStream();
-                                pic.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                                    Console.WriteLine("Downloaded");
+                                    byte[] data = frame.GetRGBA(ColourSpace.BT709);
+                                    Bitmap pic = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                                im.Base64 = Convert.ToBase64String(ms.ToArray());
-                                im.Downloaded = true;
+                                    for (int x = 0; x < 1920; x++)
+                                    {
+                                        for (int y = 0; y < 1080; y++)
+                                        {
+                                            int arrayIndex = (y * 1920 + x) * 4;
+                                            Color c = Color.FromArgb(data[arrayIndex + 3], data[arrayIndex], data[arrayIndex + 1], data[arrayIndex + 2]);
+                                            pic.SetPixel(x, y, c);
+                                        }
+                                    }
+                                    //pic.Save("output.jpg", ImageFormat.Jpeg);  // Or Png
+                                    MemoryStream ms = new MemoryStream();
+                                    pic.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                                    im.Base64 = Convert.ToBase64String(ms.ToArray());
+                                    im.Downloaded = true;
+                                }
+                                else
+                                {
+                                    _images.Remove(im);
+                                }
 
                             }));
                             Client.DataTransfer.QueueJob(job);

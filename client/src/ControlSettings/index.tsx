@@ -15,6 +15,7 @@ import multiview1 from './assets/multiview1.svg';
 import multiview2 from './assets/multiview2.svg';
 import multiview3 from './assets/multiview3.svg';
 import multiview4 from './assets/multiview4.svg';
+import { spacing } from 'react-select/src/theme';
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
 
@@ -237,8 +238,8 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
       videoMode: props.currentState.settings.videoMode,
       multiViewMode: 0, //Set all of the bellow to the correct value
       downConvertMode: 0,
-      clip1Length: 450,
-      clip2Length: 450
+      clip1Length: props.currentState.mediaPool.clips[0].maxFrames,
+      clip2Length: props.currentState.mediaPool.clips[1].maxFrames
 
     }
 
@@ -309,6 +310,11 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
     for (var i = 0; i < multiViewModes[videoMode].length; i++) {
       multiviewMode.push(<option value={i}>{videModeNames[multiViewModes[videoMode][i]]}</option>)
     }
+
+    var maxFrames = 0;
+    for( var i=0; i< currentState.mediaPool.clips.length;i++){
+      maxFrames += currentState.mediaPool.clips[i].maxFrames
+    }
     return (
       <Container className="p-5 maxW" >
         <h3>Video</h3>
@@ -346,13 +352,13 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               </Form.Control>
             </Col>
           </Form.Group>
-          <Button onClick={() => this.updateLable()} variant="primary" >
+          {/* <Button onClick={() => this.updateLable()} variant="primary" >
             Set
-  </Button>
+  </Button> */}
 
         </Form>
         <h3>Media Pool</h3>
-        <small id="emailHelp" className="form-text text-muted">There are 900 frames to share between the clips</small>
+        <small id="emailHelp" className="form-text text-muted">There are {maxFrames} frames to share between the clips</small>
 
         <Form.Group as={Row}>
           <Form.Label column sm="4" >Clip 1 Length:</Form.Label>
@@ -360,13 +366,13 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
             <Slider
               key={0}
               min={0}
-              max={900}
+              max={maxFrames}
               step={1}
               // labels={"horizontalLabels"}
               onChange={(v) => {
                 this.setState({
                   clip1Length: v,
-                  clip2Length: 900 - v
+                  clip2Length: maxFrames - v
                 })
               }}
               value={this.state.clip1Length}
@@ -381,14 +387,14 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               type="number"
               placeholder={""}
               min={0}
-              max={900}
+              max={maxFrames}
               value={prettyDecimal(this.state.clip1Length)}
               onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
                 if (e.currentTarget.value) {
                   this.setState({
 
                     clip1Length: parseInt(e.currentTarget.value),
-                    clip2Length: 900 - parseInt(e.currentTarget.value)
+                    clip2Length: maxFrames - parseInt(e.currentTarget.value)
                   })
                 }
               }}
@@ -401,12 +407,12 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
             <Slider
               key={0}
               min={0}
-              max={900}
+              max={maxFrames}
               step={1}
               onChange={(v) => {
                 this.setState({
                   clip2Length: v,
-                  clip1Length: 900 - v
+                  clip1Length: maxFrames - v
                 })
               }}
               value={this.state.clip2Length}
@@ -420,20 +426,25 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               type="number"
               placeholder={""}
               min={0}
-              max={900}
+              max={maxFrames}
               value={prettyDecimal(this.state.clip2Length)}
               onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
                 if (e.currentTarget.value) {
                   this.setState({
 
                     clip2Length: parseInt(e.currentTarget.value),
-                    clip1Length: 900 - parseInt(e.currentTarget.value)
+                    clip1Length: maxFrames - parseInt(e.currentTarget.value)
                   })
                 }
               }}
             />
           </Col>
+  
         </Form.Group>
+        <Button onClick={() => this.sendCommand("LibAtem.Commands.Settings.VideoModeSetCommand", { videoMode: this.state.videoMode })} variant="primary" >
+              Set
+  </Button>
+  
         <h3>Camera Control</h3>
       </Container>
     )

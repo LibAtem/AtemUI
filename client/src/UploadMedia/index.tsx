@@ -105,7 +105,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   // Here we define the function that will send the request to the server. 
   // It will accept the image name, and the base64 data as arguments
 
-  sendBase64ToServer(name: string, base64: string) {
+  sendBase64ToServer(name: string, base64: string, index :any) {
 
     var device = this.props.device
     if (device) {
@@ -113,7 +113,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
 
       var httpPost = new XMLHttpRequest(),
         path = "http://127.0.0.1:5000/api2/" + id + "/" + name,
-        data = JSON.stringify({ image: base64 });
+        data = JSON.stringify({ image: base64, index:index });
       httpPost.onreadystatechange = function (err) {
         if (httpPost.readyState == 4 && httpPost.status == 200) {
           console.log(httpPost.responseText);
@@ -138,7 +138,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
 
     this.convertToBase64(src, type, function (data: string) {
       console.log("button Pressed")
-      parentThis.sendBase64ToServer(name, data);
+      parentThis.sendBase64ToServer(name, data,0);
 
     });
   };
@@ -150,7 +150,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   //   changeImage(this);
   // });
 
-  changeImage(input: any) {
+  changeImage(input: any,id:any) {
     var reader;
     var parentThis = this
     console.log(input)
@@ -161,7 +161,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
         var result = e.originalTarget.result
         if (result) {
           console.log(result)
-          parentThis.sendBase64ToServer("Test", result)
+          parentThis.sendBase64ToServer("Test", result ,id)
         }
         // console.log(result.readAsDataURL())
         // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
@@ -332,11 +332,12 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
      
         }
       }else{
-        imgs.push(<div className="image" draggable={true}>
+        const x = i
+        imgs.push(<div className="image" onDragStart={(event)=>this.drag(event,parseInt(x))} draggable={true}>
           {mp}
         <div className="inner">
           <div className ="emptyInner">{parseInt(i)+1}</div>
-          
+          <input type="file" id="fileElem" multiple accept="image/*" onChange={(e)=>this.changeImage(e.currentTarget,x)}></input>
         </div>
       </div>)
       }
@@ -348,10 +349,20 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       if(this.props.currentState.mediaPlayers[i].source.sourceType==1 && this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].isUsed && this.state.images[this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].hash]){
         mediaPlayers.push(    <div className="current">
         <div className="heading">
-          No Media Assigned
+          {this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].filename}
         </div>
         <div className="current-inner" onDrop={(event)=>this.drop(event,parseInt(x))} onDragOver={(event)=>this.allowDrop(event)}>
           <img src={"data:image/jpg;base64," + this.state.images[this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].hash]} width="100%"></img>
+        </div>
+      </div>)
+      }else{
+        mediaPlayers.push(    <div className="current">
+        <div className="heading">
+          No Media Assigned
+        </div>
+        <div className="current-inner" onDrop={(event)=>this.drop(event,parseInt(x))} onDragOver={(event)=>this.allowDrop(event)}>
+        
+        <div className ="emptyInner lower">{(parseInt(this.props.currentState.mediaPlayers[i].source.sourceIndex)+1)}</div>
         </div>
       </div>)
       }

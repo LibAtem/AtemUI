@@ -19,6 +19,7 @@ namespace AtemServer.Controllers
        public class imageData
     {
         public string image { get; set; }
+        public uint index { get; set; }
     }
 
     public class hashData
@@ -162,7 +163,7 @@ namespace AtemServer.Controllers
                     }
                     grPhoto.Dispose();
                     image.Dispose();
-                    var job = new UploadMediaStillJob(8, AtemFrame.FromRGBA(name, pixelData, ColourSpace.BT709), uploadResult);
+                    var job = new UploadMediaStillJob(data.index, AtemFrame.FromRGBA(name, pixelData, ColourSpace.BT709), uploadResult);
                     Console.WriteLine("sending image");
                     client.Client.DataTransfer.QueueJob(job);
                     //image.Save("output.jpg", ImageFormat.Jpeg);  // Or Png
@@ -170,7 +171,7 @@ namespace AtemServer.Controllers
             }
 
 
-            return "sucess";
+            return "success";
         }
 
         public void uploadResult(bool result)
