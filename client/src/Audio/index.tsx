@@ -181,9 +181,11 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         total += this.state.peaks[audio[j]][i];
       }
       var avg = total / this.state.peaks[audio[j]].length;
-
+      if (this.props.currentState.audio.inputs[audio[j]].levels == null) {
+        this.state.peaks[audio[j]] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+      }
       //if new val is higher than average
-      if (this.props.currentState.audio.inputs[audio[j]].levels.levels[0] > avg) {
+      else if (this.props.currentState.audio.inputs[audio[j]].levels.levels[0] > avg) {
         this.state.peaks[audio[j]] = this.state.peaks[audio[j]].fill(parseInt(this.props.currentState.audio.inputs[audio[j]].levels.levels[0]), 0, 15)
       } else {
         this.state.peaks[audio[j]].shift()
@@ -200,7 +202,10 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         total += this.state.peaksRight[audio[j]][i];
       }
       var avg = total / this.state.peaksRight[audio[j]].length;
-      if (this.props.currentState.audio.inputs[audio[j]].levels.levels[1] > avg) {
+      if (this.props.currentState.audio.inputs[audio[j]].levels == null) {
+        this.state.peaksRight[audio[j]] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+      }
+      else if (this.props.currentState.audio.inputs[audio[j]].levels.levels[1] > avg) {
         this.state.peaksRight[audio[j]] = this.state.peaksRight[audio[j]].fill(parseInt(this.props.currentState.audio.inputs[audio[j]].levels.levels[1]), 0, 15)
       } else {
         this.state.peaksRight[audio[j]].shift()
@@ -209,6 +214,82 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
 
     }
+  }
+
+  getTally(id:string){
+    if (this.props.currentState.audio.inputs[id].properties.mixOption == 0){
+      return(<div className="tally"></div>)
+    }else if(this.props.currentState.audio.inputs[id].properties.mixOption == 1){
+      return(<div className="tally tally-red"></div>)
+    }else{
+      if (this.props.currentState.audio.tally[this.state.audioId[id].audioID]) {
+        return(<div className="tally tally-red"></div>)
+      } else {
+        return(<div className="tally tally-yellow"></div>)
+      }
+    }
+  }
+
+  getName(id:string){
+    var name
+    if (this.state.audioId[id].videoID != null) {
+      name = this.props.currentState.settings.inputs[this.state.audioId[id].videoID].properties.shortName
+    } else {
+      name = this.state.audioId[id].audioID
+    }
+    if (this.props.currentState.audio.inputs[id].properties.mixOption == 0) {
+      return(<div className="name">{name}</div>)
+    }else{
+      return(<div className="name-active">{name}</div>)
+    }
+
+  }
+
+  getLowerButtons(id: string) {
+    //both
+    if (this.props.currentState.audio.inputs[id].properties.sourceType == 0) {
+      if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner left button-inner-selected">ON</div>
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>]
+        </div>)
+      } else if (this.props.currentState.audio.inputs[id].properties.mixOption == 2) {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner right button-inner-selected">AFV</div>
+        </div>)
+      } else {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>
+        </div>)
+      }
+    }
+    //afv
+    else if(this.props.currentState.audio.inputs[id].properties.sourceType == 1){
+     if (this.props.currentState.audio.inputs[id].properties.mixOption == 2) {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">AFV</div>
+        </div>)
+      } else {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner full">AFV</div>
+        </div>)
+      }
+    }
+    //on
+    else{
+      if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">ON</div>
+        </div>)
+      } else {
+        return (<div className="button-holder">
+          <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner full">ON</div>
+        </div>)
+      }
+    }
+
   }
 
 
@@ -225,66 +306,37 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     }
 
 
-    var topBar = []
+  
+    
 
     var channels = []
     var lowerButtons = []
+    var tally=[]
+
     var name = []
+
     var levels = []
     var levelsRight = []
     var peaks = []
     var peaksRight = []
-    // console.log(audioInputs)
-    // console.log(this.state.audioId)
+    var peakTopBar = []
+    var boxPeak = []
+    var boxPeakRight = []
+
     this.updatePeaks()
     for (var i = 0; i < audioInputs.length; i++) {
-      //console.log(this.state.audioId[audioInputs[i]])
       const x = i;
-      if (this.props.currentState.audio.inputs[audioInputs[i]].properties.mixOption == 1) {
-        if (this.state.audioId[audioInputs[i]].videoID != null) {
-          name.push(<div className="name-active">{this.props.currentState.settings.inputs[this.state.audioId[audioInputs[i]].videoID].properties.shortName}</div>)
-        } else {
-          name.push(<div className="name-active">{this.state.audioId[audioInputs[i]].audioID}</div>)
-        }
 
-        topBar.push(<div className="tally tally-red"></div>)
-        lowerButtons.push([<div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 0 })} className="button-inner left button-inner-selected">ON</div>,
-        <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>])
-      } else if (this.props.currentState.audio.inputs[audioInputs[i]].properties.mixOption == 2) {
-        if (this.state.audioId[audioInputs[i]].videoID != null) {
-          name.push(<div className="name-active">{this.props.currentState.settings.inputs[this.state.audioId[audioInputs[i]].videoID].properties.shortName}</div>)
-        } else {
-          name.push(<div className="name-active">{this.state.audioId[audioInputs[i]].audioID}</div>)
-        }
-
-
-
-
-        if (this.props.currentState.audio.tally[this.state.audioId[audioInputs[i]].audioID]) {
-          topBar.push(<div className="tally tally-red"></div>)
-        } else {
-          topBar.push(<div className="tally tally-yellow"></div>)
-        }
-
-
-        lowerButtons.push([<div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>, <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 0 })} className="button-inner right button-inner-selected">AFV</div>])
-
-      } else {
-
-        if (this.state.audioId[audioInputs[i]].videoID != null) {
-          name.push(<div className="name">{this.props.currentState.settings.inputs[this.state.audioId[audioInputs[i]].videoID].properties.shortName}</div>)
-        } else {
-          name.push(<div className="name">{this.state.audioId[audioInputs[i]].audioID}</div>)
-        }
-        lowerButtons.push([<div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>, <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>])
-        topBar.push(<div className="tally"></div>)
-      }
-
+      lowerButtons.push(this.getLowerButtons(audioInputs[x]))
+      name.push(this.getName(audioInputs[x]))
+      tally.push(this.getTally(audioInputs[x]))
+     
       //levels left
       if (this.props.currentState.audio.inputs[audioInputs[i]].levels != null) {
         if (this.props.currentState.audio.inputs[audioInputs[i]].levels.levels[0] == "-Infinity") {
           levels.push(<div style={{ height: "100%" }} className="level-inner"></div>)
           peaks.push(<div ></div>)
+          peakTopBar.push(<div className="peak"></div>)
         } else {
           var percent = Math.min(100 - ((this.props.currentState.audio.inputs[audioInputs[i]].levels.levels[0] + 60) / 0.60), 100)
           levels.push(<div style={{ height: percent + "%" }} className="level-inner"></div>)
@@ -293,12 +345,10 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
           //left peaks
           if (this.state.peaks[audioInputs[i]]) {
             var total = 0;
-            //console.log(this.state.peaks[audioInputs[i]])
             for (var j = 0; j < 5; j++) {
               total += this.state.peaks[audioInputs[i]][j];
             }
             var avg = total / 5;
-            //console.log(avg)
             var height = Math.min(100 - ((avg + 60) / 0.60), 100)
             if (height < 23) {
               peaks.push(<div style={{ top: height + "%", background: "red" }} className="peak-inner"></div>)
@@ -312,10 +362,32 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
           } else {
             console.log("err", console.log(this.state.peaks, audioInputs[i]))
           }
+
+
+          var leftPeak = (this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[0] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[0]
+          var rightPeak = (this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[1] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[1]
+          if (Math.max(leftPeak, rightPeak) <= -60) {
+            peakTopBar.push(<div className="peak"></div>)
+          } else if (Math.max(leftPeak, rightPeak) < -9) {
+            peakTopBar.push(<div className="peak" style={{ color: "green" }}>{Math.max(leftPeak, rightPeak).toFixed(2)}</div>)
+
+          } else {
+            peakTopBar.push(<div className="peak" >{Math.max(leftPeak, rightPeak).toFixed(2)}</div>)
+          }
+
+        }
+
+        //peak box
+        if (this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[0] > -0.01) {
+          boxPeak.push(<div className="peakBox-active"></div>)
+        } else {
+          boxPeak.push(<div className="peakBox"></div>)
         }
 
       } else {
+        boxPeak.push(<div className="peakBox"></div>)
         levels.push(<div style={{ height: "100%" }} className="level-inner"></div>)
+        peakTopBar.push(<div className="peak">{leftPeak + rightPeak / 2}</div>)
       }
 
       //levels right
@@ -350,16 +422,24 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
 
         }
+        //peak box
+        if (this.props.currentState.audio.inputs[audioInputs[i]].levels.peaks[1] > -0.01) {
+          boxPeakRight.push(<div className="peakBox-active level-right"></div>)
+        } else {
+          boxPeakRight.push(<div className="peakBox level-right"></div>)
+        }
 
       } else {
         levelsRight.push(<div style={{ height: "100%" }} className="level-inner"></div>)
         peaksRight.push(<div></div>)
+        boxPeakRight.push(<div className="peakBox level-right"></div>)
       }
 
       channels.push(<div className="channel">
         {name[x]}
-        {topBar[x]}
+        {tally[x]}
         <div className="slider-holder">
+          {peakTopBar[x]}
           <div className="scale">
             <div className="scale-1">+6-</div>
             <div className="scale-2">0-</div>
@@ -386,13 +466,16 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
               }
 
             ></Slider>
-            {/* <input ref="slider2" type="range" /> */}
+
           </div>
           <div className="level-holder">
             <div className="level">
               {levels[x]}
               {peaks[x]}
+
             </div>
+            {boxPeak[x]}
+            {boxPeakRight[x]}
 
             <div className="level level-right">
               {levelsRight[x]}
@@ -405,11 +488,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
           <div className="pan-inner">Pan</div>
           <input className="pan-input"></input>
         </div>
-
-        <div className="button-holder">
           {lowerButtons[x]}
-        </div>
-
         <div className="phones">
           <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#444444" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
         </div>
