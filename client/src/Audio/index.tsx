@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import Slider from 'react-rangeslider';
 import { Redirect } from 'react-router-dom';
+import { parse } from 'path';
 
 
 export class AudioPage extends React.Component {
@@ -161,41 +162,383 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     // step.outerHTML="<input type=\"range\" orient=\"vertical\">";
   }
 
-  getIds() {
-    var audio = Object.keys(this.props.currentState.audio.inputs)
-    for (var j = 0; j < audio.length; j++) {
-      this.state.peaks[audio[j]] = {}
-      this.state.peaks[audio[j]][0] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
-      this.state.peaks[audio[j]][1] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+  // getIds() {
+  //   var audio = Object.keys(this.props.currentState.audio.inputs)
+  //   for (var j = 0; j < audio.length; j++) {
+  //     this.state.peaks[audio[j]] = {}
+  //     this.state.peaks[audio[j]][0] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+  //     this.state.peaks[audio[j]][1] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+  //   }
+  //   this.setState({ idsSet: true })
+  // }
+
+  // updatePeaks() {
+  //   var audio = Object.keys(this.props.currentState.audio.inputs)
+
+    
+  //   for (var k = 0; k < 2; k++) { //for left and right
+  //     for (var j = 0; j < audio.length; j++) {
+        
+  //       //get average 
+  //       var total = 0;
+  //       for (var i = 0; i < this.state.peaks[audio[j]][k].length; i++) {
+  //         total += this.state.peaks[audio[j]][k][i];
+  //       }
+  //       var avg = total / this.state.peaks[audio[j]][k].length;
+        
+  //       if (this.props.currentState.audio.inputs[audio[j]].levels == null) {
+  //         this.state.peaks[audio[j]][k] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+  //       }
+
+  //       //if new val is higher than average
+  //       else{
+  //       var level = (this.props.currentState.audio.inputs[audio[j]].levels.levels[k] == "-Infinity" ? -60 : this.props.currentState.audio.inputs[audio[j]].levels.levels[k])
+  //       if (level > avg) {
+  //         this.state.peaks[audio[j]][k] = this.state.peaks[audio[j]][k].fill(parseInt(level), 0, 15)
+  //       } else {
+  //         this.state.peaks[audio[j]][k].shift()
+  //         this.state.peaks[audio[j]][k].push(level)
+  //       }
+  //     }
+  //     }
+  //   }
+
+  // }
+
+  // getTally(id: string) {
+  //   if (this.props.currentState.audio.inputs[id].properties.mixOption == 0) {
+  //     return (<div className="tally"></div>)
+  //   } else if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
+  //     return (<div className="tally tally-red"></div>)
+  //   } else {
+  //     if (this.props.currentState.audio.tally[this.state.audioId[id].audioID]) {
+  //       return (<div className="tally tally-red"></div>)
+  //     } else {
+  //       return (<div className="tally tally-yellow"></div>)
+  //     }
+  //   }
+  // }
+
+  // getName(id: string) {
+  //   var name
+  //   if (this.state.audioId[id].videoID != null) {
+  //     name = this.props.currentState.settings.inputs[this.state.audioId[id].videoID].properties.shortName
+  //   } else {
+  //     name = this.state.audioId[id].audioID
+  //   }
+  //   if (this.props.currentState.audio.inputs[id].properties.mixOption == 0) {
+  //     return (<div className="name">{name}</div>)
+  //   } else {
+  //     return (<div className="name-active">{name}</div>)
+  //   }
+
+  // }
+
+  // getLowerButtons(id: string) {
+  //   //both
+  //   if (this.props.currentState.audio.inputs[id].properties.sourceType == 0) {
+  //     if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner left button-inner-selected">ON</div>
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>]
+  //       </div>)
+  //     } else if (this.props.currentState.audio.inputs[id].properties.mixOption == 2) {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner right button-inner-selected">AFV</div>
+  //       </div>)
+  //     } else {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>
+  //       </div>)
+  //     }
+  //   }
+  //   //afv
+  //   else if (this.props.currentState.audio.inputs[id].properties.sourceType == 1) {
+  //     if (this.props.currentState.audio.inputs[id].properties.mixOption == 2) {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">AFV</div>
+  //       </div>)
+  //     } else {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner full">AFV</div>
+  //       </div>)
+  //     }
+  //   }
+  //   //on
+  //   else {
+  //     if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">ON</div>
+  //       </div>)
+  //     } else {
+  //       return (<div className="button-holder">
+  //         <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner full">ON</div>
+  //       </div>)
+  //     }
+  //   }
+
+  // }
+
+  // getLevel(id: string, index: number) {
+  //   if (this.props.currentState.audio.inputs[id].levels != null) {
+  //     var level = (this.props.currentState.audio.inputs[id].levels.levels[index] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.levels[index]
+  //     var percent = Math.min(100 - ((Math.pow(2,level/40)-0.3535)/(1-0.3535))*100 ,100)
+  //     return (<div style={{ height: percent + "%" }} className="level-inner"></div>)
+  //   } else {
+  //     return (<div style={{ height: "100%" }} className="level-inner"></div>)
+  //   }
+  // }
+
+  // getFloatingPeaks(id: string, index: number) {
+  //   if (this.props.currentState.audio.inputs[id].levels != null) {
+  //     if (this.state.peaks[id]) {
+
+  //       var total = 0;
+  //       for (var j = 0; j < 5; j++) {
+  //         total += this.state.peaks[id][index][j];
+  //       }
+  //       var avg = total / 5;
+  //       var height = Math.min(100 - ((Math.pow(2,avg/40)-0.3535)/(1-0.3535))*100 ,100)///((avg + 60) / 0.60), 100)
+  //       if (height < 23) {
+  //         return (<div style={{ top: height + "%", background: "red" }} className="peak-inner"></div>)
+  //       } else if (height < 50) {
+  //         return (<div style={{ top: height + "%", background: "yellow" }} className="peak-inner"></div>)
+  //       } else {
+  //         return (<div style={{ top: height + "%", background: "green" }} className="peak-inner"></div>)
+  //       }
+
+  //     } else {
+  //       console.log("err", console.log(this.state.peaks, id))
+  //     }
+
+  //   }
+  // }
+
+  // getPeakBoxes(id: string, index: number) {
+  //   if (this.props.currentState.audio.inputs[id].levels != null) {
+
+  //     if (this.props.currentState.audio.inputs[id].levels.peaks[index] > -0.01) {
+  //       return ((index == 0) ? <div className="peakBox-active"></div> : <div className="peakBox-active level-right"></div>)
+  //     } else {
+  //       return ((index == 0) ? <div className="peakBox"></div> : <div className="peakBox level-right"></div>)
+  //     }
+  //   }
+  // }
+
+  // getTopBarPeak(id: string) {
+  //   if (this.props.currentState.audio.inputs[id].levels != null) {
+  //   var leftPeak = (this.props.currentState.audio.inputs[id].levels.peaks[0] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.peaks[0]
+  //   var rightPeak = (this.props.currentState.audio.inputs[id].levels.peaks[1] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.peaks[1]
+  //   if (Math.max(leftPeak, rightPeak) <= -60) {
+  //     return (<div className="peak"></div>)
+  //   } else if (Math.max(leftPeak, rightPeak) < -9) {
+  //     return (<div className="peak" style={{ color: "green" }}>{Math.max(leftPeak, rightPeak).toFixed(2)}</div>)
+
+  //   } else {
+  //     return (<div className="peak" >{Math.max(leftPeak, rightPeak).toFixed(2)}</div>)
+  //   }
+  // }else{
+  //   return (<div className="peak"></div>)
+  // }
+  // }
+
+ 
+
+
+
+  render() {
+
+    if (this.props.currentProfile == null || this.props.currentState == null) {
+      return (<p>Waiting for Profile</p>)
     }
-    this.setState({ idsSet: true })
+    var audioInputs = Object.keys(this.props.currentState.audio.inputs)
+    var mainInputs = audioInputs.filter(x => (parseInt(x)<=20||parseInt(x)>=2000))
+    var externInputs = audioInputs.filter(x => (parseInt(x)>20&&parseInt(x)<2000))
+    // if (!this.state.idsSet) {
+    //   this.getIds()
+    // }
+
+    // var channels = []
+    // var lowerButtons = []
+    // var tally = []
+
+    // var name = []
+
+    // var levelsLeft = []
+    // var levelsRight = []
+    // var floatingPeaksLeft = []
+    // var floatingPeaksRight = []
+    // var peakBoxesLeft = []
+    // var peakBoxesRight = []
+    // var topBarPeak = []
+    var channels2 = []
+    var external = []
+    // this.updatePeaks()
+
+    for (var i = 0; i < externInputs.length; i++) {
+
+
+      const x = i;
+      var id = externInputs[x]
+
+      external.push(<InputAudioChannel
+      device = {this.props.device}
+      signalR = {this.props.signalR}
+      currentState ={this.props.currentState}
+      currentProfile = {this.props.currentProfile}
+      id = {id}
+      audioId = {this.state.audioId[id]}
+      ></InputAudioChannel>)
+
+      }
+
+
+    for (var i = 0; i < mainInputs.length; i++) {
+
+
+      const x = i;
+      var id = mainInputs[x]
+
+      channels2.push(<InputAudioChannel
+      device = {this.props.device}
+      signalR = {this.props.signalR}
+      currentState ={this.props.currentState}
+      currentProfile = {this.props.currentProfile}
+      id = {id}
+      audioId = {this.state.audioId[id]}
+      ></InputAudioChannel>)
+      // lowerButtons.push(this.getLowerButtons(id))
+      // name.push(this.getName(id))
+      // tally.push(this.getTally(id))
+      // levelsLeft.push(this.getLevel(id, 0))
+      // levelsRight.push(this.getLevel(id, 1))
+      // floatingPeaksLeft.push(this.getFloatingPeaks(id, 0))
+      // floatingPeaksRight.push(this.getFloatingPeaks(id, 1))
+      // peakBoxesLeft.push(this.getPeakBoxes(id, 0))
+      // peakBoxesRight.push(this.getPeakBoxes(id, 1))
+      // topBarPeak.push(this.getTopBarPeak(id))
+      // channels.push(<div className="channel">
+      //   {name[x]}
+      //   {tally[x]}
+      //   <div className="slider-holder">
+      //     {topBarPeak[x]}
+      //     <div className="scale">
+      //       <div className="scale-1">+6-</div>
+      //       <div className="scale-2">0-</div>
+      //       <div className="scale-3">-6-</div>
+      //       <div className="scale-4">-9-</div>
+      //       <div className="scale-5">-20-</div>
+      //       <div className="scale-6">-60-</div>
+      //     </div>
+      //     <div className="slider">
+      //       <div className="fake-slider"></div>
+      //       <Slider
+      //         tooltip={false}
+      //         max={1.1095}
+      //         min={0.3535}
+      //         step={0.001}
+      //         value={(Math.pow(2, ((this.props.currentState.audio.inputs[mainInputs[i]].properties.gain=="-Infinty")?-60:this.props.currentState.audio.inputs[mainInputs[i]].properties.gain) / 40))}
+      //         orientation="vertical"
+      //         onChange={(e) => {
+      //           this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: mainInputs[x], MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
+      //         }
+      //         }
+
+      //       ></Slider>
+
+      //     </div>
+      //     <div className="level-holder">
+      //       <div className="level">
+      //         {levelsLeft[x]}
+      //         {floatingPeaksLeft[x]}
+
+      //       </div>
+      //       {peakBoxesLeft[x]}
+      //       {peakBoxesRight[x]}
+      //       <div className="level level-right">
+      //         {levelsRight[x]}
+      //         {floatingPeaksRight[x]}
+
+
+      //       </div>
+      //     </div>
+      //     <input placeholder={((this.props.currentState.audio.inputs[mainInputs[i]].properties.gain=="-Infinity")?-60:(this.props.currentState.audio.inputs[mainInputs[i]].properties.gain).toFixed(2))} className="gain-input"></input>
+      //   </div>
+      //   <div className="pan">
+      //     <div className="pan-inner">Pan</div>
+      //     <input className="pan-input"></input>
+      //   </div>
+      //   {lowerButtons[x]}
+      //   <div className="phones">
+      //     <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#444444" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
+      //   </div>
+      // </div>)
+    }
+
+    return (
+
+      <div className="page-wrapper" style={{gridTemplateColumns: "repeat("+mainInputs.length+", 80px) 1px repeat("+externInputs.length+", 80px) 1px 80px" }}>
+        {channels2}
+        <div></div>
+        {external}
+        
+      </div>
+      
+    )
   }
 
-  updatePeaks() {
-    var audio = Object.keys(this.props.currentState.audio.inputs)
+
+}
+
+interface InputAudioChannelProps {
+  device: AtemDeviceInfo
+  signalR: signalR.HubConnection | undefined
+  currentState: any
+  currentProfile: any
+  id:string
+  audioId:any
+}
+interface InputAudioChannelState {
+  hasConnected: boolean
+  state: any
+  value: number
+  ids: any
+  peaks: any
+}
 
 
-    for (var k = 0; k < 2; k++) { //for left and right
-      for (var j = 0; j < audio.length; j++) {
-        //get average 
-        var total = 0;
-        for (var i = 0; i < this.state.peaks[audio[j]][k].length; i++) {
-          total += this.state.peaks[audio[j]][k][i];
-        }
-        var avg = total / this.state.peaks[audio[j]][k].length;
-        var level = (this.props.currentState.audio.inputs[audio[j]].levels.levels[k] == "-Infinity" ? -60 : this.props.currentState.audio.inputs[audio[j]].levels.levels[k])
-        if (this.props.currentState.audio.inputs[audio[j]].levels == null) {
-          this.state.peaks[audio[j]][k] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
-        }
 
-        //if new val is higher than average
-        else if (level > avg) {
-          this.state.peaks[audio[j]][k] = this.state.peaks[audio[j]][k].fill(parseInt(level), 0, 15)
-        } else {
-          this.state.peaks[audio[j]][k].shift()
-          this.state.peaks[audio[j]][k].push(level)
-        }
-      }
+class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAudioChannelState> {
+
+  constructor(props: InputAudioChannelProps) {
+    super(props)
+    this.state = {
+      hasConnected: props.device.connected,
+      state: this.props.currentState,
+      value: 0,
+      ids: {},
+      peaks: [[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]],
+
+    }
+  }
+
+  sendCommand(command: string, value: any) {
+    const { device, signalR } = this.props
+    if (device.connected && signalR) {
+      const devId = GetDeviceId(device)
+
+      signalR
+        .invoke('CommandSend', devId, command, JSON.stringify(value))
+        .then((res) => {
+          // console.log(value)
+          // console.log('ManualCommands: sent')
+          // console.log(command)
+        })
+        .catch(e => {
+          console.log('ManualCommands: Failed to send', e)
+        })
     }
 
   }
@@ -206,7 +549,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     } else if (this.props.currentState.audio.inputs[id].properties.mixOption == 1) {
       return (<div className="tally tally-red"></div>)
     } else {
-      if (this.props.currentState.audio.tally[this.state.audioId[id].audioID]) {
+      if (this.props.currentState.audio.tally[this.props.audioId.audioID]) {
         return (<div className="tally tally-red"></div>)
       } else {
         return (<div className="tally tally-yellow"></div>)
@@ -216,10 +559,10 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   getName(id: string) {
     var name
-    if (this.state.audioId[id].videoID != null) {
-      name = this.props.currentState.settings.inputs[this.state.audioId[id].videoID].properties.shortName
+    if (this.props.audioId.videoID != null) {
+      name = this.props.currentState.settings.inputs[this.props.audioId.videoID].properties.shortName
     } else {
-      name = this.state.audioId[id].audioID
+      name = this.props.audioId.audioID
     }
     if (this.props.currentState.audio.inputs[id].properties.mixOption == 0) {
       return (<div className="name">{name}</div>)
@@ -279,7 +622,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
   getLevel(id: string, index: number) {
     if (this.props.currentState.audio.inputs[id].levels != null) {
       var level = (this.props.currentState.audio.inputs[id].levels.levels[index] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.levels[index]
-      var percent = Math.min(100 - ((level + 60) / 0.60), 100)
+      var percent = Math.min(100 - ((Math.pow(2,level/40)-0.3535)/(1-0.3535))*100 ,100)
       return (<div style={{ height: percent + "%" }} className="level-inner"></div>)
     } else {
       return (<div style={{ height: "100%" }} className="level-inner"></div>)
@@ -288,14 +631,14 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   getFloatingPeaks(id: string, index: number) {
     if (this.props.currentState.audio.inputs[id].levels != null) {
-      if (this.state.peaks[id]) {
+      if (this.state.peaks) { //shouldnt have to do this check
 
         var total = 0;
         for (var j = 0; j < 5; j++) {
-          total += this.state.peaks[id][index][j];
+          total += this.state.peaks[index][j];
         }
         var avg = total / 5;
-        var height = Math.min(100 - ((avg + 60) / 0.60), 100)
+        var height = Math.min(100 - ((Math.pow(2,avg/40)-0.3535)/(1-0.3535))*100 ,100)///((avg + 60) / 0.60), 100)
         if (height < 23) {
           return (<div style={{ top: height + "%", background: "red" }} className="peak-inner"></div>)
         } else if (height < 50) {
@@ -323,6 +666,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
   }
 
   getTopBarPeak(id: string) {
+    if (this.props.currentState.audio.inputs[id].levels != null) {
     var leftPeak = (this.props.currentState.audio.inputs[id].levels.peaks[0] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.peaks[0]
     var rightPeak = (this.props.currentState.audio.inputs[id].levels.peaks[1] == "-Infinity") ? -60 : this.props.currentState.audio.inputs[id].levels.peaks[1]
     if (Math.max(leftPeak, rightPeak) <= -60) {
@@ -333,57 +677,62 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     } else {
       return (<div className="peak" >{Math.max(leftPeak, rightPeak).toFixed(2)}</div>)
     }
+  }else{
+    return (<div className="peak"></div>)
+  }
   }
 
+  updatePeaks() {
+    var audio = Object.keys(this.props.currentState.audio.inputs)
+    for (var k = 0; k < 2; k++) { //for left and right
+        //get average 
+        var total = 0;
+        for (var i = 0; i < this.state.peaks[k].length; i++) {
+          total += this.state.peaks[k][i];
+        }
+        var avg = total / this.state.peaks[k].length;
+        
+        if (this.props.currentState.audio.inputs[this.props.id].levels == null) {
+          this.state.peaks[k] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
+        }
+
+        //if new val is higher than average
+        else{
+        var level = (this.props.currentState.audio.inputs[this.props.id].levels.levels[k] == "-Infinity" ? -60 : this.props.currentState.audio.inputs[this.props.id].levels.levels[k])
+        if (level > avg) {
+          this.state.peaks[k] = this.state.peaks[k].fill(parseInt(level), 0, 15)
+        } else {
+          this.state.peaks[k].shift()
+          this.state.peaks[k].push(level)
+        }
+      }
+      
+    }
+
+  }
+
+ 
 
 
   render() {
 
-    if (this.props.currentProfile == null || this.props.currentState == null) {
-      return (<p>Waiting for Profile</p>)
-    }
-    var audioInputs = Object.keys(this.props.currentState.audio.inputs)
-
-    if (!this.state.idsSet) {
-      this.getIds()
-    }
-
-    var channels = []
-    var lowerButtons = []
-    var tally = []
-
-    var name = []
-
-    var levelsLeft = []
-    var levelsRight = []
-    var floatingPeaksLeft = []
-    var floatingPeaksRight = []
-    var peakBoxesLeft = []
-    var peakBoxesRight = []
-    var topBarPeak = []
-
-    this.updatePeaks()
-    for (var i = 0; i < audioInputs.length; i++) {
-      const x = i;
-
-      lowerButtons.push(this.getLowerButtons(audioInputs[x]))
-      name.push(this.getName(audioInputs[x]))
-      tally.push(this.getTally(audioInputs[x]))
-      levelsLeft.push(this.getLevel(audioInputs[x], 0))
-      levelsRight.push(this.getLevel(audioInputs[x], 1))
-      floatingPeaksLeft.push(this.getFloatingPeaks(audioInputs[x], 0))
-      floatingPeaksRight.push(this.getFloatingPeaks(audioInputs[x], 1))
-      peakBoxesLeft.push(this.getPeakBoxes(audioInputs[x], 0))
-      peakBoxesRight.push(this.getPeakBoxes(audioInputs[x], 1))
-      topBarPeak.push(this.getTopBarPeak(audioInputs[x]))
-
-
-      channels.push(<div className="channel">
-        {name[x]}
-        {tally[x]}
+      this.updatePeaks()
+      var lowerButton= (this.getLowerButtons(this.props.id))
+      var name = (this.getName(this.props.id))
+      var tally =(this.getTally(this.props.id))
+      var levelsLeft = (this.getLevel(this.props.id, 0))
+      var levelsRight = (this.getLevel(this.props.id, 1))
+      var floatingPeaksLeft = (this.getFloatingPeaks(this.props.id, 0))
+      var floatingPeaksRight=(this.getFloatingPeaks(this.props.id, 1))
+      var peakBoxesLeft=(this.getPeakBoxes(this.props.id, 0))
+      var peakBoxesRight=(this.getPeakBoxes(this.props.id, 1))
+      var topBarPeak=(this.getTopBarPeak(this.props.id))
+      
+      return(<div className="channel">
+        {name}
+        {tally}
         <div className="slider-holder">
-          {topBarPeak[x]}
-          
+          {topBarPeak}
           <div className="scale">
             <div className="scale-1">+6-</div>
             <div className="scale-2">0-</div>
@@ -396,16 +745,13 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
             <div className="fake-slider"></div>
             <Slider
               tooltip={false}
-
               max={1.1095}
               min={0.3535}
               step={0.001}
-              value={(Math.pow(2, ((this.props.currentState.audio.inputs[audioInputs[i]].properties.gain=="-Infinty")?-60:this.props.currentState.audio.inputs[audioInputs[i]].properties.gain) / 40))}
+              value={(Math.pow(2, ((this.props.currentState.audio.inputs[this.props.id].properties.gain=="-Infinty")?-60:this.props.currentState.audio.inputs[this.props.id].properties.gain) / 40))}
               orientation="vertical"
               onChange={(e) => {
-
-
-                this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: audioInputs[x], MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
+                this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
               }
               }
 
@@ -414,43 +760,115 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
           </div>
           <div className="level-holder">
             <div className="level">
-              {levelsLeft[x]}
-              {floatingPeaksLeft[x]}
+              {levelsLeft}
+              {floatingPeaksLeft}
 
             </div>
-            {peakBoxesLeft[x]}
-            {peakBoxesRight[x]}
+            {peakBoxesLeft}
+            {peakBoxesRight}
             <div className="level level-right">
-              {levelsRight[x]}
-              {floatingPeaksRight[x]}
+              {levelsRight}
+              {floatingPeaksRight}
 
 
             </div>
           </div>
-          <input placeholder={((this.props.currentState.audio.inputs[audioInputs[i]].properties.gain=="-Infinity")?-60:(this.props.currentState.audio.inputs[audioInputs[i]].properties.gain).toFixed(2))} className="gain-input"></input>
+          <input placeholder={((this.props.currentState.audio.inputs[this.props.id].properties.gain=="-Infinity")?-60:(this.props.currentState.audio.inputs[this.props.id].properties.gain).toFixed(2))} className="gain-input"></input>
         </div>
         <div className="pan">
           <div className="pan-inner">Pan</div>
           <input className="pan-input"></input>
         </div>
-        {lowerButtons[x]}
+        {lowerButton}
         <div className="phones">
           <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#444444" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
         </div>
-
-
       </div>)
-    }
-
-    return (
-
-      <div className="page-wrapper">
-
-        {channels}
-      </div>
-    )
-  }
-
 
 }
+}
 
+class OutputAudioChannel extends InputAudioChannel {
+
+  constructor(props: InputAudioChannelProps) {
+    super(props)
+    this.state = {
+      hasConnected: props.device.connected,
+      state: this.props.currentState,
+      value: 0,
+      ids: {},
+      peaks: [[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]]
+
+    }
+  }
+  render() {
+    var lowerButton= (this.getLowerButtons(this.props.id))
+    var name = "output"//(this.getName(this.props.id))
+    var tally =(this.getTally(this.props.id))
+    var levelsLeft = (this.getLevel(this.props.id, 0))
+    var levelsRight = (this.getLevel(this.props.id, 1))
+    var floatingPeaksLeft = (this.getFloatingPeaks(this.props.id, 0))
+    var floatingPeaksRight=(this.getFloatingPeaks(this.props.id, 1))
+    var peakBoxesLeft=(this.getPeakBoxes(this.props.id, 0))
+    var peakBoxesRight=(this.getPeakBoxes(this.props.id, 1))
+    var topBarPeak=(this.getTopBarPeak(this.props.id))
+    
+    return(<div className="channel">
+      {name} 
+      {tally}
+      <div className="slider-holder">
+        {topBarPeak}
+        <div className="scale">
+          <div className="scale-1">+6-</div>
+          <div className="scale-2">0-</div>
+          <div className="scale-3">-6-</div>
+          <div className="scale-4">-9-</div>
+          <div className="scale-5">-20-</div>
+          <div className="scale-6">-60-</div>
+        </div>
+        <div className="slider">
+          <div className="fake-slider"></div>
+          <Slider
+            tooltip={false}
+            max={1.1095}
+            min={0.3535}
+            step={0.001}
+            value={(Math.pow(2, ((this.props.currentState.audio.inputs[this.props.id].properties.gain=="-Infinty")?-60:this.props.currentState.audio.inputs[this.props.id].properties.gain) / 40))}
+            orientation="vertical"
+            onChange={(e) => {
+              this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
+            }
+            }
+
+          ></Slider>
+
+        </div>
+        <div className="level-holder">
+          <div className="level">
+            {levelsLeft}
+            {floatingPeaksLeft}
+
+          </div>
+          {peakBoxesLeft}
+          {peakBoxesRight}
+          <div className="level level-right">
+            {levelsRight}
+            {floatingPeaksRight}
+
+
+          </div>
+        </div>
+        <input placeholder={((this.props.currentState.audio.inputs[this.props.id].properties.gain=="-Infinity")?-60:(this.props.currentState.audio.inputs[this.props.id].properties.gain).toFixed(2))} className="gain-input"></input>
+      </div>
+      <div className="pan">
+        <div className="pan-inner">Pan</div>
+        <input className="pan-input"></input>
+      </div>
+      {lowerButton}
+      <div className="phones">
+        <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#444444" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
+      </div>
+    </div>)
+
+}
+}
