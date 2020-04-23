@@ -26,7 +26,7 @@ body {
 .channel {
     
     display: grid;
-    grid-template-rows: 30px 10px 1fr 45px 20px 60px;
+    grid-template-rows: 30px 10px 1fr 60px 20px 60px;
     row-gap: 10px;
 }
 
@@ -323,9 +323,9 @@ border: solid 1px #c06d00;
 .pan{
 border: solid 1px #0c0c0c;
 border-radius: 5px;
-background:#0c0c0c;
+background:#232323;
 display:grid;
-grid-template-rows: 0.5fr 1fr;
+grid-template-rows: 2fr 1fr;
 width:80px;
 overflow:hidden;
 
@@ -337,11 +337,12 @@ text-align: center;
 color:#888787;
 padding-top:2px;
 font-size:13px;
+position: relative;
 }
 
 .pan-input{
 width:80px;
-background: #232323;
+background: #0c0c0c;
 padding:0;
 border: none;
 /* border-radius: 2px; */
@@ -350,8 +351,47 @@ border-top-right-radius: 0px;
 
 text-align: center;
 color:#979797;
-font-size:15px;
+font-size:13px;
 }
+
+.pan-labels{
+    font-size:10px;
+    position: absolute;
+    width:80px;
+    top:2px;
+  }
+  
+  .pan-L{
+    position:absolute;
+    left:10px;
+  }
+  
+  .pan-R{
+    position:absolute;
+    right:10px;
+  }
+  
+  .pan-slider{
+    position:absolute;
+    left:5px;
+    height:8px;
+    /* background:#ff7b00; */
+    background: #1f1f1f;
+    border:solid 1px #090909;
+    width:70px;
+    top:20px;
+    border-radius:5px;
+    overflow: hidden;
+   
+  }
+  .pan-slider-inner{
+      position: absolute;
+      background:#ff7b00;
+      pointer-events: none;
+      height:100%;
+      right:50%;
+      
+  }
 
 .button-holder{
 display:grid;
