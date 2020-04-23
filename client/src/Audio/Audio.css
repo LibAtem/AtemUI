@@ -168,6 +168,7 @@ body {
 }
 
 .rangeslider-vertical .rangeslider__handle{
+    outline: none;
     box-shadow: 0px 0px 10px #000000;
 border: 0px solid #000000;
 z-index: 10;
