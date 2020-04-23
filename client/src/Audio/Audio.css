@@ -398,18 +398,34 @@ color:#c06d00;
 }
 
 .phones{
+    position: relative;
 width:30px;
 height:30px;
 border-radius: 15px;
 background: linear-gradient(0deg, rgba(37,37,37,1) 60%, rgba(50,50,50,1) 95%, rgba(59,59,59,1) 100%);
-border: solid 2px #1f1f1f;
+border: solid 2px #141414;
 margin-left:25px;
 }
 
-.phones-svg{
-padding-left:6px;
-padding-top:6px;
+.phones-disabled{
+background: linear-gradient(0deg, rgba(37,37,37,1) 60%, rgba(50,50,50,1) 95%, rgba(59,59,59,1) 100%);
+border: solid 2px #1f1f1f;
 }
+
+.phones-active{
+    background: linear-gradient(0deg, rgb(26, 26, 26) 60%, rgb(22, 22, 22) 95%, rgba(26, 26, 26)100%);
+}
+
+.phones-press:active{
+    box-shadow: inset 1px 1px 5px #000000b9;
+}
+
+.phones-svg{
+    position:absolute;
+    top:5px;
+    left:4px;
+}
+
 .level-holder{
 position:relative;
 }
@@ -462,5 +478,33 @@ height:10%;
     background:#ff0000;
     margin-top:2px;
     height:2px;
+    
+}
+
+.flashit{
+    -webkit-animation: flash linear 1s infinite;
+    animation: flash linear 0.7s infinite;
+}
+@-webkit-keyframes flash {
+    0% {     background: #202020;
+        background: linear-gradient(0deg, rgba(45,43,43,1) 88%, rgba(89,89,89,1) 99%);
+        border-radius: 5px;
+        margin-left: 8px;
+        margin-right: 8px;
+        border: solid 2px #202020;
+    } 
+    50% {background:rgb(255, 196, 0);
+        background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%)} 
+
+}
+@keyframes flash {
+    0% {     background: #202020;
+        background: linear-gradient(0deg, rgba(45,43,43,1) 88%, rgba(89,89,89,1) 99%);
+        border-radius: 5px;
+        margin-left: 8px;
+        margin-right: 8px;
+        border: solid 2px #202020;} 
+    50% { background:rgb(255, 196, 0);
+        background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%)} 
     
 }
