@@ -2,12 +2,8 @@ import React from 'react'
 import './Audio.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import OutsideClickHandler from 'react-outside-click-handler';
-import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
 import Slider from 'react-rangeslider';
-import { Redirect } from 'react-router-dom';
-import { parse } from 'path';
+
 
 
 export class AudioPage extends React.Component {
@@ -181,9 +177,8 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     for (var i = 0; i < externInputs.length; i++) {
 
 
-      const x = i;
-      var id = externInputs[x]
-
+      
+      var id = externInputs[i]
       external.push(<InputAudioChannel
         device={this.props.device}
         signalR={this.props.signalR}
@@ -196,19 +191,16 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     }
 
 
-    for (var i = 0; i < mainInputs.length; i++) {
+    for (var j = 0; j < mainInputs.length; j++) {
 
-
-      const x = i;
-      var id = mainInputs[x]
-
+      var idMain = mainInputs[j]
       channels2.push(<InputAudioChannel
         device={this.props.device}
         signalR={this.props.signalR}
         currentState={this.props.currentState}
         currentProfile={this.props.currentProfile}
-        id={id}
-        audioId={this.state.audioId[id]}
+        id={idMain}
+        audioId={this.state.audioId[idMain]}
       ></InputAudioChannel>)
 
     }
@@ -288,9 +280,9 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   }
 
   getTally(mixOption: number, tally: boolean) {
-    if (mixOption == 0) {
+    if (mixOption === 0) {
       return (<div className="tally"></div>)
-    } else if (mixOption == 1) {
+    } else if (mixOption === 1) {
       return (<div className="tally tally-red"></div>)
     } else {
       if (tally) {
@@ -308,7 +300,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
     } else {
       name = this.props.audioId.audioID
     }
-    if (this.props.currentState.audio.inputs[id].properties.mixOption == 0) {
+    if (this.props.currentState.audio.inputs[id].properties.mixOption === 0) {
       return (<div className="name">{name}</div>)
     } else {
       return (<div className="name-active">{name}</div>)
@@ -318,13 +310,13 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
   getLowerButtons(id: string, mixOption: number, sourceType: number) {
     //both
-    if (sourceType == 0) {
-      if (mixOption == 1) {
+    if (sourceType === 0) {
+      if (mixOption === 1) {
         return (<div className="button-holder">
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner left button-inner-selected">ON</div>
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 2 })} className="button-inner right">AFV</div>]
         </div>)
-      } else if (mixOption == 2) {
+      } else if (mixOption === 2) {
         return (<div className="button-holder">
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 1 })} className="button-inner left">ON</div>
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner right button-inner-selected">AFV</div>
@@ -337,8 +329,8 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
       }
     }
     //afv
-    else if (sourceType == 1) {
-      if (mixOption == 2) {
+    else if (sourceType === 1) {
+      if (mixOption === 2) {
         return (<div className="button-holder">
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">AFV</div>
         </div>)
@@ -350,7 +342,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
     }
     //on
     else {
-      if (mixOption == 1) {
+      if (mixOption === 1) {
         return (<div className="button-holder">
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: id, Mask: 1, MixOption: 0 })} className="button-inner full button-inner-selected">ON</div>
         </div>)
@@ -365,7 +357,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
   getLevel(index: number, levels: any) {
     if (levels != null) {
-      var level = (levels.levels[index] == "-Infinity") ? -60 : levels.levels[index]
+      var level = (levels.levels[index] === "-Infinity") ? -60 : levels.levels[index]
       var percent = Math.min(100 - ((Math.pow(2, level / 40) - 0.3535) / (1 - 0.3535)) * 100, 100)
       return (<div style={{ height: percent + "%" }} className="level-inner"></div>)
     } else {
@@ -373,7 +365,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
     }
   }
 
-  getFloatingPeaks(index: number, levels: any) {
+  getFloatingPeaks(index: number, levels: any,mixOption:number) {
     if (levels != null) {
       if (this.state.peaks) { //shouldnt have to do this check
 
@@ -383,7 +375,9 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
         }
         var avg = total / 5;
         var height = Math.min(100 - ((Math.pow(2, avg / 40) - 0.3535) / (1 - 0.3535)) * 100, 100)///((avg + 60) / 0.60), 100)
-        if (height < 23) {
+        if (mixOption === 0 ){
+          return (<div style={{ top: height + "%", background: "#5e5e5e" }} className="peak-inner"></div>)
+        } else if (height < 23) {
           return (<div style={{ top: height + "%", background: "red" }} className="peak-inner"></div>)
         } else if (height < 50) {
           return (<div style={{ top: height + "%", background: "yellow" }} className="peak-inner"></div>)
@@ -396,21 +390,26 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
     }
   }
 
-  getPeakBoxes(index: number, levels: any) {
+  getPeakBoxes(index: number, levels: any,mixOption:number) {
     if (levels != null) {
 
       if (levels.peaks[index] > -0.01) {
-        return ((index == 0) ? <div className="peakBox-active"></div> : <div className="peakBox-active level-right"></div>)
+        if(mixOption === 0){
+          return ((index === 0) ? <div style={{background:"#5e5e5e"}} className="peakBox-active"></div> : <div style={{background:"#5e5e5e"}} className="peakBox-active level-right"></div>)
+        }else{
+          return ((index === 0) ? <div className="peakBox-active"></div> : <div className="peakBox-active level-right"></div>)
+        }
+       
       } else {
-        return ((index == 0) ? <div className="peakBox"></div> : <div className="peakBox level-right"></div>)
+        return ((index === 0) ? <div className="peakBox"></div> : <div className="peakBox level-right"></div>)
       }
     }
   }
 
   getTopBarPeak(levels: any) {
     if (levels != null) {
-      var leftPeak = (levels.peaks[0] == "-Infinity") ? -60 : levels.peaks[0]
-      var rightPeak = (levels.peaks[1] == "-Infinity") ? -60 : levels.peaks[1]
+      var leftPeak = (levels.peaks[0] === "-Infinity") ? -60 : levels.peaks[0]
+      var rightPeak = (levels.peaks[1] === "-Infinity") ? -60 : levels.peaks[1]
       if (Math.max(leftPeak, rightPeak) <= -60) {
         return (<div className="peak"></div>)
       } else if (Math.max(leftPeak, rightPeak) < -9) {
@@ -434,13 +433,13 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
       }
       var avg = total / this.state.peaks[k].length;
 
-      if (levels == null) {
+      if (levels === null) {
         this.state.peaks[k] = [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
       }
 
       //if new val is higher than average
       else {
-        var level = (levels.levels[k] == "-Infinity" ? -60 : levels.levels[k])
+        var level = (levels.levels[k] === "-Infinity" ? -60 : levels.levels[k])
         if (level > avg) {
           this.state.peaks[k] = this.state.peaks[k].fill(parseInt(level), 0, 15)
         } else {
@@ -455,7 +454,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
   getPhonesButton() {
     if (this.props.currentState.audio.monitorOutputs[0].enabled) {
-      if (this.props.currentState.audio.monitorOutputs[0].solo == true && this.props.currentState.audio.monitorOutputs[0].soloSource == this.props.id) {
+      if (this.props.currentState.audio.monitorOutputs[0].solo === true && this.props.currentState.audio.monitorOutputs[0].soloSource == this.props.id) {
         return (
           <div className="phones phones-active phones-press" onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerMonitorSetCommand", { Solo: false, Mask: 8 })}>
             <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#34c9eb" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
@@ -477,7 +476,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   getPan() {
     var slider = []
     var color ="#5e5e5e"
-    if(this.props.currentState.audio.inputs[this.props.id].properties.mixOption!=0){
+    if(this.props.currentState.audio.inputs[this.props.id].properties.mixOption!==0){
       color="#ff7b00"
     }
     if (this.props.currentState.audio.inputs[this.props.id].properties.balance > 0) {
@@ -505,7 +504,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
             {slider}
           </div>
         </div>
-        <div onClick={(e)=>this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, Balance: 0, Mask: 4})} className="pan-input">  {(this.props.currentState.audio.inputs[this.props.id].properties.balance==0?"":(this.props.currentState.audio.inputs[this.props.id].properties.balance).toFixed(0))}</div>
+        <div onClick={(e)=>this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, Balance: 0, Mask: 4})} className="pan-input">  {(this.props.currentState.audio.inputs[this.props.id].properties.balance===0?"":(this.props.currentState.audio.inputs[this.props.id].properties.balance).toFixed(0))}</div>
       </div>)
   }
 
@@ -513,19 +512,22 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
   render() {
 
-    this.updatePeaks(this.props.currentState.audio.inputs[this.props.id].levels)
-    var lowerButton = (this.getLowerButtons(this.props.id, this.props.currentState.audio.inputs[this.props.id].properties.mixOption, this.props.currentState.audio.inputs[this.props.id].properties.sourceType))
+    var mixOption = this.props.currentState.audio.inputs[this.props.id].properties.mixOption
+    var levels = this.props.currentState.audio.inputs[this.props.id].levels
+    this.updatePeaks(levels)
+    var lowerButton = (this.getLowerButtons(this.props.id, mixOption, this.props.currentState.audio.inputs[this.props.id].properties.sourceType))
     var name = (this.getName(this.props.id))
-    var tally = (this.getTally(this.props.currentState.audio.inputs[this.props.id].properties.mixOption, this.props.currentState.audio.tally[this.props.audioId.audioID]))
-    var levelsLeft = (this.getLevel(0, this.props.currentState.audio.inputs[this.props.id].levels))
-    var levelsRight = (this.getLevel(1, this.props.currentState.audio.inputs[this.props.id].levels))
-    var floatingPeaksLeft = (this.getFloatingPeaks(0, this.props.currentState.audio.inputs[this.props.id].levels))
-    var floatingPeaksRight = (this.getFloatingPeaks(1, this.props.currentState.audio.inputs[this.props.id].levels))
-    var peakBoxesLeft = this.getPeakBoxes(0, this.props.currentState.audio.inputs[this.props.id].levels)
-    var peakBoxesRight = this.getPeakBoxes(1, this.props.currentState.audio.inputs[this.props.id].levels)
-    var topBarPeak = (this.getTopBarPeak(this.props.currentState.audio.inputs[this.props.id].levels))
+    var tally = (this.getTally(mixOption, this.props.currentState.audio.tally[this.props.audioId.audioID]))
+    var levelsLeft = (this.getLevel(0, levels))
+    var levelsRight = (this.getLevel(1, levels))
+    var floatingPeaksLeft = (this.getFloatingPeaks(0, levels,mixOption))
+    var floatingPeaksRight = (this.getFloatingPeaks(1, levels,mixOption))
+    var peakBoxesLeft = this.getPeakBoxes(0, levels,mixOption)
+    var peakBoxesRight = this.getPeakBoxes(1,levels,mixOption)
+    var topBarPeak = (this.getTopBarPeak(levels))
     var phonesButton = this.getPhonesButton()
     var pan = this.getPan()
+    var levelsClass = (mixOption == 0)?"level":"level level-rainbow"
     return (<div className="channel">
       {name}
       {tally}
@@ -546,7 +548,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
             max={1.1095}
             min={0.3535}
             step={0.001}
-            value={(Math.pow(2, ((this.props.currentState.audio.inputs[this.props.id].properties.gain == "-Infinty") ? -60 : this.props.currentState.audio.inputs[this.props.id].properties.gain) / 40))}
+            value={(Math.pow(2, ((this.props.currentState.audio.inputs[this.props.id].properties.gain === "-Infinty") ? -60 : this.props.currentState.audio.inputs[this.props.id].properties.gain) / 40))}
             orientation="vertical"
             onChange={(e) => {
               this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
@@ -557,21 +559,21 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
         </div>
         <div className="level-holder">
-          <div className="level">
+         <div className={levelsClass}>
             {levelsLeft}
             {floatingPeaksLeft}
 
           </div>
           {peakBoxesLeft}
           {peakBoxesRight}
-          <div className="level level-right">
+          <div className={levelsClass+" level-right"}>
             {levelsRight}
             {floatingPeaksRight}
 
 
           </div>
         </div>
-        <input placeholder={((this.props.currentState.audio.inputs[this.props.id].properties.gain == "-Infinity") ? -60 : (this.props.currentState.audio.inputs[this.props.id].properties.gain).toFixed(2))} className="gain-input"></input>
+        <input placeholder={((this.props.currentState.audio.inputs[this.props.id].properties.gain === "-Infinity") ? -60 : (this.props.currentState.audio.inputs[this.props.id].properties.gain).toFixed(2))} className="gain-input"></input>
       </div>
           {pan}
       {lowerButton}
@@ -632,10 +634,10 @@ class OutputAudioChannel extends InputAudioChannel {
     // peakBoxesLeft
     // var levelsLeft = (this.getLevel(this.props.id, 0))
     // var levelsRight = (this.getLevel(this.props.id, 1))
-    var floatingPeaksLeft = (this.getFloatingPeaks(0, levels))
-    var floatingPeaksRight = (this.getFloatingPeaks(1, levels))
-    var peakBoxesLeft = (this.getPeakBoxes(0, levels))
-    var peakBoxesRight = (this.getPeakBoxes(1, levels))
+    var floatingPeaksLeft = (this.getFloatingPeaks(0, levels,1))
+    var floatingPeaksRight = (this.getFloatingPeaks(1, levels,1))
+    var peakBoxesLeft = (this.getPeakBoxes(0, levels,1))
+    var peakBoxesRight = (this.getPeakBoxes(1, levels,1))
     
 
     // var topBarPeak=(this.getTopBarPeak(this.props.id))
@@ -660,7 +662,7 @@ class OutputAudioChannel extends InputAudioChannel {
             max={1.1095}
             min={0.3535}
             step={0.001}
-            value={(Math.pow(2, ((this.props.currentState.audio.programOut.gain == "-Infinty") ? -60 : this.props.currentState.audio.programOut.gain) / 40))}
+            value={(Math.pow(2, ((this.props.currentState.audio.programOut.gain === "-Infinty") ? -60 : this.props.currentState.audio.programOut.gain) / 40))}
             orientation="vertical"
             onChange={(e) => {
               this.sendCommand("LibAtem.Commands.Audio.AudioMixerMasterSetCommand", { Index: this.props.id, Gain: Math.log2(e) * 40, Mask: 1 })
@@ -671,21 +673,21 @@ class OutputAudioChannel extends InputAudioChannel {
 
         </div>
         <div className="level-holder">
-          <div className="level">
+          <div className="level level-rainbow">
             {levelsLeft}
             {floatingPeaksLeft}
 
           </div>
           {peakBoxesLeft}
           {peakBoxesRight}
-          <div className="level level-right">
+          <div className="level level-right level-rainbow">
             {levelsRight}
             {floatingPeaksRight}
 
 
           </div>
         </div>
-        <input placeholder={((this.props.currentState.audio.programOut.gain == "-Infinity") ? -60 : (this.props.currentState.audio.programOut.gain).toFixed(2))} className="gain-input"></input>
+        <input placeholder={((this.props.currentState.audio.programOut.gain === "-Infinity") ? -60 : (this.props.currentState.audio.programOut.gain).toFixed(2))} className="gain-input"></input>
       </div>
       
       {lowerButton}

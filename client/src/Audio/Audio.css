@@ -6,9 +6,10 @@ body {
 }*/
 .page-audio{
     display:grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: minmax(20px,1fr) auto  minmax(20px,1fr);
     grid-template-areas: ". wrapper .";
     background: #262626;
+    min-width:min-content;
 }
 .page-wrapper {
     width:auto;
@@ -473,11 +474,15 @@ position:relative;
 .level{
 position:absolute;
 bottom:10px;
-background: linear-gradient(0deg, rgba(1,128,0,1) 48%, rgba(219,213,0,1) 54%, rgba(235,229,0,1) 71%, rgba(255,0,0,1) 81%);
+background:#5e5e5e;
 width:5px;
 overflow:hidden;
 height: calc(87% - 40px);
 border: solid 1px #000; 
+}
+
+.level-rainbow{
+    background: linear-gradient(0deg, rgba(1,128,0,1) 48%, rgba(219,213,0,1) 54%, rgba(235,229,0,1) 71%, rgba(255,0,0,1) 81%);
 }
 
 .level-inner{
