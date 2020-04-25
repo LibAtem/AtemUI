@@ -6,10 +6,13 @@ html {
 
 }
 
-.page{
+.control-page{
     margin: 0;
     /* height: 90%; */
     background: #2e2e2e;
+    display:grid; 
+    grid-template-columns: auto 300px;
+
 }
 
 

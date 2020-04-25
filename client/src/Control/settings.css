@@ -1,0 +1,134 @@
+
+.ss{
+    border-left:1px solid #1b1b1b;
+}
+
+.ss-button-holder{
+    margin:10px;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    height:20px;
+}
+
+.ss-button-inner{
+    background: rgb(58, 58, 58);
+    background: linear-gradient(0deg, rgba(37,37,37,1) 49%, rgba(50,50,50,1) 90%, rgba(59,59,59,1) 100%);
+    border: solid 1px #131313;
+    text-align: center;
+    font-size:12px;
+    color:#5e5e5e;
+    line-height: 18px;
+    user-select: none;
+    padding-top: 2px;
+    box-shadow: 0px 1px 3px #00000075;
+    }
+    
+    .ss-button-inner:active{
+    box-shadow: inset 1px 1px 5px #000000b9;
+    }
+    
+    .ss-button-mid{
+        border-left:none;
+        border-right:none;
+    }
+    
+    .ss-button-left{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    }
+    
+    .ss-button-right{
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    }
+    
+    .ss-button-inner-selected{
+    background: linear-gradient(0deg, rgba(18,18,18,1) 49%, rgba(23,23,23,1) 90%, rgba(34,34,34,1) 100%);
+    color:#c06d00;
+    box-shadow: none;
+    }
+
+    .ss-submenu{
+        margin:10px;
+        user-select: none;
+    }
+    .ss-submenu-title{
+        margin:5px;
+        margin-left:10px;
+        color:#b1b1b1;
+        font-size:15px;
+        font-weight: 600;
+    }
+
+    .ss-submenu-box{
+        background:#323232;
+        padding:1px;
+        border-radius: 5px;
+        border: solid 1px #1a1a1a;
+    }
+
+    .ss-color-holder{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        
+    }
+
+    .ss-color-inner{
+        position:relative;
+    }
+
+    .ss-radio-button{
+        /* position: absolute; */
+        height:18px;
+        width:18px;
+        border-radius:50%;
+        background:#282828;
+        border:solid 1px #1c1c1c;
+        margin:15px;
+        margin-left:10px;
+    }
+
+    .ss-radio-button-inner{
+        height:10px;
+        margin:3.25px;
+        width:10px;
+        border-radius:50%;
+        background:#8f8f8f;
+        border:solid 1px #111111;
+    }
+    .ss-color-label{
+        /* position: absolute; */
+        color:#b1b1b1;
+        /* left:35px; */
+        /* top:12px; */
+        margin:10px;
+    }
+
+    .ss-color-picker{
+        width:30px;
+        height:30px;
+        position: absolute;
+        top:8px;
+        right:10px;
+        border-radius:4px;
+        border:1px solid #0a0a0a;
+        
+    }
+
+    .ss-color-picker:hover{
+        box-shadow: 0px 0px 1px rgb(109, 109, 109);
+    }
+
+    .color-picker-cover{
+        position: fixed;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+    }
+
+    .color-picker-popover{
+        position: absolute;
+        z-index:  2;
+        right:10px;
+      }

@@ -3,7 +3,7 @@ import './control.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import OutsideClickHandler from 'react-outside-click-handler';
-
+import {SwitcherSettings} from "./settings"
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -13,7 +13,7 @@ export class ControlPage extends React.Component {
   render() {
     const device = GetActiveDevice(this.context)
     return (
-      <div className="page">
+      <div className="control-page">
 
         {device ? (
           <ControlPageInner
@@ -24,8 +24,25 @@ export class ControlPage extends React.Component {
             // currentState={this.state.currentState}
             signalR={this.context.signalR}
           />
+          
+
         ) : (
             <p>No device selected</p>
+          )}
+
+{device && this.context.currentState? (
+          <SwitcherSettings
+
+            // key={this.context.activeDeviceId || ''}
+            device={device}
+            currentState={this.context.currentState}
+            // currentState={this.state.currentState}
+            signalR={this.context.signalR}
+          />
+          
+
+        ) : (
+            <div></div>
           )}
       </div>
     )

@@ -599,7 +599,7 @@ class OutputAudioChannel extends InputAudioChannel {
 
   getMasterTally() {
     if (this.props.currentState.audio.programOut.followFadeToBlack && (this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition || this.props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)) {
-      return <div className="tally flashit"></div>
+      return <div className="tally audio-flashit"></div>
     } else {
       return <div className="tally tally-red"></div>
     }

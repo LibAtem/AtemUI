@@ -16,6 +16,7 @@ import multiview2 from './assets/multiview2.svg';
 import multiview3 from './assets/multiview3.svg';
 import multiview4 from './assets/multiview4.svg';
 import { spacing } from 'react-select/src/theme';
+import {videoIds} from "./ids"
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
 
@@ -302,14 +303,18 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
     console.log(currentProfile, currentState, currentProfile.videoModes.supportedModes.length)
     var videoModes = []
     var videModeNames = ["525i59.94 NTSC", "625i50 PAL", "525i59.94 16:9", "625i50 16:9", "720p50", "720p59.94", "1080i50", "1080i59.94", "1080p23.98", "1080p24", "1080p25", "1080p29.97", "1080p50", "1080p59.94", "4KHDp23.98", "4KHDp24", "4KHDp25", "4KHDp29.97", "4KHDp50", "4KHDp59.94"]
-    var multiViewModes = [[7], [6], [7], [6], [4], [5], [6], [7], [8], [9], [10, 6], [11, 7], [12, 6], [13, 7], [8], [9], [6], [7], [6], [7]]
-    for (var i = 0; i < currentProfile.videoModes.supportedModes.length; i++) {
-      videoModes.push(<option value={i}>{videModeNames[currentProfile.videoModes.supportedModes[i]]}</option>)
+    var multiViewModes = [[7], [6], [7], [6], [4], [5], [6], [7], [8], [9], [10, 6], [11, 7], [12, 6], [13, 7], [8], [9], [6], [7], [6], [7]] //remove this 
+    for (var i = 0; i < currentState.info.supportedVideoModes.length; i++) {
+      videoModes.push(<option value={currentState.info.supportedVideoModes[i].mode}>{videModeNames[currentState.info.supportedVideoModes[i].mode]}</option>)
     }
     var multiviewMode = []
-    for (var i = 0; i < multiViewModes[videoMode].length; i++) {
-      multiviewMode.push(<option value={i}>{videModeNames[multiViewModes[videoMode][i]]}</option>)
+    var pos = currentState.info.supportedVideoModes.findIndex((item:any) => item.mode == videoMode)
+    if(pos!=-1){
+    console.log(pos)
+    for (var i = 0; i < currentState.info.supportedVideoModes[pos].multiviewModes.length; i++) {
+      multiviewMode.push(<option value={i}>{videModeNames[currentState.info.supportedVideoModes[pos].multiviewModes[i]]}</option>)
     }
+  }
 
     var maxFrames = 0;
     for( var i=0; i< currentState.mediaPool.clips.length;i++){
@@ -495,6 +500,7 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
   public updateLable(name:string,id:number) {
     const signalR = this.signalR
     const device = this.device
+    console.log("update label" ,name,id)
     if (device.connected && signalR) {
       const devId = GetDeviceId(device)
 
@@ -579,20 +585,22 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var port = document.getElementById("port" + i) as HTMLInputElement
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
+      console.log(outputs[i],index)
+      var id = videoIds[outputs[i]]
       if (long && short) { }
       if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
+        this.props.updateLabel(long.value,id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 7, LongName: long.value, ShortName: short.value, ExternalPortType: parseInt(port.value) })
       } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
+        this.props.updateLabel(long.value,id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 3, LongName: long.value, ShortName: short.value })
       } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
+        this.props.updateLabel(long.value,id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 5, LongName: long.value, ExternalPortType: parseInt(port.value) })
       } else if (short.value != this.props.currentState.settings.inputs["input"+index].properties.shortValue && port.value != this.props.currentState.settings.inputs["input" + (parseInt(i) + 1)].properties.currentExternalPortType) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 6, ShortName: short.value, ExternalPortType: parseInt(port.value) })
       } else if (long.value != this.props.currentState.settings.inputs["input"+index].properties.longName) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs["input"+index].properties.id)
+        this.props.updateLabel(long.value,id)
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 1, LongName: long.value })
       } else if (short.value != this.props.currentState.settings.inputs["input"+index].properties.shortName) {
         this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: index, Mask: 2, ShortName: short.value })
@@ -667,16 +675,19 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
-      if (long && short) { }
+      var id = videoIds[outputs[i]]
+      console.log(outputs[i],id)
+      if (long && short) { 
       if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName && short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 3, LongName: long.value, ShortName: short.value })
+        this.props.updateLabel(long.value,id)
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 3, LongName: long.value, ShortName: short.value })
       } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 1, LongName: long.value })
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 1, LongName: long.value })
+        this.props.updateLabel(long.value,id)
       } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 2, ShortName: short.value })
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 2, ShortName: short.value })
       }
+    }
 
     }
   }
@@ -732,15 +743,16 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
       var long = document.getElementById("long" + i) as HTMLInputElement
       var short = document.getElementById("short" + i) as HTMLInputElement
+      var id = videoIds[outputs[i]]
       if (long && short) { }
       if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName && short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 3, LongName: long.value, ShortName: short.value })
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 3, LongName: long.value, ShortName: short.value })
+        this.props.updateLabel(long.value,id)
       } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
-        this.props.updateLabel(long.value,this.props.currentState.settings.inputs[outputs[i]].properties.id)
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 1, LongName: long.value })
+        this.props.updateLabel(long.value,id)
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 1, LongName: long.value })
       } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
-        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: this.props.currentState.settings.inputs[outputs[i]].properties.id, Mask: 2, ShortName: short.value })
+        this.props.sendCommand("LibAtem.Commands.Settings.InputPropertiesSetCommand", { Id: id, Mask: 2, ShortName: short.value })
       }
 
     }
@@ -831,12 +843,13 @@ class MultiViewSettings extends React.Component<MultiViewSettingsProps, MultiVie
       layout = [[0],[1],[2,3,6,7],[4,5,8,9]]
     }
     var options= []
-   
-    for(var i in this.props.currentState.settings.inputs){
-      options.push(<option value={this.props.currentState.settings.inputs[i].properties.id }>{this.props.currentState.settings.inputs[i].properties.longName}</option>)
+    var inputs = Object.keys(this.props.currentState.settings.inputs)
+    for(var i = 0 ; i< inputs.length;i++){
+      console.log(videoIds[inputs[i]])
+      options.push(<option value={videoIds[inputs[i]]}>{this.props.currentState.settings.inputs[inputs[i]].properties.longName}</option>)
     }
     var content = []
-    for(i in layout){
+    for(i = 0 ; i<layout.length;i++){
       if (layout[i].length ==1){
         if(layout[i][0]==0){
           content.push(<div className="mutliViewItem programPreview">Preview</div>)
