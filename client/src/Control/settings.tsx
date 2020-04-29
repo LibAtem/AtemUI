@@ -1,15 +1,12 @@
 import React from 'react'
 import { AtemDeviceInfo } from '../Devices/types'
 import "./settings.css"
-import { SketchPicker, ChromePicker } from 'react-color';
+import { ChromePicker } from 'react-color';
 import { GetDeviceId } from '../DeviceManager';
-import OutsideClickHandler from 'react-outside-click-handler';
-import { Form } from 'react-bootstrap';
-import { groupHeadingCSS } from 'react-select/src/components/Group';
 import { videoIds } from '../ControlSettings/ids';
-import { borderRadius } from 'react-select/src/theme';
 import Slider from 'react-rangeslider';
-
+import pattern0 from "./patterns/0.svg"
+import { Wipe } from './wipe';
 
 interface SwitcherSettingsProps {
     device: AtemDeviceInfo
@@ -64,6 +61,14 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
                 currentState={this.props.currentState}
                 signalR={this.props.signalR}
                 name={"Color Generators"}
+            />
+
+            <Transition
+                key={'tran'}
+                device={this.props.device}
+                currentState={this.props.currentState}
+                signalR={this.props.signalR}
+                name={"Transition"}
             />
 
             <DownStreamKeys
@@ -134,67 +139,14 @@ class FadeToBlack extends React.Component<SubMenuProps, SubMenuState> {
 
     }
 
-    ftbRate(id: string, index: number) {
-        var input = document.getElementById(id) as HTMLInputElement
-        if (input.value !== "") {
-            this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
-            input.value = ""
-        }
-    }
-
-    validRate(e: React.KeyboardEvent<HTMLDivElement>, id: string) {
-        var input = document.getElementById(id) as HTMLInputElement //Work out what the input will be
-        if (((e.keyCode >= 96) && (e.keyCode <= 105)) || ((e.keyCode >= 48) && (e.keyCode <= 57)) || (e.keyCode === 59)) {
-            if (input) {
-                var startPos = input.selectionStart || 0;
-                var endPos = input.selectionEnd || 0;
-                var value = input.value.split("")
-                var newChar = String.fromCharCode((96 <= e.keyCode && e.keyCode <= 105) ? e.keyCode - 48 : e.keyCode)
-                newChar = ((newChar === ";") ? ":" : newChar)
-                value.splice(startPos, endPos - startPos, newChar)
-                if (value.includes(";") || value.includes(":")) { //Check if it is valid
-                    if (!value.join("").match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) { //This can be expanded to do all checks
-                        if (e.preventDefault) e.preventDefault();
-                    }
-                } else {
-                    if (value.length > 3) {
-                        if (e.preventDefault) e.preventDefault();
-                    }
-                }
-            }
-        } else if (e.keyCode !== 8 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 46) { //Allow special keys
-            if (e.preventDefault) e.preventDefault();
-        }
-    }
-
-    ftbRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
-        if (e.keyCode === 13) {
-            this.ftbRate(id, index)
-        } else {
-            this.validRate(e, id)
-        }
-    }
-
-    rateToFrames(rate: string) {
-        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.currentState.settings.videoMode]
-        return parseInt(rate.replace(":", "").padStart(4, "0").substr(0, 2)) * fps + parseInt(rate.replace(":", "").padStart(4, "0").substr(2, 3))
-    }
-
-    framesToRate(frames: number) {
-        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.currentState.settings.videoMode]
-        var framesRemaining = frames % fps
-        var seconds = Math.floor(frames / fps);
-        return seconds.toString() + ":" + framesRemaining.toString().padStart(2, "0")
-    }
-
     render() {
         var rate = []
         var box = []
         if (this.state.open) {
-            rate.push((this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ss-ftb0", 0) }}><div className="ss-rate"> <input placeholder={this.framesToRate(this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ss-ftb0", 0)} id="ss-ftb0" disabled className="ss-rate-input" ></input></div></OutsideClickHandler>
-                : <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ss-ftb0", 0) }}><div className="ss-rate"> <input placeholder={this.framesToRate(this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ss-ftb0", 0)} id="ss-ftb0" className="ss-rate-input" ></input></div></OutsideClickHandler>)
-
-            box.push(<div className="ss-rate-holder"><div className="ss-rate-label">Rate:</div>{rate}
+            rate.push(
+                <div className="ss-rate"><RateInput value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames} videoMode={this.props.currentState.settings.videoMode}
+                    callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: 0, Rate: e }) }} /></div>)
+            box.push(<div className="ss-rate-holder"><div className="ss-label">Rate:</div>{rate}
                 <label className="ss-checkbox-container">Audio Follow Video
   <                 input type="checkbox" checked={this.props.currentState.audio.programOut.followFadeToBlack} onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerMasterSetCommand", { FollowFadeToBlack: !this.props.currentState.audio.programOut.followFadeToBlack, Mask: 4 })}></input>
                     <span className="checkmark"></span>
@@ -273,14 +225,14 @@ class ColorMenu extends React.Component<SubMenuProps, ColorMenuState>{
             box.push(<div className="ss-color-holder">
                 <div className="ss-color-inner">
                     {/* <div className="ss-radio-button"><div className="ss-radio-button-inner"></div></div> */}
-                    <div className="ss-color-label">Color 1</div>
+                    <div className="ss-label">Color 1</div>
                     <div className="ss-color-picker" onClick={() => this.setState({ displayColorPicker: !this.state.displayColorPicker })} style={{ background: "hsl(" + this.props.currentState.colorGenerators[0].hue + "," + this.props.currentState.colorGenerators[0].saturation + "%," + this.props.currentState.colorGenerators[0].luma + "%)" }}></div>
                     {picker}
                 </div>
 
                 <div className="ss-color-inner">
                     {/* <div className="ss-radio-button"></div> */}
-                    <div className="ss-color-label">Color 2</div>
+                    <div className="ss-label">Color 2</div>
                     <div className="ss-color-picker" onClick={() => this.setState({ displayColorPicker2: !this.state.displayColorPicker2 })} style={{ background: "hsl(" + this.props.currentState.colorGenerators[1].hue + "," + this.props.currentState.colorGenerators[1].saturation + "%," + this.props.currentState.colorGenerators[1].luma + "%)" }}></div>
                     {picker2}
                     {/* <ChromePicker disableAlpha ={true} color={{h:this.props.currentState.colorGenerators[0].hue,s:this.props.currentState.colorGenerators[0].saturation,l:this.props.currentState.colorGenerators[0].luma}} /> */}
@@ -306,7 +258,7 @@ class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState>{
     constructor(props: SubMenuProps) {
         super(props)
         this.state = {
-            open: true,
+            open: false,
             hasConnected: props.device.connected,
             state: props.currentState,
             currentState: null
@@ -337,132 +289,82 @@ class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState>{
         return (<div className="ss-heading">Key {index + 1}</div>)
     }
 
-    getSourceOptions(){
+    getSourceOptions() {
         var inputs = Object.keys(this.props.currentState.settings.inputs)
-        var sources = inputs.filter(i => videoIds[i]<4000)
+        var sources = inputs.filter(i => videoIds[i] < 4000)
         var options = []
-        for(var i in sources){
+        for (var i in sources) {
             options.push(<option value={videoIds[sources[i]]}>{this.props.currentState.settings.inputs[sources[i]].properties.longName}</option>)
         }
         return options
-      }
+    }
 
     getTopBox(index: number) {
         return (<div className="ss-dsk-top">
             <div className="ss-label">Rate:</div>
-            <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ss-dsk" + index, 0) }}><div className="ss-rate"> <input placeholder={this.framesToRate(this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ss-dsk" + index, 0)} id={"ss-dsk" + index} className="ss-rate-input" ></input></div></OutsideClickHandler>
+            <div className="ss-rate"><RateInput value={this.props.currentState.downstreamKeyers[index].properties.rate} videoMode={this.props.currentState.settings.videoMode}
+                callback={(e: string) => { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: e }) }} /></div>
             <div className="ss-label">Fill Source:</div>
-            <select onChange={(e)=>{this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand",{Index:index,FillSource:e.currentTarget.value})}} value={this.props.currentState.downstreamKeyers[index].sources.fillSource} className="ss-dropdown" id="cars">
+            <select onChange={(e) => { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand", { Index: index, FillSource: e.currentTarget.value }) }} value={this.props.currentState.downstreamKeyers[index].sources.fillSource} className="ss-dropdown" id="cars">
                 {this.getSourceOptions()}
             </select>
             <div className="ss-label">Key Source:</div>
-            <select onChange={(e)=>{this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand",{Index:index,CutSource:e.currentTarget.value})}} value={this.props.currentState.downstreamKeyers[index].sources.cutSource} className="ss-dropdown" id="cars">
+            <select onChange={(e) => { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand", { Index: index, CutSource: e.currentTarget.value }) }} value={this.props.currentState.downstreamKeyers[index].sources.cutSource} className="ss-dropdown" id="cars">
                 {this.getSourceOptions()}
             </select>
         </div>)
     }
 
-    ftbRate(id: string, index: number) {
-        var input = document.getElementById(id) as HTMLInputElement
-        if (input.value !== "") {
-            this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
-            input.value = ""
-        }
-    }
 
-    rateToFrames(rate: string) {
-        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.currentState.settings.videoMode]
-        return parseInt(rate.replace(":", "").padStart(4, "0").substr(0, 2)) * fps + parseInt(rate.replace(":", "").padStart(4, "0").substr(2, 3))
-    }
 
-    framesToRate(frames: number) {
-        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.currentState.settings.videoMode]
-        var framesRemaining = frames % fps
-        var seconds = Math.floor(frames / fps);
-        return seconds.toString() + ":" + framesRemaining.toString().padStart(2, "0")
-    }
-
-    validRate(e: React.KeyboardEvent<HTMLDivElement>, id: string) {
-        var input = document.getElementById(id) as HTMLInputElement //Work out what the input will be
-        if (((e.keyCode >= 96) && (e.keyCode <= 105)) || ((e.keyCode >= 48) && (e.keyCode <= 57)) || (e.keyCode === 59)) {
-            if (input) {
-                var startPos = input.selectionStart || 0;
-                var endPos = input.selectionEnd || 0;
-                var value = input.value.split("")
-                var newChar = String.fromCharCode((96 <= e.keyCode && e.keyCode <= 105) ? e.keyCode - 48 : e.keyCode)
-                newChar = ((newChar === ";") ? ":" : newChar)
-                value.splice(startPos, endPos - startPos, newChar)
-                if (value.includes(";") || value.includes(":")) { //Check if it is valid
-                    if (!value.join("").match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) { //This can be expanded to do all checks
-                        if (e.preventDefault) e.preventDefault();
-                    }
-                } else {
-                    if (value.length > 3) {
-                        if (e.preventDefault) e.preventDefault();
-                    }
-                }
-            }
-        } else if (e.keyCode !== 8 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 46) { //Allow special keys
-            if (e.preventDefault) e.preventDefault();
-        }
-    }
-
-    ftbRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
-        if (e.keyCode === 13) {
-            this.ftbRate(id, index)
-        } else {
-            this.validRate(e, id)
-        }
-    }
-
-    getMaskBox(index:number){
+    getMaskBox(index: number) {
         var enabled = this.props.currentState.downstreamKeyers[index].properties.maskEnabled
-        var button = (enabled)? <div className="ss-circle-button"><div className="ss-circle-button-inner"></div></div>:<div className="ss-circle-button"></div>
-        var label = <div className="ss-circle-button-holder" onClick={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand",{Index:index,Mask:1,maskEnabled:!this.props.currentState.downstreamKeyers[index].properties.maskEnabled})}>
+        var button = (enabled) ? <div className="ss-circle-button"><div className="ss-circle-button-inner"></div></div> : <div className="ss-circle-button"></div>
+        var label = <div className="ss-circle-button-holder" onClick={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand", { Index: index, Mask: 1, maskEnabled: !this.props.currentState.downstreamKeyers[index].properties.maskEnabled })}>
             {button}<div className="ss-heading">Mask</div>
         </div>
-        var labelClass = (enabled)?"ss-label":"ss-label disabled"
-        
-        return(<div className="ss-mask-box">{label}
-        <div className="ss-mask-holder">
-            <div className={labelClass}>Top:</div>
-            <div className="ss-rate"> <MagicInput disabled={!enabled}  value={this.props.currentState.downstreamKeyers[index].properties.maskTop} callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand",{Index:index,Mask:2,MaskTop:Math.min(9,Math.max(-9,value))})}}} /></div>
-            <div className={labelClass}>Bottom:</div>
-            <div className="ss-rate"> <MagicInput disabled={!enabled}  value={this.props.currentState.downstreamKeyers[index].properties.maskBottom} callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand",{Index:index,Mask:4,MaskBottom:Math.min(9,Math.max(-9,value))})}}} /></div>
-            <div className={labelClass}>Left:</div>
-            <div className="ss-rate"> <MagicInput disabled={!enabled} value={this.props.currentState.downstreamKeyers[index].properties.maskLeft} callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand",{Index:index,Mask:8,MaskLeft:Math.min(16,Math.max(-16,value))})}}} /></div>
-            <div className={labelClass}>Right:</div>
-            <div className="ss-rate"> <MagicInput disabled={!enabled}  value={this.props.currentState.downstreamKeyers[index].properties.maskRight} callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand",{Index:index,Mask:16,MaskRight:Math.min(16,Math.max(-16,value))})}}} /></div>
-        </div>
+        var labelClass = (enabled) ? "ss-label" : "ss-label disabled"
+
+        return (<div className="ss-mask-box">{label}
+            <div className="ss-mask-holder">
+                <div className={labelClass}>Top:</div>
+                <div className="ss-rate"> <MagicInput disabled={!enabled} value={this.props.currentState.downstreamKeyers[index].properties.maskTop} callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand", { Index: index, Mask: 2, MaskTop: Math.min(9, Math.max(-9, value)) }) } }} /></div>
+                <div className={labelClass}>Bottom:</div>
+                <div className="ss-rate"> <MagicInput disabled={!enabled} value={this.props.currentState.downstreamKeyers[index].properties.maskBottom} callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand", { Index: index, Mask: 4, MaskBottom: Math.min(9, Math.max(-9, value)) }) } }} /></div>
+                <div className={labelClass}>Left:</div>
+                <div className="ss-rate"> <MagicInput disabled={!enabled} value={this.props.currentState.downstreamKeyers[index].properties.maskLeft} callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand", { Index: index, Mask: 8, MaskLeft: Math.min(16, Math.max(-16, value)) }) } }} /></div>
+                <div className={labelClass}>Right:</div>
+                <div className="ss-rate"> <MagicInput disabled={!enabled} value={this.props.currentState.downstreamKeyers[index].properties.maskRight} callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand", { Index: index, Mask: 16, MaskRight: Math.min(16, Math.max(-16, value)) }) } }} /></div>
+            </div>
         </div>)
     }
 
-    getPreMultBox(index:number){
+    getPreMultBox(index: number) {
         var enabled = this.props.currentState.downstreamKeyers[index].properties.preMultipliedKey
-        var button = (enabled)? <div className="ss-circle-button"><div className="ss-circle-button-inner"></div></div>:<div className="ss-circle-button"></div>
-        var label = <div className="ss-circle-button-holder" onClick={()=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand",{Index:index,Mask:1,PreMultipliedKey:!this.props.currentState.downstreamKeyers[index].properties.preMultipliedKey})}>
-                        {button}<div className="ss-heading">Pre Multiplied Key</div>
-                    </div>
-        var diabledClass = (!enabled)?"sss ss-slider-outer":"sss ss-slider-outer disabled"
-        return(<div className ="ss-pmk" >
+        var button = (enabled) ? <div className="ss-circle-button"><div className="ss-circle-button-inner"></div></div> : <div className="ss-circle-button"></div>
+        var label = <div className="ss-circle-button-holder" onClick={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 1, PreMultipliedKey: !this.props.currentState.downstreamKeyers[index].properties.preMultipliedKey })}>
+            {button}<div className="ss-heading">Pre Multiplied Key</div>
+        </div>
+        var diabledClass = (!enabled) ? "sss ss-slider-outer" : "sss ss-slider-outer disabled"
+        return (<div className="ss-pmk" >
             {label}
             <div className="ss-slider-holder">
-               <div className={diabledClass}><Slider  tooltip={false} step={0.1} onChange={(e)=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand",{Index:index,Mask:2,Clip:e})}  value={this.props.currentState.downstreamKeyers[index].properties.clip}/><div className="ss-slider-label">Clip:</div></div> 
-               <MagicInput disabled={enabled} value={this.props.currentState.downstreamKeyers[index].properties.clip}
-                callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand",{Index:index,Mask:2,Clip:Math.min(100,Math.max(0,value))})}}} />
+                <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 2, Clip: e })} value={this.props.currentState.downstreamKeyers[index].properties.clip} /><div className="ss-slider-label">Clip:</div></div>
+                <MagicInput disabled={enabled} value={this.props.currentState.downstreamKeyers[index].properties.clip}
+                    callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 2, Clip: Math.min(100, Math.max(0, value)) }) } }} />
             </div>
 
             <div className="ss-slider-holder">
-               <div className={diabledClass}><Slider  tooltip={false} step={0.1} onChange={(e)=>this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand",{Index:index,Mask:4,Gain:e})}  value={this.props.currentState.downstreamKeyers[index].properties.gain}/><div className="ss-slider-label">Gain:</div></div> 
-               <MagicInput disabled={enabled} value={this.props.currentState.downstreamKeyers[index].properties.gain}
-                callback={(value: any)=>{if(value!=""){this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand",{Index:index,Mask:4,Gain:Math.min(100,Math.max(0,value))})}}} />
+                <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 4, Gain: e })} value={this.props.currentState.downstreamKeyers[index].properties.gain} /><div className="ss-slider-label">Gain:</div></div>
+                <MagicInput disabled={enabled} value={this.props.currentState.downstreamKeyers[index].properties.gain}
+                    callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 4, Gain: Math.min(100, Math.max(0, value)) }) } }} />
             </div>
 
             <label className="ss-checkbox-container">Invert
-            <input type="checkbox" disabled={enabled} checked={this.props.currentState.downstreamKeyers[index].properties.invert} onClick={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", {Index:index,Mask:8, Invert: !this.props.currentState.downstreamKeyers[index].properties.invert })}></input>
-                    <span className="checkmark"></span>
+            <input type="checkbox" disabled={enabled} checked={this.props.currentState.downstreamKeyers[index].properties.invert} onClick={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand", { Index: index, Mask: 8, Invert: !this.props.currentState.downstreamKeyers[index].properties.invert })}></input>
+                <span className="checkmark"></span>
             </label>
-            
+
 
 
         </div>)
@@ -470,11 +372,9 @@ class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState>{
 
     render() {
 
-
-
         var box = []
         if (this.state.open) {
-            for(var i = 0; i<this.props.currentState.downstreamKeyers.length;i++){
+            for (var i = 0; i < this.props.currentState.downstreamKeyers.length; i++) {
                 box.push(this.getHeading(i))
                 box.push(this.getTopBox(i))
                 box.push(this.getMaskBox(i))
@@ -487,7 +387,205 @@ class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState>{
             <div className="ss-submenu-title" onClick={(e) => { this.setState({ open: !this.state.open }) }}>
                 {this.props.name}
             </div>
-            <div className="ss-submenu-box" style={{ display: "grid", gridTemplateRows: "repeat("+this.props.currentState.downstreamKeyers.length *4+",auto)",overflow:"hidden"}} >
+            <div className="ss-submenu-box" style={{ display: "grid", gridTemplateRows: "repeat(" + this.props.currentState.downstreamKeyers.length * 4 + ",auto)", overflow: "hidden" }} >
+                {box}
+            </div>
+
+
+
+        </div>)
+    }
+}
+
+
+
+interface TransitionState {
+    hasConnected: boolean
+    state: any | null
+    currentState: any
+    open: boolean
+    page: number
+}
+
+
+
+class Transition extends React.Component<SubMenuProps, TransitionState>{
+    constructor(props: SubMenuProps) {
+        super(props)
+        this.state = {
+            open: true,
+            hasConnected: props.device.connected,
+            state: props.currentState,
+            currentState: null,
+            page: 2
+        }
+    }
+
+    private sendCommand(command: string, value: any) {
+        const { device, signalR } = this.props
+        if (device.connected && signalR) {
+            const devId = GetDeviceId(device)
+            signalR
+                .invoke('CommandSend', devId, command, JSON.stringify(value))
+                .then((res) => {
+                })
+                .catch(e => {
+                    console.log('ManualCommands: Failed to send', e)
+                })
+        }
+    }
+
+    getPreMultBox(index:number) {
+        var enabled = this.props.currentState.mixEffects[index].transition.stinger.preMultipliedKey
+        var button = (enabled) ? <div className="ss-circle-button"><div className="ss-circle-button-inner"></div></div> : <div className="ss-circle-button"></div>
+        var label = <div className="ss-circle-button-holder" onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 2, PreMultipliedKey: !enabled })}>
+            {button}<div className="ss-heading">Pre Multiplied Key</div>
+        </div>
+        var diabledClass = (!enabled) ? "sss ss-slider-outer" : "sss ss-slider-outer disabled"
+        return (<div className="ss-pmk" >
+            {label}
+            <div className="ss-slider-holder">
+                <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 4, Clip: e })} value={this.props.currentState.mixEffects[index].transition.stinger.clip} /><div className="ss-slider-label">Clip:</div></div>
+                <MagicInput disabled={enabled} value={this.props.currentState.mixEffects[index].transition.stinger.clip}
+                    callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 4, Clip: Math.min(100, Math.max(0, value)) }) } }} />
+            </div>
+
+            <div className="ss-slider-holder">
+                <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 8, Gain: e })} value={this.props.currentState.mixEffects[index].transition.stinger.gain} /><div className="ss-slider-label">Gain:</div></div>
+                <MagicInput disabled={enabled} value={this.props.currentState.mixEffects[index].transition.stinger.gain}
+                    callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 8, Gain: Math.min(100, Math.max(0, value)) }) } }} />
+            </div>
+
+            <label className="ss-checkbox-container">Invert
+            <input type="checkbox" disabled={enabled} checked={this.props.currentState.mixEffects[index].transition.stinger.invert} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: index, Mask: 16, Invert: !this.props.currentState.mixEffects[index].transition.stinger.invert })}></input>
+                <span className="checkmark"></span>
+            </label>
+
+
+
+        </div>)
+    }
+
+    getSourceOptions() {
+        var inputs = Object.keys(this.props.currentState.settings.inputs)
+        var sources = inputs.filter(i => videoIds[i] < 4000)
+        var options = []
+        for (var i in sources) {
+            options.push(<option value={videoIds[sources[i]]}>{this.props.currentState.settings.inputs[sources[i]].properties.longName}</option>)
+        }
+        return options
+    }
+
+    getMediaPlayerOptions() {
+        var sources = Object.keys(this.props.currentState.settings.inputs).filter(i => videoIds[i] === 3010 || videoIds[i] === 3020 || videoIds[i] === 3030 || videoIds[i] === 3040)
+        var options = []
+        for (var i in sources) {
+            const x = parseInt(i)
+            options.push(<option value={x + 1}>{this.props.currentState.settings.inputs[sources[i]].properties.longName}</option>)
+        }
+        return options
+    }
+
+
+    render() {
+
+
+        if (!this.state.open) {
+            return (<div className="ss-submenu" >
+                <div className="ss-submenu-title" onClick={(e) => { this.setState({ open: !this.state.open }) }}>
+                    {this.props.name}
+                </div>
+                <div className="ss-submenu-box"  >
+                </div>
+            </div>)
+        }
+
+        var box = []
+        if (this.state.page === 0) { //mix
+            box.push(
+                <div className="ss-row"><div className="ss-label">Rate:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.mix.rate} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionMixSetCommand", { Index: 0, Rate: e }) }} />
+                </div>
+                </div>
+
+            )
+        } else if (this.state.page === 1) { //dip
+            box.push(
+                <div className="ss-row"><div className="ss-label">Rate:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.dip.rate} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand", { Index: 0, Mask: 1, Rate: e }) }} />
+                </div>
+                </div>
+
+            )
+
+            box.push(<div className="ss-row">
+                <div className="ss-label">Dip Source:</div>
+                <select onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand", { Index: 0, Mask: 2, Input: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[0].transition.dip.input} className="ss-dropdown" id="cars">
+                    {this.getSourceOptions()}
+                </select>
+            </div>)
+        }else if(this.state.page === 2){//wipe
+            box.push(<Wipe device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState} />)
+
+        } else if (this.state.page === 3) { //stinger
+            box.push(<div className="ss-row">
+                <div className="ss-label">Source:</div>
+                <select onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 1, Source: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[0].transition.stinger.source} className="ss-dropdown" id="cars">
+                    {this.getMediaPlayerOptions()}
+                </select>
+            </div>)
+
+            box.push(
+                <div className="ss-row"><div className="ss-label">Clip Duration:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.stinger.clipDuration} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 64, ClipDuration: e }) }} />
+                </div>
+                </div>
+
+            )
+            box.push(
+                <div className="ss-row"><div className="ss-label">Trigger Point:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.stinger.triggerPoint} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 128, TriggerPoint: e }) }} />
+                </div>
+                </div>
+
+            )
+            box.push(
+                <div className="ss-row"><div className="ss-label">Mix Rate:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.stinger.mixRate} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 256, MixRate: e }) }} />
+                </div>
+                </div>
+
+            )
+            box.push(
+                <div className="ss-row"><div className="ss-label">Pre Roll:</div> <div className="ss-rate">
+                    <RateInput value={this.props.currentState.mixEffects[0].transition.stinger.preroll} videoMode={this.props.currentState.settings.videoMode}
+                        callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand", { Index: 0, Mask: 32, Preroll: e }) }} />
+                </div>
+                </div>
+
+            )
+            box.push(this.getPreMultBox(0))
+        }
+
+        return (<div className="ss-submenu" >
+            <div className="ss-submenu-title" onClick={(e) => { this.setState({ open: !this.state.open }) }}>
+                {this.props.name}
+            </div>
+            <div className="ss-submenu-box" style={{ overflow: "hidden" }} >
+                <div className="ss-submenu-submenu">
+                    <div onClick={() => this.setState({ page: 0 })} className={(this.state.page === 0) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Mix</div>
+                    <div onClick={() => this.setState({ page: 1 })} className={(this.state.page === 1) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Dip</div>
+                    <div onClick={() => this.setState({ page: 2 })} className={(this.state.page === 2) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Wipe</div>
+                    <div onClick={() => this.setState({ page: 3 })} className={(this.state.page === 3) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Stinger</div>
+                    <div onClick={() => this.setState({ page: 4 })} className={(this.state.page === 4) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>DVE</div>
+                </div>
+
+
                 {box}
             </div>
 
@@ -496,37 +594,99 @@ class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState>{
 }
 
 interface MagicInputProps {
-    callback:any
-    value:any
-    disabled?:boolean
+    callback: any
+    value: any
+    disabled?: boolean
+    step?:number
 }
 interface MagicInputState {
-    focus:boolean
-    tempValue:any
-    disabled:boolean
+    focus: boolean
+    tempValue: any
+    disabled: boolean
 }
 
-class MagicInput extends React.Component<MagicInputProps, MagicInputState>{
+export class MagicInput extends React.Component<MagicInputProps, MagicInputState>{
     constructor(props: MagicInputProps) {
         super(props)
         this.state = {
-            focus:false,
-            tempValue:this.props.value,
+            focus: false,
+            tempValue: this.props.value,
             disabled: this.props.disabled || true
         }
     }
 
-    render(){
+    render() {
+        return (<input type="number" step={this.props.step||0.01}
+            disabled={this.props.disabled}
+            onBlur={(e) => { this.setState({ focus: false }); this.props.callback(e.currentTarget.value) }}
+            onFocus={(e) => this.setState({ focus: true, tempValue: this.props.value })}
+            onChange={(e => this.setState({ tempValue: e.currentTarget.value }))}
+            value={(this.state.focus) ? this.state.tempValue : this.props.value}
+            onKeyPress={(e) => { if (e.key === "Enter") { this.props.callback(e.currentTarget.value) } }}
+            className="ss-rate-input" ></input>)
+    }
+}
 
-        return(<input type="number" step={0.01} 
-        disabled={this.props.disabled}
-        onBlur={(e)=>{this.setState({focus:false}); this.props.callback(e.currentTarget.value)}} 
-        onFocus={(e)=>this.setState({focus:true,tempValue:this.props.value})}
-        onChange={(e=>this.setState({tempValue:e.currentTarget.value}))}
-        value={(this.state.focus)?this.state.tempValue:this.props.value}
-        onKeyPress={(e)=>{if(e.key==="Enter"){this.props.callback(e.currentTarget.value)}}}
-        className="ss-rate-input" ></input>)
+interface RateProps {
+    callback: any
+    value: any
+    disabled?: boolean
+    videoMode: number
+    className?: string
+}
+interface RateState {
+    focus: boolean
+    tempValue: string
+    disabled: boolean
+}
+
+export class RateInput extends React.Component<RateProps, RateState>{
+    constructor(props: RateProps) {
+        super(props)
+        this.state = {
+            focus: false,
+            tempValue: this.framesToRate(this.props.value),
+            disabled: this.props.disabled || true
+        }
+    }
+
+    rateToFrames(rate: string) {
+        console.log(rate)
+        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.videoMode]
+        return parseInt(rate.replace(":", "").padStart(4, "0").substr(0, 2)) * fps + parseInt(rate.replace(":", "").padStart(4, "0").substr(2, 3))
+    }
+
+    framesToRate(frames: number) {
+        var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.videoMode]
+        var framesRemaining = frames % fps
+        var seconds = Math.floor(frames / fps);
+        return seconds.toString() + ":" + framesRemaining.toString().padStart(2, "0")
+    }
+
+    onChange(e: React.ChangeEvent<HTMLInputElement>) {
+        var value = e.currentTarget.value
+        if (value.match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) {
+            this.setState({ tempValue: value })
+        }
+        else if (Number.isInteger(Number(value)) && value.length <= 3) {
+            this.setState({ tempValue: value })
+        }
+    }
+
+    render() {
+        var className = this.props.className || "ss-rate-input"
+        return (
+            <input
+                disabled={this.props.disabled}
+                onBlur={(e) => { this.setState({ focus: false }); this.props.callback(Math.min(this.rateToFrames(this.state.tempValue), 250)) }}
+                onFocus={(e) => this.setState({ focus: true, tempValue: this.framesToRate(this.props.value) })}
+                value={(this.state.focus) ? this.state.tempValue : this.framesToRate(this.props.value)}
+                onChange={(e) => this.onChange(e)}
+                onKeyPress={(e) => { if (e.key === "Enter") { this.props.callback(Math.min(this.rateToFrames(this.state.tempValue), 250)); this.setState({ tempValue: this.framesToRate(this.rateToFrames(this.state.tempValue)) }) } }}
+                className={className} ></input>
+        )
     }
 
 }
+
 
