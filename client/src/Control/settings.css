@@ -23,6 +23,17 @@
     box-shadow: 0px 1px 3px #00000075;
     }
     
+    .ss-button-inner.disabled{
+        background: rgb(77, 77, 77);
+        background: linear-gradient(0deg, rgb(48, 48, 48) 49%, rgb(59, 59, 59) 90%, rgb(71, 71, 71) 100%);
+        color:#535353;
+        border-color:rgb(49, 49, 49) ;
+    }
+
+    .ss-button-inner.disabled:active{
+        box-shadow: 0px 1px 3px #00000075;
+    }
+
     .ss-button-inner:active{
     box-shadow: inset 1px 1px 5px #000000b9;
     }
@@ -199,7 +210,25 @@
         user-select: none;
         
       }
-      
+
+
+      .ss-checkbox-container.disabled {
+        color:#616161;
+        cursor:default;
+      }
+
+      .checkmark.disabled {
+        cursor:default;
+        color:#777676;
+      }
+
+    
+
+      .ss-checkbox-container .checkmark.disabled:after {
+        border: solid rgb(85, 85, 85);
+        border-width: 0 3px 3px 0;
+      }
+
       /* Hide the browser's default checkbox */
       .ss-checkbox-container input {
         position: absolute;
@@ -220,6 +249,9 @@
         border-radius:3px;
         background-color: rgb(41, 41, 41);
       }
+
+
+      
       
       /* On mouse-over, add a grey background color */
       .ss-checkbox-container:hover input ~ .checkmark {
@@ -249,7 +281,7 @@
         top: 2px;
         width: 5px;
         height: 10px;
-        border: solid white;
+        border: solid rgb(216, 216, 216);
         border-width: 0 3px 3px 0;
         -webkit-transform: rotate(45deg);
         -ms-transform: rotate(45deg);
@@ -261,6 +293,10 @@
           margin:10px;
           font-size:14px;
       }
+
+      .ss-heading.disabled{
+        color:#646464;
+    }
       .ss-label{
         font-size:13px;
         color:#858585;
@@ -292,6 +328,12 @@
           -moz-appearance: none;
           -webkit-appearance: none;
           appearance: none;
+      }
+
+      .ss-dropdown:disabled{
+        color:#6d6d6d;
+        background:#3d3d3d;
+        border:1px solid #2b2b2b;
       }
 
       .ss-dropdown *{
@@ -492,4 +534,70 @@ input[type=number] {
     display:grid;
     grid-template-columns: 1fr 1fr;
     height:25px;
+}
+
+.ss-dve-style-heading{
+    width:100%;
+    margin:10px 0px;
+    text-align: center;
+    color:#949494;
+    font-size:14px;
+}
+
+.ss-dve-style-page-button-holder{
+    margin: 10px auto;
+    display: grid;
+    column-gap: 10px;
+    grid-template-columns: 8px 8px 8px 8px;
+    width:fit-content;
+}
+.ss-dve-style-page-button{
+    height:8px;
+    width:8px;
+    border-radius: 50%;
+    background:#171717; 
+}
+
+.ss-dve-style-page-button.currentPage{
+    background:#c8c8c8;
+}
+
+.ss-dve-style-page-button.currentItem{
+    background:#ff7b00;
+}
+.ss-dve-style-page-button:hover{
+    background:#c8c8c8;
+}
+
+.ss-dve-style-holder{
+    display:grid;
+    width: 80%;
+    /* height:150px; */
+    margin:auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    border-radius:5px;
+    border:solid 1px #1a1a1a;
+    overflow: hidden;
+}
+
+.ss-dve-style-item{
+    background:#2c2c2c;
+    outline:solid 1px #1a1a1a;
+}
+
+.ss-dve-style-item.selected{
+    background:#202020;
+}
+
+.ss-dve-style-item.selected:hover{
+    background:#202020;
+}
+
+.ss-dve-style-item:hover{
+    background:#383838;
+}
+
+.ss-dve-style-item.dummy:hover{
+    background:#2c2c2c;
 }

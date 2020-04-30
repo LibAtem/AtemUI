@@ -4,6 +4,7 @@ import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import OutsideClickHandler from 'react-outside-click-handler';
 import {SwitcherSettings} from "./settings"
+import { AtemButton } from './button/button';
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -280,7 +281,8 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
     var myKeys = Object.keys(inputs).filter(x => x.includes("input"))
     var programButtons = myKeys.map(item =>
-      item.includes(programSource) ? <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red atem-button-red-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red">{inputs[(item)].properties.shortName}</div>
+      <AtemButton name={inputs[(item)].properties.shortName} callback={()=>this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} active={item.includes(programSource)}></AtemButton>
+      // item.includes(programSource) ? <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red atem-button-red-active">{inputs[(item)].properties.shortName}</div> : <div key={item} onMouseDown={() => this.ProgramMix(Object.keys(this.props.currentState.settings.inputs).indexOf(item.toString()))} className="atem-button button-red">{inputs[(item)].properties.shortName}</div>
     )
 
     var blkProgram = (programSource === 0) ? <div onMouseDown={() => this.ProgramMix(0)} className="atem-button button-red atem-button-red-active">Blk</div> : <div onMouseDown={() => this.ProgramMix(0)} className="atem-button button-red atem-button-red">Blk</div>

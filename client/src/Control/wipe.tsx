@@ -4,8 +4,8 @@ import { GetDeviceId } from "../DeviceManager"
 import { RateInput, MagicInput } from "./settings"
 import Slider from "react-rangeslider"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlay, faSyncAlt, faAngleRight, faAngleLeft } from "@fortawesome/free-solid-svg-icons"
-
+import { faAngleRight, faAngleLeft } from "@fortawesome/free-solid-svg-icons"
+import { videoIds } from '../ControlSettings/ids';
 
 
 interface WipeProps {
@@ -43,6 +43,16 @@ export class Wipe extends React.Component<WipeProps, WipeState>{
                     console.log('ManualCommands: Failed to send', e)
                 })
         }
+    }
+
+    getSourceOptions() {
+        var inputs = Object.keys(this.props.currentState.settings.inputs)
+        var sources = inputs.filter(i => videoIds[i] < 4000)
+        var options = []
+        for (var i in sources) {
+            options.push(<option value={videoIds[sources[i]]}>{this.props.currentState.settings.inputs[sources[i]].properties.longName}</option>)
+        }
+        return options
     }
 
     render() {
@@ -233,14 +243,40 @@ export class Wipe extends React.Component<WipeProps, WipeState>{
                         callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 128, YPosition: Math.min(1, Math.max(0, value)) }) } }} />
                 </div>
 
-                <div className="ss-row" style={{gridTemplateColumns:"1fr 1fr 1fr"}}>
+                <div className="ss-row" style={{gridTemplateColumns:"1fr 1fr 1.5fr"}}>
                     <div className="ss-label">Direction:</div>
                     <div className="ss-direction-holder">
                         <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand",{Index:0,ReverseDirection:false,Mask:256})} style={{lineHeight:"25px"}}  className={(!this.props.currentState.mixEffects[0].transition.wipe.reverseDirection)?"ss-button-inner ss-button-left ss-button-inner-selected":"ss-button-inner ss-button-left"}><FontAwesomeIcon icon={faAngleRight} /></div>
                         <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand",{Index:0,ReverseDirection:true,Mask:256})} style={{lineHeight:"25px"}}  className={(this.props.currentState.mixEffects[0].transition.wipe.reverseDirection)?"ss-button-inner ss-button-right ss-button-inner-selected":"ss-button-inner ss-button-right"}><FontAwesomeIcon icon={faAngleLeft} /></div>
                     </div>
+                    <label className="ss-checkbox-container">Flip Flop
+                    <input type="checkbox" checked={this.props.currentState.mixEffects[0].transition.wipe.flipFlop} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index:0, FlipFlop:!this.props.currentState.mixEffects[0].transition.wipe.flipFlop, Mask: 512 })}></input>
+                    <span className="checkmark"></span>
+                </label>
 
                 </div>
+                <div className="ss-heading">Border</div>
+                <div className="ss-slider-holder">
+                    <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 32, BorderSoftness: e })} value={this.props.currentState.mixEffects[0].transition.wipe.borderSoftness} />
+                    <div className="ss-slider-label">Softness:</div></div>
+                    <MagicInput disabled={disabled} value={this.props.currentState.mixEffects[0].transition.wipe.borderSoftness}
+                        callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 32, BorderSoftness: Math.min(100, Math.max(0, value)) }) } }} />
+                </div>
+
+                <div className="ss-slider-holder">
+                    <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 4, BorderWidth: e })} value={this.props.currentState.mixEffects[0].transition.wipe.borderWidth} />
+                    <div className="ss-slider-label">Width:</div></div>
+                    <MagicInput disabled={disabled} value={this.props.currentState.mixEffects[0].transition.wipe.borderWidth}
+                        callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 4, BorderWidth: Math.min(100, Math.max(0, value)) }) } }} />
+                </div>
+
+                <div className="ss-row">
+                <div className={(this.props.currentState.mixEffects[0].transition.wipe.borderWidth===0)?"ss-label disabled":"ss-label"}>Fill Source:</div>
+                <select disabled={(this.props.currentState.mixEffects[0].transition.wipe.borderWidth===0)} onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: 0, Mask: 8, BorderInput: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[0].transition.wipe.borderInput} className="ss-dropdown" id="cars">
+                    {this.getSourceOptions()}
+                </select>
+                </div>
+
 
             </div>
 

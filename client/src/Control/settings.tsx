@@ -7,6 +7,7 @@ import { videoIds } from '../ControlSettings/ids';
 import Slider from 'react-rangeslider';
 import pattern0 from "./patterns/0.svg"
 import { Wipe } from './wipe';
+import { DVE } from './dve';
 
 interface SwitcherSettingsProps {
     device: AtemDeviceInfo
@@ -417,7 +418,7 @@ class Transition extends React.Component<SubMenuProps, TransitionState>{
             hasConnected: props.device.connected,
             state: props.currentState,
             currentState: null,
-            page: 2
+            page: 4
         }
     }
 
@@ -570,6 +571,9 @@ class Transition extends React.Component<SubMenuProps, TransitionState>{
 
             )
             box.push(this.getPreMultBox(0))
+        }else if(this.state.page === 4){//wipe
+            box.push(<DVE device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState} />)
+
         }
 
         return (<div className="ss-submenu" >

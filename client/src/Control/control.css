@@ -128,10 +128,10 @@ html {
     width: auto;
     display: grid;
     row-gap: 40px;
-    column-gap: 0.3%;
+    column-gap: 5px;
     /* margin: 20px; */
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(54px, 54px));
 }
 
 
@@ -324,4 +324,40 @@ html {
     -webkit-box-shadow: 0px 3px 25px -9px rgb(251, 255, 0);
     -moz-box-shadow: 0px 3px 25px -9px rgb(251, 255, 0);
     box-shadow: 0px 3px 25px -9px rgb(208, 255, 0);
+}
+
+.atem-button-holder{
+    position: relative;
+    border-radius: 7px;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 6px 5px rgba(0, 0, 0, 0.637);
+}
+
+.atem-button-holder:active{
+    opacity: 0.8;
+    box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.856);
+}
+
+.atem-button-text{
+    position:absolute;
+    font-weight: 600;
+    color:#1b1b1b;
+    text-align: center;
+    font-size: 15px;
+    width:54px;
+    top:16px;
+    user-select: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.atem-button-holder.red{
+    box-shadow: 0px 0px 25px 5px rgba(255, 0, 0, 0.637);
+    
+}
+
+.atem-button-holder.red:active{
+    box-shadow: 0px 0px 25px 2px rgb(165, 1, 1);
+    opacity: 0.8;
 }
