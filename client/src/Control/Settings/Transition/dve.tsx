@@ -1,16 +1,17 @@
 import React from "react"
-import { AtemDeviceInfo } from "../Devices/types"
-import { GetDeviceId } from "../DeviceManager"
-import { RateInput, MagicInput } from "./settings"
+import { AtemDeviceInfo } from "../../../Devices/types"
+import { GetDeviceId } from "../../../DeviceManager"
+import { RateInput, MagicInput } from "../settings"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from "@fortawesome/free-solid-svg-icons"
-import { videoIds } from "../ControlSettings/ids"
+import { videoIds } from "../../../ControlSettings/ids"
 import Slider from "react-rangeslider"
 
 interface DVEProps {
     device: AtemDeviceInfo
     signalR: signalR.HubConnection | undefined
     currentState: any
+    mixEffect:number
 }
 
 interface DVEState {
@@ -46,10 +47,10 @@ export class DVE extends React.Component<DVEProps, DVEState>{
         }
     }
     getSpin(){
-        var style = this.props.currentState.mixEffects[0].transition.dve.style
+        var style = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
         return(
         <div className="ss-dve-style-holder">
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 13 })} className={(style == 13) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 13 })} className={(style == 13) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(-1, 1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -63,7 +64,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 8 })} className={(style == 8) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 8 })} className={(style == 8) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -78,7 +79,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 15 })} className={(style == 15) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 15 })} className={(style == 15) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask2">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -93,7 +94,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 10 })} className={(style == 10) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 10 })} className={(style == 10) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(-1, 1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask2">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -108,7 +109,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
             <div className="ss-dve-style-item dummy"></div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 9 })} className={(style == 9) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 9 })} className={(style == 9) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask2">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -123,7 +124,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 12 })} className={(style == 12) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 12 })} className={(style == 12) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(-1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask2">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -137,7 +138,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 11 })} className={(style == 11) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 11 })} className={(style == 11) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(-1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -151,7 +152,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 14 })} className={(style == 14) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 14 })} className={(style == 14) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" transform="scale(1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <mask id="myMask">
                         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -171,9 +172,9 @@ export class DVE extends React.Component<DVEProps, DVEState>{
     }
 
     getSqueeze() {
-        var style = this.props.currentState.mixEffects[0].transition.dve.style
+        var style = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
         return (<div className="ss-dve-style-holder">
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 16 })} className={(style == 16) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 16 })} className={(style == 16) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(40,25) rotate(-45,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 16) ? "#ff8c00" : "#b2b2b2"} />
@@ -187,7 +188,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 17 })} className={(style == 17) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 17 })} className={(style == 17) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(0,25)" stroke-width="0.2" stroke="#191919" fill={(style === 17) ? "#ff8c00" : "#b2b2b2"} />
@@ -198,7 +199,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 18 })} className={(style == 18) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 18 })} className={(style == 18) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-40,25) rotate(45,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 26) ? "#ff8c00" : "#b2b2b2"} />
@@ -210,7 +211,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 19 })} className={(style == 19) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 19 })} className={(style == 19) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(45,0) rotate(-90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 19) ? "#ff8c00" : "#b2b2b2"} />
@@ -224,7 +225,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
             <div className="ss-dve-style-item dummy"></div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 20 })} className={(style == 20) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 20 })} className={(style == 20) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-45,0) rotate(90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 20) ? "#ff8c00" : "#b2b2b2"} />
@@ -236,7 +237,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 21 })} className={(style == 21) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 21 })} className={(style == 21) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(45,-25) rotate(-135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 29) ? "#ff8c00" : "#b2b2b2"} />
@@ -247,7 +248,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 22 })} className={(style == 22) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 22 })} className={(style == 22) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(0,-25) rotate(180,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 22) ? "#ff8c00" : "#b2b2b2"} />
@@ -259,7 +260,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 23 })} className={(style == 23) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 23 })} className={(style == 23) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-45,-25) rotate(135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 23) ? "#ff8c00" : "#b2b2b2"} />
@@ -278,11 +279,11 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
     getPush() {
 
-        var style = this.props.currentState.mixEffects[0].transition.dve.style
+        var style = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
         return (<div className="ss-dve-style-holder">
 
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 24 })} className={(style == 24) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 24 })} className={(style == 24) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(40,25) rotate(-45,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 24) ? "#ff8c00" : "#b2b2b2"} />
@@ -293,7 +294,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 25 })} className={(style == 25) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 25 })} className={(style == 25) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(0,25)" stroke-width="0.2" stroke="#191919" fill={(style === 25) ? "#ff8c00" : "#b2b2b2"} />
@@ -303,7 +304,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 26 })} className={(style == 26) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 26 })} className={(style == 26) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-40,25) rotate(45,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 26) ? "#ff8c00" : "#b2b2b2"} />
@@ -313,7 +314,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 27 })} className={(style == 27) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 27 })} className={(style == 27) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(45,0) rotate(-90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 27) ? "#ff8c00" : "#b2b2b2"} />
@@ -324,7 +325,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
             <div className="ss-dve-style-item dummy"></div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 28 })} className={(style == 28) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 28 })} className={(style == 28) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-45,0) rotate(90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 28) ? "#ff8c00" : "#b2b2b2"} />
@@ -334,7 +335,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 29 })} className={(style == 29) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 29 })} className={(style == 29) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(45,-25) rotate(-135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 29) ? "#ff8c00" : "#b2b2b2"} />
@@ -345,7 +346,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 30 })} className={(style == 30) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 30 })} className={(style == 30) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(0,-25) rotate(180,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 30) ? "#ff8c00" : "#b2b2b2"} />
@@ -356,7 +357,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 31 })} className={(style == 31) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 31 })} className={(style == 31) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="5" transform=" translate(-45,-25) rotate(135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 31) ? "#ff8c00" : "#b2b2b2"} />
@@ -372,18 +373,18 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
     getSwoosh() {
 
-        var style = this.props.currentState.mixEffects[0].transition.dve.style
+        var style = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
         return (<div className="ss-dve-style-holder">
 
 
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 0 })} className={(style == 0) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 0 })} className={(style == 0) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(-45,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 0) ? "#ff8c00" : "#b2b2b2"} />
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 1 })} className={(style == 1) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 1 })} className={(style == 1) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50 " rx="2" stroke-width="0.2" stroke="#191919" fill={(style === 1) ? "#ff8c00" : "#b2b2b2"} />
@@ -391,7 +392,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
 
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 2 })} className={(style == 2) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 2 })} className={(style == 2) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
 
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
@@ -401,7 +402,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
 
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 3 })} className={(style == 3) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 3 })} className={(style == 3) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(-90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 3) ? "#ff8c00" : "#b2b2b2"} />
@@ -409,21 +410,21 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
             </div>
             <div className="ss-dve-style-item dummy"></div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 4 })} className={(style == 4) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 4 })} className={(style == 4) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(90,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 4) ? "#ff8c00" : "#b2b2b2"} />
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 5 })} className={(style == 5) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 5 })} className={(style == 5) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(-135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 5) ? "#ff8c00" : "#b2b2b2"} />
                     </g>
                 </svg>
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 6 })} className={(style == 6) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 6 })} className={(style == 6) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(180,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 6) ? "#ff8c00" : "#b2b2b2"} />
@@ -431,7 +432,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
                 </svg>
 
             </div>
-            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 7 })} className={(style == 7) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
+            <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 7 })} className={(style == 7) ? "ss-dve-style-item selected" : "ss-dve-style-item"}>
                 <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
                     <g>
                         <polygon id="pattern 1" points="75,35 90,50 80,50 80,65 70,65 70,50 60,50" rx="2" transform="rotate(135,75,50)" stroke-width="0.2" stroke="#191919" fill={(style === 7) ? "#ff8c00" : "#b2b2b2"} />
@@ -454,7 +455,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
     getPreMultBox(index:number) {
 
         var enabled = this.props.currentState.mixEffects[index].transition.dve.preMultiplied
-        if(this.props.currentState.mixEffects[0].transition.dve.style<32||!this.props.currentState.mixEffects[0].transition.dve.enableKey){
+        if(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32||!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey){
             var button = <div className="ss-circle-button"></div>  
             var label = <div className="ss-circle-button-holder">
                 {button}<div className="ss-heading disabled">Pre Multiplied Key</div>
@@ -496,7 +497,7 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
 
         var styleHeding = ["Push", "Squeeze", "Spin", "Swoosh"][this.state.page]
-        var currentStyle = this.props.currentState.mixEffects[0].transition.dve.style
+        var currentStyle = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
         var style = []
         if (this.state.page === 0) {
             style.push(this.getPush())
@@ -512,29 +513,29 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
         var rate = []
 
-        if(this.props.currentState.mixEffects[0].transition.dve.style!=34){
+        if(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style!=34){
             rate.push(        <div className="ss-row" style={{ marginTop: "20px", marginBottom: "20px" }}>
             <div className="ss-label" >Rate:</div>
-            <div className="ss-rate"><RateInput videoMode={this.props.currentState.settings.videoMode} value={this.props.currentState.mixEffects[0].transition.dve.rate} callback={(e: number) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 1, Rate: e })} /></div>
+            <div className="ss-rate"><RateInput videoMode={this.props.currentState.settings.videoMode} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.rate} callback={(e: number) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 1, Rate: e })} /></div>
         </div>)
         }else{
             rate.push(   <div className="ss-row" style={{ marginTop: "20px", marginBottom: "20px" }}>
             <div className="ss-label" >Rate:</div>
-            <div className="ss-rate"><RateInput videoMode={this.props.currentState.settings.videoMode} value={this.props.currentState.mixEffects[0].transition.dve.logoRate} callback={(e: number) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 2, LogoRate: e })} /></div>
+            <div className="ss-rate"><RateInput videoMode={this.props.currentState.settings.videoMode} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.logoRate} callback={(e: number) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 2, LogoRate: e })} /></div>
         </div>)
         }
 
         var direction =[]
-        if(this.props.currentState.mixEffects[0].transition.dve.style==32 || this.props.currentState.mixEffects[0].transition.dve.style==33){
+        if(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==32 || this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==33){
             direction.push(<div className="ss-row" style={{gridTemplateColumns:"1fr 1fr 1.5fr"}}>
             <div className="ss-label disabled">Direction:</div>
             <div className="ss-direction-holder">
                 <div  style={{lineHeight:"25px"}}  className="ss-button-inner ss-button-left disabled"><FontAwesomeIcon icon={faAngleRight} /></div>
                 <div  style={{lineHeight:"25px"}}  className="ss-button-inner ss-button-right disabled"><FontAwesomeIcon icon={faAngleLeft} /></div>
             </div>
-            <label className={(this.props.currentState.mixEffects[0].transition.dve.style==32 || this.props.currentState.mixEffects[0].transition.dve.style==33)?"ss-checkbox-container disabled":"ss-checkbox-container"  }>Flip Flop
-            <input type="checkbox" disabled={true} checked={this.props.currentState.mixEffects[0].transition.dve.flipFlop} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index:0, FlipFlop:!this.props.currentState.mixEffects[0].transition.dve.flipFlop, Mask: 2048 })}></input>
-            <span className={(this.props.currentState.mixEffects[0].transition.dve.style==32 || this.props.currentState.mixEffects[0].transition.dve.style==33)?"checkmark disabled":"checkmark"  }></span>
+            <label className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==32 || this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==33)?"ss-checkbox-container disabled":"ss-checkbox-container"  }>Flip Flop
+            <input type="checkbox" disabled={true} checked={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.flipFlop} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, FlipFlop:!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.flipFlop, Mask: 2048 })}></input>
+            <span className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==32 || this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==33)?"checkmark disabled":"checkmark"  }></span>
             </label>
 
         </div>)
@@ -542,11 +543,11 @@ export class DVE extends React.Component<DVEProps, DVEState>{
             direction.push(<div className="ss-row" style={{gridTemplateColumns:"1fr 1fr 1.5fr"}}>
             <div className="ss-label">Direction:</div>
             <div className="ss-direction-holder">
-                <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand",{Index:0,Reverse:false,Mask:1024})} style={{lineHeight:"25px"}}  className={(!this.props.currentState.mixEffects[0].transition.dve.reverse)?"ss-button-inner ss-button-left ss-button-inner-selected":"ss-button-inner ss-button-left"}><FontAwesomeIcon icon={faAngleRight} /></div>
-                <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand",{Index:0,Reverse:true,Mask:1024})} style={{lineHeight:"25px"}}  className={(this.props.currentState.mixEffects[0].transition.dve.reverse)?"ss-button-inner ss-button-right ss-button-inner-selected":"ss-button-inner ss-button-right"}><FontAwesomeIcon icon={faAngleLeft} /></div>
+                <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand",{Index: this.props.mixEffect,Reverse:false,Mask:1024})} style={{lineHeight:"25px"}}  className={(!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse)?"ss-button-inner ss-button-left ss-button-inner-selected":"ss-button-inner ss-button-left"}><FontAwesomeIcon icon={faAngleRight} /></div>
+                <div onClick={()=>this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand",{Index: this.props.mixEffect,Reverse:true,Mask:1024})} style={{lineHeight:"25px"}}  className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse)?"ss-button-inner ss-button-right ss-button-inner-selected":"ss-button-inner ss-button-right"}><FontAwesomeIcon icon={faAngleLeft} /></div>
             </div>
             <label className="ss-checkbox-container">Flip Flop
-            <input type="checkbox" checked={this.props.currentState.mixEffects[0].transition.dve.flipFlop} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index:0, FlipFlop:!this.props.currentState.mixEffects[0].transition.dve.flipFlop, Mask: 2048 })}></input>
+            <input type="checkbox" checked={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.flipFlop} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, FlipFlop:!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.flipFlop, Mask: 2048 })}></input>
             <span className="checkmark"></span>
             </label>
 
@@ -573,26 +574,26 @@ export class DVE extends React.Component<DVEProps, DVEState>{
 
                 <div className ="ss-row" style={{gridTemplateColumns: "1fr 25px 25px 25px 1fr"}}> 
                     <div className="ss-label">Effects: </div>
-                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 33 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[0].transition.dve.style==33)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faUndoAlt} /></div>
-                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 32 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[0].transition.dve.style==32)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faRedoAlt} /></div>
-                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 4, Style: 34 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[0].transition.dve.style==34)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faArrowRight} /></div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 33 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==33)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faUndoAlt} /></div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 32 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==32)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faRedoAlt} /></div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 4, Style: 34 })} style={{borderRadius:"10px",lineHeight:"25px"}} className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style==34)?"ss-button-inner ss-button-inner-selected":"ss-button-inner"}><FontAwesomeIcon icon={faArrowRight} /></div>
                 </div>
 
                 <div className="ss-row">
-                <div className={(this.props.currentState.mixEffects[0].transition.dve.style<32)?"ss-label disabled":"ss-label"}>Fill Source:</div>
-                <select disabled={(this.props.currentState.mixEffects[0].transition.dve.style<32)} onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 8, FillSource: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[0].transition.dve.fillSource} className="ss-dropdown" id="cars">
+                <div className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32)?"ss-label disabled":"ss-label"}>Fill Source:</div>
+                <select disabled={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32)} onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 8, FillSource: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.fillSource} className="ss-dropdown" id="cars">
                     {this.getSourceOptions()}
                 </select>
                 </div>
 
-                <label className={(this.props.currentState.mixEffects[0].transition.dve.style<32)?"ss-checkbox-container disabled":"ss-checkbox-container"}>Enable Key
-                    <input type="checkbox" checked={this.props.currentState.mixEffects[0].transition.dve.enableKey} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index:0, EnableKey:!this.props.currentState.mixEffects[0].transition.dve.enableKey, Mask: 32 })}></input>
-                    <span className={(this.props.currentState.mixEffects[0].transition.dve.style<32)?"checkmark disabled":"checkmark"}></span>
+                <label className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32)?"ss-checkbox-container disabled":"ss-checkbox-container"}>Enable Key
+                    <input type="checkbox" checked={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey} onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, EnableKey:!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey, Mask: 32 })}></input>
+                    <span className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32)?"checkmark disabled":"checkmark"}></span>
                 </label>
 
                 <div className="ss-row">
-                <div className={(this.props.currentState.mixEffects[0].transition.dve.style<32||!this.props.currentState.mixEffects[0].transition.dve.enableKey)?"ss-label disabled":"ss-label"}>Key Source:</div>
-                <select disabled={(this.props.currentState.mixEffects[0].transition.dve.style<32||!this.props.currentState.mixEffects[0].transition.dve.enableKey)} onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: 0, Mask: 16, KeySource: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[0].transition.dve.keySource} className="ss-dropdown" id="cars">
+                <div className={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32||!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey)?"ss-label disabled":"ss-label"}>Key Source:</div>
+                <select disabled={(this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style<32||!this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey)} onChange={(e) => { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand", { Index: this.props.mixEffect, Mask: 16, KeySource: e.currentTarget.value }) }} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.keySource} className="ss-dropdown" id="cars">
                     {this.getSourceOptions()}
                 </select>
                 </div>

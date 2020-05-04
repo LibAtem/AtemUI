@@ -1,8 +1,44 @@
 
 .ss{
     border-left:1px solid #1b1b1b;
+    background:#2e2e2e;
+    min-height:calc(100vh - 56px);
+    height:calc(100vh - 56px);
+    width:100%;
+    min-width: 310px;
 }
 
+/* @media only screen and (max-width: 600px) {
+    .ss{
+        width:100%;
+        grid-column-start: 1;
+        grid-column-end: 3;
+    }
+} */
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #2e2e2e; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(78, 78, 78); 
+    border-radius: 5px;
+    
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+
+  
 .ss-button-holder{
     margin:10px;
     display:grid;
@@ -62,6 +98,7 @@
 
     .ss-submenu{
         margin:10px;
+        margin-right:2px;
         user-select: none;
     }
     .ss-submenu-title{

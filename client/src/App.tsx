@@ -205,10 +205,12 @@ export default class App extends React.Component<{}, AppState> {
         </div>
         <Router>
           <div className="full">
-            <Navbar bg="dark" variant="dark">
+            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
               <LinkContainer to="/">
                 <Navbar.Brand>Atem UI</Navbar.Brand>
               </LinkContainer>
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="mr-auto">
                 <IndexLinkContainer to="/">
                   <Nav.Link>Home</Nav.Link>
@@ -242,6 +244,7 @@ export default class App extends React.Component<{}, AppState> {
                 {this.renderDeviceSelection()}
                 <Button variant="outline-info">Search</Button>
               </Form>
+              </Navbar.Collapse>
             </Navbar>
 
             {connected !== ConnectionStatus.Disconnected ? (
