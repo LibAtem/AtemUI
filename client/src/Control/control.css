@@ -8,14 +8,16 @@ html {
 }
 
 .open-button{
-    position: absolute;
-    height:30px;
-    width: 30px;
-    left:-30px;
-    border-bottom-left-radius: 100%;
+    margin-top:45vh;
+    position: relative;
+    height:40px;
+    width: 20px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
     background:#202020;
-    border-bottom:1px solid #1a1a1a;
+    /* border-bottom:1px solid #1a1a1a; */
     border-left:1px solid #1a1a1a;
+    overflow:hidden;
 }
 
 .open-button:hover{
@@ -97,17 +99,18 @@ html {
     border-radius: 5px;
     border: 1.5px solid #191919;
     display:grid;
-    grid-template-columns: 55px 55px;
-    grid-template-rows: 55px 55px 55px 55px;
-    column-gap: 0px;
+    grid-template-columns: 50px 50px;
+    grid-template-rows: 50px 50px 50px 50px;
+    column-gap: 5px;
+    row-gap:5px;
     position: relative;
     padding:10px;
 }
 
 .box-ftb{
     display:grid;
-    grid-template-columns: 55px 55px;
-    column-gap: 0px; 
+    grid-template-columns: 50px 50px;
+    column-gap: 5px; 
     padding:10px;
     background: #202020;
     border-radius: 5px;
@@ -148,7 +151,8 @@ html {
     /* column-gap: 15px; */
     row-gap: 40px;
     padding:10px;
-    grid-template-columns: 55px 55px 55px 55px 55px;
+    column-gap: 5px;
+    grid-template-columns: 50px 50px 50px 50px 50px;
     grid-template-rows: 1fr 1fr;
 }
 
@@ -252,7 +256,6 @@ html {
 }
 
 #FTB{
-    height:75px;
     grid-area:FTB
 }
 
@@ -399,6 +402,36 @@ html {
     box-shadow: 0px 0px 6px 5px rgba(0, 0, 0, 0.5);
 }
 
+.atem-button-holder.flash{
+    -webkit-animation: flash cubic-bezier(1,0,0,1)  0.7s infinite;
+    animation: flash cubic-bezier(1,0,0,1) 0.7s infinite;
+    background-image: url("/images/button_new_low.png");
+    background-blend-mode: lighten;
+    background-size: 50px 50px;
+    -webkit-transition: background-image 0.4s ease-in-out;
+    transition: background-image 0.4s ease-in-out;
+}
+
+
+@-webkit-keyframes flash {
+    0% { 
+        background-image: url("/images/button_new_low.png");
+        } 
+    50% {
+        box-shadow: 0px 0px 20px 5px rgba(255, 0, 0, 0.637);
+        background-image: url("/images/button_red5.png");
+    } 
+} 
+@keyframes flash {
+    0% { 
+        background-image: url("/images/button_new_low.png");
+        } 
+    50% {
+        box-shadow: 0px 0px 20px 5px rgba(255, 0, 0, 0.637);
+        background-image: url("/images/button_red5.png");
+    } 
+    
+}
 .atem-button-holder:active{
     opacity: 0.8;
     box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.856);
@@ -414,6 +447,17 @@ html {
     top:15px;
     user-select: none;
     font-family: Arial, Helvetica, sans-serif;
+}
+.atem-button-text.on-air{
+    padding: 0px 5px;
+    top:5px;
+    line-height: 20px;
+}
+
+.atem-button-text.prev-trans{
+    line-height: 13px;
+    font-size:13px;
+    top:13px;
 }
 
 .atem-button-holder.red{
@@ -433,7 +477,18 @@ html {
     
 }
 
-.atem-button-holder.greeb:active{
+.atem-button-holder.green:active{
     box-shadow: 0px 0px 20px 2px rgba(39, 165, 1, 0.651);
+    opacity: 0.8;
+}
+
+.atem-button-holder.yellow{
+    box-shadow: 0px 0px 20px 5px rgba(255, 208, 0, 0.432);
+    z-index:10;
+    
+}
+
+.atem-button-holder.yellow:active{
+    box-shadow: 0px 0px 20px 2px rgba(165, 162, 1, 0.651);
     opacity: 0.8;
 }

@@ -3,10 +3,11 @@ import './control.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import OutsideClickHandler from 'react-outside-click-handler';
-import { SwitcherSettings } from "./Settings/settings"
-import { AtemButtonRed, AtemButtonGreen } from './button/button';
+import { SwitcherSettings, RateInput } from "./Settings/settings"
+import { AtemButtonRed, AtemButtonGreen, AtemButtonYellow, AtemButtonOnAir, AtemButtonFTB } from './button/button';
 import { videoIds } from '../ControlSettings/ids';
 import MediaQuery, { useMediaQuery } from 'react-responsive'
+import { createSecretKey } from 'crypto';
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -16,19 +17,22 @@ export class ControlPage extends React.Component {
   render() {
     const device = GetActiveDevice(this.context)
     if (device) {
-      return (
+      if(device.connected){
+        return (
 
-        <ControlPageInnerInner
-
-          key={this.context.activeDeviceId || ''}
-          device={device}
-          currentState={this.context.currentState}
-          // currentState={this.state.currentState}
-          signalR={this.context.signalR}
-        />
-
-      )
-
+          <ControlPageInnerInner
+  
+            key={this.context.activeDeviceId || ''}
+            device={device}
+            currentState={this.context.currentState}
+            // currentState={this.state.currentState}
+            signalR={this.context.signalR}
+          />
+  
+        )
+      }else{
+        return (<div>Device is not connected</div>)
+      }
     } else {
       return (<div>No device Selected</div>)
     }
@@ -44,6 +48,7 @@ interface ControlPageInnerInnerState {
   open: boolean
 }
 
+//Handles Mobile Layout
 class ControlPageInnerInner extends React.Component<ControlPageInnerProps, ControlPageInnerInnerState> {
   constructor(props: ControlPageInnerProps) {
     super(props)
@@ -51,8 +56,6 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
       open: true
     }
   }
-
-
   render() {
 
     if (this.state.open) {
@@ -60,7 +63,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
         {(matches) =>
           matches
             ?
-            <div className="control-page" style={{ gridTemplateColumns: "1fr 310px" }}>
+            <div className="control-page" style={{ gridTemplateColumns: "1fr 20px 310px" }}>
 
               <ControlPageInner
 
@@ -71,6 +74,11 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
                 
                 signalR={this.props.signalR}
               />
+
+                
+                    <div onClick={()=>{this.setState({open:false})}} className="open-button"><svg style={{ position: "absolute", top: "7px" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange" width="25px" height="25px"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" /></svg></div>
+               
+
               <SwitcherSettings
                 full={false}
                 // key={this.context.activeDeviceId || ''}
@@ -121,7 +129,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
         {(matches) =>
           matches
             ?
-            <div className="control-page">
+            <div className="control-page" style={{ gridTemplateColumns: "1fr 20px" }}>
               <ControlPageInner
 
                 // key={this.props.activeDeviceId || ''}
@@ -131,8 +139,9 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
                 signalR={this.context.signalR}
               />
 
-
+            <div onClick={()=>{this.setState({open:true})}} className="open-button"><svg style={{ position: "absolute",left:"-1px", top: "7px" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange" width="25px" height="25px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div>
             </div>
+            
 
             :
 
@@ -332,37 +341,37 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
   }
 
-  ftbRate(id: string, index: number) {
-    var input = document.getElementById(id) as HTMLInputElement
-    if (input.value !== "") {
-      this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
-      input.value = ""
-    }
-  }
+  // ftbRate(id: string, index: number) {
+  //   var input = document.getElementById(id) as HTMLInputElement
+  //   if (input.value !== "") {
+  //     this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
+  //     input.value = ""
+  //   }
+  // }
 
-  ftbRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
-    if (e.keyCode === 13) {
-      this.ftbRate(id, index)
-    } else {
-      this.validRate(e, id)
-    }
-  }
+  // ftbRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
+  //   if (e.keyCode === 13) {
+  //     this.ftbRate(id, index)
+  //   } else {
+  //     this.validRate(e, id)
+  //   }
+  // }
 
-  dskRate(id: string, index: number) {
-    var input = document.getElementById(id) as HTMLInputElement
-    if (input.value !== "") {
-      this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
-      input.value = ""
-    }
-  }
+  // dskRate(id: string, index: number) {
+  //   var input = document.getElementById(id) as HTMLInputElement
+  //   if (input.value !== "") {
+  //     this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: index, Rate: Math.min(this.rateToFrames(input.value), 250) })
+  //     input.value = ""
+  //   }
+  // }
 
-  dskRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
-    if (e.keyCode === 13) {
-      this.dskRate(id, index)
-    } else {
-      this.validRate(e, id)
-    }
-  }
+  // dskRateHelper(e: React.KeyboardEvent<HTMLDivElement>, id: string, index: number) {
+  //   if (e.keyCode === 13) {
+  //     this.dskRate(id, index)
+  //   } else {
+  //     this.validRate(e, id)
+  //   }
+  // }
 
   rateToFrames(rate: string) {
     var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.currentState.settings.videoMode]
@@ -405,41 +414,18 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
     var state = currentState
    
-    const previewSource = state.mixEffects[0].sources.preview
-    const inputs = state.settings.inputs
+    // const previewSource = state.mixEffects[0].sources.preview
+    // const inputs = state.settings.inputs
 
 
-    var myKeys = Object.keys(inputs).filter(i => videoIds[i] < 50 && videoIds[i] > 0)
 
-
-    var previewButtons = myKeys.map(item =>
-      <AtemButtonGreen name={inputs[(item)].properties.shortName} callback={() => this.PreviewMix(videoIds[item])} active={item.includes(previewSource)}></AtemButtonGreen>
-    )
-
-    var blkPreview = (previewSource === 0) ? <div onMouseDown={() => this.PreviewMix(0)} className="atem-button button-green atem-button-green-active">Blk</div> : <div onMouseDown={() => this.PreviewMix(0)} className="atem-button button-green atem-button-green">Blk</div>
-    var barsPreview = (previewSource === 1000) ? <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button button-green atem-button-green-active">Bars</div> : <div onMouseDown={() => this.PreviewMix(1000)} className="atem-button button-green atem-button-green">Bars</div>
-    var col1Preview = (previewSource === 2001) ? <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button button-green atem-button-green-active">Col1</div> : <div onMouseDown={() => this.PreviewMix(2001)} className="atem-button button-green atem-button-green">Col1</div>
-    var mp1Preview = (previewSource === 3010) ? <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button button-green atem-button-green-active">MP1</div> : <div onMouseDown={() => this.PreviewMix(3010)} className="atem-button button-green atem-button-green">MP1</div>
-    var mp2Preview = (previewSource === 3020) ? <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button button-green atem-button-green-active">MP2</div> : <div onMouseDown={() => this.PreviewMix(3020)} className="atem-button button-green atem-button-green">MP2</div>
-
-    var onAirs = [];
-    for (var i = 0; i < state.mixEffects[0].keyers.length; i++) {
-      const x = i
-      onAirs.push((state.mixEffects[0].keyers[i].onAir) ? <div onMouseDown={() => this.OnAir(0, x, false)} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.OnAir(0, x, true)} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
-    }
-
-    var keysState = this.dec2bin(state.mixEffects[0].transition.properties.selection).split("").reverse().join(""); //get binary of state and reverse it for iterating 
-    var keys = [];
-    keys.push((keysState[0] === "1") ? <div onMouseDown={() => this.SetKey(0)} className="atem-button button-yellow atem-button-yellow-active">BKGD</div> : <div onMouseDown={() => this.SetKey(0)} className="atem-button button-yellow atem-button-yellow">BKGD</div>)
-    for (i = 0; i < state.mixEffects[0].keyers.length; i++) {
-      const x = i
-      keys.push((keysState[i + 1] === "1") ? <div onMouseDown={() => this.SetKey(x + 1)} className="atem-button button-yellow atem-button-yellow-active">KEY{i + 1}</div> : <div onMouseDown={() => this.SetKey(x + 1)} className="atem-button button-yellow atem-button-yellow">KEY{i + 1}</div>)
-    }
+  
+ 
 
     var style = [];
     var styleNames = [["MIX", "0"], ["DIP", "1"], ["WIPE", "2"], ["STING", "4"], ["DVE", "3"]] //Styles have 3 and 4 ids swapped
 
-    for (i = 0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
       const x = styleNames[i][1];
 
       style.push((state.mixEffects[0].transition.properties.style === x) ? <div onMouseDown={() => this.SetStyle(x)} className="atem-button button-yellow atem-button-yellow-active">{styleNames[i][0]}</div> : <div onMouseDown={() => this.SetStyle(x)} className="atem-button button-yellow atem-button-yellow">{styleNames[i][0]}</div>)
@@ -451,69 +437,25 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     var autoRate = (state.mixEffects[0].transition.properties.style === 4 || state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.setTransitionRate(state.mixEffects[0].transition.properties.style, "autoRate") }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].transition.position.remainingFrames)} onKeyDown={(e) => this.transitionRate(e, "autoRate", state.mixEffects[0].transition.properties.style)} id="autoRate" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.setTransitionRate(state.mixEffects[0].transition.properties.style, "autoRate") }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].transition.position.remainingFrames)} onKeyDown={(e) => this.transitionRate(e, "autoRate", state.mixEffects[0].transition.properties.style)} id="autoRate" className="rate-input" ></input></div></OutsideClickHandler>
     // 
 
-    var dsk = [];
-    dsk.push((state.downstreamKeyers[0].properties.tie) ? <div className="atem-button button-yellow atem-button-yellow-active" onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand", { Index: 0, Tie: false })}>TIE</div> : <div className="atem-button button-yellow " onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand", { Index: 0, Tie: true })}>TIE</div>)
-    dsk.push((state.downstreamKeyers[1].properties.tie) ? <div className="atem-button button-yellow atem-button-yellow-active" onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand", { Index: 1, Tie: false })}>TIE</div> : <div className="atem-button button-yellow " onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand", { Index: 1, Tie: true })}>TIE</div>)
-    dsk.push((state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[0].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk0", 0)} id="dsk0" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[0].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk0", 0)} id="dsk0" className="rate-input" ></input></div></OutsideClickHandler>)
-    dsk.push((state.mixEffects[0].transition.position.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk1", 1) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[1].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk1", 1)} id="dsk1" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.dskRate("dsk1", 1) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.downstreamKeyers[1].state.remainingFrames)} onKeyDown={(e) => this.dskRateHelper(e, "dsk1", 1)} id="dsk1" className="rate-input" ></input></div></OutsideClickHandler>)
-    dsk.push((state.downstreamKeyers[0].state.onAir) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand", { Index: 0, OnAir: false })} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand", { Index: 0, OnAir: true })} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
-    dsk.push((state.downstreamKeyers[1].state.onAir) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand", { Index: 1, OnAir: false })} className="atem-button button-red atem-button-red-active two-lines">ON AIR</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand", { Index: 1, OnAir: true })} className="atem-button button-red atem-button-red two-lines">ON AIR</div>)
-    dsk.push((state.downstreamKeyers[0].state.isAuto) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command", { Index: 0 })} className="atem-button atem-button-red-active button-red">AUTO</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command", { Index: 0 })} className="atem-button button-red">AUTO</div>)
-    dsk.push((state.downstreamKeyers[1].state.isAuto) ? <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command", { "Index": 1, "IsTowardsOnAir": false })} className="atem-button atem-button-red-active button-red">AUTO</div> : <div onMouseDown={() => this.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command", { Index: 1, IsTowardsOnAir: false })} className="atem-button button-red">AUTO</div>)
 
-    var ftb = [];
-    ftb.push((state.mixEffects[0].fadeToBlack.status.inTransition) ? <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ftb0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ftb0", 0)} id="ftb0" disabled className="rate-input" ></input></div></OutsideClickHandler> : <OutsideClickHandler onOutsideClick={() => { this.ftbRate("ftb0", 0) }}><div className="rate"> Rate <input placeholder={this.framesToRate(state.mixEffects[0].fadeToBlack.status.remainingFrames)} onKeyDown={(e) => this.ftbRateHelper(e, "ftb0", 0)} id="ftb0" className="rate-input" ></input></div></OutsideClickHandler>)
-    if (state.mixEffects[0].fadeToBlack.status.isFullyBlack) {
-      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", { Index: 0 })} className="atem-button atem-button-red-active flashit button-red">FTB</div>)
-    } else if (state.mixEffects[0].fadeToBlack.status.inTransition) {
-      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", { Index: 0 })} className="atem-button atem-button-red-active button-red">FTB</div>)
-    } else {
-      ftb.push(<div onMouseDown={() => this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", { Index: 0 })} className="atem-button button-red">FTB</div>)
-    }
-
+ 
     return (
       <div id="page-wrapper">
         
        <Program currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
-        <div className="box" id="Next">
-          <div className="box-title">Next Transition</div>
-          <div className="box-transition">
-            <div></div>
-            {onAirs}
-            {keys}
-          </div>
-        </div>
-        <div className="box" id="Transition">
-          <div className="box-title">Transition Style</div>
-          <div className="box-transition">
-            {style}
-            {prevTrans}
-            <div></div>
-            <div onMouseDown={() => this.Cut()} className="atem-button button-grey ">CUT</div>
-            {auto}
-            {autoRate}
-          </div>
-        </div>
+      
+        <Transition currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
         <Preview currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
-
-        <div className="box" id="DSK">
-          <div className="box-title">DSK1 	&nbsp;	&nbsp;  DSK2</div>
-          <div className="box-dsk">
-            {dsk}
-          </div>
-        </div>
-        <div className="box" id="FTB">
-          <div className="box-title">Fade to Black</div>
-          <div className="box-ftb">
-            {ftb}
-          </div>
-        </div>
+        <Next currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
+        <DSK currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
+        <FTB currentState={this.props.currentState} sendCommand={(command :string, values:any)=>this.sendCommand(command,values)} />
 
 
       </div >
     )
   }
 }
+
 
 
 interface ProgramProps {
@@ -541,6 +483,7 @@ function Program(props:ProgramProps){
   if(!isPhone){
   return(
     <div className="box pp" id="Program" >
+    
    <div className="box-title">Program</div>
    <div className="box-inner-mobile">
      <div className="box-inner-inputs">
@@ -633,4 +576,125 @@ function Preview(props:ProgramProps){
      </div>
    </div>)
   }
+}
+
+function Transition(props:ProgramProps){
+  var styleName = ["Mix", "Dip", "Wipe", "DVE"]
+  var style = props.currentState.mixEffects[0].transition.properties.style
+  return(
+  <div className="box" id="Transition">
+  <div className="box-title">Transition Style</div>
+  <div className="box-transition">
+    <AtemButtonYellow callback={(()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, NextStyle: 0 }))} active={style===0} name={"MIX"}></AtemButtonYellow>
+    <AtemButtonYellow callback={(()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, NextStyle: 1 }))} active={style===1} name={"DIP"}></AtemButtonYellow>
+    <AtemButtonYellow callback={(()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, NextStyle: 2 }))} active={style===2} name={"WIPE"}></AtemButtonYellow>
+    <AtemButtonYellow callback={(()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, NextStyle: 4 }))} active={style===4} name={"STING"}></AtemButtonYellow>
+    <AtemButtonYellow callback={(()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 1, NextStyle: 3 }))} active={style===3} name={"DVE"}></AtemButtonYellow>   
+    
+    <AtemButtonRed className={"atem-button-text prev-trans"} callback={()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPreviewSetCommand", { Index: 0, PreviewTransition: !props.currentState.mixEffects[0].transition.properties.preview })} active={props.currentState.mixEffects[0].transition.properties.preview} name={"PREV TRANS"}></AtemButtonRed> 
+
+    {/* {prevTrans} */}
+    <div></div>
+    {/* <div onMouseDown={() => this.Cut()} className="atem-button button-grey ">CUT</div> */}
+    {/* {auto} */}
+    <AtemButtonRed callback={()=>props.sendCommand("LibAtem.Commands.MixEffects.MixEffectCutCommand", { Index: 0 })} active={false} name={"CUT"}></AtemButtonRed> 
+
+    <AtemButtonRed callback={()=>props.sendCommand("LibAtem.Commands.MixEffects.MixEffectAutoCommand", { Index: 0 })} active={props.currentState.mixEffects[0].transition.position.inTransition} name={"AUTO"}></AtemButtonRed> 
+
+    <div className="rate"> Rate<RateInput disabled={style===4} className={"rate-input"} callback={(e: string) => { props.sendCommand("LibAtem.Commands.MixEffects.Transition.Transition" + styleName[style] + "SetCommand", { Index: 0, Mask: 1, Rate: e })}} value={props.currentState.mixEffects[0].transition.position.remainingFrames} videoMode={props.currentState.settings.videoMode} ></RateInput></div>
+  </div>
+</div>)
+}
+
+function FTB(props:ProgramProps){
+
+  return(
+    <div className="box" id="FTB">
+    <div className="box-title">Fade to Black</div>
+    <div className="box-ftb">
+    <div className="rate"> Rate<RateInput className={"rate-input"} callback={(e: string) => { props.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: 0, Rate: e }) }} value={props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames} videoMode={props.currentState.settings.videoMode} ></RateInput></div>
+    <AtemButtonFTB key={"ftb_button"} callback={() => props.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", { Index: 0 })} name={"FTB"} inTransition={props.currentState.mixEffects[0].fadeToBlack.status.inTransition} isFullBlack={props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack}></AtemButtonFTB>
+    </div>
+    </div>
+  )
+}
+
+function Next(props:ProgramProps){
+
+  function dec2bin(dec: number) {
+    return (dec >>> 0).toString(2);
+  }
+
+
+  function setKey(id: number) {
+    var dec = dec2bin(props.currentState.mixEffects[0].transition.properties.selection).padStart(5, '0').split("").reverse();
+    dec[id] = (dec[id] === "0" ? "1" : "0")
+    return(parseInt(dec.reverse().join(""), 2)) 
+  }
+
+  var onAirs = [];
+  var keysState = ((props.currentState.mixEffects[0].transition.properties.selection>>>0).toString(2)).split("").reverse().join(""); //get binary of state and reverse it for iterating 
+  var keys = [];
+
+  var selection = props.currentState.mixEffects[0].transition.properties.selection
+
+  keys.push(<AtemButtonYellow update ={selection} callback={()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 2, NextSelection: setKey(0) })} active={keysState[0] === "1"} name={"BKGD"}></AtemButtonYellow>)
+
+  for (var i = 0; i < props.currentState.mixEffects[0].keyers.length; i++) {
+    const x = i
+    onAirs.push(<AtemButtonOnAir name={"ON AIR"} callback={() => props.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyOnAirSetCommand", {  MixEffectIndex: 0,KeyerIndex:x, OnAir: !props.currentState.mixEffects[0].keyers[x].onAir }) } active={props.currentState.mixEffects[0].keyers[x].onAir}/>)
+    keys.push(<AtemButtonYellow update ={selection} callback={()=>props.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand", { Index: 0, Mask: 2, NextSelection: setKey(x+1) })} active={keysState[i+1] === "1"} name={"KEY"+(i + 1)}></AtemButtonYellow>)
+  }
+  
+
+  return(
+  <div style={{gridTemplateColumns:"repeat("+ props.currentState.mixEffects[0].keyers.length +1 +" 50px)"}} className="box" id="Next">
+  <div className="box-title">Next Transition</div>
+  <div className="box-transition">
+    <div></div>
+    {onAirs}
+    {keys}
+  </div>
+</div>)
+}
+
+function DSK(props:ProgramProps){
+  var dskCount = props.currentState.downstreamKeyers.length
+  var tie =[]
+  var rate = []
+  var onAir = []
+  var auto = []
+  for(var i =0;i<dskCount;i++){
+    const x = i
+    tie.push(<AtemButtonYellow name={"Tie"} callback={() => props.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand", { Index: x, Tie: !props.currentState.downstreamKeyers[x].properties.tie }) } active={props.currentState.downstreamKeyers[x].properties.tie}/>)
+    rate.push(<div className="rate"> Rate<RateInput className={"rate-input"} callback={(e: string) => { props.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand", { Index: x, Rate: e }) }} value={props.currentState.downstreamKeyers[x].state.remainingFrames} videoMode={props.currentState.settings.videoMode} ></RateInput></div>)
+    onAir.push(<AtemButtonOnAir name={"ON AIR"} callback={() => props.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand", { Index: x, OnAir: !props.currentState.downstreamKeyers[x].state.onAir }) } active={props.currentState.downstreamKeyers[x].state.onAir}/>)
+    auto.push(<AtemButtonRed name={"AUTO"} callback={() => props.sendCommand("LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command", { Index: x, IsTowardsOnAir: !props.currentState.downstreamKeyers[x].state.onAuto }) } active={props.currentState.downstreamKeyers[x].state.isAuto}/>)
+  }
+
+  if(dskCount==1){
+    var style ="50px"
+  }else{
+    style ="50px 50px"
+  }
+  return(  
+  <div className="box" id="DSK">
+    
+    {(dskCount===2)?
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr"}}>
+      <div className="box-title">DSK1</div>
+      <div className="box-title">DSK2</div>
+    </div>:
+    
+      <div className="box-title">DSK1</div>
+      
+    }
+
+  <div className="box-dsk" style={{gridTemplateColumns:style}}>
+      {tie}
+      {rate}
+      {onAir}
+      {auto}
+  </div>
+</div>)
 }

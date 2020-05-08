@@ -149,17 +149,6 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   }
 
-  componentDidMount() {
-
-    //this.refs.slider.getDOMNode().orient = 'vertical';;
-    // console.log("vertical2")
-    // var step = ReactDOM.findDOMNode(this.refs.slider2) as any;
-    // console.log(step)
-    // step.outerHTML="<input type=\"range\" orient=\"vertical\">";
-  }
-
-
-
 
 
   render() {
@@ -182,10 +171,14 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
       external.push(<InputAudioChannel
         device={this.props.device}
         signalR={this.props.signalR}
-        currentState={this.props.currentState}
-        currentProfile={this.props.currentProfile}
+
+
+        currentInput={this.props.currentState.audio.inputs[id]}
         id={id}
         audioId={this.state.audioId[id]}
+        audioTally={this.props.currentState.audio.tally[this.state.audioId[id].audioID]}
+        monitors = {this.props.currentState.audio.monitorOutputs[0]}
+        name={this.state.audioId[id].audioID}
       ></InputAudioChannel>)
 
     }
@@ -197,17 +190,21 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
       channels2.push(<InputAudioChannel
         device={this.props.device}
         signalR={this.props.signalR}
-        currentState={this.props.currentState}
-        currentProfile={this.props.currentProfile}
+
+
+        currentInput={this.props.currentState.audio.inputs[idMain]}
         id={idMain}
         audioId={this.state.audioId[idMain]}
+        audioTally={this.props.currentState.audio.tally[this.state.audioId[idMain].audioID]}
+        monitors = {this.props.currentState.audio.monitorOutputs[0]}
+        name ={this.props.currentState.settings.inputs[this.state.audioId[idMain].videoID].properties.shortName}
       ></InputAudioChannel>)
 
     }
 
     return (
 
-      <div className="page-wrapper" style={{ gridTemplateColumns: "repeat(" + mainInputs.length + ", 80px) 1px repeat(" + externInputs.length + ", 80px) 1px 80px" }}>
+      <div className="page-wrapper" style={{  gridTemplateColumns: "repeat(" + mainInputs.length + ", 80px) 1px repeat(" + externInputs.length + ", 80px) 1px 80px" }}>
         {channels2}
         <div></div>
         {external}
@@ -215,10 +212,12 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         <OutputAudioChannel
           device={this.props.device}
           signalR={this.props.signalR}
-          currentState={this.props.currentState}
-          currentProfile={this.props.currentProfile}
+
           id={"Master"}
           audioId={"Master"}
+          audioTally ={ this.props.currentState.audio.programOut.followFadeToBlack && (this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition || this.props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)}
+          followFadeToBlack={this.props.currentState.audio.programOut.followFadeToBlack}
+          currentInput={this.props.currentState.audio.programOut}
         ></OutputAudioChannel>
       </div>
 
@@ -231,14 +230,19 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 interface InputAudioChannelProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
+
+  currentInput: any
+
+  audioTally:boolean
   id: string
   audioId: any
+  monitors?:any
+  name?:string
+  followFadeToBlack?:Boolean
 }
 interface InputAudioChannelState {
   hasConnected: boolean
-  state: any
+
   value: number
   ids: any
   peaks: any
@@ -252,13 +256,22 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
     super(props)
     this.state = {
       hasConnected: props.device.connected,
-      state: this.props.currentState,
+
       value: 0,
       ids: {},
       peaks: [[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60], [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]],
 
     }
   }
+
+  shouldComponentUpdate(nextProps : InputAudioChannelProps ) {
+    const differentInput = JSON.stringify(this.props.currentInput) !== JSON.stringify(nextProps.currentInput);
+    const differentName = this.props.name !== nextProps.name
+    const differentMonitors = JSON.stringify(this.props.monitors) !== JSON.stringify(nextProps.monitors)
+    // return differentName || differentInput || differentMonitors;
+    return differentInput || differentName || differentMonitors;
+}
+
 
   sendCommand(command: string, value: any) {
     const { device, signalR } = this.props
@@ -294,16 +307,16 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   }
 
   getName(id: string) {
-    var name
-    if (this.props.audioId.videoID != null) {
-      name = this.props.currentState.settings.inputs[this.props.audioId.videoID].properties.shortName
+    // var name
+    // if (this.props.audioId.videoID != null) {
+    //   name = this.props.currentState.settings.inputs[this.props.audioId.videoID].properties.shortName
+    // } else {
+    //   name = this.props.audioId.audioID
+    // }
+    if (this.props.currentInput.properties.mixOption === 0) {
+      return (<div className="name">{this.props.name}</div>)
     } else {
-      name = this.props.audioId.audioID
-    }
-    if (this.props.currentState.audio.inputs[id].properties.mixOption === 0) {
-      return (<div className="name">{name}</div>)
-    } else {
-      return (<div className="name-active">{name}</div>)
+      return (<div className="name-active">{this.props.name}</div>)
     }
 
   }
@@ -453,8 +466,8 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   }
 
   getPhonesButton() {
-    if (this.props.currentState.audio.monitorOutputs[0].enabled) {
-      if (this.props.currentState.audio.monitorOutputs[0].solo === true && this.props.currentState.audio.monitorOutputs[0].soloSource == this.props.id) {
+    if (this.props.monitors.enabled) {
+      if (this.props.monitors.solo === true && this.props.monitors.soloSource == this.props.id) {
         return (
           <div className="phones phones-active phones-press" onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerMonitorSetCommand", { Solo: false, Mask: 8 })}>
             <svg className="phones-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#34c9eb" width="18px" height="18px"><path d="M0 0h24v24H0z" fill="none" opacity=".1" /><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" /></svg>
@@ -476,14 +489,14 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   getPan() {
     var slider = []
     var color ="#5e5e5e"
-    if(this.props.currentState.audio.inputs[this.props.id].properties.mixOption!==0){
+    if(this.props.currentInput.properties.mixOption!==0){
       color="#ff7b00"
     }
-    if (this.props.currentState.audio.inputs[this.props.id].properties.balance > 0) {
+    if (this.props.currentInput.properties.balance > 0) {
       
-      slider.push(<div style={{ left: "50%",background:color, width: (35 * (this.props.currentState.audio.inputs[this.props.id].properties.balance) / 50) + "px" }} className="pan-slider-inner"></div>)
+      slider.push(<div style={{ left: "50%",background:color, width: (35 * (this.props.currentInput.properties.balance) / 50) + "px" }} className="pan-slider-inner"></div>)
     } else { 
-      slider.push(<div style={{ right: "50%",background:color, width: (35 * (this.props.currentState.audio.inputs[this.props.id].properties.balance) / -50) + "px" }} className="pan-slider-inner"></div> )
+      slider.push(<div style={{ right: "50%",background:color, width: (35 * (this.props.currentInput.properties.balance) / -50) + "px" }} className="pan-slider-inner"></div> )
   }
     return (
       <div className="pan">
@@ -504,7 +517,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
             {slider}
           </div>
         </div>
-        <div onClick={(e)=>this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, Balance: 0, Mask: 4})} className="pan-input">  {(this.props.currentState.audio.inputs[this.props.id].properties.balance===0?"":(this.props.currentState.audio.inputs[this.props.id].properties.balance).toFixed(0))}</div>
+        <div onClick={(e)=>this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, Balance: 0, Mask: 4})} className="pan-input">  {(this.props.currentInput.properties.balance===0?"":(this.props.currentInput.properties.balance).toFixed(0))}</div>
       </div>)
   }
 
@@ -512,12 +525,12 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
   render() {
 
-    var mixOption = this.props.currentState.audio.inputs[this.props.id].properties.mixOption
-    var levels = this.props.currentState.audio.inputs[this.props.id].levels
+    var mixOption = this.props.currentInput.properties.mixOption
+    var levels = this.props.currentInput.levels
     this.updatePeaks(levels)
-    var lowerButton = (this.getLowerButtons(this.props.id, mixOption, this.props.currentState.audio.inputs[this.props.id].properties.sourceType))
+    var lowerButton = (this.getLowerButtons(this.props.id, mixOption, this.props.currentInput.properties.sourceType))
     var name = (this.getName(this.props.id))
-    var tally = (this.getTally(mixOption, this.props.currentState.audio.tally[this.props.audioId.audioID]))
+    var tally = (this.getTally(mixOption, this.props.audioTally))
     var levelsLeft = (this.getLevel(0, levels))
     var levelsRight = (this.getLevel(1, levels))
     var floatingPeaksLeft = (this.getFloatingPeaks(0, levels,mixOption))
@@ -548,7 +561,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
             max={1.1095}
             min={0.3535}
             step={0.001}
-            value={(Math.pow(2, ((this.props.currentState.audio.inputs[this.props.id].properties.gain === "-Infinty") ? -60 : this.props.currentState.audio.inputs[this.props.id].properties.gain) / 40))}
+            value={(Math.pow(2, ((this.props.currentInput.properties.gain === "-Infinty") ? -60 : this.props.currentInput.properties.gain) / 40))}
             orientation="vertical"
             onChange={(e) => {
               this.sendCommand("LibAtem.Commands.Audio.AudioMixerInputSetCommand", { Index: this.props.id, MixOption: 0, Gain: Math.log2(e) * 40, RcaToXlrEnabled: false, Mask: 2 })
@@ -573,7 +586,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
           </div>
         </div>
-        <input placeholder={((this.props.currentState.audio.inputs[this.props.id].properties.gain === "-Infinity") ? -60 : (this.props.currentState.audio.inputs[this.props.id].properties.gain).toFixed(2))} className="gain-input"></input>
+        <input placeholder={((this.props.currentInput.properties.gain === "-Infinity") ? -60 : (this.props.currentInput.properties.gain).toFixed(2))} className="gain-input"></input>
       </div>
           {pan}
       {lowerButton}
@@ -583,13 +596,14 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   }
 }
 
+
 class OutputAudioChannel extends InputAudioChannel {
 
-  constructor(props: InputAudioChannelProps) {
+  constructor(props: InputAudioChannelProps ) {
     super(props)
     this.state = {
       hasConnected: props.device.connected,
-      state: this.props.currentState,
+
       value: 0,
       ids: {},
       peaks: [[-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60], [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]]
@@ -597,8 +611,17 @@ class OutputAudioChannel extends InputAudioChannel {
     }
   }
 
+  shouldComponentUpdate(nextProps : InputAudioChannelProps ) {
+    const differentInput = JSON.stringify(this.props.currentInput) !== JSON.stringify(nextProps.currentInput);
+    const differentFollow = JSON.stringify(this.props.followFadeToBlack) != JSON.stringify(nextProps.followFadeToBlack)
+    const differentTally = JSON.stringify(this.props.audioTally) != JSON.stringify(nextProps.audioTally)
+    // return differentName || differentInput || differentMonitors;
+    return differentInput || differentFollow || differentTally;
+}
+ 
+
   getMasterTally() {
-    if (this.props.currentState.audio.programOut.followFadeToBlack && (this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition || this.props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)) {
+    if (this.props.audioTally) {
       return <div className="tally audio-flashit"></div>
     } else {
       return <div className="tally tally-red"></div>
@@ -606,7 +629,7 @@ class OutputAudioChannel extends InputAudioChannel {
   }
 
   getMasterButtons() {
-    if (this.props.currentState.audio.programOut.followFadeToBlack) {
+    if (this.props.followFadeToBlack) {
       return (
         <div className="button-holder">
           <div onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerMasterSetCommand", { FollowFadeToBlack: false, Mask: 4 })} className="button-inner full button-inner-selected">AFV</div>
@@ -625,7 +648,7 @@ class OutputAudioChannel extends InputAudioChannel {
   render() {
 
     var lowerButton = this.getMasterButtons()
-    var levels = this.props.currentState.audio.programOut.levels
+    var levels = this.props.currentInput.levels
     this.updatePeaks(levels)
     var tally = this.getMasterTally()
     var topBarPeak = (this.getTopBarPeak(levels))
@@ -662,7 +685,7 @@ class OutputAudioChannel extends InputAudioChannel {
             max={1.1095}
             min={0.3535}
             step={0.001}
-            value={(Math.pow(2, ((this.props.currentState.audio.programOut.gain === "-Infinty") ? -60 : this.props.currentState.audio.programOut.gain) / 40))}
+            value={(Math.pow(2, ((this.props.currentInput.gain === "-Infinty") ? -60 : this.props.currentInput.gain) / 40))}
             orientation="vertical"
             onChange={(e) => {
               this.sendCommand("LibAtem.Commands.Audio.AudioMixerMasterSetCommand", { Index: this.props.id, Gain: Math.log2(e) * 40, Mask: 1 })
@@ -687,7 +710,7 @@ class OutputAudioChannel extends InputAudioChannel {
 
           </div>
         </div>
-        <input placeholder={((this.props.currentState.audio.programOut.gain === "-Infinity") ? -60 : (this.props.currentState.audio.programOut.gain).toFixed(2))} className="gain-input"></input>
+        <input placeholder={((this.props.currentInput.gain === "-Infinity") ? -60 : (this.props.currentInput.gain).toFixed(2))} className="gain-input"></input>
       </div>
       
       {lowerButton}
@@ -697,3 +720,4 @@ class OutputAudioChannel extends InputAudioChannel {
 
   }
 }
+
