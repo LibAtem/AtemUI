@@ -56,6 +56,7 @@ interface ControlSettingsPageInnerState {
   hasConnected: boolean
   state: any | null
   page: number
+  currentState: any | null
   // currentState: any
 
 }
@@ -64,8 +65,27 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
   state = {
     hasConnected: this.props.device.connected,
     state: this.props.currentState,
-    page: 0
+    page: 0,
+    currentState:null
   }
+
+  componentDidMount() {
+    if(this.props.signalR){
+    this.props.signalR.on("state", (state: any) => {
+      state.audio = undefined //remove levels which cause constant updates 
+      if(JSON.stringify(this.state.currentState) !== JSON.stringify(state)){
+        this.setState({ currentState: state })
+      }
+    })
+   }
+  }
+  
+  componentWillUnmount(){
+    if(this.props.signalR){
+        this.props.signalR.off("state")
+    }
+  }
+
 
   loadDeviceState(props: ControlSettingsPageInnerProps) {
     if (props.signalR) {
@@ -138,8 +158,8 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
   }
 
   render() {
-    const { device, currentState, signalR, currentProfile } = this.props
-    const { hasConnected } = this.state
+    const { device, signalR, currentProfile } = this.props
+    const { hasConnected, currentState } = this.state
 
 
 
@@ -155,7 +175,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
       content = <GeneralSettings
         key={this.context.activeDeviceId || ''}
         device={device}
-        currentState={this.props.currentState}
+        currentState={currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile} />
     } else if (this.state.page == 2) {
@@ -163,7 +183,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
       content = <MultiViewSettings
         key={this.context.activeDeviceId || ''}
         device={device}
-        currentState={this.props.currentState}
+        currentState={currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile} />
 
@@ -172,7 +192,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
       content = <LabelSettings
         key={this.context.activeDeviceId || ''}
         device={device}
-        currentState={this.props.currentState}
+        currentState={currentState}
         signalR={this.props.signalR}
         currentProfile={this.props.currentProfile}
         sendCommand={this.sendCommand}

@@ -335,9 +335,20 @@
         color:#646464;
     }
       .ss-label{
+        position: relative;
         font-size:13px;
         color:#858585;
         line-height: 25px;
+      }
+
+      .ss-label-hover{
+          position:absolute;
+          width:400px;
+          left:-200px;
+          height:400px;
+          top:-200px;
+          z-index:20;
+          background:red;
       }
       .ss-label.right{
           text-align: right;

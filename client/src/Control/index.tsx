@@ -46,6 +46,7 @@ interface ControlPageInnerProps {
 }
 interface ControlPageInnerInnerState {
   open: boolean
+  currentState:any
 }
 
 //Handles Mobile Layout
@@ -53,9 +54,30 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
   constructor(props: ControlPageInnerProps) {
     super(props)
     this.state = {
-      open: true
+      open: true,
+      currentState:undefined
     }
   }
+
+  componentDidMount() {
+    if(this.props.signalR){
+    this.props.signalR.on("state", (state: any) => {
+      state.audio = {programOut:{followFadeToBlack: state.audio.programOut.followFadeToBlack}} //remove levels which cause constant updates 
+      if(JSON.stringify(this.state.currentState) !== JSON.stringify(state)){
+        this.setState({ currentState: state })
+      }
+    })
+   }
+  }
+  
+  componentWillUnmount(){
+    if(this.props.signalR){
+        this.props.signalR.off("state")
+    }
+  }
+
+  
+
   render() {
 
     if (this.state.open) {
@@ -69,7 +91,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
 
                 // key={this.context.activeDeviceId || ''}
                 device={this.props.device}
-                currentState={this.props.currentState}
+                currentState={this.state.currentState}
                 // currentState={this.state.currentState}
                 
                 signalR={this.props.signalR}
@@ -84,7 +106,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
                 // key={this.context.activeDeviceId || ''}
                 
                 device={this.props.device}
-                currentState={this.props.currentState}
+                currentState={this.state.currentState}
                 // currentState={this.state.currentState}
                 signalR={this.props.signalR}
               />
@@ -114,7 +136,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
                 
                 // key={this.context.activeDeviceId || ''}
                 device={this.props.device}
-                currentState={this.props.currentState}
+                currentState={this.state.currentState}
                 // currentState={this.state.currentState}
                 signalR={this.props.signalR}
               />
@@ -134,7 +156,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
 
                 // key={this.props.activeDeviceId || ''}
                 device={this.props.device}
-                currentState={this.props.currentState}
+                currentState={this.state.currentState}
                 // currentState={this.state.currentState}
                 signalR={this.context.signalR}
               />
@@ -161,7 +183,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerProps, Contr
 
                 // key={this.props.activeDeviceId || ''}
                 device={this.props.device}
-                currentState={this.props.currentState}
+                currentState={this.state.currentState}
                 // currentState={this.state.currentState}
                 signalR={this.props.signalR}
               />
@@ -197,9 +219,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       hasConnected: props.device.connected,
       state: props.currentState,
       currentState: null
-   
     }
-
     if (props.device.connected) {
       this.loadDeviceState(props)
     }

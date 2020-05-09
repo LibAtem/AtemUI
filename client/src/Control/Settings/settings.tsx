@@ -32,16 +32,32 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
             state: props.currentState,
             currentState: null,
             page: 0,
-            // open: true,
+        }
+        if (props.device.connected) {
+            this.loadDeviceState(props)
+        }
+    }
+
+    loadDeviceState(props: SwitcherSettingsProps) {
+        if (props.signalR) {
+            props.signalR
+                .invoke<any>('sendState', GetDeviceId(props.device))
+                .then(state => {
+                })
+                .catch(err => {
+                    console.error('StateViewer: Failed to load state:', err)
+                    this.setState({
+                        state: null
+                    })
+                })
         }
     }
 
 
-
     render() {
-        
-        if(!this.props.currentState){
-            return(<div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss"></div>)
+
+        if (!this.props.currentState) {
+            return (<div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss"></div>)
         }
         return (
             <div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss">
@@ -168,7 +184,7 @@ class FadeToBlack extends React.Component<SubMenuProps, SubMenuState> {
             rate.push(
                 <div className="ss-rate"><RateInput value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames} videoMode={this.props.currentState.settings.videoMode}
                     callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: 0, Rate: e }) }} /></div>)
-            box.push(<div className="ss-rate-holder"><div className="ss-label">Rate:</div>{rate}
+            box.push(<div className="ss-rate-holder"><MagicLabel callback={(e: string) => { this.sendCommand("LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand", { Index: 0, Rate: Math.min(250,Math.max(parseInt(e),0)) }) }} value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames} label={"Rate:"} />{rate}
                 <label className="ss-checkbox-container">Audio Follow Video
   <                 input type="checkbox" checked={this.props.currentState.audio.programOut.followFadeToBlack} onClick={() => this.sendCommand("LibAtem.Commands.Audio.AudioMixerMasterSetCommand", { FollowFadeToBlack: !this.props.currentState.audio.programOut.followFadeToBlack, Mask: 4 })}></input>
                     <span className="checkmark"></span>
@@ -336,6 +352,12 @@ export class RateInput extends React.Component<RateProps, RateState>{
         }
     }
 
+    // shouldComponentUpdate(nextProps:RateProps){
+    //     const changedVideoMode = this.props.videoMode !== nextProps.videoMode
+    //     const changedValue = this.props.value !== nextProps.value
+    //     return changedValue || changedVideoMode
+    // }
+
     rateToFrames(rate: string) {
         console.log(rate)
         var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.videoMode]
@@ -375,4 +397,48 @@ export class RateInput extends React.Component<RateProps, RateState>{
 
 }
 
+interface MagicLabelProps {
+    callback: any
+    value: any
+    disabled?: boolean
+    step?: number
+    label: string
+}
+interface MagicLabelState {
+    focus: boolean
+    tempValue: any
+    disabled: boolean
+    xCoord: number
+    yCoord:number
 
+}
+
+export class MagicLabel extends React.Component<MagicLabelProps, MagicLabelState>{
+    constructor(props: MagicLabelProps) {
+        super(props)
+        this.state = {
+            focus: false,
+            tempValue: this.props.value,
+            disabled: this.props.disabled || true,
+            xCoord:0,
+            yCoord:0
+        }
+    }
+
+    render() {
+            var step= this.props.step || 1
+            return (<div style={{overscrollBehavior:"contain",touchAction:"none"}}
+
+                onTouchMove={(e)=>{
+                    console.log((this.state.yCoord-e.touches.item(0).clientY))
+                    this.props.callback(this.props.value+((this.state.yCoord-e.touches.item(0).clientY)))
+                    this.setState({xCoord:e.touches.item(0).clientX,yCoord:e.touches.item(0).clientY})
+                }}
+                onTouchStart={(e)=>this.setState({xCoord:e.touches.item(0).clientX,yCoord:e.touches.item(0).clientY})}
+                className="ss-label">
+                {this.props.label}
+            </div>)
+
+        
+    }
+}

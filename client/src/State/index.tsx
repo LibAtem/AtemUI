@@ -38,7 +38,7 @@ interface StateViewerPageInnerProps {
 }
 interface StateViewerPageInnerState {
   hasConnected: boolean
-  state: object | null
+  currentState: object | null
 }
 
 class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, StateViewerPageInnerState> {
@@ -47,7 +47,7 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
 
     this.state = {
       hasConnected: props.device.connected,
-      state: null
+      currentState: null
     }
 
     if (props.device.connected) {
@@ -55,24 +55,34 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
     }
   }
 
-  loadDeviceState(props: StateViewerPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<object>('stateGet', GetDeviceId(props.device))
-        .then(state => {
-          console.log('StateViewer: Got new state')
-          this.setState({
-            state: state
-          })
-        })
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-          this.setState({
-            state: null
-          })
-        })
+  componentDidMount() {
+    if(this.props.signalR){
+    this.props.signalR.on("state", (state: any) => {
+
+        this.setState({ currentState: state })
+
+    })
+   }
+  }
+  
+  componentWillUnmount(){
+    if(this.props.signalR){
+        this.props.signalR.off("state")
     }
   }
+
+  loadDeviceState(props: StateViewerPageInnerProps) {
+    if (props.signalR) {
+        props.signalR
+            .invoke<any>('sendState', GetDeviceId(props.device))
+            .then(state => {
+            })
+            .catch(err => {
+                console.error('StateViewer: Failed to load state:', err)
+               
+            })
+    }
+}
 
   componentDidUpdate(prevProps: StateViewerPageInnerProps) {
     // Should we reload the commandsSpec
@@ -82,7 +92,7 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        state: null,
+        currentState: null,
         hasConnected: true
       })
       // now reload
@@ -91,8 +101,8 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
   }
 
   render() {
-    const { device, signalR, currentState } = this.props
-    const { hasConnected, state } = this.state
+    const { device, signalR } = this.props
+    const { hasConnected, currentState } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>

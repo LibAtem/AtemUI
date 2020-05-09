@@ -18,6 +18,7 @@ import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
 import { AudioPage } from './Audio'
+import { ReactComponent } from '*.svg'
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
 enum ConnectionStatus {
@@ -46,151 +47,139 @@ class SignalRRetryPolicy implements signalR.IRetryPolicy {
 
 export default class App extends React.Component<{}, AppState> {
 
-    state = {
-    signalR:  new signalR.HubConnectionBuilder()
-    .withUrl('/hub')
-    .configureLogging(signalR.LogLevel.Information)
-    .withAutomaticReconnect(new SignalRRetryPolicy())
-    .build(),
-      devices: [] as AtemDeviceInfo[],
-      activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
+  state = {
+    signalR: new signalR.HubConnectionBuilder()
+      .withUrl('/hub')
+      .configureLogging(signalR.LogLevel.Information)
+      .withAutomaticReconnect(new SignalRRetryPolicy())
+      .build(),
+    devices: [] as AtemDeviceInfo[],
+    activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
     currentState: null,
     currentProfile: null,
-      connected: ConnectionStatus.Disconnected
-      // hasConnected: false
-    }
- updateProfile(){
-  if (this.state.signalR && this.state.activeDeviceId) {
-    this.state.signalR
-      .invoke<object>('SendProfile', this.state.activeDeviceId)
-      .then(profile => {
-        console.log('ProfileUpdate: Got profile',profile)
-        this.setState({currentProfile:profile})
-      })
-      .catch(err => {
-        console.error('ProfileUpdate: Failed to load profile:', err)
-        
-        this.setState({currentProfile:null})
-      })
+    connected: ConnectionStatus.Disconnected
+    // hasConnected: false
   }
-}
+  updateProfile() {
+    if (this.state.signalR && this.state.activeDeviceId) {
+      this.state.signalR
+        .invoke<object>('SendProfile', this.state.activeDeviceId)
+        .then(profile => {
+          console.log('ProfileUpdate: Got profile', profile)
+          this.setState({ currentProfile: profile })
+        })
+        .catch(err => {
+          console.error('ProfileUpdate: Failed to load profile:', err)
+
+          this.setState({ currentProfile: null })
+        })
+    }
+  }
 
   componentDidMount() {
 
-  
 
-  if(this.state.signalR){
-    const connection = this.state.signalR
-  
-  
 
-    
+    if (this.state.signalR) {
+      const connection = this.state.signalR
 
-    connection.on('messageReceived', (username: string, message: string) => {
-      console.log(username, message)
-    })
 
-    connection.on('devices', (devices: AtemDeviceInfo[]) => {
-      console.log('Devices update:', devices)
-      const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
-      if (currentDevice && !isDeviceAvailable(currentDevice)) {
-        console.log('Forget activeDevice')
-        // Selected device is now invalid
-        // mutation.activeDeviceId = null
-        // TODO - is this desired behaviour?
-      }
-      this.setState({ devices: devices })
-    })
 
-    connection.on("state", (state: any) => {
-      // console.log(state)
-      this.setState({ currentState: state })
-    })
 
-    connection.onreconnecting(err => {
-      if (err) {
-        console.log('SignalR connection error:', err)
-      }
 
-      this.setState({
-        connected: ConnectionStatus.Reconnecting
+      connection.on('messageReceived', (username: string, message: string) => {
+        console.log(username, message)
       })
-    })
-    connection.onreconnected(() => {
-      this.setState({
-        connected: ConnectionStatus.Connected
-      })
-    })
-    connection.onclose(err => {
-      if (err) {
-        console.log('SignalR connection error:', err)
-      }
 
-      this.setState({
-        connected: ConnectionStatus.Disconnected
+      connection.on('devices', (devices: AtemDeviceInfo[]) => {
+        console.log('Devices update:', devices)
+        const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
+        if (currentDevice && !isDeviceAvailable(currentDevice)) {
+          console.log('Forget activeDevice')
+          // Selected device is now invalid
+          // mutation.activeDeviceId = null
+          // TODO - is this desired behaviour?
+        }
+        
+        this.setState({ devices: devices })
       })
-    })
-    this.setState({
-      signalR: connection
-    })
-      ; (window as any).conn2 = connection
 
-    connection
-      .start()
-      .then(() => {
-        console.log('SignalR connected')
+      connection.on("state", (state: any) => {
+        // console.log(state)
+        // this.setState({ currentState: state })
+      })
+
+      connection.onreconnecting(err => {
+        if (err) {
+          console.log('SignalR connection error:', err)
+        }
+
+        this.setState({
+          connected: ConnectionStatus.Reconnecting
+        })
+      })
+      connection.onreconnected(() => {
         this.setState({
           connected: ConnectionStatus.Connected
-          // hasConnected: true
         })
-        this.updateProfile()
       })
-      .catch(err => console.error('Connection failed', err))
-  }
-}
-
-  renderDeviceSelection() {
-    const availableDevices = this.state.devices.filter(isDeviceAvailable)
-
-    const onChange = (e: FormEvent<FormControl & FormControlProps>) => {
-      const id = availableDevices.map(dev => GetDeviceId(dev)).find(id => id === e.currentTarget.value)
-      console.log('Change active device: ', id)
-      this.setState({
-        activeDeviceId: id || null
-      })
-      if (id) {
-        console.log("here",id)
-       if (this.state.signalR) {
-          this.state.signalR
-            .invoke<object>('SendProfile', id)
-            .then(profile => {
-              console.log('ProfileUpdate: Got profile',profile)
-              this.setState({currentProfile:profile})          
-            })
-            .catch(err => {
-              console.error('ProfileUpdate: Failed to load profile:', err)
-              this.setState({currentProfile:null})
-            })
+      connection.onclose(err => {
+        if (err) {
+          console.log('SignalR connection error:', err)
         }
- 
-        // TODO - does this behave ok with multiple tabs?
-        window.localStorage.setItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID, id)
-      } else {
-        window.localStorage.removeItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID)
-      }
-    }
 
-    return (
-      <FormControl as="select" className="mr-sm-2" value={this.state.activeDeviceId || '-'} onChange={onChange}>
-        <option value="-">-</option>
-        {availableDevices.map((dev, i) => (
-          <option key={i} value={GetDeviceId(dev)}>
-            {dev.info.name}
-          </option>
-        ))}
-      </FormControl>
-    )
+        this.setState({
+          connected: ConnectionStatus.Disconnected
+        })
+      })
+      this.setState({
+        signalR: connection
+      })
+        ; (window as any).conn2 = connection
+
+      connection
+        .start()
+        .then(() => {
+          console.log('SignalR connected')
+          this.setState({
+            connected: ConnectionStatus.Connected
+            // hasConnected: true
+          })
+          this.updateProfile()
+        })
+        .catch(err => console.error('Connection failed', err))
+    }
   }
+
+  setDeivce(id: string | undefined) {
+
+    console.log('Change active device: ', id)
+    this.setState({
+      activeDeviceId: id || null
+    })
+    if (id) {
+      console.log("here", id)
+      if (this.state.signalR) {
+        this.state.signalR
+          .invoke<object>('SendProfile', id)
+          .then(profile => {
+            console.log('ProfileUpdate: Got profile', profile)
+            this.setState({ currentProfile: profile })
+          })
+          .catch(err => {
+            console.error('ProfileUpdate: Failed to load profile:', err)
+            this.setState({ currentProfile: null })
+          })
+      }
+
+      // TODO - does this behave ok with multiple tabs?
+      window.localStorage.setItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID, id)
+    } else {
+      window.localStorage.removeItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID)
+    }
+  }
+
+
 
   render() {
     const { connected } = this.state
@@ -205,48 +194,8 @@ export default class App extends React.Component<{}, AppState> {
         </div>
         <Router>
           <div className="full">
-            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-              <LinkContainer to="/">
-                <Navbar.Brand>Atem UI</Navbar.Brand>
-              </LinkContainer>
-              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-              <Navbar.Collapse id="responsive-navbar-nav">
-              <Nav className="mr-auto">
-                <IndexLinkContainer to="/">
-                  <Nav.Link>Home</Nav.Link>
-                </IndexLinkContainer>
-                <LinkContainer to="/commands">
-                  <Nav.Link>Manual Commands</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/control">
-                  <Nav.Link>Control</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/settings">
-                  <Nav.Link>Settings</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/state">
-                  <Nav.Link>State</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/profile">
-                  <Nav.Link>Profile</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/devices">
-                  <Nav.Link>Devices</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/media">
-                  <Nav.Link>Media</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/audio">
-                  <Nav.Link>Audio</Nav.Link>
-                </LinkContainer>
-              </Nav>
-              <Form inline>
-                {this.renderDeviceSelection()}
-                <Button variant="outline-info">Search</Button>
-              </Form>
-              </Navbar.Collapse>
-            </Navbar>
 
+            <NavBar activeDeviceId={this.state.activeDeviceId} devices={this.state.devices} setDevice={(id: string | undefined) => { this.setDeivce(id) }}></NavBar>
             {connected !== ConnectionStatus.Disconnected ? (
               <Switch>
                 <Route exact path="/">
@@ -271,15 +220,15 @@ export default class App extends React.Component<{}, AppState> {
                   <DeviceProfileViewerPage />
                 </Route>
                 <Route path="/media">
-                  <UploadMediaPage/>
+                  <UploadMediaPage />
                 </Route>
                 <Route path="/audio">
-                  <AudioPage/>
+                  <AudioPage />
                 </Route>
               </Switch>
             ) : (
-              ''
-            )}
+                ''
+              )}
           </div>
         </Router>
       </DeviceManagerContext.Provider>
@@ -296,4 +245,81 @@ function Home() {
       <h2>Home</h2>
     </Container>
   )
+}
+
+class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }>{
+
+
+  shouldComponentUpdate(nextProps: { devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }) {
+    var deviceInfoChanged = JSON.stringify(this.props.devices) !== JSON.stringify(nextProps.devices)
+    var activeDevice = this.props.activeDeviceId !== nextProps.activeDeviceId
+    // console.log(activeDevice,deviceInfoChanged)
+    return deviceInfoChanged || activeDevice
+  }
+
+  renderDeviceSelection() {
+    const availableDevices = this.props.devices.filter(isDeviceAvailable)
+
+    const onChange = (e: FormEvent<FormControl & FormControlProps>) => {
+      const id = availableDevices.map(dev => GetDeviceId(dev)).find(id => id === e.currentTarget.value)
+      this.props.setDevice(id)
+    }
+
+
+    return (
+      <FormControl as="select" className="mr-sm-2" value={this.props.activeDeviceId || '-'} onChange={onChange}>
+        <option value="-">-</option>
+        {availableDevices.map((dev, i) => (
+          <option key={i} value={GetDeviceId(dev)}>
+            {dev.info.name}
+          </option>
+        ))}
+      </FormControl>
+    )
+  }
+
+  render() {
+    return (
+      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+        <LinkContainer to="/">
+          <Navbar.Brand>Atem UI</Navbar.Brand>
+        </LinkContainer>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="mr-auto">
+            <IndexLinkContainer to="/">
+              <Nav.Link>Home</Nav.Link>
+            </IndexLinkContainer>
+            <LinkContainer to="/commands">
+              <Nav.Link>Manual Commands</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/control">
+              <Nav.Link>Control</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/settings">
+              <Nav.Link>Settings</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/state">
+              <Nav.Link>State</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/profile">
+              <Nav.Link>Profile</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/devices">
+              <Nav.Link>Devices</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/media">
+              <Nav.Link>Media</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/audio">
+              <Nav.Link>Audio</Nav.Link>
+            </LinkContainer>
+          </Nav>
+          <Form inline>
+            {this.renderDeviceSelection()}
+            <Button variant="outline-info">Search</Button>
+          </Form>
+        </Navbar.Collapse>
+      </Navbar>)
+  }
 }
