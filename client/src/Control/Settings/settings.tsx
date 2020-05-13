@@ -8,6 +8,7 @@ import { DownStreamKeys } from './downstreamkey';
 import { relative } from 'path';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { UpstreamKey } from './Upstream/upstream';
 
 interface SwitcherSettingsProps {
     device: AtemDeviceInfo
@@ -57,7 +58,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     render() {
 
         if (!this.props.currentState) {
-            return (<div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss"></div>)
+            return (<div style={this.props.full ? { height: "100%" } : { overflowY: "auto" }} className="ss"></div>)
         }
         return (
             <div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss">
@@ -99,6 +100,17 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
                     signalR={this.props.signalR}
                     name={"Transition"}
                 />
+
+                <UpstreamKey
+                    key={'up1'}
+                    device={this.props.device}
+                    currentState={this.props.currentState}
+                    signalR={this.props.signalR}
+                    id={0}
+                    name={"Upstream Key 1"}
+                    mixEffect={0}
+                />
+
 
                 <DownStreamKeys
                     key={'dsk'}
@@ -265,7 +277,7 @@ class ColorMenu extends React.Component<SubMenuProps, ColorMenuState>{
                     {/* <div className="ss-radio-button"><div className="ss-radio-button-inner"></div></div> */}
                     <div className="ss-label">Color 1</div>
                     <div className="ss-color-picker" onClick={() => this.setState({ displayColorPicker: !this.state.displayColorPicker })} style={{ background: "hsl(" + this.props.currentState.colorGenerators[0].hue + "," + this.props.currentState.colorGenerators[0].saturation + "%," + this.props.currentState.colorGenerators[0].luma + "%)" }}></div>
-                    {picker}
+                    
                 </div>
 
                 <div className="ss-color-inner">
@@ -273,6 +285,7 @@ class ColorMenu extends React.Component<SubMenuProps, ColorMenuState>{
                     <div className="ss-label">Color 2</div>
                     <div className="ss-color-picker" onClick={() => this.setState({ displayColorPicker2: !this.state.displayColorPicker2 })} style={{ background: "hsl(" + this.props.currentState.colorGenerators[1].hue + "," + this.props.currentState.colorGenerators[1].saturation + "%," + this.props.currentState.colorGenerators[1].luma + "%)" }}></div>
                     {picker2}
+                    {picker}
                     {/* <ChromePicker disableAlpha ={true} color={{h:this.props.currentState.colorGenerators[0].hue,s:this.props.currentState.colorGenerators[0].saturation,l:this.props.currentState.colorGenerators[0].luma}} /> */}
                 </div>
 

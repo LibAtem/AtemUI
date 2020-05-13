@@ -35,21 +35,49 @@ html {
 }
 
 
-#page-wrapper {
+.page-wrapper-control {
     margin: 0;
     min-height: calc(100vh - 56px);
     display: grid;
     grid-template-areas:"Program Next DSK"
     "Preview Transition FTB";
-    padding:3%;
+    padding:2%;
+    margin:auto;
     column-gap: 3%;
-    grid-template-columns: 3fr auto auto;
+    grid-template-columns: minmax(500px,830px) auto auto;
     grid-template-rows: 1fr 1fr;
     row-gap: 50px;
 }
 
-@media only screen and (max-width: 960px) {
-    #page-wrapper {
+
+
+#DSK{
+    position:relative;
+    top:37px;
+}
+
+#FTB{
+    position:relative;
+    bottom:-44px;
+}
+
+@media only screen and (max-width: 1320px) {
+    .page-wrapper-control.open {
+        grid-template-areas:"Program Program"
+        "Preview Preview"
+         "Transition Next"
+         "DSK FTB";
+        padding:3%;
+        column-gap: 3%;
+        margin:0px;
+        grid-template-columns: 1fr 1fr ;
+        grid-template-rows: 1fr 1fr auto auto auto;
+        row-gap: 50px;
+    }
+}
+
+@media only screen and (max-width: 1045px) {
+    .page-wrapper-control {
  
         grid-template-areas:"Program Program"
         "Preview Preview"
@@ -57,14 +85,23 @@ html {
          "DSK FTB";
         padding:3%;
         column-gap: 3%;
+        margin:0px;
         grid-template-columns: 1fr 1fr ;
         grid-template-rows: 1fr 1fr auto auto auto;
         row-gap: 50px;
         
     }
+    #DSK{
+        top:0px;
+    }
+
+    #FTB{
+        top:0px;
+    }
+
   }
   @media only screen and (max-width: 650px) {
-    #page-wrapper {
+    .page-wrapper-control {
  
         grid-template-areas:"Program Program"
         "Preview Preview"
@@ -73,10 +110,25 @@ html {
          "DSK FTB";
         padding:3%;
         column-gap: 3%;
+        margin:0px;
         grid-template-columns: 1fr 1fr ;
         grid-template-rows: 1fr 1fr auto auto auto;
         row-gap: 50px;
         
+    }
+
+    .page-wrapper-control.open {
+        grid-template-areas:"Program Program"
+        "Preview Preview"
+         "Transition Transition"
+         "Next Next"
+         "DSK FTB";
+        padding:3%;
+        column-gap: 3%;
+        margin:0px;
+        grid-template-columns: 1fr 1fr ;
+        grid-template-rows: 1fr 1fr auto auto auto;
+        row-gap: 50px;
     }
   }
 

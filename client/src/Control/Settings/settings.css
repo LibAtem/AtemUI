@@ -6,6 +6,8 @@
     height:calc(100vh - 56px);
     width:100%;
     min-width: 310px;
+    max-width:500px;
+    margin:0px auto;
 }
 
 /* @media only screen and (max-width: 600px) {
@@ -456,6 +458,14 @@ input[type=number] {
         margin: 11px 0;
 } 
 
+.sss.hue .rangeslider.rangeslider-horizontal{
+    height: 3px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    margin: 11px 0;
+} 
+
+
 .sss.disabled .rangeslider.rangeslider-horizontal{
     pointer-events: none;
     background:#303030;
@@ -493,7 +503,7 @@ input[type=number] {
     display:grid;
     grid-template-columns: 4fr 1fr;
     column-gap: 15px;
-    margin:15px 10px;
+    margin:20px 10px;
 }
 .ss-slider-outer{
     position: relative;
@@ -648,4 +658,49 @@ input[type=number] {
 
 .ss-dve-style-item.dummy:hover{
     background:#2c2c2c;
+}
+
+.ss-dve-style-item.disabled{
+    background:#333333;
+    color:#646464;
+    outline: 1px solid #252525;
+}
+
+.ss-run-holder{
+    display:grid;
+    margin:auto;
+    grid-template-columns: 50px 50px 50px;
+    column-gap: 10px;
+
+    width: max-content;
+}
+
+.ss-run-button{
+    background:#2c2c2c;
+    background: linear-gradient(0deg, rgba(35,35,35,1) 0%, rgba(44,44,44,1) 60%, rgb(46, 46, 46) 93%);
+    color:#858585;
+    text-align:center;
+    border-radius:5px;
+    border:1px solid #1a1a1a;
+    font-size: 14px;
+    line-height: 25px;
+}
+
+.ss-run-button.disabled{
+    background:#333333;
+    color:#646464;
+    border: 1px solid #252525;
+}
+
+.ss-run-button.disabled:active{
+    box-shadow:none;
+}
+
+.ss-run-button:active{
+    box-shadow: inset 0px 0px 5px #00000054;
+}
+
+.ss-run-button.active{
+    background: linear-gradient(0deg, rgb(27, 27, 27) 0%, rgb(32, 32, 32) 60%, rgb(34, 34, 34) 93%);
+    color:orange;
 }

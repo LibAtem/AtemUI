@@ -104,10 +104,12 @@ export default class App extends React.Component<{}, AppState> {
         this.setState({ devices: devices })
       })
 
-      connection.on("state", (state: any) => {
-        // console.log(state)
-        // this.setState({ currentState: state })
-      })
+      
+
+      // connection.on("state", (state: any) => {
+      //   // console.log(state)
+      //   // this.setState({ currentState: state })
+      // })
 
       connection.onreconnecting(err => {
         if (err) {

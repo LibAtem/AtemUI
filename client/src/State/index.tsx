@@ -58,7 +58,7 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
   componentDidMount() {
     if(this.props.signalR){
     this.props.signalR.on("state", (state: any) => {
-
+      console.log(state)
         this.setState({ currentState: state })
 
     })

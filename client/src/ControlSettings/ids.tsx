@@ -78,9 +78,101 @@ export const videoIds : {[key: string]: number}={
     "mE4Prog":10040,
     "mE4Prev":10041,
     "input1Direct":11001
-
-
-
-    
-
 }
+
+export const patterns : {symmetry:boolean,x:boolean,y:boolean}[]=
+[
+    { //0
+        symmetry:false,
+        x:false,
+        y:false
+    },
+    { //1
+        symmetry:false,
+        x:false,
+        y:false
+    },
+    { //2
+        symmetry:false,
+        x:true,
+        y:false
+    },
+    { //3
+        symmetry:false,
+        x:false,
+        y:true
+    },
+    { //4
+        symmetry:true,
+        x:true,
+        y:true
+    },
+    { //5
+        symmetry:true,
+        x:true,
+        y:true
+    },
+    { //6
+        symmetry:true,
+        x:true,
+        y:true
+    },
+    { //7
+        symmetry:true,
+        x:true,
+        y:true
+    },
+    { //8
+        symmetry:true,
+        x:false,
+        y:false
+    },
+    { //9
+        symmetry:true,
+        x:false,
+        y:false
+    },
+    { //10
+        symmetry:true,
+        x:false,
+        y:false
+    },
+    { //11
+        symmetry:true,
+        x:false,
+        y:false
+    },
+    { //12
+        symmetry:false,
+        x:true,
+        y:false
+    },
+    { //13
+        symmetry:false,
+        x:false,
+        y:true
+    },
+    { //14
+        symmetry:false,
+        x:true,
+        y:false
+    },
+    { //15
+        symmetry:false,
+        x:false,
+        y:true
+    },
+    { //16
+        symmetry:true,
+        x:false,
+        y:false
+    },
+    { //17
+        symmetry:true,
+        x:false,
+        y:false
+    },
+
+
+
+]

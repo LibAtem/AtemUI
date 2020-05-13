@@ -5,7 +5,7 @@ import { RateInput, MagicInput } from "../settings"
 import Slider from "react-rangeslider"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight, faAngleLeft } from "@fortawesome/free-solid-svg-icons"
-import { videoIds } from '../../../ControlSettings/ids';
+import { videoIds,patterns } from '../../../ControlSettings/ids';
 
 
 interface WipeProps {
@@ -229,18 +229,18 @@ export class Wipe extends React.Component<WipeProps, WipeState>{
                 </div>
 
                 <div className="ss-slider-holder">
-                    <div className={diabledClass}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: this.props.mixEffect, Mask: 16, Symmetry: e })} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.symmetry} /><div className="ss-slider-label">Symmetry:</div></div>
-                    <MagicInput disabled={disabled} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.symmetry}
+                    <div className={(patterns[pattern].symmetry) ? "sss ss-slider-outer" : "sss ss-slider-outer disabled"}><Slider tooltip={false} step={0.1} onChange={(e) => this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: this.props.mixEffect, Mask: 16, Symmetry: e })} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.symmetry} /><div className="ss-slider-label">Symmetry:</div></div>
+                    <MagicInput  disabled={patterns[pattern].symmetry} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.symmetry}
                         callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: this.props.mixEffect, Mask: 16, Symmetry: Math.min(100, Math.max(0, value)) }) } }} />
                 </div>
 
                 <div className="ss-row xy">
                     <div className="ss-label">Position:</div>
-                    <div className="ss-label right" >X:</div>
-                    <MagicInput step={0.0001}  disabled={disabled} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.xPosition}
+                    <div className={(patterns[pattern].x)?"ss-label right":"ss-label disabled right"} >X:</div>
+                    <MagicInput step={0.0001}  disabled={!patterns[pattern].x} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.xPosition}
                         callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: this.props.mixEffect, Mask: 64, XPosition: Math.min(1, Math.max(0, value)) }) } }} />
-                    <div className="ss-label right" >Y:</div>
-                    <MagicInput step={0.0001} disabled={disabled} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.yPosition}
+                    <div className={(patterns[pattern].y)?"ss-label right":"ss-label disabled right"} >Y:</div>
+                    <MagicInput step={0.0001} disabled={!patterns[pattern].y} value={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.yPosition}
                         callback={(value: any) => { if (value != "") { this.sendCommand("LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand", { Index: this.props.mixEffect, Mask: 128, YPosition: Math.min(1, Math.max(0, value)) }) } }} />
                 </div>
 
