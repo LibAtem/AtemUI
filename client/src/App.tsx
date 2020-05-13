@@ -252,12 +252,12 @@ function Home() {
 class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }>{
 
 
-  shouldComponentUpdate(nextProps: { devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }) {
-    var deviceInfoChanged = JSON.stringify(this.props.devices) !== JSON.stringify(nextProps.devices)
-    var activeDevice = this.props.activeDeviceId !== nextProps.activeDeviceId
-    // console.log(activeDevice,deviceInfoChanged)
-    return deviceInfoChanged || activeDevice
-  }
+  // shouldComponentUpdate(nextProps: { devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }) {
+  //   var deviceInfoChanged = JSON.stringify(this.props.devices) !== JSON.stringify(nextProps.devices)
+  //   var activeDevice = this.props.activeDeviceId !== nextProps.activeDeviceId
+  //   // console.log(activeDevice,deviceInfoChanged)
+  //   return deviceInfoChanged || activeDevice
+  // }
 
   renderDeviceSelection() {
     const availableDevices = this.props.devices.filter(isDeviceAvailable)

@@ -16,8 +16,6 @@ interface UpstreamKeyState {
     state: any | null
     currentState: any
     open: boolean
-    page: number
-
 }
 
 interface SubMenuProps {
@@ -34,12 +32,16 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
     constructor(props: SubMenuProps) {
         super(props)
         this.state = {
-            open: true,
+            open: false,
             hasConnected: props.device.connected,
             state: props.currentState,
             currentState: null,
-            page: 3
+
         }
+    }
+
+    shouldComponentUpdate(next:SubMenuProps,nextState:UpstreamKeyState){
+        return this.state.open !== nextState.open || this.state.open //only update if component is open
     }
 
     private sendCommand(command: string, value: any) {
@@ -73,11 +75,12 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         }
 
         var inner = <></>
-        if (this.state.page === 0) { 
+        var page =this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keyType;
+        if (page === 0) { 
             inner = <Luma id={this.props.id} mixEffect={this.props.mixEffect} device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState}></Luma>
-        }else  if (this.state.page === 1) { 
+        }else  if (page === 1) { 
             inner = <Chroma id={this.props.id} mixEffect={this.props.mixEffect} device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState}></Chroma>
-        }else  if (this.state.page === 2) { 
+        }else  if (page === 2) { 
             inner = <Pattern id={this.props.id} mixEffect={this.props.mixEffect} device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState}></Pattern>
         }else{
             inner = <DVE id={this.props.id} mixEffect={this.props.mixEffect} device={this.props.device} signalR={this.props.signalR} currentState={this.props.currentState}></DVE>
@@ -90,10 +93,10 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
             </div>
             <div className="ss-submenu-box" style={{ overflow: "hidden" }} >
                 <div className="ss-submenu-submenu">
-                    <div onClick={() => this.setState({ page: 0 })} className={(this.state.page === 0) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Luma</div>
-                    <div onClick={() => this.setState({ page: 1 })} className={(this.state.page === 1) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Chroma</div>
-                    <div onClick={() => this.setState({ page: 2 })} className={(this.state.page === 2) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Pattern</div>
-                    <div onClick={() => this.setState({ page: 3 })} className={(this.state.page === 3) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>DVE</div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand", { KeyerIndex: this.props.id, MixEffectIndex: this.props.mixEffect, Mask: 1, KeyType:0 }) }  className={(page === 0) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Luma</div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand", { KeyerIndex: this.props.id, MixEffectIndex: this.props.mixEffect, Mask: 1, KeyType:1 }) }  className={(page === 1) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Chroma</div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand", { KeyerIndex: this.props.id, MixEffectIndex: this.props.mixEffect, Mask: 1, KeyType:2 }) }  className={(page === 2) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>Pattern</div>
+                    <div onClick={() => this.sendCommand("LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand", { KeyerIndex: this.props.id, MixEffectIndex: this.props.mixEffect, Mask: 1, KeyType:3 }) }  className={(page === 3) ? "ss-submenu-submenu-item" : "ss-submenu-submenu-item disabled"}>DVE</div>
                 </div>
 
                 {inner}

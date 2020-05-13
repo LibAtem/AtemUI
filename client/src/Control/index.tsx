@@ -381,7 +381,7 @@ function Preview(props: ProgramProps) {
         <div className="box-inner-mobile">
           <div className="box-inner-inputs">
             {previewButtons}
-            {previewButtons}
+
           </div>
           <div className="box-program-row">
             {blk}

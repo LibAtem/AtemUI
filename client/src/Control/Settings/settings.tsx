@@ -60,6 +60,22 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         if (!this.props.currentState) {
             return (<div style={this.props.full ? { height: "100%" } : { overflowY: "auto" }} className="ss"></div>)
         }
+
+        var upstreamKeys =[]
+        for (var i=0; i<this.props.currentState.mixEffects[0].keyers.length; i++){
+            upstreamKeys.push(
+                <UpstreamKey
+                key={'up'+i}
+                device={this.props.device}
+                currentState={this.props.currentState}
+                signalR={this.props.signalR}
+                id={i}
+                name={"Upstream Key "+(i+1)}
+                mixEffect={0}
+            />
+
+            )
+        }
         return (
             <div style={this.props.full ? { height: "100%" } : { overflowY: "scroll" }} className="ss">
 
@@ -101,16 +117,8 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
                     name={"Transition"}
                 />
 
-                <UpstreamKey
-                    key={'up1'}
-                    device={this.props.device}
-                    currentState={this.props.currentState}
-                    signalR={this.props.signalR}
-                    id={0}
-                    name={"Upstream Key 1"}
-                    mixEffect={0}
-                />
-
+               
+                {upstreamKeys}
 
                 <DownStreamKeys
                     key={'dsk'}
@@ -352,7 +360,7 @@ interface RateProps {
 interface RateState {
     focus: boolean
     tempValue: string
-    disabled: boolean
+
 }
 
 export class RateInput extends React.Component<RateProps, RateState>{
@@ -361,15 +369,19 @@ export class RateInput extends React.Component<RateProps, RateState>{
         this.state = {
             focus: false,
             tempValue: this.framesToRate(this.props.value),
-            disabled: this.props.disabled || true
+
         }
     }
 
-    // shouldComponentUpdate(nextProps:RateProps){
-    //     const changedVideoMode = this.props.videoMode !== nextProps.videoMode
-    //     const changedValue = this.props.value !== nextProps.value
-    //     return changedValue || changedVideoMode
-    // }
+    shouldComponentUpdate(nextProps:RateProps, nextState: RateState){
+        const changedVideoMode = this.props.videoMode !== nextProps.videoMode
+        const changedValue = this.props.value !== nextProps.value
+        const changedDisabled = this.props.disabled !== nextProps.disabled
+        const changedTempValue = this.state.tempValue !== nextState.tempValue 
+        const changedFocus = this.state.focus !== nextState.focus 
+
+        return changedValue || changedVideoMode || changedFocus || changedTempValue || changedDisabled
+    }
 
     rateToFrames(rate: string) {
         console.log(rate)
