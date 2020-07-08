@@ -2,12 +2,10 @@ import React from 'react'
 import './control.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import OutsideClickHandler from 'react-outside-click-handler';
 import { SwitcherSettings, RateInput } from "./Settings/settings"
 import { AtemButtonRed, AtemButtonGreen, AtemButtonYellow, AtemButtonOnAir, AtemButtonFTB } from './button/button';
 import { videoIds } from '../ControlSettings/ids';
 import MediaQuery, { useMediaQuery } from 'react-responsive'
-import { createSecretKey } from 'crypto';
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>

@@ -2,20 +2,13 @@ import React from 'react'
 import './settings.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import OutsideClickHandler from 'react-outside-click-handler';
-import { Container, Table, ButtonGroup, Button, Modal, Form, Row, Col, Navbar, Nav, FormControl, FormControlProps } from 'react-bootstrap'
-import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
-import { Switch, Route } from 'react-router';
-import { createSecureContext } from 'tls';
+import { Container, ButtonGroup, Button, Form, Row, Col, Nav } from 'react-bootstrap'
 import { prettyDecimal } from '../util';
-import PropTypes from 'prop-types';
 import Slider from 'react-rangeslider';
-import { STATUS_CODES } from 'http';
 import multiview1 from './assets/multiview1.svg';
 import multiview2 from './assets/multiview2.svg';
 import multiview3 from './assets/multiview3.svg';
 import multiview4 from './assets/multiview4.svg';
-import { spacing } from 'react-select/src/theme';
 import {videoIds} from "./ids"
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -414,7 +407,7 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               min={0}
               max={maxFrames}
               value={prettyDecimal(this.state.clip1Length)}
-              onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
                 if (e.currentTarget.value) {
                   this.setState({
 
@@ -453,7 +446,7 @@ class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSetti
               min={0}
               max={maxFrames}
               value={prettyDecimal(this.state.clip2Length)}
-              onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
                 if (e.currentTarget.value) {
                   this.setState({
 

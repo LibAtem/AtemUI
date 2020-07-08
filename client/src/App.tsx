@@ -5,7 +5,7 @@ import 'react-rangeslider/lib/index.css'
 import React, { FormEvent } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { Navbar, Nav, Form, Button, FormControl, Container, FormControlProps } from 'react-bootstrap'
+import { Navbar, Nav, Form, Button, FormControl, Container } from 'react-bootstrap'
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
 import { ManualCommandsPage } from './ManualCommands'
@@ -262,7 +262,7 @@ class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice:
   renderDeviceSelection() {
     const availableDevices = this.props.devices.filter(isDeviceAvailable)
 
-    const onChange = (e: FormEvent<FormControl & FormControlProps>) => {
+    const onChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const id = availableDevices.map(dev => GetDeviceId(dev)).find(id => id === e.currentTarget.value)
       this.props.setDevice(id)
     }
@@ -307,14 +307,16 @@ class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice:
             <LinkContainer to="/profile">
               <Nav.Link>Profile</Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/devices">
-              <Nav.Link>Devices</Nav.Link>
-            </LinkContainer>
             <LinkContainer to="/media">
               <Nav.Link>Media</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/audio">
               <Nav.Link>Audio</Nav.Link>
+            </LinkContainer>
+          </Nav>
+          <Nav className="justify-content-end">
+            <LinkContainer to="/devices">
+              <Nav.Link>Devices</Nav.Link>
             </LinkContainer>
           </Nav>
           <Form inline>

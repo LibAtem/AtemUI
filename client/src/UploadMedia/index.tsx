@@ -2,15 +2,6 @@ import React, { RefObject } from 'react'
 
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import OutsideClickHandler from 'react-outside-click-handler';
-import { Container, Table, ButtonGroup, Button, Modal, Form, Row, Col, Navbar, Nav, FormControl, FormControlProps } from 'react-bootstrap'
-import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap';
-import { Switch, Route } from 'react-router';
-import { createSecureContext } from 'tls';
-import { prettyDecimal } from '../util';
-import PropTypes from 'prop-types';
-import Slider from 'react-rangeslider';
-import { STATUS_CODES } from 'http';
 import remove from './assets/remove.svg';
 import './media.css'
 

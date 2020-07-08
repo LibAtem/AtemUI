@@ -377,7 +377,7 @@ class CommandBuilderSliderProperty extends React.Component<CommandBuilderPropert
         min={min}
         max={max}
         value={prettyDecimal(value)}
-        onChange={(e: React.FormEvent<FormControl & FormControlProps>) => {
+        onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
           change(parseInt(e.currentTarget.value || '', 10))
         }}
       />
