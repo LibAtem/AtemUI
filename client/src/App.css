@@ -1,82 +1,82 @@
 div#not-connected-overlay {
-    z-index: 99999999;
-    float: left;
-    position: absolute;
-    left: 0;
-    top: 0;
+  z-index: 99999999;
+  float: left;
+  position: absolute;
+  left: 0;
+  top: 0;
 
-    background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.7);
 
-    width: 100vw;
-    height: 100vh;
+  width: 100vw;
+  height: 100vh;
 
-    padding: 5vh 5vw;
-    text-align: center;
+  padding: 5vh 5vw;
+  text-align: center;
 }
 
-.full{
-    margin:0;
-    height:100%;
+.full {
+  margin: 0;
+  height: 100%;
 }
 
 div#not-connected-overlay p {
-    color: #ddd;
-    font-size: 2em;
+  color: #ddd;
+  font-size: 2em;
 }
 
 /** Tree view **/
 .toggle-icon {
-    display: inline-block;
+  display: inline-block;
 }
 
 .toggle-icon-symbol {
-    width: 2rem;
-    height: 2rem;
-    text-align: center;
-    line-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  line-height: 2rem;
 }
 
 .tree-item-group {
-    list-style-type: none;
-    padding-left: 0;
-    border-top: 1px solid #ccc;
-    text-align: left;
-    /* width: 100vw; */
+  list-style-type: none;
+  padding-left: 0;
+  border-top: 1px solid #ccc;
+  text-align: left;
+  /* width: 100vw; */
 }
 
 .tree-item {
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    color: #333;
-    background: none;
-    border-bottom: 1px solid #ccc;
-    box-shadow: none;
-    z-index: unset;
-    position: relative;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: #333;
+  background: none;
+  border-bottom: 1px solid #ccc;
+  box-shadow: none;
+  z-index: unset;
+  position: relative;
 }
 
 .tree-item--active {
-    color: white;
-    background: #179ed3;
-    border-bottom: none;
+  color: white;
+  background: #179ed3;
+  border-bottom: none;
 }
 
 .tree-item--focused {
-    box-shadow: 0 0 5px 0 #222;
-    z-index: 999;
+  box-shadow: 0 0 5px 0 #222;
+  z-index: 999;
 }
 
 .search {
-    padding: 1rem 1.5rem;
-    border: none;
-    width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  width: 100%;
 }
 
 .compact-tree .tree-item {
-    padding-top: 0;
-    padding-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
-#root{
-    margin:0;
-    height:100%;
+#root {
+  margin: 0;
+  height: 100%;
 }

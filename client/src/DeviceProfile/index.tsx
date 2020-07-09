@@ -41,7 +41,10 @@ interface DeviceProfileViewerPageInnerState {
   state: object | null
 }
 
-class DeviceProfileViewerPageInner extends React.Component<DeviceProfileViewerPageInnerProps, DeviceProfileViewerPageInnerState> {
+class DeviceProfileViewerPageInner extends React.Component<
+  DeviceProfileViewerPageInnerProps,
+  DeviceProfileViewerPageInnerState
+> {
   constructor(props: DeviceProfileViewerPageInnerProps) {
     super(props)
 
@@ -156,4 +159,3 @@ function transformStateToTree(state: object, parents: string[]): TreeNodeObject 
 
   return res
 }
-

@@ -56,33 +56,30 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
   }
 
   componentDidMount() {
-    if(this.props.signalR){
-    this.props.signalR.on("state", (state: any) => {
-      console.log(state)
+    if (this.props.signalR) {
+      this.props.signalR.on('state', (state: any) => {
+        console.log(state)
         this.setState({ currentState: state })
-
-    })
-   }
+      })
+    }
   }
-  
-  componentWillUnmount(){
-    if(this.props.signalR){
-        this.props.signalR.off("state")
+
+  componentWillUnmount() {
+    if (this.props.signalR) {
+      this.props.signalR.off('state')
     }
   }
 
   loadDeviceState(props: StateViewerPageInnerProps) {
     if (props.signalR) {
-        props.signalR
-            .invoke<any>('sendState', GetDeviceId(props.device))
-            .then(state => {
-            })
-            .catch(err => {
-                console.error('StateViewer: Failed to load state:', err)
-               
-            })
+      props.signalR
+        .invoke<any>('sendState', GetDeviceId(props.device))
+        .then(state => {})
+        .catch(err => {
+          console.error('StateViewer: Failed to load state:', err)
+        })
     }
-}
+  }
 
   componentDidUpdate(prevProps: StateViewerPageInnerProps) {
     // Should we reload the commandsSpec

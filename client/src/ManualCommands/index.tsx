@@ -63,7 +63,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
     fetch(`/api/spec/${GetDeviceId(props.device)}`)
       .then(res => res.json())
       .then((data: CommandSpecSet) => {
-        console.log('Commands: Got new spec',data.commands)
+        console.log('Commands: Got new spec', data.commands)
         this.setState({
           commandsSpec: data.commands
         })
@@ -219,7 +219,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
       console.log(this.state.values)
       signalR
         .invoke('CommandSend', devId, spec.fullName, JSON.stringify(this.state.values))
-        .then((res) => {
+        .then(res => {
           console.log('ManualCommands: sent')
           console.log(res)
         })

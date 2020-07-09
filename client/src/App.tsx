@@ -44,9 +44,7 @@ class SignalRRetryPolicy implements signalR.IRetryPolicy {
   }
 }
 
-
 export default class App extends React.Component<{}, AppState> {
-
   state = {
     signalR: new signalR.HubConnectionBuilder()
       .withUrl('/hub')
@@ -77,15 +75,8 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-
-
-
     if (this.state.signalR) {
       const connection = this.state.signalR
-
-
-
-
 
       connection.on('messageReceived', (username: string, message: string) => {
         console.log(username, message)
@@ -100,11 +91,9 @@ export default class App extends React.Component<{}, AppState> {
           // mutation.activeDeviceId = null
           // TODO - is this desired behaviour?
         }
-        
+
         this.setState({ devices: devices })
       })
-
-      
 
       // connection.on("state", (state: any) => {
       //   // console.log(state)
@@ -137,7 +126,7 @@ export default class App extends React.Component<{}, AppState> {
       this.setState({
         signalR: connection
       })
-        ; (window as any).conn2 = connection
+      ;(window as any).conn2 = connection
 
       connection
         .start()
@@ -154,13 +143,12 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   setDeivce(id: string | undefined) {
-
     console.log('Change active device: ', id)
     this.setState({
       activeDeviceId: id || null
     })
     if (id) {
-      console.log("here", id)
+      console.log('here', id)
       if (this.state.signalR) {
         this.state.signalR
           .invoke<object>('SendProfile', id)
@@ -181,8 +169,6 @@ export default class App extends React.Component<{}, AppState> {
     }
   }
 
-
-
   render() {
     const { connected } = this.state
     return (
@@ -196,8 +182,13 @@ export default class App extends React.Component<{}, AppState> {
         </div>
         <Router>
           <div className="full">
-
-            <NavBar activeDeviceId={this.state.activeDeviceId} devices={this.state.devices} setDevice={(id: string | undefined) => { this.setDeivce(id) }}></NavBar>
+            <NavBar
+              activeDeviceId={this.state.activeDeviceId}
+              devices={this.state.devices}
+              setDevice={(id: string | undefined) => {
+                this.setDeivce(id)
+              }}
+            ></NavBar>
             {connected !== ConnectionStatus.Disconnected ? (
               <Switch>
                 <Route exact path="/">
@@ -229,8 +220,8 @@ export default class App extends React.Component<{}, AppState> {
                 </Route>
               </Switch>
             ) : (
-                ''
-              )}
+              ''
+            )}
           </div>
         </Router>
       </DeviceManagerContext.Provider>
@@ -249,9 +240,11 @@ function Home() {
   )
 }
 
-class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }>{
-
-
+class NavBar extends React.PureComponent<{
+  devices: AtemDeviceInfo[]
+  setDevice: (_: string | undefined) => void
+  activeDeviceId: string | null
+}> {
   // shouldComponentUpdate(nextProps: { devices: AtemDeviceInfo[], setDevice: (_: string | undefined) => void, activeDeviceId: string | null }) {
   //   var deviceInfoChanged = JSON.stringify(this.props.devices) !== JSON.stringify(nextProps.devices)
   //   var activeDevice = this.props.activeDeviceId !== nextProps.activeDeviceId
@@ -266,7 +259,6 @@ class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice:
       const id = availableDevices.map(dev => GetDeviceId(dev)).find(id => id === e.currentTarget.value)
       this.props.setDevice(id)
     }
-
 
     return (
       <FormControl as="select" className="mr-sm-2" value={this.props.activeDeviceId || '-'} onChange={onChange}>
@@ -324,6 +316,7 @@ class NavBar extends React.PureComponent<{ devices: AtemDeviceInfo[], setDevice:
             <Button variant="outline-info">Search</Button>
           </Form>
         </Navbar.Collapse>
-      </Navbar>)
+      </Navbar>
+    )
   }
 }

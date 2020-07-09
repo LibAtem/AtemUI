@@ -6,7 +6,7 @@ export interface DeviceContext {
   devices: AtemDeviceInfo[]
   activeDeviceId: string | null
   currentState: LibAtem.AtemState | null
-  currentProfile:any
+  currentProfile: any
 }
 
 export const DeviceManagerContext = React.createContext<DeviceContext>({
