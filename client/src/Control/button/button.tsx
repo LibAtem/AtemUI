@@ -11,28 +11,52 @@ interface AtemButtonProps {
     className?:string
     update?:any
 }
-interface AtemButtonState {
- 
+
+interface AtemButtonGenericProps {
+    callback: any
+    active: boolean
+    disabled?: boolean // TODO - use
+    name: string
+    textClassName?: string
+    color: 'red' | 'green'
 }
 
-export class AtemButtonRed extends React.Component<AtemButtonProps>{
+function assertNever(_: never): void{
+}
+
+export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps>{
    
-    shouldComponentUpdate(nextProps : AtemButtonProps ) {
-        const differentActive = this.props.active !== nextProps.active;
-        const differentName = this.props.name !== nextProps.name
-        return differentName || differentActive;
-    }
+    // shouldComponentUpdate(nextProps : AtemButtonProps ) {
+    //     const differentActive = this.props.active !== nextProps.active;
+    //     const differentName = this.props.name !== nextProps.name
+    //     return differentName || differentActive;
+    // }
 
     render() {
 
-        var textClass = this.props.className || "atem-button-text"
-        if(this.props.active){
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder red"><img height="50px" width="50px" src={buttonRed}></img><div className={textClass}>{this.props.name}</div></div>)
-        }else{
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder"><img height="50px" width="50px" src={buttonGrey}></img><div className={textClass}>{this.props.name}</div></div>)
+        let className = 'atem-button-holder '
+        let buttonImage = buttonGrey
+        if (this.props.active) {
+            className += this.props.color
+
+            switch(this.props.color) {
+                case 'red':
+                    buttonImage = buttonRed
+                    break
+                case 'green':
+                    buttonImage = buttonGreen
+                    break
+                default:
+                    assertNever(this.props.color)
+                    break
+            }
         }
+
+        const textClass = this.props.textClassName || "atem-button-text"
+        return (<div onMouseDown={this.props.callback} className={className}><img height="50px" width="50px" src={buttonImage}></img><div className={textClass}>{this.props.name}</div></div>)
     }
 }
+
 
 interface AtemButtonFTBProps {
     callback: any
@@ -60,45 +84,6 @@ export class AtemButtonFTB extends React.Component<AtemButtonFTBProps>{
         }else{
             return (<div onMouseDown={this.props.callback} className="atem-button-holder"><img height="50px" width="50px" src={buttonGrey}></img><div className="atem-button-text">{this.props.name}</div></div>)
         }
-    }
-}
-
-export class AtemButtonOnAir extends React.Component<AtemButtonProps, AtemButtonState>{
-  
-
-    shouldComponentUpdate(nextProps : AtemButtonProps ) {
-        const differentActive = this.props.active !== nextProps.active;
-        const differentName = this.props.name !== nextProps.name
-        return differentName || differentActive;
-    }
-
-
-    render() {
-        if(this.props.active){
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder red"><img height="50px" width="50px" src={buttonRed}></img><div className="atem-button-text on-air">{this.props.name}</div></div>)
-        }else{
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder "><img height="50px" width="50px" src={buttonGrey}></img><div className="atem-button-text on-air">{this.props.name}</div></div>)
-        }
-    }
-}
-
-export class AtemButtonGreen extends React.Component<AtemButtonProps>{
-
-
-    shouldComponentUpdate(nextProps : AtemButtonProps ) {
-        const differentActive = this.props.active !== nextProps.active;
-        const differentName = this.props.name !== nextProps.name
-        return differentName || differentActive;
-    }
-
-
-    render() {
-        if(this.props.active){
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder green"><img height="50px" width="50px" src={buttonGreen}></img><div className="atem-button-text">{this.props.name}</div></div>)
-        }else{
-            return (<div onMouseDown={this.props.callback} className="atem-button-holder"><img height="50px" width="50px" src={buttonGrey}></img><div className="atem-button-text">{this.props.name}</div></div>)
-        }
-        
     }
 }
 

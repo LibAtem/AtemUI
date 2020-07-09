@@ -1,0 +1,19 @@
+{
+    "include": [
+        "../LibAtem/LibAtem.State/**/*.cs",
+        "../LibAtem/LibAtem/Common/**/*.cs"
+    ],
+    "exclude": [
+        "../LibAtem/LibAtem.State/Builder/**/*.cs"
+    ],
+    "namespace": "LibAtem",
+    "output": "./src/libatem.state.d.ts",
+    "camelCase": true,
+    "camelCaseEnums": false,
+    "numericEnums": true,
+    "stringLiteralTypesInsteadOfEnums": false,
+    "customTypeTranslations": {
+        "ProductName": "string",
+        "ProductNumber": "string"
+    }
+}

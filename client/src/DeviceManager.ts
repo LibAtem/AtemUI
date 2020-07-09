@@ -5,7 +5,7 @@ export interface DeviceContext {
   signalR: signalR.HubConnection | undefined
   devices: AtemDeviceInfo[]
   activeDeviceId: string | null
-  currentState:any
+  currentState: LibAtem.AtemState | null
   currentProfile:any
 }
 
