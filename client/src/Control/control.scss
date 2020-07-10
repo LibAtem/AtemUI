@@ -193,7 +193,7 @@ html {
   grid-template-columns: 1fr 50px auto;
 }
 
-.box-transition {
+.box-transition, .box-style {
   background: #202020;
 
   border-radius: 5px;
@@ -210,6 +210,10 @@ html {
   column-gap: 5px;
   grid-template-columns: 50px 50px 50px 50px 50px;
   /* grid-template-rows: 1fr 1fr; */
+}
+.box-style {
+  row-gap: 40px;
+  grid-template-rows: 1fr 1fr;
 }
 .box-transition-col {
   display: grid;

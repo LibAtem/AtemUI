@@ -65,7 +65,7 @@ export function TransitionStylePanel(props: StyleProps) {
   return (
     <div className="box" id="Transition">
       <div className="box-title">Transition Style</div>
-      <div className="box-transition">
+      <div className="box-style">
         {styles.map((style, index) => (
           <AtemButtonGeneric
             color="yellow"
