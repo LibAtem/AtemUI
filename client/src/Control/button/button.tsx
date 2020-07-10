@@ -1,6 +1,4 @@
 import React from 'react'
-import buttonRed from './images/button_red5.png'
-import buttonGreen from './images/button_green2.png'
 import buttonGrey from './images/button_new_low.png'
 import buttonYellow from './images/button_yellow.png'
 interface AtemButtonProps {
@@ -14,14 +12,12 @@ interface AtemButtonProps {
 
 interface AtemButtonGenericProps {
   callback: any
-  active: boolean
-  disabled?: boolean // TODO - use
+  active: boolean | null
+  // disabled?: boolean // TODO - use
   name: string
   textClassName?: string
   color: 'red' | 'green' | 'yellow'
 }
-
-function assertNever(_: never): void {}
 
 export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
   // shouldComponentUpdate(nextProps : AtemButtonProps ) {
@@ -32,73 +28,20 @@ export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
 
   render() {
     let className = 'atem-button-holder '
-    let buttonImage = buttonGrey
-    if (this.props.active) {
-      className += this.props.color
 
-      switch (this.props.color) {
-        case 'red':
-          buttonImage = buttonRed
-          break
-        case 'green':
-          buttonImage = buttonGreen
-          break
-        case 'yellow':
-          buttonImage = buttonYellow
-          break
-        default:
-          assertNever(this.props.color)
-          break
-      }
+    if (this.props.active === null) {
+      className += `btn-${this.props.color}-flash`
+    } else if (this.props.active !== false) {
+      className += `btn-${this.props.color}`
+    } else {
+      className += 'btn-default'
     }
 
-    const textClass = this.props.textClassName || 'atem-button-text'
     return (
       <div onMouseDown={this.props.callback} className={className}>
-        <img height="50px" width="50px" src={buttonImage}></img>
-        <div className={textClass}>{this.props.name}</div>
+        <div className={`atem-button-text ${this.props.textClassName}`}>{this.props.name}</div>
       </div>
     )
-  }
-}
-
-interface AtemButtonFTBProps {
-  callback: any
-  isFullBlack: boolean
-  inTransition: boolean
-  disabled?: boolean
-  name: string
-}
-
-export class AtemButtonFTB extends React.Component<AtemButtonFTBProps> {
-  shouldComponentUpdate(nextProps: AtemButtonFTBProps) {
-    const differentBlack = this.props.isFullBlack !== nextProps.isFullBlack
-    const differentTransition = this.props.inTransition !== nextProps.inTransition
-    return differentBlack || differentTransition
-  }
-
-  render() {
-    if (this.props.inTransition) {
-      return (
-        <div onMouseDown={this.props.callback} className="atem-button-holder red">
-          <img height="50px" width="50px" src={buttonRed}></img>
-          <div className="atem-button-text">{this.props.name}</div>
-        </div>
-      )
-    } else if (this.props.isFullBlack) {
-      return (
-        <div onMouseDown={this.props.callback} className="atem-button-holder flash">
-          <div className="atem-button-text">{this.props.name}</div>
-        </div>
-      )
-    } else {
-      return (
-        <div onMouseDown={this.props.callback} className="atem-button-holder">
-          <img height="50px" width="50px" src={buttonGrey}></img>
-          <div className="atem-button-text">{this.props.name}</div>
-        </div>
-      )
-    }
   }
 }
 

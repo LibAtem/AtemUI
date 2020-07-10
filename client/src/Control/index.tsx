@@ -1,9 +1,9 @@
 import React from 'react'
-import './control.css'
+import './control.scss'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { SwitcherSettings, RateInput } from './Settings/settings'
-import { AtemButtonYellow, AtemButtonFTB, AtemButtonGeneric } from './button/button'
+import { AtemButtonYellow, AtemButtonGeneric } from './button/button'
 import { videoIds } from '../ControlSettings/ids'
 import MediaQuery, { useMediaQuery } from 'react-responsive'
 import { DSKPanel } from './dsk'
@@ -231,7 +231,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
   }
 
-  public sendCommand(command: string, value: Array<string | number>) {
+  public sendCommand(command: string, value: { [key: string]: string | number | boolean }) {
     const signalR = this.props.signalR
     const device = this.props.device
     if (device.connected && signalR) {
@@ -282,31 +282,31 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       <div className={this.props.open ? 'page-wrapper-control open' : 'page-wrapper-control'}>
         <Program
           currentState={currentState}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
 
         <Transition
           currentState={currentState}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
         <Preview
           currentState={currentState}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
         <NextPanel
           meIndex={meIndex}
           transition={currentME.transition.properties}
           keyers={keyers.map(k => ({ onAir: k.onAir }))}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
         <DSKPanel
           downstreamKeyers={currentState.downstreamKeyers}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
         <FTB
           currentState={currentState}
-          sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => this.sendCommand(command, values)}
         />
       </div>
     )
@@ -593,7 +593,7 @@ function Transition(props: ProgramProps) {
 
         <AtemButtonGeneric
           color="red"
-          textClassName={'atem-button-text prev-trans'}
+          textClassName={'prev-trans'}
           callback={() =>
             props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPreviewSetCommand', {
               Index: 0,
@@ -604,10 +604,7 @@ function Transition(props: ProgramProps) {
           name={'PREV TRANS'}
         />
 
-        {/* {prevTrans} */}
         <div></div>
-        {/* <div onMouseDown={() => this.Cut()} className="atem-button button-grey ">CUT</div> */}
-        {/* {auto} */}
         <AtemButtonGeneric
           color="red"
           callback={() => props.sendCommand('LibAtem.Commands.MixEffects.MixEffectCutCommand', { Index: 0 })}
@@ -645,6 +642,7 @@ function Transition(props: ProgramProps) {
 }
 
 function FTB(props: ProgramProps) {
+  const status = props.currentState.mixEffects[0].fadeToBlack.status
   return (
     <div className="box" id="FTB">
       <div className="box-title">Fade to Black</div>
@@ -661,13 +659,12 @@ function FTB(props: ProgramProps) {
             videoMode={props.currentState.settings.videoMode}
           ></RateInput>
         </div>
-        <AtemButtonFTB
-          key={'ftb_button'}
+        <AtemButtonGeneric
+        color='red'
           callback={() => props.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackAutoCommand', { Index: 0 })}
           name={'FTB'}
-          inTransition={props.currentState.mixEffects[0].fadeToBlack.status.inTransition}
-          isFullBlack={props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack}
-        ></AtemButtonFTB>
+          active={status.isFullyBlack ? null : status.inTransition}
+        />
       </div>
     </div>
   )

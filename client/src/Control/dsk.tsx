@@ -41,7 +41,7 @@ export function DSKPanel(props: DSKProps) {
         </div>
         <AtemButtonGeneric
           color="red"
-          textClassName={'atem-button-text on-air'}
+          textClassName={'on-air'}
           name={'ON AIR'}
           callback={() =>
             props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand', {

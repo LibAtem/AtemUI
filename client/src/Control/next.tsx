@@ -24,7 +24,7 @@ export function NextPanel(props: NextProps) {
       <div key={index} className="box-transition-col">
         <AtemButtonGeneric
           color="red"
-          textClassName={'atem-button-text on-air'}
+          textClassName={'on-air'}
           name={'ON AIR'}
           callback={() =>
             props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyOnAirSetCommand', {
