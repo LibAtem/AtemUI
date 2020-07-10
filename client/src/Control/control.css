@@ -205,11 +205,17 @@ html {
   width: auto;
   display: grid;
   /* column-gap: 15px; */
-  row-gap: 40px;
+  /* row-gap: 40px; */
   padding: 10px;
   column-gap: 5px;
   grid-template-columns: 50px 50px 50px 50px 50px;
+  /* grid-template-rows: 1fr 1fr; */
+}
+.box-transition-col {
+  display: grid;
   grid-template-rows: 1fr 1fr;
+  row-gap: 40px;
+
 }
 
 .box-inner-inputs {

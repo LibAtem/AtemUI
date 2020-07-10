@@ -7,6 +7,9 @@ import { AtemButtonYellow, AtemButtonFTB, AtemButtonGeneric } from './button/but
 import { videoIds } from '../ControlSettings/ids'
 import MediaQuery, { useMediaQuery } from 'react-responsive'
 import { DSKPanel } from './dsk'
+import { NextPanel } from './next'
+
+export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -60,7 +63,9 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   componentDidMount() {
     if (this.props.signalR) {
       this.props.signalR.on('state', (state: any) => {
-        state.audio = state.audio ? { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } } : undefined //remove levels which cause constant updates
+        state.audio = state.audio
+          ? { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } }
+          : undefined //remove levels which cause constant updates
         if (JSON.stringify(this.state.currentState) !== JSON.stringify(state)) {
           this.setState({ currentState: state })
         }
@@ -226,7 +231,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     }
   }
 
-  public sendCommand(command: string, value: any) {
+  public sendCommand(command: string, value: Array<string | number>) {
     const signalR = this.props.signalR
     const device = this.props.device
     if (device.connected && signalR) {
@@ -236,11 +241,11 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
         .invoke('CommandSend', devId, command, JSON.stringify(value))
         .then(res => {
           console.log(value)
-          console.log('ManualCommands: sent')
+          console.log('Control: sent')
           console.log(command)
         })
         .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
+          console.log('Control: Failed to send', e)
         })
     }
   }
@@ -269,6 +274,10 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
       return <p>Loading state...</p>
     }
 
+    const meIndex = 0
+    const currentME = currentState.mixEffects[meIndex]
+    const keyers = currentME.keyers as LibAtem.MixEffectState_KeyerState[]
+
     return (
       <div className={this.props.open ? 'page-wrapper-control open' : 'page-wrapper-control'}>
         <Program
@@ -284,8 +293,10 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
           currentState={currentState}
           sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
         />
-        <Next
-          currentState={currentState}
+        <NextPanel
+          meIndex={meIndex}
+          transition={currentME.transition.properties}
+          keyers={keyers.map(k => ({ onAir: k.onAir }))}
           sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
         />
         <DSKPanel
@@ -303,7 +314,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 }
 
 interface ProgramProps {
-  sendCommand: any
+  sendCommand: SendCommand
   currentState: LibAtem.AtemState
 }
 
@@ -657,94 +668,6 @@ function FTB(props: ProgramProps) {
           inTransition={props.currentState.mixEffects[0].fadeToBlack.status.inTransition}
           isFullBlack={props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack}
         ></AtemButtonFTB>
-      </div>
-    </div>
-  )
-}
-
-function Next(props: ProgramProps) {
-  function dec2bin(dec: number) {
-    return (dec >>> 0).toString(2)
-  }
-
-  function setKey(id: number) {
-    var dec = dec2bin(props.currentState.mixEffects[0].transition.properties.selection)
-      .padStart(5, '0')
-      .split('')
-      .reverse()
-    dec[id] = dec[id] === '0' ? '1' : '0'
-    return parseInt(dec.reverse().join(''), 2)
-  }
-
-  var onAirs = []
-  var keysState = (props.currentState.mixEffects[0].transition.properties.selection >>> 0)
-    .toString(2)
-    .split('')
-    .reverse()
-    .join('') //get binary of state and reverse it for iterating
-  var keys = []
-
-  var selection = props.currentState.mixEffects[0].transition.properties.selection
-
-  keys.push(
-    <AtemButtonYellow
-      update={selection}
-      callback={() =>
-        props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {
-          Index: 0,
-          Mask: 2,
-          NextSelection: setKey(0)
-        })
-      }
-      active={keysState[0] === '1'}
-      name={'BKGD'}
-    ></AtemButtonYellow>
-  )
-
-  for (var i = 0; i < props.currentState.mixEffects[0].keyers.length; i++) {
-    const x = i
-    onAirs.push(
-      <AtemButtonGeneric
-        color="red"
-        textClassName={'atem-button-text on-air'}
-        name={'ON AIR'}
-        callback={() =>
-          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyOnAirSetCommand', {
-            MixEffectIndex: 0,
-            KeyerIndex: x,
-            OnAir: !props.currentState.mixEffects[0].keyers[x].onAir
-          })
-        }
-        active={props.currentState.mixEffects[0].keyers[x].onAir}
-      />
-    )
-    keys.push(
-      <AtemButtonYellow
-        update={selection}
-        callback={() =>
-          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {
-            Index: 0,
-            Mask: 2,
-            NextSelection: setKey(x + 1)
-          })
-        }
-        active={keysState[i + 1] === '1'}
-        name={'KEY' + (i + 1)}
-      ></AtemButtonYellow>
-    )
-  }
-
-  return (
-    <div
-      className="box"
-      id="Next"
-    >
-      <div className="box-title">Next Transition</div>
-      <div className="box-transition"
-      style={{ gridTemplateColumns: `repeat(${onAirs.length + 1}, 50px)` }}>
-        <div></div>
-        {onAirs}
-        {keys}
       </div>
     </div>
   )

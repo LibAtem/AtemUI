@@ -1,9 +1,10 @@
 import { AtemButtonGeneric } from './button/button'
 import { RateInput } from './Settings/settings'
 import React from 'react'
+import { SendCommand } from '.'
 
 interface DSKProps {
-  sendCommand: any
+  sendCommand: SendCommand
   downstreamKeyers: LibAtem.DownstreamKeyerState[]
   videoMode: LibAtem.VideoMode
 }
