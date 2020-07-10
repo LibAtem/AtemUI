@@ -59,7 +59,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   componentDidMount() {
     if (this.props.signalR) {
       this.props.signalR.on('state', (state: any) => {
-        state.audio = { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } } //remove levels which cause constant updates
+        state.audio = state.audio ? { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } } : undefined //remove levels which cause constant updates
         if (JSON.stringify(this.state.currentState) !== JSON.stringify(state)) {
           this.setState({ currentState: state })
         }
@@ -316,7 +316,7 @@ function Program(props: ProgramProps) {
       callback={() =>
         props.sendCommand('LibAtem.Commands.MixEffects.ProgramInputSetCommand', { Index: 0, Source: videoIds[item] })
       }
-      active={item.includes(programSource + '')}
+      active={item === `input${programSource}`} // TODO
     />
   ))
 
@@ -422,7 +422,7 @@ function Preview(props: ProgramProps) {
       callback={() =>
         props.sendCommand('LibAtem.Commands.MixEffects.PreviewInputSetCommand', { Index: 0, Source: videoIds[item] })
       }
-      active={item.includes(previewSource + '')}
+      active={item === `input${previewSource}`} // TODO
     />
   ))
 
@@ -734,12 +734,12 @@ function Next(props: ProgramProps) {
 
   return (
     <div
-      style={{ gridTemplateColumns: 'repeat(' + props.currentState.mixEffects[0].keyers.length + 1 + ' 50px)' }}
       className="box"
       id="Next"
     >
       <div className="box-title">Next Transition</div>
-      <div className="box-transition">
+      <div className="box-transition"
+      style={{ gridTemplateColumns: `repeat(${onAirs.length + 1}, 50px)` }}>
         <div></div>
         {onAirs}
         {keys}
@@ -811,23 +811,18 @@ function DSK(props: ProgramProps) {
     )
   }
 
-  if (dskCount == 1) {
-    var style = '50px'
-  } else {
-    style = '50px 50px'
+  const headings: React.ReactElement[] = []
+  for (let i = 1; i <= dskCount; i++ ) {
+    headings.push(<div key={i} className="box-title">DSK{i}</div>)
   }
+
   return (
     <div className="box" id="DSK">
-      {dskCount === 2 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-          <div className="box-title">DSK1</div>
-          <div className="box-title">DSK2</div>
-        </div>
-      ) : (
-        <div className="box-title">DSK1</div>
-      )}
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${headings.length}, 1fr)` }}>
+        {headings}
+      </div>
 
-      <div className="box-dsk" style={{ gridTemplateColumns: style }}>
+      <div className="box-dsk" style={{ gridTemplateColumns: `repeat(${dskCount}, 50px)` }}>
         {tie}
         {rate}
         {onAir}

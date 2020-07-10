@@ -94,8 +94,8 @@ class DeviceProfileViewerPageInner extends React.Component<
   }
 
   render() {
-    const { device, signalR, currentDeviceProfile } = this.props
-    const { hasConnected, state } = this.state
+    const { currentDeviceProfile } = this.props
+    const { hasConnected } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>
