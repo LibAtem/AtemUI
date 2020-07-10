@@ -145,11 +145,23 @@ html {
   border: 1.5px solid #191919;
   display: grid;
   grid-template-columns: 50px 50px;
-  grid-template-rows: 50px 50px 50px 50px;
   column-gap: 5px;
-  row-gap: 5px;
   position: relative;
   padding: 10px;
+}
+
+.box-dsk .dsk-col {
+  display: grid;
+  grid-template-rows: 50px 50px 50px 50px;
+  row-gap: 5px;
+}
+
+.dsk-title {
+  display: grid;
+  column-gap: 5px;
+  padding: 0 10px;
+  margin: 0 !important;
+  text-align: center;
 }
 
 .box-ftb {

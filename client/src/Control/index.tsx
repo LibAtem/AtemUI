@@ -6,6 +6,7 @@ import { SwitcherSettings, RateInput } from './Settings/settings'
 import { AtemButtonYellow, AtemButtonFTB, AtemButtonGeneric } from './button/button'
 import { videoIds } from '../ControlSettings/ids'
 import MediaQuery, { useMediaQuery } from 'react-responsive'
+import { DSKPanel } from './dsk'
 
 export class ControlPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -287,8 +288,9 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
           currentState={currentState}
           sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
         />
-        <DSK
-          currentState={currentState}
+        <DSKPanel
+          downstreamKeyers={currentState.downstreamKeyers}
+          videoMode={currentState.settings.videoMode}
           sendCommand={(command: string, values: any) => this.sendCommand(command, values)}
         />
         <FTB
@@ -743,90 +745,6 @@ function Next(props: ProgramProps) {
         <div></div>
         {onAirs}
         {keys}
-      </div>
-    </div>
-  )
-}
-
-function DSK(props: ProgramProps) {
-  var dskCount = props.currentState.downstreamKeyers.length
-  var tie = []
-  var rate = []
-  var onAir = []
-  var auto = []
-  for (var i = 0; i < dskCount; i++) {
-    const x = i
-    tie.push(
-      <AtemButtonYellow
-        name={'Tie'}
-        callback={() =>
-          props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyTieSetCommand', {
-            Index: x,
-            Tie: !props.currentState.downstreamKeyers[x].properties.tie
-          })
-        }
-        active={props.currentState.downstreamKeyers[x].properties.tie}
-      />
-    )
-    rate.push(
-      <div className="rate">
-        {' '}
-        Rate
-        <RateInput
-          className={'rate-input'}
-          callback={(e: string) => {
-            props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', { Index: x, Rate: e })
-          }}
-          value={props.currentState.downstreamKeyers[x].state.remainingFrames}
-          videoMode={props.currentState.settings.videoMode}
-        ></RateInput>
-      </div>
-    )
-    onAir.push(
-      <AtemButtonGeneric
-        color="red"
-        textClassName={'atem-button-text on-air'}
-        name={'ON AIR'}
-        callback={() =>
-          props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyOnAirSetCommand', {
-            Index: x,
-            OnAir: !props.currentState.downstreamKeyers[x].state.onAir
-          })
-        }
-        active={props.currentState.downstreamKeyers[x].state.onAir}
-      />
-    )
-    auto.push(
-      <AtemButtonGeneric
-        color="red"
-        name={'AUTO'}
-        callback={() =>
-          props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command', {
-            Index: x,
-            IsTowardsOnAir: !props.currentState.downstreamKeyers[x].state.isTowardsOnAir
-          })
-        }
-        active={props.currentState.downstreamKeyers[x].state.isAuto}
-      />
-    )
-  }
-
-  const headings: React.ReactElement[] = []
-  for (let i = 1; i <= dskCount; i++ ) {
-    headings.push(<div key={i} className="box-title">DSK{i}</div>)
-  }
-
-  return (
-    <div className="box" id="DSK">
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${headings.length}, 1fr)` }}>
-        {headings}
-      </div>
-
-      <div className="box-dsk" style={{ gridTemplateColumns: `repeat(${dskCount}, 50px)` }}>
-        {tie}
-        {rate}
-        {onAir}
-        {auto}
       </div>
     </div>
   )

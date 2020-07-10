@@ -18,7 +18,7 @@ interface AtemButtonGenericProps {
   disabled?: boolean // TODO - use
   name: string
   textClassName?: string
-  color: 'red' | 'green'
+  color: 'red' | 'green' | 'yellow'
 }
 
 function assertNever(_: never): void {}
@@ -42,6 +42,9 @@ export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
           break
         case 'green':
           buttonImage = buttonGreen
+          break
+        case 'yellow':
+          buttonImage = buttonYellow
           break
         default:
           assertNever(this.props.color)
