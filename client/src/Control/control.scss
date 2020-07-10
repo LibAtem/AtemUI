@@ -408,6 +408,25 @@ html {
     &:active {
       box-shadow: 0px 0px 20px 5px rgba(255, 208, 0, 0.232);
     }
+
+
+  &.btn-yellow-flash {
+    animation: btn-yellow-flash cubic-bezier(1, 0, 0, 1) 0.7s infinite;
+    background-image: url('/images/button_new_low.png');
+    background-blend-mode: lighten;
+    background-size: 50px 50px;
+    transition: background-image 0.4s ease-in-out;
+
+    @keyframes btn-yellow-flash {
+      0% {
+        background-image: url('/images/button_new_low.png');
+      }
+      50% {
+        box-shadow: 0px 0px 20px 5px rgba(255, 208, 0, 0.432);
+        background-image: url('/images/button_yellow.png');
+      }
+    }
+  }
   }
 
   .atem-button-text {
