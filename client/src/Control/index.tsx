@@ -12,8 +12,6 @@ import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper } from '../device-page-wrapper'
 import * as LibAtem from '../libatem'
-import * as objectPath from 'object-path'
-import camelcase from 'camelcase'
 
 export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
@@ -22,8 +20,7 @@ export class ControlPage extends DevicePageWrapper {
     return (
       <ControlPageInnerInner
         device={device}
-        // currentState={this.context.currentState}
-        // currentState={this.state.currentState}
+        currentState={this.context.currentState}
         signalR={signalR}
       />
     )
@@ -33,12 +30,11 @@ export class ControlPage extends DevicePageWrapper {
 interface ControlPageInnerInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  // currentState: LibAtem.AtemState | null
+  currentState: LibAtem.AtemState | null
 }
 interface ControlPageInnerInnerState {
   open: boolean
   openMobile: boolean
-  currentState: LibAtem.AtemState | null
 }
 
 //Handles Mobile Layout
@@ -48,72 +44,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
     this.state = {
       open: true,
       openMobile: false,
-      currentState: null
     }
-  }
-
-  componentDidMount() {
-    this.props.signalR
-    .invoke<any>('subscribeState', GetDeviceId(this.props.device))
-    .then(state => {
-      this.setState({ currentState: state })
-    })
-    .catch(err => {
-      console.error('StateViewer: Failed to load state:', err)
-    })
-
-    this.props.signalR.on('state', (state: any) => {
-      if (state.deviceId === GetDeviceId(this.props.device)) {
-        state = state.state
-        state.audio = state.audio
-          ? { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } }
-          : undefined //remove levels which cause constant updates
-        if (JSON.stringify(this.state.currentState) !== JSON.stringify(state)) {
-          this.setState({ currentState: state })
-        }
-      }
-    })
-
-    this.props.signalR.on('stateDiff', (state: any) => {
-      if (state.deviceId === GetDeviceId(this.props.device) && this.state.currentState) {
-
-        const updatePath = (input: any, path: string[], newObj: any): any => {
-          if (input === undefined) {
-            return undefined // TODO is this ok?
-          }
-
-          const i = path.shift()
-          if (i === undefined) {
-            return newObj
-          } else {
-            const child = updatePath(input[i], path, newObj)
-            if (Array.isArray(input)) {
-              const res = [...input]
-              res[Number(i)] = child
-              return res
-            } else {
-              return {
-                ...input,
-                [i]: child,
-              }
-            }
-          }
-        }
-
-        let newState = this.state.currentState
-        for (const path of state.paths as string[]) {
-          const path2 = path.split('.').map(p => camelcase(p))
-          const newObj = objectPath.get(state.state, path2.join('.'))
-
-          newState = updatePath(newState, path2, newObj)
-        }
-        this.setState({ currentState: newState })
-      }
-    })
-  }
-
-  componentWillUnmount() {
-    this.props.signalR.off('state')
   }
 
   render() {
@@ -126,7 +57,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <ControlPageInner
                   open={this.state.open}
                   device={this.props.device}
-                  currentState={this.state.currentState}
+                  currentState={this.props.currentState}
                   signalR={this.props.signalR}
                 />
 
@@ -152,7 +83,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <SwitcherSettings
                   full={false}
                   device={this.props.device}
-                  currentState={this.state.currentState}
+                  currentState={this.props.currentState}
                   signalR={this.props.signalR}
                 />
               </div>
@@ -161,7 +92,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <ControlPageInner
                   open={this.state.open}
                   device={this.props.device}
-                  currentState={this.state.currentState}
+                  currentState={this.props.currentState}
                   signalR={this.props.signalR}
                 />
 
@@ -203,7 +134,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               <SwitcherSettings
                 full={true}
                 device={this.props.device}
-                currentState={this.state.currentState}
+                currentState={this.props.currentState}
                 signalR={this.props.signalR}
               />
             </div>
@@ -224,7 +155,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
               <ControlPageInner
                 device={this.props.device}
-                currentState={this.state.currentState}
+                currentState={this.props.currentState}
                 open={this.state.open}
                 signalR={this.props.signalR}
               />

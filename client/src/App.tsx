@@ -18,7 +18,9 @@ import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
 import { AudioPage } from './Audio'
-import * as LibAtem  from './libatem'
+import * as LibAtem from './libatem'
+import * as objectPath from 'object-path'
+import camelcase from 'camelcase'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
@@ -96,10 +98,48 @@ export default class App extends React.Component<{}, AppState> {
         this.setState({ devices: devices })
       })
 
-      // connection.on("state", (state: any) => {
-      //   // console.log(state)
-      //   // this.setState({ currentState: state })
-      // })
+      connection.on('state', (state: any) => {
+        if (state.deviceId === this.state.activeDeviceId) {
+          // console.log(state)
+          this.setState({ currentState: state.state })
+        }
+      })
+
+      connection.on('stateDiff', (state: any) => {
+        if (state.deviceId === this.state.activeDeviceId && this.state.currentState) {
+          const updatePath = (input: any, path: string[], newObj: any): any => {
+            if (input === undefined) {
+              return undefined // TODO is this ok?
+            }
+
+            const i = path.shift()
+            if (i === undefined) {
+              return newObj
+            } else {
+              const child = updatePath(input[i], path, newObj)
+              if (Array.isArray(input)) {
+                const res = [...input]
+                res[Number(i)] = child
+                return res
+              } else {
+                return {
+                  ...input,
+                  [i]: child
+                }
+              }
+            }
+          }
+
+          let newState = this.state.currentState
+          for (const path of state.paths as string[]) {
+            const path2 = path.split('.').map(p => camelcase(p))
+            const newObj = objectPath.get(state.state, path2.join('.'))
+
+            newState = updatePath(newState, path2, newObj)
+          }
+          this.setState({ currentState: newState })
+        }
+      })
 
       connection.onreconnecting(err => {
         if (err) {
@@ -138,6 +178,7 @@ export default class App extends React.Component<{}, AppState> {
             // hasConnected: true
           })
           this.updateProfile()
+          this.setDeivce(this.state.activeDeviceId || undefined)
         })
         .catch(err => console.error('Connection failed', err))
     }
@@ -145,8 +186,19 @@ export default class App extends React.Component<{}, AppState> {
 
   setDeivce(id: string | undefined) {
     console.log('Change active device: ', id)
+    const oldDeviceId = this.state.activeDeviceId
+    if (oldDeviceId !== id && oldDeviceId) {
+      this.state.signalR
+        .invoke<any>('UnsubscribeState', oldDeviceId)
+        .then(state => {})
+        .catch(err => {
+          console.error('StateViewer: Failed to subscribe state:', err)
+        })
+    }
+
     this.setState({
-      activeDeviceId: id || null
+      activeDeviceId: id || null,
+      currentState: null
     })
     if (id) {
       console.log('here', id)
@@ -160,6 +212,15 @@ export default class App extends React.Component<{}, AppState> {
           .catch(err => {
             console.error('ProfileUpdate: Failed to load profile:', err)
             this.setState({ currentProfile: null })
+          })
+
+        this.state.signalR
+          .invoke<any>('SubscribeState', id)
+          .then(state => {
+            this.setState({ currentState: state })
+          })
+          .catch(err => {
+            console.error('StateViewer: Failed to subscribe state:', err)
           })
       }
 
