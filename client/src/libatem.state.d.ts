@@ -44,13 +44,13 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
   export interface MixEffectState_TransitionState {
-    properties: TransitionPropertiesState
-    position: TransitionPositionState
-    mix: TransitionMixState
-    dip: TransitionDipState
-    wipe: TransitionWipeState
-    stinger: TransitionStingerState
-    dve: TransitionDVEState
+    properties: MixEffectState_TransitionPropertiesState
+    position: MixEffectState_TransitionPositionState
+    mix: MixEffectState_TransitionMixState
+    dip: MixEffectState_TransitionDipState
+    wipe: MixEffectState_TransitionWipeState
+    stinger: MixEffectState_TransitionStingerState
+    dve: MixEffectState_TransitionDVEState
   }
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
@@ -126,15 +126,15 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
   export interface MixEffectState_KeyerState {
-    luma: KeyerLumaState
-    chroma: KeyerChromaState
-    advancedChroma: KeyerAdvancedChromaState
-    pattern: KeyerPatternState
-    dve: KeyerDVEState
-    flyFrames: KeyerFlyFrameState[]
+    luma: MixEffectState_KeyerLumaState
+    chroma: MixEffectState_KeyerChromaState
+    advancedChroma: MixEffectState_KeyerAdvancedChromaState
+    pattern: MixEffectState_KeyerPatternState
+    dve: MixEffectState_KeyerDVEState
+    flyFrames: MixEffectState_KeyerFlyFrameState[]
     onAir: boolean
-    properties: KeyerPropertiesState
-    flyProperties: KeyerFlyProperties
+    properties: MixEffectState_KeyerPropertiesState
+    flyProperties: MixEffectState_KeyerFlyProperties
   }
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
@@ -169,8 +169,8 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
   export interface MixEffectState_KeyerAdvancedChromaState {
-    sample: KeyerAdvancedChromaSampleState
-    properties: KeyerAdvancedChromaPropertiesState
+    sample: MixEffectState_KeyerAdvancedChromaSampleState
+    properties: MixEffectState_KeyerAdvancedChromaPropertiesState
   }
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
@@ -277,8 +277,8 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
   export interface MixEffectState_FadeToBlackState {
-    status: FadeToBlackStatusState
-    properties: FadeToBlackPropertiesState
+    status: MixEffectState_FadeToBlackStatusState
+    properties: MixEffectState_FadeToBlackPropertiesState
   }
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
@@ -295,7 +295,7 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MixEffectState.cs
   export interface MixEffectState {
-    keyers: KeyerState[]
+    keyers: MixEffectState_KeyerState[]
     transition: MixEffectState_TransitionState
     sources: MixEffectState_SourcesState
     fadeToBlack: MixEffectState_FadeToBlackState
@@ -350,7 +350,7 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/SuperSourceState.cs
   export interface SuperSourceState {
-    boxes: BoxState[]
+    boxes: SuperSourceState_BoxState[]
     properties: SuperSourceState_PropertiesState
     border: SuperSourceState_BorderState
   }
@@ -401,7 +401,7 @@ declare module LibAtem {
     gain: number
     balance: number
     followFadeToBlack: boolean
-    levels: LevelsState
+    levels: AudioState_LevelsState
   }
 
   // ../LibAtem/LibAtem.State/AudioState.cs
@@ -424,7 +424,7 @@ declare module LibAtem {
   }
 
   // ../LibAtem/LibAtem.State/AudioState.cs
-  export interface AudioState_InputState_PropertiesState {
+  export interface InputState_PropertiesState {
     sourceType: AudioSourceType
     portType: AudioPortType
     mixOption: AudioMixOption
@@ -433,24 +433,24 @@ declare module LibAtem {
   }
 
   // ../LibAtem/LibAtem.State/AudioState.cs
-  export interface AudioState_InputState_AnalogState {
+  export interface InputState_AnalogState {
     rcaToXlr: boolean
   }
 
   // ../LibAtem/LibAtem.State/AudioState.cs
   export interface AudioState_InputState {
     isMixedIn: boolean
-    properties: PropertiesState
-    levels: LevelsState
-    analog: AnalogState
+    properties: InputState_PropertiesState
+    levels: AudioState_LevelsState
+    analog: InputState_AnalogState
   }
 
   // ../LibAtem/LibAtem.State/AudioState.cs
   export interface AudioState {
     programOut: AudioState_ProgramOutState
     inputs: Record<number, InputState>
-    monitorOutputs: MonitorOutputState[]
-    headphoneOutputs: HeadphoneOutputState[]
+    monitorOutputs: AudioState_MonitorOutputState[]
+    headphoneOutputs: AudioState_HeadphoneOutputState[]
     tally: Record<AudioSource, boolean>
   }
 
@@ -472,7 +472,7 @@ declare module LibAtem {
   // ../LibAtem/LibAtem.State/SettingsState.cs
   export interface SettingsState_TalkbackState {
     muteSdi: boolean
-    inputs: TalkbackInputState[]
+    inputs: SettingsState_TalkbackInputState[]
   }
 
   // ../LibAtem/LibAtem.State/SettingsState.cs
@@ -482,9 +482,9 @@ declare module LibAtem {
   export interface SettingsState {
     multiViewers: MultiViewerState[]
     inputs: Record<VideoSource, InputState>
-    hyperdecks: HyperdeckState[]
+    hyperdecks: SettingsState_HyperdeckState[]
     talkback: Record<TalkbackChannel, TalkbackState>
-    mixMinusOutputs: MixMinusOutputState[]
+    mixMinusOutputs: SettingsState_MixMinusOutputState[]
     videoMode: VideoMode
     downConvertMode: DownConvertMode
     downConvertVideoMode: VideoMode
@@ -536,7 +536,7 @@ declare module LibAtem {
     supportsToggleSafeArea: boolean
     vuMeterOpacity: number
     properties: MultiViewerState_PropertiesState
-    windows: WindowState[]
+    windows: MultiViewerState_WindowState[]
   }
 
   // ../LibAtem/LibAtem.State/MacroState.cs
@@ -562,7 +562,7 @@ declare module LibAtem {
 
   // ../LibAtem/LibAtem.State/MacroState.cs
   export interface MacroState {
-    pool: ItemState[]
+    pool: MacroState_ItemState[]
     recordStatus: MacroState_RecordStatusState
     runStatus: MacroState_RunStatusState
   }
@@ -579,9 +579,9 @@ declare module LibAtem {
     gain: number
     followFadeToBlack: boolean
     audioFollowVideoCrossfadeTransitionEnabled: boolean
-    dynamics: DynamicsState
-    equalizer: EqualizerState
-    levels: LevelsState
+    dynamics: FairlightAudioState_DynamicsState
+    equalizer: FairlightAudioState_EqualizerState
+    levels: FairlightAudioState_LevelsState
   }
 
   // ../LibAtem/LibAtem.State/FairlightAudioState.cs
@@ -611,8 +611,8 @@ declare module LibAtem {
     supportedConfigurations: FairlightInputConfiguration
     externalPortType: ExternalPortType
     activeConfiguration: FairlightInputConfiguration
-    analog: AnalogState
-    sources: InputSourceState[]
+    analog: FairlightAudioState_AnalogState
+    sources: FairlightAudioState_InputSourceState[]
   }
 
   // ../LibAtem/LibAtem.State/FairlightAudioState.cs
@@ -634,17 +634,17 @@ declare module LibAtem {
     framesDelay: uint
     hasStereoSimulation: boolean
     stereoSimulation: number
-    dynamics: DynamicsState
-    equalizer: EqualizerState
-    levels: LevelsState
+    dynamics: FairlightAudioState_DynamicsState
+    equalizer: FairlightAudioState_EqualizerState
+    levels: FairlightAudioState_LevelsState
   }
 
   // ../LibAtem/LibAtem.State/FairlightAudioState.cs
   export interface FairlightAudioState_DynamicsState {
     makeUpGain: number
-    limiter: LimiterState
-    compressor: CompressorState
-    expander: ExpanderState
+    limiter: FairlightAudioState_LimiterState
+    compressor: FairlightAudioState_CompressorState
+    expander: FairlightAudioState_ExpanderState
   }
 
   // ../LibAtem/LibAtem.State/FairlightAudioState.cs
@@ -682,7 +682,7 @@ declare module LibAtem {
   export interface FairlightAudioState_EqualizerState {
     enabled: boolean
     gain: number
-    bands: EqualizerBandState[]
+    bands: FairlightAudioState_EqualizerBandState[]
   }
 
   // ../LibAtem/LibAtem.State/FairlightAudioState.cs
@@ -701,7 +701,7 @@ declare module LibAtem {
   export interface FairlightAudioState {
     programOut: FairlightAudioState_ProgramOutState
     inputs: Record<number, InputState>
-    monitors: MonitorOutputState[]
+    monitors: FairlightAudioState_MonitorOutputState[]
     tally: Dictionary<Tuple<AudioSource, long>, bool>
   }
 
@@ -723,13 +723,13 @@ declare module LibAtem {
     isUsed: boolean
     name: string
     maxFrames: uint
-    frames: FrameState[]
+    frames: MediaPoolState_FrameState[]
   }
 
   // ../LibAtem/LibAtem.State/MediaPoolState.cs
   export interface MediaPoolState {
-    stills: StillState[]
-    clips: ClipState[]
+    stills: MediaPoolState_StillState[]
+    clips: MediaPoolState_ClipState[]
   }
 
   // ../LibAtem/LibAtem.State/MediaPlayerState.cs
@@ -1819,5 +1819,61 @@ declare module LibAtem {
     Microphone = 1,
     ConsumerLine = 2,
     ProLine = 4
+  }
+
+  // ../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs
+  export interface DeviceProfile {
+    model: ModelId
+    product: string
+    mixEffectBlocks: uint
+    sources: DevicePort[]
+    audioSources: AudioSource[]
+    auxiliaries: uint
+    downstreamKeys: uint
+    upstreamKeys: uint
+    routableKeyMasks: boolean
+    hyperDecks: uint
+    stingers: uint
+    multiView: MultiView
+    dve: uint
+    superSource: uint
+    mediaPlayers: uint
+    mediaPoolClips: uint
+    mediaPoolStills: uint
+    macroCount: uint
+    serialPort: uint
+    audioMonitor: boolean
+    videoModes: VideoModeSet
+    mixMinusOutputs: uint
+  }
+
+  // ../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs
+  export interface VideoModeSet {
+    supportedModes: VideoMode[]
+    maxFrames: MaxFramesSet
+  }
+
+  // ../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs
+  export interface MaxFramesSet {
+    sd: uint
+    720: uint
+    1080: uint
+    '4K': uint
+  }
+
+  // ../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs
+  export interface DevicePort {
+    id: VideoSource
+    port: ExternalPortType[]
+  }
+
+  // ../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs
+  export interface MultiView {
+    count: uint
+    vuMeters: boolean
+    canSwapPreviewProgram: boolean
+    supports1080P: boolean
+    canRouteInputs: boolean
+    canToggleSafeArea: boolean
   }
 }

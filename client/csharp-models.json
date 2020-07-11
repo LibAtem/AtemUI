@@ -1,7 +1,8 @@
 {
     "include": [
         "../LibAtem/LibAtem.State/**/*.cs",
-        "../LibAtem/LibAtem/Common/**/*.cs"
+        "../LibAtem/LibAtem/Common/**/*.cs",
+        "../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs"
     ],
     "exclude": [
         "../LibAtem/LibAtem.State/Builder/**/*.cs"
