@@ -1,5 +1,5 @@
 import React from 'react'
-import { DeviceManagerContext, GetActiveDevice } from './DeviceManager'
+import { DeviceManagerContext, GetActiveDevice, GetDeviceId } from './DeviceManager'
 import { AtemDeviceInfo } from './Devices/types'
 import { Row, Col, Container } from 'react-bootstrap'
 
@@ -46,4 +46,30 @@ function NotConnected(props: {}) {
       </Row>
     </Container>
   )
+}
+
+export interface PropsBase {
+  device: AtemDeviceInfo
+  signalR: signalR.HubConnection
+}
+
+export type SendCommandArgs = { [key: string]: string | number | boolean }
+export type SendCommand = (commandName: string, args: SendCommandArgs) => void
+
+export function sendCommand(props: PropsBase, command: string, value: SendCommandArgs) {
+  const { device, signalR } = props
+  if (device.connected) {
+    const devId = GetDeviceId(device)
+
+    signalR
+      .invoke<void>('CommandSend', devId, command, JSON.stringify(value))
+      .then(() => {
+        console.log(value)
+        console.log('Control: sent')
+        console.log(command)
+      })
+      .catch(e => {
+        console.log('Control: Failed to send', e)
+      })
+  }
 }

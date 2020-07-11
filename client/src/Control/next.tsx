@@ -1,6 +1,6 @@
 import React from 'react'
 import { AtemButtonGeneric } from './button/button'
-import { SendCommand } from '.'
+import { SendCommand } from '../device-page-wrapper'
 import * as LibAtem  from '../libatem'
 
 interface NextProps {

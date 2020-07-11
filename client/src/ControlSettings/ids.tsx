@@ -11,7 +11,7 @@ export const videoIds: { [key: string]: number } = {
   input9: 9,
   input10: 10,
   input11: 11,
-  input12: 13,
+  input12: 12,
   input13: 13,
   input14: 14,
   input15: 15,

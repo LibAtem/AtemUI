@@ -1,7 +1,6 @@
 import React from 'react'
 import './control.scss'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetDeviceId } from '../DeviceManager'
 import { SwitcherSettings } from './Settings/settings'
 import { videoIds } from '../ControlSettings/ids'
 import MediaQuery from 'react-responsive'
@@ -10,10 +9,8 @@ import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
-import { DevicePageWrapper } from '../device-page-wrapper'
+import { DevicePageWrapper, sendCommand } from '../device-page-wrapper'
 import * as LibAtem from '../libatem'
-
-export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -39,7 +36,7 @@ interface ControlPageInnerInnerState {
 
 //Handles Mobile Layout
 class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, ControlPageInnerInnerState> {
-  constructor(props: ControlPageInnerProps) {
+  constructor(props: MixEffectPanelProps) {
     super(props)
     this.state = {
       open: true,
@@ -54,7 +51,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
           matches ? (
             this.state.open ? (
               <div className="control-page" style={{ gridTemplateColumns: '1fr 20px 310px' }}>
-                <ControlPageInner
+                <MixEffectPanel
                   open={this.state.open}
                   device={this.props.device}
                   currentState={this.props.currentState}
@@ -89,7 +86,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               </div>
             ) : (
               <div className="control-page" style={{ gridTemplateColumns: '1fr 20px' }}>
-                <ControlPageInner
+                <MixEffectPanel
                   open={this.state.open}
                   device={this.props.device}
                   currentState={this.props.currentState}
@@ -153,7 +150,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 </div>
               </div>
 
-              <ControlPageInner
+              <MixEffectPanel
                 device={this.props.device}
                 currentState={this.props.currentState}
                 open={this.state.open}
@@ -167,13 +164,13 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   }
 }
 
-interface ControlPageInnerProps {
+interface MixEffectPanelProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
   currentState: LibAtem.AtemState | null
   open: boolean
 }
-interface ControlPageInnerState {
+interface MixEffectPanelState {
   hasConnected: boolean
 }
 
@@ -181,36 +178,15 @@ function compact<T>(raw: Array<T | undefined>): T[] {
   return raw.filter(v => v !== undefined) as T[]
 }
 
-class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPageInnerState> {
-  constructor(props: ControlPageInnerProps) {
+class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanelState> {
+  constructor(props: MixEffectPanelProps) {
     super(props)
     this.state = {
       hasConnected: props.device.connected
     }
-    // if (props.device.connected) {
-    //   this.loadDeviceState(props)
-    // }
   }
 
-  public sendCommand(command: string, value: { [key: string]: string | number | boolean }) {
-    const { device, signalR } = this.props
-    if (device.connected) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('Control: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('Control: Failed to send', e)
-        })
-    }
-  }
-
-  componentDidUpdate(prevProps: ControlPageInnerProps) {
+  componentDidUpdate(prevProps: MixEffectPanelProps) {
     // Should we reload the commandsSpec
     if (
       !this.state.hasConnected &&
@@ -261,14 +237,14 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
           isProgram={true}
           currentSource={currentME.sources.program}
           sources={sources}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
         <TransitionStylePanel
           meIndex={meIndex}
           properties={currentME.transition.properties}
           position={currentME.transition.position}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
         <BankPanel
           meIndex={meIndex}
@@ -276,24 +252,24 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
           isProgram={false}
           currentSource={currentME.sources.preview}
           sources={sources}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
         <NextPanel
           meIndex={meIndex}
           transition={currentME.transition.properties}
           keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
         <DSKPanel
           downstreamKeyers={currentState.downstreamKeyers}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
         <FTBPanel
           meIndex={meIndex}
           videoMode={currentState.settings.videoMode}
           status={currentME.fadeToBlack.status}
-          sendCommand={(command, values) => this.sendCommand(command, values)}
+          sendCommand={(command, values) => sendCommand(this.props, command, values)}
         />
       </div>
     )

@@ -1,7 +1,7 @@
 import { AtemButtonGeneric } from './button/button'
 import { RateInput } from './Settings/settings'
 import React from 'react'
-import { SendCommand } from '.'
+import { SendCommand } from '../device-page-wrapper'
 import * as LibAtem  from '../libatem'
 
 interface DSKProps {

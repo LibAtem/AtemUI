@@ -1,7 +1,7 @@
 import { AtemButtonGeneric } from './button/button'
 import React from 'react'
-import { SendCommand } from '.'
 import { useMediaQuery } from 'react-responsive'
+import { SendCommand } from '../device-page-wrapper'
 
 export interface InputProps {
   index: number
