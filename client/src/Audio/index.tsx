@@ -33,12 +33,11 @@ export class AudioPage extends React.Component {
 interface AudioPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: unknown
+  currentState: any // LibAtem.AtemState | null
 }
 interface AudioPageInnerState {
   hasConnected: boolean
-  currentState: any
-  state: any
+  // state: any
   value: number
   ids: any
   idsSet: boolean
@@ -52,10 +51,8 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     super(props)
     this.state = {
       hasConnected: props.device.connected,
-      state: this.props.currentState,
       value: 0,
       ids: {},
-      currentState: null,
       idsSet: false,
       audioId: {
         1: { videoID: 'input1', audioID: 'input1' },
@@ -93,36 +90,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
     }
 
     if (props.device.connected) {
-      this.loadDeviceState(props)
       this.sendCommand('LibAtem.Commands.Audio.AudioMixerSendLevelsCommand', { SendLevels: true })
-    }
-  }
-
-  componentDidMount() {
-    if (this.props.signalR) {
-      this.props.signalR.on('state', (state: any) => {
-        this.setState({ currentState: state })
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.signalR) {
-      this.props.signalR.off('state')
-    }
-  }
-
-  loadDeviceState(props: AudioPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-          this.setState({
-            state: null
-          })
-        })
     }
   }
 
@@ -146,13 +114,13 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   render() {
     if (
-      this.state.currentState == null ||
-      this.state.currentState.audio.inputs == undefined
+      this.props.currentState == null ||
+      this.props.currentState.audio.inputs == undefined
     ) {
       return <p>Waiting for Profile</p>
     }
 
-    var audioInputs = Object.keys(this.state.currentState.audio.inputs)
+    var audioInputs = Object.keys(this.props.currentState.audio.inputs)
     var mainInputs = audioInputs.filter(x => parseInt(x) <= 20 || parseInt(x) >= 2000)
     var externInputs = audioInputs.filter(x => parseInt(x) > 20 && parseInt(x) < 2000)
 
@@ -165,11 +133,11 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         <InputAudioChannel
           device={this.props.device}
           signalR={this.props.signalR}
-          currentInput={this.state.currentState.audio.inputs[id]}
+          currentInput={this.props.currentState.audio.inputs[id]}
           id={id}
           audioId={this.state.audioId[id]}
-          audioTally={this.state.currentState.audio.tally[this.state.audioId[id].audioID]}
-          monitors={this.state.currentState.audio.monitorOutputs[0]}
+          audioTally={this.props.currentState.audio.tally[this.state.audioId[id].audioID]}
+          monitors={this.props.currentState.audio.monitorOutputs[0]}
           name={this.state.audioId[id].audioID}
         ></InputAudioChannel>
       )
@@ -181,12 +149,12 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         <InputAudioChannel
           device={this.props.device}
           signalR={this.props.signalR}
-          currentInput={this.state.currentState.audio.inputs[idMain]}
+          currentInput={this.props.currentState.audio.inputs[idMain]}
           id={idMain}
           audioId={this.state.audioId[idMain]}
-          audioTally={this.state.currentState.audio.tally[this.state.audioId[idMain].audioID]}
-          monitors={this.state.currentState.audio.monitorOutputs[0]}
-          name={this.state.currentState.settings.inputs[this.state.audioId[idMain].videoID].properties.shortName}
+          audioTally={this.props.currentState.audio.tally[this.state.audioId[idMain].audioID]}
+          monitors={this.props.currentState.audio.monitorOutputs[0]}
+          name={this.props.currentState.settings.inputs[this.state.audioId[idMain].videoID].properties.shortName}
         ></InputAudioChannel>
       )
     }
@@ -209,12 +177,12 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
           id={'Master'}
           audioId={'Master'}
           audioTally={
-            this.state.currentState.audio.programOut.followFadeToBlack &&
-            (this.state.currentState.mixEffects[0].fadeToBlack.status.inTransition ||
-              this.state.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)
+            this.props.currentState.audio.programOut.followFadeToBlack &&
+            (this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition ||
+              this.props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)
           }
-          followFadeToBlack={this.state.currentState.audio.programOut.followFadeToBlack}
-          currentInput={this.state.currentState.audio.programOut}
+          followFadeToBlack={this.props.currentState.audio.programOut.followFadeToBlack}
+          currentInput={this.props.currentState.audio.programOut}
         ></OutputAudioChannel>
       </div>
     )

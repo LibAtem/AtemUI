@@ -1,10 +1,11 @@
 import React from 'react'
 import { Container } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetActiveDevice, DeviceManagerContext } from '../DeviceManager'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { isObject } from 'util'
+import * as LibAtem from '../libatem'
 
 export class StateViewerPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -34,11 +35,10 @@ export class StateViewerPage extends React.Component {
 interface StateViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: unknown
+  currentState: LibAtem.AtemState | null
 }
 interface StateViewerPageInnerState {
   hasConnected: boolean
-  currentState: object | null
 }
 
 class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, StateViewerPageInnerState> {
@@ -47,37 +47,6 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
 
     this.state = {
       hasConnected: props.device.connected,
-      currentState: null
-    }
-
-    if (props.device.connected) {
-      this.loadDeviceState(props)
-    }
-  }
-
-  componentDidMount() {
-    if (this.props.signalR) {
-      this.props.signalR.on('state', (state: any) => {
-        console.log(state)
-        this.setState({ currentState: state })
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.signalR) {
-      this.props.signalR.off('state')
-    }
-  }
-
-  loadDeviceState(props: StateViewerPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-        })
     }
   }
 
@@ -89,17 +58,15 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        currentState: null,
+        // currentState: null,
         hasConnected: true
       })
-      // now reload
-      this.loadDeviceState(this.props)
     }
   }
 
   render() {
-    const { device, signalR } = this.props
-    const { hasConnected, currentState } = this.state
+    const { currentState } = this.props
+    const { hasConnected } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>

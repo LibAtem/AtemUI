@@ -4,6 +4,7 @@ import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import remove from './assets/remove.svg'
 import './media.css'
+import * as LibAtem from '../libatem'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -34,48 +35,18 @@ export class UploadMediaPage extends React.Component {
 interface MediaPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: unknown
+  currentState: LibAtem.AtemState | null
 }
 interface MediaPageInnerState {
   hasConnected: boolean
   images: any
-  currentState: any
 }
 class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInnerState> {
   constructor(props: MediaPageInnerProps) {
     super(props)
     this.state = {
       hasConnected: this.props.device.connected,
-      images: {} as any,
-      currentState: null
-    }
-    if (props.device.connected) {
-      this.loadDeviceState(props)
-    }
-  }
-
-  loadDeviceState(props: MediaPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-        })
-    }
-  }
-
-  componentDidMount() {
-    if (this.props.signalR) {
-      this.props.signalR.on('state', (state: any) => {
-        this.setState({ currentState: state })
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.signalR) {
-      this.props.signalR.off('state')
+      images: {} as any
     }
   }
 
@@ -186,12 +157,13 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   }
 
   getImages() {
-    var imageArray = []
-    for (var i in this.state.currentState.mediaPool.stills) {
-      if (this.state.currentState.mediaPool.stills[i].isUsed) {
-        if (!this.state.images[this.state.currentState.mediaPool.stills[i].hash]) {
-          console.log('image not found:' + this.state.currentState.mediaPool.stills[i].hash)
-          this.getImage(this.state.currentState.mediaPool.stills[i].hash)
+    if (this.props.currentState) {
+      for (var i in this.props.currentState.mediaPool.stills) {
+        if (this.props.currentState.mediaPool.stills[i].isUsed) {
+          if (!this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]) {
+            console.log('image not found:' + this.props.currentState.mediaPool.stills[i].hash)
+            this.getImage(this.props.currentState.mediaPool.stills[i].hash as any)
+          }
         }
       }
     }
@@ -282,58 +254,58 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   //uploadImage(imgsrc, name, 'image/jpeg')
   /* <button onClick={()=>this.uploadImage("/img1.png", "image", 'image/jpeg')}>UP</button> */
   render() {
-    if (!this.state.currentState) {
+    if (!this.props.currentState) {
       return <p>Waiting for state</p>
     }
-    var imagearray = this.getImages()
     var imgs = []
-    for (var i in this.state.currentState.mediaPool.stills) {
+    for (var i0 in this.props.currentState.mediaPool.stills) {
+      const i = Number(i0)
       const mp = []
       if (
-        this.state.currentState.mediaPlayers[0].source.sourceType == 1 &&
-        this.state.currentState.mediaPlayers[0].source.sourceIndex == i &&
-        this.state.currentState.mediaPlayers[1].source.sourceType == 1 &&
-        this.state.currentState.mediaPlayers[1].source.sourceIndex == i
+        this.props.currentState.mediaPlayers[0].source.sourceType == 1 &&
+        this.props.currentState.mediaPlayers[0].source.sourceIndex == i &&
+        this.props.currentState.mediaPlayers[1].source.sourceType == 1 &&
+        this.props.currentState.mediaPlayers[1].source.sourceIndex == i
       ) {
-        if (this.state.currentState.mixEffects[0].sources.program == 3010) {
+        if (this.props.currentState.mixEffects[0].sources.program == 3010) {
           mp.push(<div className="mp1 mp-program">1</div>)
-        } else if (this.state.currentState.mixEffects[0].sources.preview == 3010) {
+        } else if (this.props.currentState.mixEffects[0].sources.preview == 3010) {
           mp.push(<div className="mp1 mp-preview">1</div>)
         } else {
           mp.push(<div className="mp1">1</div>)
         }
-        if (this.state.currentState.mixEffects[0].sources.program == 3020) {
+        if (this.props.currentState.mixEffects[0].sources.program == 3020) {
           mp.push(<div className="mp2 mp-program">2</div>)
-        } else if (this.state.currentState.mixEffects[0].sources.preview == 3020) {
+        } else if (this.props.currentState.mixEffects[0].sources.preview == 3020) {
           mp.push(<div className="mp2 mp-preview">2</div>)
         } else {
           mp.push(<div className="mp2">2</div>)
         }
       } else if (
-        this.state.currentState.mediaPlayers[0].source.sourceType == 1 &&
-        this.state.currentState.mediaPlayers[0].source.sourceIndex == i
+        this.props.currentState.mediaPlayers[0].source.sourceType == 1 &&
+        this.props.currentState.mediaPlayers[0].source.sourceIndex == i
       ) {
-        if (this.state.currentState.mixEffects[0].sources.program == 3010) {
+        if (this.props.currentState.mixEffects[0].sources.program == 3010) {
           mp.push(<div className="mp1 mp-program">1</div>)
-        } else if (this.state.currentState.mixEffects[0].sources.preview == 3010) {
+        } else if (this.props.currentState.mixEffects[0].sources.preview == 3010) {
           mp.push(<div className="mp1 mp-preview">1</div>)
         } else {
           mp.push(<div className="mp1">1</div>)
         }
       } else if (
-        this.state.currentState.mediaPlayers[1].source.sourceType == 1 &&
-        this.state.currentState.mediaPlayers[1].source.sourceIndex == i
+        this.props.currentState.mediaPlayers[1].source.sourceType == 1 &&
+        this.props.currentState.mediaPlayers[1].source.sourceIndex == i
       ) {
-        if (this.state.currentState.mixEffects[0].sources.program == 3020) {
+        if (this.props.currentState.mixEffects[0].sources.program == 3020) {
           mp.push(<div className="mp1 mp-program">2</div>)
-        } else if (this.state.currentState.mixEffects[0].sources.preview == 3020) {
+        } else if (this.props.currentState.mixEffects[0].sources.preview == 3020) {
           mp.push(<div className="mp1 mp-preview">2</div>)
         } else {
           mp.push(<div className="mp1">2</div>)
         }
       }
-      if (this.state.currentState.mediaPool.stills[i].isUsed) {
-        if (this.state.images[this.state.currentState.mediaPool.stills[i].hash]) {
+      if (this.props.currentState.mediaPool.stills[i].isUsed) {
+        if (this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]) {
           const x = i
 
           imgs.push(
@@ -348,14 +320,17 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
               <div className="inner">
                 <img
                   className="drag"
-                  onDragStart={event => this.drag(event, parseInt(x))}
+                  onDragStart={event => this.drag(event, Number(x))}
                   draggable={true}
-                  src={'data:image/jpg;base64,' + this.state.images[this.state.currentState.mediaPool.stills[i].hash]}
+                  src={
+                    'data:image/jpg;base64,' +
+                    this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]
+                  }
                   width="100%"
                 ></img>
               </div>
               <div className="nameTag">
-                {parseInt(i) + 1 + '  ' + this.state.currentState.mediaPool.stills[i].filename}
+                {Number(i) + 1 + '  ' + this.props.currentState.mediaPool.stills[i].filename}
               </div>
             </div>
           )
@@ -363,10 +338,10 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       } else {
         const x = i
         imgs.push(
-          <div className="image" onDragStart={event => this.drag(event, parseInt(x))} draggable={true}>
+          <div className="image" onDragStart={event => this.drag(event, Number(x))} draggable={true}>
             {mp}
             <div className="inner">
-              <div className="emptyInner">{parseInt(i) + 1}</div>
+              <div className="emptyInner">{Number(i) + 1}</div>
               <input
                 type="file"
                 id="fileElem"
@@ -381,20 +356,21 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     }
 
     var mediaPlayers = []
-    for (var i in this.state.currentState.mediaPlayers) {
+    for (var i in this.props.currentState.mediaPlayers) {
       const x = i
       if (
-        this.state.currentState.mediaPlayers[i].source.sourceType == 1 &&
-        this.state.currentState.mediaPool.stills[this.state.currentState.mediaPlayers[i].source.sourceIndex].isUsed &&
+        this.props.currentState.mediaPlayers[i].source.sourceType == 1 &&
+        this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].isUsed &&
         this.state.images[
-          this.state.currentState.mediaPool.stills[this.state.currentState.mediaPlayers[i].source.sourceIndex].hash
+          this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
+            .hash as any
         ]
       ) {
         mediaPlayers.push(
           <div className="current">
             <div className="heading">
               {
-                this.state.currentState.mediaPool.stills[this.state.currentState.mediaPlayers[i].source.sourceIndex]
+                this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
                   .filename
               }
             </div>
@@ -407,8 +383,8 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
                 src={
                   'data:image/jpg;base64,' +
                   this.state.images[
-                    this.state.currentState.mediaPool.stills[this.state.currentState.mediaPlayers[i].source.sourceIndex]
-                      .hash
+                    this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
+                      .hash as any
                   ]
                 }
                 width="100%"
@@ -426,7 +402,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
               onDragOver={event => this.allowDrop(event)}
             >
               <div className="emptyInner lower">
-                {parseInt(this.state.currentState.mediaPlayers[i].source.sourceIndex) + 1}
+                {Number(this.props.currentState.mediaPlayers[i].source.sourceIndex) + 1}
               </div>
             </div>
           </div>

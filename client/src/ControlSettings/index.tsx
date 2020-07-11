@@ -11,6 +11,7 @@ import multiview3 from './assets/multiview3.svg'
 import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
 import * as LibAtem  from '../libatem'
+import { sendCommand } from '../device-page-wrapper'
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -22,7 +23,7 @@ export class ControlSettingsPage extends React.Component {
 
     return (
       <Container>
-        {device ? (
+        {device && this.context.signalR ? (
           <ControlSettingsPageInner
             key={this.context.activeDeviceId || ''}
             device={device}
@@ -40,73 +41,24 @@ export class ControlSettingsPage extends React.Component {
 
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: unknown
+  signalR: signalR.HubConnection
+  currentState: LibAtem.AtemState | null
   currentProfile: LibAtem.DeviceProfile | null
 }
 interface ControlSettingsPageInnerState {
   hasConnected: boolean
-  state: any | null
   page: number
-  currentState: any | null
   // currentState: any
 }
 
 class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerProps, ControlSettingsPageInnerState> {
   state = {
     hasConnected: this.props.device.connected,
-    state: this.props.currentState,
     page: 0,
-    currentState: null
-  }
-
-  componentDidMount() {
-    if (this.props.signalR) {
-      this.props.signalR.on('state', (state: any) => {
-        state.audio = undefined //remove levels which cause constant updates
-        if (JSON.stringify(this.state.currentState) !== JSON.stringify(state)) {
-          this.setState({ currentState: state })
-        }
-      })
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.signalR) {
-      this.props.signalR.off('state')
-    }
-  }
-
-  loadDeviceState(props: ControlSettingsPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-          this.setState({
-            state: null
-          })
-        })
-    }
   }
 
   public sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
+    sendCommand(this.props, command, value)
   }
 
   public updateLabel(name: string, id: number) {
@@ -135,22 +87,18 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        state: null,
         hasConnected: true
       })
-      // now reload
-      this.loadDeviceState(this.props)
     }
   }
 
   render() {
-    const { device, signalR, currentProfile } = this.props
-    const { hasConnected, currentState } = this.state
+    const { device, currentState } = this.props
+    const { hasConnected  } = this.state
 
     if (!hasConnected) {
       return <p className="mt-5">Device is not connected</p>
     } else if (!currentState) {
-      this.loadDeviceState(this.props)
       return <p className="mt-5">Loading state...</p>
     }
     var content = <></>
