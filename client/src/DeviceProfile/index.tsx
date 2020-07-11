@@ -5,6 +5,7 @@ import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceMan
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { isObject } from 'util'
+import * as LibAtem  from '../libatem'
 
 export class DeviceProfileViewerPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>

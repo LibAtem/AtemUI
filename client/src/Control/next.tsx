@@ -1,6 +1,7 @@
 import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommand } from '.'
+import * as LibAtem  from '../libatem'
 
 interface NextProps {
   sendCommand: SendCommand

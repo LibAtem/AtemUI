@@ -11,6 +11,7 @@ import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper } from '../device-page-wrapper'
+import * as LibAtem  from '../libatem'
 
 export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
@@ -226,7 +227,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
   public sendCommand(command: string, value: { [key: string]: string | number | boolean }) {
     const { device, signalR } = this.props
-    if (device.connected && signalR) {
+    if (device.connected) {
       const devId = GetDeviceId(device)
 
       signalR

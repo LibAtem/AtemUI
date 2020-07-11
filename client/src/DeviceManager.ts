@@ -1,5 +1,6 @@
 import React from 'react'
 import { AtemDeviceInfo } from './Devices/types'
+import * as LibAtem  from './libatem'
 
 export interface DeviceContext {
   signalR: signalR.HubConnection | undefined

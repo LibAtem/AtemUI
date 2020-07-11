@@ -2,6 +2,7 @@ import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommand } from '.'
 import { RateInput } from './Settings/settings'
+import * as LibAtem  from '../libatem'
 
 interface FTBProps {
   sendCommand: SendCommand

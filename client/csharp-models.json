@@ -1,20 +1,24 @@
 {
     "include": [
+        "../LibAtem/LibAtem/Version.cs",
         "../LibAtem/LibAtem.State/**/*.cs",
         "../LibAtem/LibAtem/Common/**/*.cs",
         "../LibAtem/LibAtem.DeviceProfile/DeviceProfile.cs"
     ],
     "exclude": [
-        "../LibAtem/LibAtem.State/Builder/**/*.cs"
+        "../LibAtem/LibAtem.State/Builder/**/*.cs",
+        "../LibAtem/LibAtem.State/Tolerance/**/*.cs"
     ],
     "namespace": "LibAtem",
-    "output": "./src/libatem.state.d.ts",
+    "output": "./src/libatem.ts",
     "camelCase": true,
     "camelCaseEnums": false,
     "numericEnums": true,
     "stringLiteralTypesInsteadOfEnums": false,
     "customTypeTranslations": {
         "ProductName": "string",
-        "ProductNumber": "string"
+        "ProductNumber": "string",
+        "Attribute": "Object",
+        "System.Attribute": "Object"
     }
 }

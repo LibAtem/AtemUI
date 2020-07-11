@@ -3,6 +3,7 @@ import './Audio.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import Slider from 'react-rangeslider'
+import * as LibAtem  from '../libatem'
 
 export class AudioPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -283,7 +284,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   }
 
   getTally(mixOption: number, tally: boolean) {
-    if (mixOption === 0) {
+    if (mixOption === LibAtem.AudioMixOption.Off) {
       return <div className="tally"></div>
     } else if (mixOption === 1) {
       return <div className="tally tally-red"></div>

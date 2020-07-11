@@ -18,6 +18,7 @@ import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
 import { AudioPage } from './Audio'
+import * as LibAtem  from './libatem'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 

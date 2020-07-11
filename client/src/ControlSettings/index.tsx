@@ -10,6 +10,8 @@ import multiview2 from './assets/multiview2.svg'
 import multiview3 from './assets/multiview3.svg'
 import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
+import * as LibAtem  from '../libatem'
+
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
 
