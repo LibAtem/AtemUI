@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using AtemServer.Hubs;
 using LibAtem;
@@ -19,8 +18,7 @@ using LibAtem.Common;
 using LibAtem.Util.Media;
 using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Drawing.Imaging;
+using LibAtem.Util;
 
 namespace AtemServer
 {
@@ -38,26 +36,37 @@ namespace AtemServer
 
     public class AtemClientExt
     {
+        private readonly string _deviceId;
         private readonly DeviceProfileHandler _profile;
         private readonly List<MediaPoolImage> _images;
         private readonly AtemState _state;
         private readonly IHubContext<DevicesHub> context_;
+        private readonly HashSet<string> _subscriptions;
 
-
-        public AtemClientExt(AtemClient client, IHubContext<DevicesHub> _context)
+        public AtemClientExt(string deviceId, AtemClient client, IHubContext<DevicesHub> _context, HashSet<string> subscriptions)
         {
+            _deviceId = deviceId;
             _profile = new DeviceProfileHandler();
+            _subscriptions = subscriptions;
             _state = new AtemState();
             context_ = _context;
             _images = new List<MediaPoolImage>();
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
-            Client.OnConnection += sender => { Connected = true; };
-            Client.OnDisconnect += sender => { Connected = false; };
+            Client.OnConnection += sender =>
+            {
+                Connected = true;
+                SendState(GetState());
+            };
+            Client.OnDisconnect += sender =>
+            {
+                Connected = false;
+                SendState(null);
+            };
 
             Client.OnReceive += async (sender, commands) =>
             {
-                var changedPaths = new List<string>();
+                var changedPaths = new HashSet<string>();
                 var errors = new List<string>();
                 lock (_state)
                 {
@@ -77,11 +86,18 @@ namespace AtemServer
                                 errors.Add($"Failed to update state for {command.GetType().Name}");
                             }
                         }
-
-                        
-                        
                     }
                 }
+
+                AtemState newState = GetState();
+                /*
+                var diffs = new Dictionary<string, object>();
+                foreach (string path in changedPaths)
+                {
+                    diffs.Add(path, new object()); // TODO
+                }*/
+
+                SendStateDiff(GetState(), changedPaths);
 
                 for (var i = 0; i < _state.MediaPool.Stills.Count; i++)
                 {
@@ -128,14 +144,8 @@ namespace AtemServer
                         }
                     }
                 }
-
-
-                SendState(); //Send State to All clients // This wont work if clients are on different devices.
-
-
             };
         }
-
 
         public DeviceProfile GetProfile()
         {
@@ -145,27 +155,41 @@ namespace AtemServer
             }
         }
 
-
-        public void SendState()
+        private List<string> GetClientIds()
         {
-            context_.Clients.All.SendAsync("state", GetState());
-
+            lock (_subscriptions)
+            {
+                return new List<string>(_subscriptions);
+            }
         }
 
+        private void SendState(AtemState state)
+        {
+            context_.Clients.Clients(GetClientIds()).SendAsync("state", new AtemStateWrapped{
+                State = state,
+                DeviceId = _deviceId
+            });
+        }
+        
+        private void SendStateDiff(AtemState state, HashSet<string> paths/*Dictionary<string, object> diffs*/)
+        {
+            context_.Clients.Clients(GetClientIds()).SendAsync("stateDiff", new AtemStateDiff(){
+                State = state,
+                Paths = paths,
+                DeviceId = _deviceId
+            });
+        }
 
         public AtemState GetState()
         {
             lock (_state)
             {
-                
                 return _state.Clone();
             }
         }
 
         public MediaPoolImage GetImage(string Name)
         {
-
-            
                 byte[] bytes = Convert.FromBase64String(Name);
 
             var imageList = _images.Where(p => (p.Hash.SequenceEqual(bytes))).ToList();
@@ -175,9 +199,6 @@ namespace AtemServer
                 }
 
                 return null;
- 
-
-            
         }
 
         public AtemClient Client { get; }
@@ -199,6 +220,10 @@ namespace AtemServer
         [JsonIgnore]
         public AtemClientExt Client { get; set; }
 
+        [BsonIgnore]
+        [JsonIgnore]
+        public HashSet<string> Subscriptions { get; set; }
+        
         public bool Connected => Client?.Connected ?? false;
         public string Version => Client?.Version;
 
@@ -211,7 +236,21 @@ namespace AtemServer
             // For LiteDB
         }
     }
+    
+    public class AtemStateWrapped
+    {
+        public string DeviceId { get; set; }
+        public AtemState State { get; set; }
+    }
 
+    public class AtemStateDiff
+    {
+        public string DeviceId { get; set; }
+        //public Dictionary<string, object> Diffs { get; set; }
+        public AtemState State { get; set; }
+        public HashSet<string> Paths { get; set; }
+    }
+    
     public class AtemRepository
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AtemClient));
@@ -244,26 +283,83 @@ namespace AtemServer
             // Load up old devices
             foreach (AtemDevice device in dbDevices.FindAll())
             {
+                device.Subscriptions = new HashSet<string>();
                 SetupConnection(device);
                 devices[device.Info.Id()] = device;
             }
-
+            
             discovery = new AtemDiscoveryService();
             discovery.OnDeviceSeen += OnDeviceSeen;
             discovery.OnDeviceLost += OnDeviceLost;
+        }
+
+        public AtemState SubscribeClient(string connectionId, string deviceId)
+        {
+            AtemDevice device;
+            lock (devices)
+            {
+                device = devices[deviceId];
+            }
+
+            if (device == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            lock (device.Subscriptions)
+            {
+                device.Subscriptions.Add(connectionId);
+            }
+
+            // Send the initial state
+            return device.Client?.GetState();
+        }
+        
+        public void UnsubscribeClient(string connectionId, string deviceId)
+        {
+            AtemDevice device;
+            lock (devices)
+            {
+                device = devices[deviceId];
+            }
+
+            if (device == null)
+            {
+                throw new Exception("Bad deviceId");
+            }
+
+            lock (device.Subscriptions)
+            {
+                device.Subscriptions.Remove(connectionId);
+            }
+        }
+
+        public void DisconnectClient(string connectionId)
+        {
+            lock (devices)
+            {
+                foreach (var device in devices)
+                {
+                    lock (device.Value.Subscriptions)
+                    {
+                        device.Value.Subscriptions.Remove(connectionId);
+                    }
+                }
+            }
         }
 
         private void SetupConnection(AtemDevice device)
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClientExt(new AtemClient(device.Info.Address, false), context_);
+                device.Client = new AtemClientExt(device.Info.Id(), new AtemClient(device.Info.Address, false), context_, device.Subscriptions);
                 // TODO setup listeners for stuff
                 
                 device.Client.Client.Connect();
             } else if (!device.Enabled && device.Client != null) {
                 device.Client.Client.Dispose();
                 device.Client = null;
+                // TODO - send 'empty' state
             }
         }
 

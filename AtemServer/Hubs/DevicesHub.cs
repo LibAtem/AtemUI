@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading.Tasks;
 
 namespace AtemServer.Hubs
@@ -19,6 +18,13 @@ namespace AtemServer.Hubs
         public DevicesHub(AtemRepository repo)
         {
             repo_ = repo;
+        }
+        
+        public override async Task OnDisconnectedAsync(Exception exception)
+        {
+            //await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
+            repo_.DisconnectClient(Context.ConnectionId);
+            await base.OnDisconnectedAsync(exception);
         }
 
         public override async Task OnConnectedAsync()
@@ -157,25 +163,20 @@ namespace AtemServer.Hubs
             client.Client.DataTransfer.QueueJob(job);
         }*/
 
-
-
-
         public void uploadResult(bool result)
         {
             //... do something
             Console.WriteLine("Sucess? {0}", result);
         }
 
-        public Task<AtemState> StateGet(string deviceId)
+        public async Task<AtemState> SubscribeState(string deviceId)
         {
-            var client = repo_.GetConnection(deviceId);
-            if (client == null)
-            {
-                throw new Exception("Bad deviceId");
-            }
-
-
-            return Task.FromResult(client.GetState());
+            return repo_.SubscribeClient(Context.ConnectionId, deviceId);
+        }
+        
+        public async void UnsubscribeState(string deviceId)
+        {
+            repo_.UnsubscribeClient(Context.ConnectionId, deviceId);
         }
 
         public async void SendState(string deviceId)
@@ -185,9 +186,8 @@ namespace AtemServer.Hubs
             {
                 throw new Exception("Bad deviceId");
             }
-
+            
             await Clients.All.SendAsync("state", client.GetState());
-
         }
 
         public Task<DeviceProfile> SendProfile(string deviceId)
@@ -199,14 +199,7 @@ namespace AtemServer.Hubs
             }
 
             return Task.FromResult(client.GetProfile());
-
         }
-
-        public async Task NewMessage(long username, string message)
-        {
-            await Clients.All.SendAsync("messageReceived", username, message);
-        }
-
 
     }
 }

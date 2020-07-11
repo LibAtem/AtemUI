@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetActiveDevice, DeviceManagerContext } from '../DeviceManager'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { isObject } from 'util'
@@ -39,7 +39,6 @@ interface DeviceProfileViewerPageInnerProps {
 }
 interface DeviceProfileViewerPageInnerState {
   hasConnected: boolean
-  state: object | null
 }
 
 class DeviceProfileViewerPageInner extends React.Component<
@@ -51,30 +50,6 @@ class DeviceProfileViewerPageInner extends React.Component<
 
     this.state = {
       hasConnected: props.device.connected,
-      state: null
-    }
-
-    if (props.device.connected) {
-      this.loadDeviceState(props)
-    }
-  }
-
-  loadDeviceState(props: DeviceProfileViewerPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<object>('stateGet', GetDeviceId(props.device))
-        .then(state => {
-          console.log('StateViewer: Got new state')
-          this.setState({
-            state: state
-          })
-        })
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-          this.setState({
-            state: null
-          })
-        })
     }
   }
 
@@ -86,11 +61,8 @@ class DeviceProfileViewerPageInner extends React.Component<
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        state: null,
         hasConnected: true
       })
-      // now reload
-      this.loadDeviceState(this.props)
     }
   }
 

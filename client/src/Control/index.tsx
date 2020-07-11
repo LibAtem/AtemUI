@@ -11,7 +11,9 @@ import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper } from '../device-page-wrapper'
-import * as LibAtem  from '../libatem'
+import * as LibAtem from '../libatem'
+import * as objectPath from 'object-path'
+import camelcase from 'camelcase'
 
 export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
@@ -51,22 +53,67 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   }
 
   componentDidMount() {
-    if (this.props.signalR) {
-      this.props.signalR.on('state', (state: any) => {
+    this.props.signalR
+    .invoke<any>('subscribeState', GetDeviceId(this.props.device))
+    .then(state => {
+      this.setState({ currentState: state })
+    })
+    .catch(err => {
+      console.error('StateViewer: Failed to load state:', err)
+    })
+
+    this.props.signalR.on('state', (state: any) => {
+      if (state.deviceId === GetDeviceId(this.props.device)) {
+        state = state.state
         state.audio = state.audio
           ? { programOut: { followFadeToBlack: state.audio.programOut.followFadeToBlack } }
           : undefined //remove levels which cause constant updates
         if (JSON.stringify(this.state.currentState) !== JSON.stringify(state)) {
           this.setState({ currentState: state })
         }
-      })
-    }
+      }
+    })
+
+    this.props.signalR.on('stateDiff', (state: any) => {
+      if (state.deviceId === GetDeviceId(this.props.device) && this.state.currentState) {
+
+        const updatePath = (input: any, path: string[], newObj: any): any => {
+          if (input === undefined) {
+            return undefined // TODO is this ok?
+          }
+
+          const i = path.shift()
+          if (i === undefined) {
+            return newObj
+          } else {
+            const child = updatePath(input[i], path, newObj)
+            if (Array.isArray(input)) {
+              const res = [...input]
+              res[Number(i)] = child
+              return res
+            } else {
+              return {
+                ...input,
+                [i]: child,
+              }
+            }
+          }
+        }
+
+        let newState = this.state.currentState
+        for (const path of state.paths as string[]) {
+          const path2 = path.split('.').map(p => camelcase(p))
+          const newObj = objectPath.get(state.state, path2.join('.'))
+
+          newState = updatePath(newState, path2, newObj)
+        }
+        this.setState({ currentState: newState })
+      }
+    })
   }
 
   componentWillUnmount() {
-    if (this.props.signalR) {
-      this.props.signalR.off('state')
-    }
+    this.props.signalR.off('state')
   }
 
   render() {
@@ -209,20 +256,9 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
     this.state = {
       hasConnected: props.device.connected
     }
-    if (props.device.connected) {
-      this.loadDeviceState(props)
-    }
-  }
-
-  loadDeviceState(props: ControlPageInnerProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-        })
-    }
+    // if (props.device.connected) {
+    //   this.loadDeviceState(props)
+    // }
   }
 
   public sendCommand(command: string, value: { [key: string]: string | number | boolean }) {
