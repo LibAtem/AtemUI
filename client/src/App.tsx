@@ -18,7 +18,7 @@ import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
 import { AudioPage } from './Audio'
-import { ReactComponent } from '*.svg'
+
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
 enum ConnectionStatus {
@@ -61,7 +61,7 @@ export default class App extends React.Component<{}, AppState> {
   updateProfile() {
     if (this.state.signalR && this.state.activeDeviceId) {
       this.state.signalR
-        .invoke<object>('SendProfile', this.state.activeDeviceId)
+        .invoke<LibAtem.DeviceProfile>('SendProfile', this.state.activeDeviceId)
         .then(profile => {
           console.log('ProfileUpdate: Got profile', profile)
           this.setState({ currentProfile: profile })
@@ -151,7 +151,7 @@ export default class App extends React.Component<{}, AppState> {
       console.log('here', id)
       if (this.state.signalR) {
         this.state.signalR
-          .invoke<object>('SendProfile', id)
+          .invoke<LibAtem.DeviceProfile>('SendProfile', id)
           .then(profile => {
             console.log('ProfileUpdate: Got profile', profile)
             this.setState({ currentProfile: profile })

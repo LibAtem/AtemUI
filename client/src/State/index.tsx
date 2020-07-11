@@ -34,7 +34,7 @@ export class StateViewerPage extends React.Component {
 interface StateViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
+  currentState: unknown
 }
 interface StateViewerPageInnerState {
   hasConnected: boolean

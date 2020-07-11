@@ -34,7 +34,7 @@ export class DeviceProfileViewerPage extends React.Component {
 interface DeviceProfileViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentDeviceProfile: any
+  currentDeviceProfile: LibAtem.DeviceProfile | null
 }
 interface DeviceProfileViewerPageInnerState {
   hasConnected: boolean

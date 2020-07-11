@@ -19,8 +19,6 @@ export class AudioPage extends React.Component {
             key={this.context.activeDeviceId || ''}
             device={device}
             currentState={this.context.currentState}
-            currentProfile={this.context.currentProfile}
-            // currentState={this.state.currentState}
             signalR={this.context.signalR}
           />
         ) : (
@@ -34,8 +32,7 @@ export class AudioPage extends React.Component {
 interface AudioPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
+  currentState: unknown
 }
 interface AudioPageInnerState {
   hasConnected: boolean
@@ -148,7 +145,6 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   render() {
     if (
-      this.props.currentProfile == null ||
       this.state.currentState == null ||
       this.state.currentState.audio.inputs == undefined
     ) {

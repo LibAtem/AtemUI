@@ -26,7 +26,6 @@ export class ControlSettingsPage extends React.Component {
             device={device}
             currentState={this.context.currentState}
             currentProfile={this.context.currentProfile}
-            // currentState={this.state.currentState}
             signalR={this.context.signalR}
           />
         ) : (
@@ -40,8 +39,8 @@ export class ControlSettingsPage extends React.Component {
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
+  currentState: unknown
+  currentProfile: LibAtem.DeviceProfile | null
 }
 interface ControlSettingsPageInnerState {
   hasConnected: boolean

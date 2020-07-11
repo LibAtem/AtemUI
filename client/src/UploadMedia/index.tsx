@@ -21,8 +21,6 @@ export class UploadMediaPage extends React.Component {
             key={this.context.activeDeviceId || ''}
             device={device}
             currentState={this.context.currentState}
-            currentProfile={this.context.currentProfile}
-            // currentState={this.state.currentState}
             signalR={this.context.signalR}
           />
         ) : (
@@ -36,8 +34,7 @@ export class UploadMediaPage extends React.Component {
 interface MediaPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
+  currentState: unknown
 }
 interface MediaPageInnerState {
   hasConnected: boolean

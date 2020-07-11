@@ -1,4 +1,6 @@
 import React from 'react'
+import _ from 'underscore'
+
 interface AtemButtonGenericProps {
   callback: () => void
   active: boolean | null
@@ -9,11 +11,9 @@ interface AtemButtonGenericProps {
 }
 
 export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
-  // shouldComponentUpdate(nextProps : AtemButtonProps ) {
-  //     const differentActive = this.props.active !== nextProps.active;
-  //     const differentName = this.props.name !== nextProps.name
-  //     return differentName || differentActive;
-  // }
+  shouldComponentUpdate(nextProps: AtemButtonGenericProps) {
+    return !_.isEqual(_.omit(nextProps, 'callback'), _.omit(this.props, 'callback'))
+  }
 
   render() {
     let className = 'atem-button-holder '

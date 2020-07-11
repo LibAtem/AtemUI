@@ -1,7 +1,7 @@
 import React from 'react'
 import './control.scss'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetDeviceId } from '../DeviceManager'
 import { SwitcherSettings } from './Settings/settings'
 import { videoIds } from '../ControlSettings/ids'
 import MediaQuery from 'react-responsive'
@@ -10,39 +10,26 @@ import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
+import { DevicePageWrapper } from '../device-page-wrapper'
 
 export type SendCommand = (commandName: string, args: { [key: string]: string | number | boolean }) => void
 
-export class ControlPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
-    if (device) {
-      if (device.connected) {
-        return (
-          <ControlPageInnerInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            // currentState={this.context.currentState}
-            // currentState={this.state.currentState}
-            signalR={this.context.signalR}
-          />
-        )
-      } else {
-        return <div>Device is not connected</div>
-      }
-    } else {
-      return <div>No device Selected</div>
-    }
+export class ControlPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+    return (
+      <ControlPageInnerInner
+        device={device}
+        // currentState={this.context.currentState}
+        // currentState={this.state.currentState}
+        signalR={signalR}
+      />
+    )
   }
 }
 
 interface ControlPageInnerInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   // currentState: LibAtem.AtemState | null
 }
 interface ControlPageInnerInnerState {
@@ -203,7 +190,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
 interface ControlPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   currentState: LibAtem.AtemState | null
   open: boolean
 }
@@ -238,8 +225,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
   }
 
   public sendCommand(command: string, value: { [key: string]: string | number | boolean }) {
-    const signalR = this.props.signalR
-    const device = this.props.device
+    const { device, signalR } = this.props
     if (device.connected && signalR) {
       const devId = GetDeviceId(device)
 
@@ -282,7 +268,6 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
 
     const meIndex = 0
     const currentME = currentState.mixEffects[meIndex]
-    const keyers = currentME.keyers as LibAtem.MixEffectState_KeyerState[]
 
     const sources = compact(
       Object.entries(currentState.settings.inputs).map(([id, src]) => {
@@ -328,7 +313,7 @@ class ControlPageInner extends React.Component<ControlPageInnerProps, ControlPag
         <NextPanel
           meIndex={meIndex}
           transition={currentME.transition.properties}
-          keyers={keyers.map(k => ({ onAir: k.onAir }))}
+          keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
           sendCommand={(command, values) => this.sendCommand(command, values)}
         />
         <DSKPanel
