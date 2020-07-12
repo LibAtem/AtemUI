@@ -9,6 +9,7 @@ import { Luma } from './luma'
 import { Chroma } from './chroma'
 import { Pattern } from './pattern'
 import { DVE } from './dve'
+import { ToggleButton } from '../common'
 
 interface UpstreamKeyState {
   hasConnected: boolean
@@ -190,34 +191,22 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
 
 export function Mask(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
   var enabled = props.properties.maskEnabled
-  var button = enabled ? (
-    <div className="ss-circle-button">
-      <div className="ss-circle-button-inner"></div>
-    </div>
-  ) : (
-    <div className="ss-circle-button"></div>
-  )
-  var label = (
-    <div
-      className="ss-circle-button-holder"
-      onClick={() =>
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.mixEffectIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: 1,
-          maskEnabled: !props.properties.maskEnabled
-        })
-      }
-    >
-      {button}
-      <div className="ss-heading">Mask</div>
-    </div>
-  )
   var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
 
   return (
     <div className="ss-mask-box">
-      {label}
+      <ToggleButton
+        active={enabled}
+        label={'Mask'}
+        onClick={() => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+            MixEffectIndex: props.mixEffectIndex,
+            KeyerIndex: props.keyerIndex,
+            Mask: 1,
+            maskEnabled: !props.properties.maskEnabled
+          })
+        }}
+      />
       <div className="ss-mask-holder">
         <div className={labelClass}>Top:</div>
         <div className="ss-rate">
@@ -304,34 +293,22 @@ export function FlyingKey(props: {
   sendCommand: any
 }) {
   var enabled = props.flyEnabled
-  var button = enabled ? (
-    <div className="ss-circle-button">
-      <div className="ss-circle-button-inner"></div>
-    </div>
-  ) : (
-    <div className="ss-circle-button"></div>
-  )
-  var label = (
-    <div
-      className="ss-circle-button-holder"
-      onClick={() =>
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-          MixEffectIndex: props.mixEffectIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: 2,
-          FlyEnabled: !props.flyEnabled
-        })
-      }
-    >
-      {button}
-      <div className="ss-heading">Flying Key</div>
-    </div>
-  )
   var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
 
   return (
     <div>
-      {label}
+      <ToggleButton
+        active={enabled}
+        label={'Flying Key'}
+        onClick={() => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
+            MixEffectIndex: props.mixEffectIndex,
+            KeyerIndex: props.keyerIndex,
+            Mask: 2,
+            FlyEnabled: !props.flyEnabled
+          })
+        }}
+      />
 
       <div className="ss-row xy">
         <div style={{ minWidth: '50px' }} className="ss-label">

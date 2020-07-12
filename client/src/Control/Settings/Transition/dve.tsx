@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { videoIds } from '../../../ControlSettings/ids'
 import Slider from 'react-rangeslider'
+import { ToggleButton } from '../common'
 
 interface DVEProps {
   device: AtemDeviceInfo
@@ -1284,52 +1285,32 @@ export class DVE extends React.Component<DVEProps, DVEState> {
   }
 
   getPreMultBox(index: number) {
-    var enabled = this.props.currentState.mixEffects[index].transition.dve.preMultiplied
-    if (
-      this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style < 32 ||
-      !this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.enableKey
-    ) {
-      var button = <div className="ss-circle-button"></div>
-      var label = (
-        <div className="ss-circle-button-holder">
-          {button}
-          <div className="ss-heading disabled">Pre Multiplied Key</div>
-        </div>
-      )
-      enabled = true
-    } else {
-      var button = enabled ? (
-        <div className="ss-circle-button">
-          <div className="ss-circle-button-inner"></div>
-        </div>
-      ) : (
-        <div className="ss-circle-button"></div>
-      )
-      var label = (
-        <div
-          className="ss-circle-button-holder"
-          onClick={() =>
-            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-              Index: index,
-              Mask: 64,
-              PreMultiplied: !enabled
-            })
-          }
-        >
-          {button}
-          <div className="ss-heading">Pre Multiplied Key</div>
-        </div>
-      )
-    }
+    const dve: any = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve
+    const supported = dve.enableKey && dve.style >= 32
+    const disabled = !supported || dve.preMultiplied
 
-    var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
+    var diabledClass = !disabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
     return (
       <div className="ss-pmk">
-        {label}
+        <ToggleButton
+          disabled={!supported}
+          active={dve.preMultiplied}
+          label="Pre Multiplied Key"
+          onClick={() => {
+            if (supported) {
+              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: index,
+                Mask: 64,
+                PreMultiplied: !dve.preMultiplied
+              })
+            }
+          }}
+        />
         <div className="ss-slider-holder">
           <div className={diabledClass}>
             <Slider
               tooltip={false}
+              disabled={disabled}
               step={0.1}
               onChange={e =>
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
@@ -1343,7 +1324,7 @@ export class DVE extends React.Component<DVEProps, DVEState> {
             <div className="ss-slider-label">Clip:</div>
           </div>
           <MagicInput
-            disabled={enabled}
+            disabled={disabled}
             value={this.props.currentState.mixEffects[index].transition.dve.clip}
             callback={(value: any) => {
               if (value != '') {
@@ -1361,6 +1342,7 @@ export class DVE extends React.Component<DVEProps, DVEState> {
           <div className={diabledClass}>
             <Slider
               tooltip={false}
+              disabled={disabled}
               step={0.1}
               onChange={e =>
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
@@ -1374,7 +1356,7 @@ export class DVE extends React.Component<DVEProps, DVEState> {
             <div className="ss-slider-label">Gain:</div>
           </div>
           <MagicInput
-            disabled={enabled}
+            disabled={disabled}
             value={this.props.currentState.mixEffects[index].transition.dve.gain}
             callback={(value: any) => {
               if (value != '') {
@@ -1388,11 +1370,11 @@ export class DVE extends React.Component<DVEProps, DVEState> {
           />
         </div>
 
-        <label className={!enabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
+        <label className={!disabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
           Invert
           <input
             type="checkbox"
-            disabled={enabled}
+            disabled={disabled}
             checked={this.props.currentState.mixEffects[index].transition.dve.invert}
             onClick={() =>
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
@@ -1402,7 +1384,7 @@ export class DVE extends React.Component<DVEProps, DVEState> {
               })
             }
           ></input>
-          <span className={!enabled ? 'checkmark' : 'checkmark disabled'}></span>
+          <span className={!disabled ? 'checkmark' : 'checkmark disabled'}></span>
         </label>
       </div>
     )

@@ -6,6 +6,7 @@ import { FlyingKey, KeyFrame } from './upstream'
 import { MagicInput } from '../settings'
 import Slider from 'react-rangeslider'
 import { ChromePicker } from 'react-color'
+import { ToggleButton } from '../common'
 
 interface DVEProps {
   device: AtemDeviceInfo
@@ -224,34 +225,22 @@ export class DVE extends React.Component<DVEProps> {
 
 function Mask(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
   var enabled = props.properties.maskEnabled
-  var button = enabled ? (
-    <div className="ss-circle-button">
-      <div className="ss-circle-button-inner"></div>
-    </div>
-  ) : (
-    <div className="ss-circle-button"></div>
-  )
-  var label = (
-    <div
-      className="ss-circle-button-holder"
-      onClick={() =>
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-          MixEffectIndex: props.mixEffectIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: 1048576,
-          MaskEnabled: !props.properties.maskEnabled
-        })
-      }
-    >
-      {button}
-      <div className="ss-heading">Mask</div>
-    </div>
-  )
   var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
 
   return (
     <div className="ss-mask-box">
-      {label}
+      <ToggleButton
+        active={enabled}
+        label={'Mask'}
+        onClick={() => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+            MixEffectIndex: props.mixEffectIndex,
+            KeyerIndex: props.keyerIndex,
+            Mask: 1048576,
+            MaskEnabled: !props.properties.maskEnabled
+          })
+        }}
+      />
       <div className="ss-mask-holder">
         <div className={labelClass}>Top:</div>
         <div className="ss-rate">
@@ -332,34 +321,22 @@ function Mask(props: { keyerIndex: number; mixEffectIndex: number; properties: a
 
 function Shadow(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
   var enabled = props.properties.borderShadowEnabled
-  var button = enabled ? (
-    <div className="ss-circle-button">
-      <div className="ss-circle-button-inner"></div>
-    </div>
-  ) : (
-    <div className="ss-circle-button"></div>
-  )
-  var label = (
-    <div
-      className="ss-circle-button-holder"
-      onClick={() =>
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-          MixEffectIndex: props.mixEffectIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: 64,
-          BorderShadowEnabled: !enabled
-        })
-      }
-    >
-      {button}
-      <div className="ss-heading">Shadow</div>
-    </div>
-  )
   var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
 
   return (
     <div>
-      {label}
+      <ToggleButton
+        active={enabled}
+        label={'Shadow'}
+        onClick={() => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+            MixEffectIndex: props.mixEffectIndex,
+            KeyerIndex: props.keyerIndex,
+            Mask: 64,
+            BorderShadowEnabled: !enabled
+          })
+        }}
+      />
       <div style={{ gridTemplateRows: '1fr' }} className="ss-mask-holder">
         <div className={labelClass}>Angle:</div>
         <div className="ss-rate">
@@ -421,29 +398,6 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
 
   render() {
     var enabled = this.props.properties.borderEnabled
-    var button = enabled ? (
-      <div className="ss-circle-button">
-        <div className="ss-circle-button-inner"></div>
-      </div>
-    ) : (
-      <div className="ss-circle-button"></div>
-    )
-    var label = (
-      <div
-        className="ss-circle-button-holder"
-        onClick={() =>
-          this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-            MixEffectIndex: this.props.mixEffectIndex,
-            KeyerIndex: this.props.keyerIndex,
-            Mask: 32,
-            BorderEnabled: !enabled
-          })
-        }
-      >
-        {button}
-        <div className="ss-heading">Border</div>
-      </div>
-    )
     var labelClass = enabled ? 'ss-slider-label' : 'ss-slider-label disabled'
 
     var picker = this.state.displayColorPicker ? (
@@ -472,7 +426,18 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
 
     return (
       <div className="ss-mask-box">
-        {label}
+        <ToggleButton
+          active={enabled}
+          label={'Border'}
+          onClick={() => {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.mixEffectIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: 32,
+              BorderEnabled: !enabled
+            })
+          }}
+        />
 
         <div className="ss-color-inner">
           <div className={enabled ? 'ss-label' : 'ss-label disabled'}>Color: </div>

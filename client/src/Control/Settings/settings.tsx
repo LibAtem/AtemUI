@@ -5,15 +5,13 @@ import { ChromePicker } from 'react-color'
 import { GetDeviceId } from '../../DeviceManager'
 import { Transition } from './Transition/transition'
 import { DownStreamKeys } from './downstreamkey'
-import { relative } from 'path'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { UpstreamKey } from './Upstream/upstream'
+import * as LibAtem from '../../libatem'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: any
+  currentState: LibAtem.AtemState | null
   full: boolean
 }
 interface SwitcherSettingsState {
@@ -53,7 +51,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
   }
 
   render() {
-    if (!this.props.currentState) {
+    if (!this.props.currentState || !this.props.signalR) {
       return <div style={this.props.full ? { height: '100%' } : { overflowY: 'auto' }} className="ss"></div>
     }
 
@@ -80,7 +78,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         {/* <div style={{ overflowY: "scroll", height: "100%" }} > */}
 
         <div className="ss-button-holder">
-          <div className="ss-button-inner ss-button-left ss-button-inner-selected">Paletts</div>
+          <div className="ss-button-inner ss-button-left ss-button-inner-selected">Palettes</div>
           <div className="ss-button-inner ss-button-mid">Media Players</div>
           <div className="ss-button-inner ss-button-right">Capture</div>
         </div>
@@ -105,11 +103,11 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         {upstreamKeys}
 
         <DownStreamKeys
-          key={'dsk'}
           device={this.props.device}
-          currentState={this.props.currentState}
+          videoMode={this.props.currentState.settings.videoMode}
+          inputs={this.props.currentState.settings.inputs}
+          keyers={this.props.currentState.downstreamKeyers}
           signalR={this.props.signalR}
-          name={'Downstream Keys'}
         />
 
         <FadeToBlack
@@ -399,7 +397,6 @@ interface MagicInputProps {
 interface MagicInputState {
   focus: boolean
   tempValue: any
-  disabled: boolean
 }
 
 export class MagicInput extends React.Component<MagicInputProps, MagicInputState> {
@@ -408,7 +405,6 @@ export class MagicInput extends React.Component<MagicInputProps, MagicInputState
     this.state = {
       focus: false,
       tempValue: this.props.value,
-      disabled: this.props.disabled || true
     }
   }
 

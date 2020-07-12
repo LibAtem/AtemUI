@@ -6,6 +6,7 @@ import { videoIds } from '../../../ControlSettings/ids'
 import { Wipe } from './wipe'
 import { DVE } from './dve'
 import { AtemDeviceInfo } from '../../../Devices/types'
+import { ToggleButton } from '../common'
 
 interface TransitionState {
   hasConnected: boolean
@@ -50,32 +51,20 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
 
   getPreMultBox(index: number) {
     var enabled = this.props.currentState.mixEffects[index].transition.stinger.preMultipliedKey
-    var button = enabled ? (
-      <div className="ss-circle-button">
-        <div className="ss-circle-button-inner"></div>
-      </div>
-    ) : (
-      <div className="ss-circle-button"></div>
-    )
-    var label = (
-      <div
-        className="ss-circle-button-holder"
-        onClick={() =>
-          this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-            Index: index,
-            Mask: 2,
-            PreMultipliedKey: !enabled
-          })
-        }
-      >
-        {button}
-        <div className="ss-heading">Pre Multiplied Key</div>
-      </div>
-    )
     var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
     return (
       <div className="ss-pmk">
-        {label}
+        <ToggleButton
+          active={enabled}
+          label={'Pre Multiplied Key'}
+          onClick={() => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+              Index: index,
+              Mask: 2,
+              PreMultipliedKey: !enabled
+            })
+          }}
+        />
         <div className="ss-slider-holder">
           <div className={diabledClass}>
             <Slider

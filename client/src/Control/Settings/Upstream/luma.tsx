@@ -5,7 +5,7 @@ import { videoIds } from '../../../ControlSettings/ids'
 import { Mask, FlyingKey, KeyFrame } from './upstream'
 import { MagicInput } from '../settings'
 import Slider from 'react-rangeslider'
-import { unstable_renderSubtreeIntoContainer } from 'react-dom'
+import { ToggleButton } from '../common'
 
 interface LumaProps {
   device: AtemDeviceInfo
@@ -32,34 +32,21 @@ export class Luma extends React.Component<LumaProps> {
 
   getPreMultBox(index: number) {
     var enabled = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.preMultiplied
-    var button = enabled ? (
-      <div className="ss-circle-button">
-        <div className="ss-circle-button-inner"></div>
-      </div>
-    ) : (
-      <div className="ss-circle-button"></div>
-    )
-    var label = (
-      <div
-        className="ss-circle-button-holder"
-        onClick={() =>
-          this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-            MixEffectIndex: this.props.mixEffect,
-            KeyerIndex: this.props.id,
-            Mask: 1,
-            PreMultiplied: !enabled
-          })
-        }
-      >
-        {button}
-        <div className="ss-heading">Pre Multiplied Key</div>
-      </div>
-    )
-
     var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
     return (
       <div className="ss-pmk">
-        {label}
+        <ToggleButton
+          active={enabled}
+          label={'Pre Multiplied Key'}
+          onClick={() => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
+              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.id,
+              Mask: 1,
+              PreMultiplied: !enabled
+            })
+          }}
+        />
         <div className="ss-slider-holder">
           <div className={diabledClass}>
             <Slider
