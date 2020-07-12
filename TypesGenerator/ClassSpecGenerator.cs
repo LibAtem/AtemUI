@@ -115,7 +115,8 @@ namespace TypesGenerator
                 foreach (PropertyInfo prop in t.GetProperties(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
-                    _file.WriteLine($"  {prop.Name}: {translateType(prop.PropertyType)}");
+                    var name = Char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
+                    _file.WriteLine($"  {name}: {translateType(prop.PropertyType)}");
                 }
 
                 _file.WriteLine($"}}\n");

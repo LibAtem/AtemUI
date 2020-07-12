@@ -4,7 +4,7 @@ import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import remove from './assets/remove.svg'
 import './media.css'
-import * as LibAtem from '../libatem'
+import { LibAtemState } from '../generated'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -35,7 +35,7 @@ export class UploadMediaPage extends React.Component {
 interface MediaPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: LibAtem.AtemState | null
+  currentState: LibAtemState.AtemState | null
 }
 interface MediaPageInnerState {
   hasConnected: boolean

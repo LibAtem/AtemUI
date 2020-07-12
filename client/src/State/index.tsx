@@ -5,7 +5,7 @@ import { GetActiveDevice, DeviceManagerContext } from '../DeviceManager'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { isObject } from 'util'
-import * as LibAtem from '../libatem'
+import { LibAtemState } from '../generated'
 
 export class StateViewerPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -35,7 +35,7 @@ export class StateViewerPage extends React.Component {
 interface StateViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: LibAtem.AtemState | null
+  currentState: LibAtemState.AtemState | null
 }
 interface StateViewerPageInnerState {
   hasConnected: boolean

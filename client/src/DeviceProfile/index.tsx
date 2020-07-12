@@ -5,7 +5,7 @@ import { GetActiveDevice, DeviceManagerContext } from '../DeviceManager'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { isObject } from 'util'
-import * as LibAtem  from '../libatem'
+import { LibAtemProfile } from '../generated'
 
 export class DeviceProfileViewerPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -35,7 +35,7 @@ export class DeviceProfileViewerPage extends React.Component {
 interface DeviceProfileViewerPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentDeviceProfile: LibAtem.DeviceProfile | null
+  currentDeviceProfile: LibAtemProfile.DeviceProfile | null
 }
 interface DeviceProfileViewerPageInnerState {
   hasConnected: boolean

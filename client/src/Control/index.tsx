@@ -10,7 +10,7 @@ import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
-import * as LibAtem from '../libatem'
+import { LibAtemState } from '../generated'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -27,7 +27,7 @@ export class ControlPage extends DevicePageWrapper {
 interface ControlPageInnerInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtem.AtemState | null
+  currentState: LibAtemState.AtemState | null
 }
 interface ControlPageInnerInnerState {
   open: boolean
@@ -167,7 +167,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 interface MixEffectPanelProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtem.AtemState | null
+  currentState: LibAtemState.AtemState | null
   open: boolean
 }
 interface MixEffectPanelState {

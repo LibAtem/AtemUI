@@ -6,12 +6,12 @@ import { GetDeviceId } from '../../DeviceManager'
 import { Transition } from './Transition/transition'
 import { DownStreamKeys } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
-import * as LibAtem from '../../libatem'
+import { LibAtemState } from '../../generated'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection | undefined
-  currentState: LibAtem.AtemState | null
+  currentState: LibAtemState.AtemState | null
   full: boolean
 }
 interface SwitcherSettingsState {

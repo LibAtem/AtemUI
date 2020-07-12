@@ -10,7 +10,7 @@ import multiview2 from './assets/multiview2.svg'
 import multiview3 from './assets/multiview3.svg'
 import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
-import * as LibAtem  from '../libatem'
+import { LibAtemState, LibAtemProfile } from '../generated'
 import { sendCommand } from '../device-page-wrapper'
 
 export class ControlSettingsPage extends React.Component {
@@ -42,8 +42,8 @@ export class ControlSettingsPage extends React.Component {
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtem.AtemState | null
-  currentProfile: LibAtem.DeviceProfile | null
+  currentState: LibAtemState.AtemState | null
+  currentProfile: LibAtemProfile.DeviceProfile | null
 }
 interface ControlSettingsPageInnerState {
   hasConnected: boolean

@@ -1,50 +1,50 @@
 import * as Enums from './common-enums'
 export interface DeviceProfile {
-  Model: Enums.ModelId
-  Product: string
-  MixEffectBlocks: number
-  Sources: DevicePort[]
-  AudioSources: Enums.AudioSource[]
-  Auxiliaries: number
-  DownstreamKeys: number
-  UpstreamKeys: number
-  RoutableKeyMasks: boolean
-  HyperDecks: number
-  Stingers: number
-  MultiView: MultiView
-  DVE: number
-  SuperSource: number
-  MediaPlayers: number
-  MediaPoolClips: number
-  MediaPoolStills: number
-  MacroCount: number
-  SerialPort: number
-  AudioMonitor: boolean
-  VideoModes: VideoModeSet
-  MixMinusOutputs: number
+  model: Enums.ModelId
+  product: string
+  mixEffectBlocks: number
+  sources: DevicePort[]
+  audioSources: Enums.AudioSource[]
+  auxiliaries: number
+  downstreamKeys: number
+  upstreamKeys: number
+  routableKeyMasks: boolean
+  hyperDecks: number
+  stingers: number
+  multiView: MultiView
+  dVE: number
+  superSource: number
+  mediaPlayers: number
+  mediaPoolClips: number
+  mediaPoolStills: number
+  macroCount: number
+  serialPort: number
+  audioMonitor: boolean
+  videoModes: VideoModeSet
+  mixMinusOutputs: number
 }
 
 export interface DevicePort {
-  Id: Enums.VideoSource
-  Port: Enums.ExternalPortType[]
+  id: Enums.VideoSource
+  port: Enums.ExternalPortType[]
 }
 
 export interface MultiView {
-  Count: number
-  VuMeters: boolean
-  CanSwapPreviewProgram: boolean
-  Supports1080p: boolean
-  CanRouteInputs: boolean
-  CanToggleSafeArea: boolean
+  count: number
+  vuMeters: boolean
+  canSwapPreviewProgram: boolean
+  supports1080p: boolean
+  canRouteInputs: boolean
+  canToggleSafeArea: boolean
 }
 
 export interface VideoModeSet {
-  SupportedModes: Enums.VideoMode[]
-  MaxFrames: MaxFramesSet
+  supportedModes: Enums.VideoMode[]
+  maxFrames: MaxFramesSet
 }
 
 export interface MaxFramesSet {
-  SD: number
+  sD: number
   _720: number
   _1080: number
   _4K: number

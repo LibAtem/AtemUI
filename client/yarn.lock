@@ -3561,13 +3561,6 @@ crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-csharp-models-to-typescript@^0.18.1:
-  version "0.18.1"
-  resolved "https://registry.yarnpkg.com/csharp-models-to-typescript/-/csharp-models-to-typescript-0.18.1.tgz#e821159d2157b4c77d6e101ed8ce9db4e823188f"
-  integrity sha512-dkG9m8qpzduTx4BGelQjDYiYa6KucHhADPoKNLSATQOeHHWWFALK6TU+eLeNhvaM1THXrOOakFskXW9NoANgzg==
-  dependencies:
-    camelcase "^6.0.0"
-
 css-blank-pseudo@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/css-blank-pseudo/-/css-blank-pseudo-0.1.4.tgz#dfdefd3254bf8a82027993674ccf35483bfcb3c5"

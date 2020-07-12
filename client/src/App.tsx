@@ -18,7 +18,7 @@ import { StateViewerPage } from './State'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
 import { AudioPage } from './Audio'
-import * as LibAtem from './libatem'
+import { LibAtemProfile } from './generated'
 import * as objectPath from 'object-path'
 import camelcase from 'camelcase'
 
@@ -64,7 +64,7 @@ export default class App extends React.Component<{}, AppState> {
   updateProfile() {
     if (this.state.signalR && this.state.activeDeviceId) {
       this.state.signalR
-        .invoke<LibAtem.DeviceProfile>('SendProfile', this.state.activeDeviceId)
+        .invoke<LibAtemProfile.DeviceProfile>('SendProfile', this.state.activeDeviceId)
         .then(profile => {
           console.log('ProfileUpdate: Got profile', profile)
           this.setState({ currentProfile: profile })
@@ -204,7 +204,7 @@ export default class App extends React.Component<{}, AppState> {
       console.log('here', id)
       if (this.state.signalR) {
         this.state.signalR
-          .invoke<LibAtem.DeviceProfile>('SendProfile', id)
+          .invoke<LibAtemProfile.DeviceProfile>('SendProfile', id)
           .then(profile => {
             console.log('ProfileUpdate: Got profile', profile)
             this.setState({ currentProfile: profile })

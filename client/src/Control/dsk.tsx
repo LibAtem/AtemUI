@@ -2,12 +2,12 @@ import { AtemButtonGeneric } from './button/button'
 import { RateInput } from './Settings/settings'
 import React from 'react'
 import { SendCommandStrict } from '../device-page-wrapper'
-import * as LibAtem  from '../libatem'
+import { LibAtemState, LibAtemEnums } from '../generated'
 
 interface DSKProps {
   sendCommand: SendCommandStrict
-  downstreamKeyers: LibAtem.DownstreamKeyerState[]
-  videoMode: LibAtem.VideoMode
+  downstreamKeyers: LibAtemState.DownstreamKeyerState[]
+  videoMode: LibAtemEnums.VideoMode
 }
 
 export function DSKPanel(props: DSKProps) {

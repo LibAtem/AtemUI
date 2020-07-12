@@ -2,13 +2,13 @@ import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
-import * as LibAtem  from '../libatem'
+import { LibAtemState, LibAtemEnums } from '../generated'
 
 interface FTBProps {
   sendCommand: SendCommandStrict
   meIndex: number
-  status: LibAtem.MixEffectState_FadeToBlackStatusState
-  videoMode: LibAtem.VideoMode
+  status: LibAtemState.MixEffectState_FadeToBlackStatusState
+  videoMode: LibAtemEnums.VideoMode
 }
 
 export function FTBPanel(props: FTBProps) {

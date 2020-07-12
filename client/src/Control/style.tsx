@@ -2,14 +2,14 @@ import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
-import * as LibAtem  from '../libatem'
+import { LibAtemState, LibAtemEnums } from '../generated'
 
 interface StyleProps {
   sendCommand: SendCommandStrict
   meIndex: number
-  properties: LibAtem.MixEffectState_TransitionPropertiesState
-  position: LibAtem.MixEffectState_TransitionPositionState
-  videoMode: LibAtem.VideoMode
+  properties: LibAtemState.MixEffectState_TransitionPropertiesState
+  position: LibAtemState.MixEffectState_TransitionPositionState
+  videoMode: LibAtemEnums.VideoMode
 }
 
 interface TransStyleProps {

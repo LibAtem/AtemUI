@@ -3,16 +3,16 @@ import React from 'react'
 import Slider from 'react-rangeslider'
 import { videoIds } from '../../ControlSettings/ids'
 import { AtemDeviceInfo } from '../../Devices/types'
-import * as LibAtem from '../../libatem'
 import { sendCommand, SendCommandArgs } from '../../device-page-wrapper'
 import { MaskProperties, ToggleButton } from './common'
+import { LibAtemState, LibAtemEnums } from '../../generated'
 
 interface SubMenuProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  keyers: LibAtem.DownstreamKeyerState[]
-  inputs: Record<LibAtem.VideoSource, LibAtem.InputState>
-  videoMode: LibAtem.VideoMode
+  keyers: LibAtemState.DownstreamKeyerState[]
+  inputs: Record<LibAtemEnums.VideoSource, LibAtemState.InputState>
+  videoMode: LibAtemEnums.VideoMode
 }
 interface SubMenuState {
   open: boolean

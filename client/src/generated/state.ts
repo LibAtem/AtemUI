@@ -1,687 +1,687 @@
 import * as Enums from './common-enums'
 export interface AtemState {
-  Auxiliaries: AuxState[]
-  ColorGenerators: ColorState[]
-  DownstreamKeyers: DownstreamKeyerState[]
-  MediaPlayers: MediaPlayerState[]
-  MixEffects: MixEffectState[]
-  SuperSources: SuperSourceState[]
-  Audio: AudioState
-  Fairlight: FairlightAudioState
-  Macros: MacroState
-  MediaPool: MediaPoolState
-  Settings: SettingsState
-  Info: InfoState
-  Power: boolean[]
+  auxiliaries: AuxState[]
+  colorGenerators: ColorState[]
+  downstreamKeyers: DownstreamKeyerState[]
+  mediaPlayers: MediaPlayerState[]
+  mixEffects: MixEffectState[]
+  superSources: SuperSourceState[]
+  audio: AudioState
+  fairlight: FairlightAudioState
+  macros: MacroState
+  mediaPool: MediaPoolState
+  settings: SettingsState
+  info: InfoState
+  power: boolean[]
 }
 
 export interface AuxState {
-  Source: Enums.VideoSource
+  source: Enums.VideoSource
 }
 
 export interface ColorState {
-  Hue: number
-  Saturation: number
-  Luma: number
+  hue: number
+  saturation: number
+  luma: number
 }
 
 export interface DownstreamKeyerState {
-  Sources: DownstreamKeyerState_SourcesState
-  Properties: DownstreamKeyerState_PropertiesState
-  State: DownstreamKeyerState_StateState
+  sources: DownstreamKeyerState_SourcesState
+  properties: DownstreamKeyerState_PropertiesState
+  state: DownstreamKeyerState_StateState
 }
 
 export interface MediaPlayerState {
-  Source: MediaPlayerState_SourceState
-  ClipStatus: MediaPlayerState_ClipStatusState
+  source: MediaPlayerState_SourceState
+  clipStatus: MediaPlayerState_ClipStatusState
 }
 
 export interface MixEffectState {
-  Keyers: MixEffectState_KeyerState[]
-  Transition: MixEffectState_TransitionState
-  Sources: MixEffectState_SourcesState
-  FadeToBlack: MixEffectState_FadeToBlackState
+  keyers: MixEffectState_KeyerState[]
+  transition: MixEffectState_TransitionState
+  sources: MixEffectState_SourcesState
+  fadeToBlack: MixEffectState_FadeToBlackState
 }
 
 export interface SuperSourceState {
-  Boxes: SuperSourceState_BoxState[]
-  Properties: SuperSourceState_PropertiesState
-  Border: SuperSourceState_BorderState
+  boxes: SuperSourceState_BoxState[]
+  properties: SuperSourceState_PropertiesState
+  border: SuperSourceState_BorderState
 }
 
 export interface AudioState {
-  ProgramOut: AudioState_ProgramOutState
-  Inputs: Record<number, AudioState_InputState>
-  MonitorOutputs: AudioState_MonitorOutputState[]
-  HeadphoneOutputs: AudioState_HeadphoneOutputState[]
-  Tally: Record<Enums.AudioSource, boolean>
+  programOut: AudioState_ProgramOutState
+  inputs: Record<number, AudioState_InputState>
+  monitorOutputs: AudioState_MonitorOutputState[]
+  headphoneOutputs: AudioState_HeadphoneOutputState[]
+  tally: Record<Enums.AudioSource, boolean>
 }
 
 export interface FairlightAudioState {
-  ProgramOut: FairlightAudioState_ProgramOutState
-  Inputs: Record<number, FairlightAudioState_InputState>
-  Monitors: FairlightAudioState_MonitorOutputState[]
-  Tally: unknown
+  programOut: FairlightAudioState_ProgramOutState
+  inputs: Record<number, FairlightAudioState_InputState>
+  monitors: FairlightAudioState_MonitorOutputState[]
+  tally: unknown
 }
 
 export interface MacroState {
-  Pool: MacroState_ItemState[]
-  RecordStatus: MacroState_RecordStatusState
-  RunStatus: MacroState_RunStatusState
+  pool: MacroState_ItemState[]
+  recordStatus: MacroState_RecordStatusState
+  runStatus: MacroState_RunStatusState
 }
 
 export interface MediaPoolState {
-  Stills: MediaPoolState_StillState[]
-  Clips: MediaPoolState_ClipState[]
+  stills: MediaPoolState_StillState[]
+  clips: MediaPoolState_ClipState[]
 }
 
 export interface SettingsState {
-  MultiViewers: MultiViewerState[]
-  Inputs: Record<Enums.VideoSource, InputState>
-  Hyperdecks: SettingsState_HyperdeckState[]
-  Talkback: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
-  MixMinusOutputs: SettingsState_MixMinusOutputState[]
-  VideoMode: Enums.VideoMode
-  DownConvertMode: Enums.DownConvertMode
-  DownConvertVideoMode: Enums.VideoMode
-  SerialMode: Enums.SerialMode
-  SDI3GLevel: Enums.SDI3GOutputLevel
-  SuperSourceCascade: boolean
+  multiViewers: MultiViewerState[]
+  inputs: Record<Enums.VideoSource, InputState>
+  hyperdecks: SettingsState_HyperdeckState[]
+  talkback: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
+  mixMinusOutputs: SettingsState_MixMinusOutputState[]
+  videoMode: Enums.VideoMode
+  downConvertMode: Enums.DownConvertMode
+  downConvertVideoMode: Enums.VideoMode
+  serialMode: Enums.SerialMode
+  sDI3GLevel: Enums.SDI3GOutputLevel
+  superSourceCascade: boolean
 }
 
 export interface InfoState {
-  Version: unknown
-  TimecodeLocked: boolean
-  LastTimecode: Timecode
-  Model: Enums.ModelId
-  ProductName: string
-  SupportedVideoModes: VideoModeInfo[]
-  SupportsAutoVideoMode: boolean
+  version: unknown
+  timecodeLocked: boolean
+  lastTimecode: Timecode
+  model: Enums.ModelId
+  productName: string
+  supportedVideoModes: VideoModeInfo[]
+  supportsAutoVideoMode: boolean
 }
 
 export interface DownstreamKeyerState_SourcesState {
-  FillSource: Enums.VideoSource
-  CutSource: Enums.VideoSource
+  fillSource: Enums.VideoSource
+  cutSource: Enums.VideoSource
 }
 
 export interface DownstreamKeyerState_PropertiesState {
-  Tie: boolean
-  Rate: number
-  PreMultipliedKey: boolean
-  Clip: number
-  Gain: number
-  Invert: boolean
-  MaskEnabled: boolean
-  MaskTop: number
-  MaskBottom: number
-  MaskLeft: number
-  MaskRight: number
+  tie: boolean
+  rate: number
+  preMultipliedKey: boolean
+  clip: number
+  gain: number
+  invert: boolean
+  maskEnabled: boolean
+  maskTop: number
+  maskBottom: number
+  maskLeft: number
+  maskRight: number
 }
 
 export interface DownstreamKeyerState_StateState {
-  OnAir: boolean
-  InTransition: boolean
-  IsAuto: boolean
-  IsTowardsOnAir: boolean
-  RemainingFrames: number
+  onAir: boolean
+  inTransition: boolean
+  isAuto: boolean
+  isTowardsOnAir: boolean
+  remainingFrames: number
 }
 
 export interface MediaPlayerState_SourceState {
-  SourceType: Enums.MediaPlayerSource
-  SourceIndex: number
+  sourceType: Enums.MediaPlayerSource
+  sourceIndex: number
 }
 
 export interface MediaPlayerState_ClipStatusState {
-  Playing: boolean
-  Loop: boolean
-  AtBeginning: boolean
-  ClipFrame: number
+  playing: boolean
+  loop: boolean
+  atBeginning: boolean
+  clipFrame: number
 }
 
 export interface MixEffectState_KeyerState {
-  Luma: MixEffectState_KeyerLumaState
-  Chroma: MixEffectState_KeyerChromaState
-  AdvancedChroma: MixEffectState_KeyerAdvancedChromaState
-  Pattern: MixEffectState_KeyerPatternState
-  DVE: MixEffectState_KeyerDVEState
-  FlyFrames: MixEffectState_KeyerFlyFrameState[]
-  OnAir: boolean
-  Properties: MixEffectState_KeyerPropertiesState
-  FlyProperties: MixEffectState_KeyerFlyProperties
+  luma: MixEffectState_KeyerLumaState
+  chroma: MixEffectState_KeyerChromaState
+  advancedChroma: MixEffectState_KeyerAdvancedChromaState
+  pattern: MixEffectState_KeyerPatternState
+  dVE: MixEffectState_KeyerDVEState
+  flyFrames: MixEffectState_KeyerFlyFrameState[]
+  onAir: boolean
+  properties: MixEffectState_KeyerPropertiesState
+  flyProperties: MixEffectState_KeyerFlyProperties
 }
 
 export interface MixEffectState_TransitionState {
-  Properties: MixEffectState_TransitionPropertiesState
-  Position: MixEffectState_TransitionPositionState
-  Mix: MixEffectState_TransitionMixState
-  Dip: MixEffectState_TransitionDipState
-  Wipe: MixEffectState_TransitionWipeState
-  Stinger: MixEffectState_TransitionStingerState
-  DVE: MixEffectState_TransitionDVEState
+  properties: MixEffectState_TransitionPropertiesState
+  position: MixEffectState_TransitionPositionState
+  mix: MixEffectState_TransitionMixState
+  dip: MixEffectState_TransitionDipState
+  wipe: MixEffectState_TransitionWipeState
+  stinger: MixEffectState_TransitionStingerState
+  dVE: MixEffectState_TransitionDVEState
 }
 
 export interface MixEffectState_SourcesState {
-  Program: Enums.VideoSource
-  Preview: Enums.VideoSource
+  program: Enums.VideoSource
+  preview: Enums.VideoSource
 }
 
 export interface MixEffectState_FadeToBlackState {
-  Status: MixEffectState_FadeToBlackStatusState
-  Properties: MixEffectState_FadeToBlackPropertiesState
+  status: MixEffectState_FadeToBlackStatusState
+  properties: MixEffectState_FadeToBlackPropertiesState
 }
 
 export interface SuperSourceState_BoxState {
-  Enabled: boolean
-  Source: Enums.VideoSource
-  PositionX: number
-  PositionY: number
-  Size: number
-  Cropped: boolean
-  CropTop: number
-  CropBottom: number
-  CropLeft: number
-  CropRight: number
+  enabled: boolean
+  source: Enums.VideoSource
+  positionX: number
+  positionY: number
+  size: number
+  cropped: boolean
+  cropTop: number
+  cropBottom: number
+  cropLeft: number
+  cropRight: number
 }
 
 export interface SuperSourceState_PropertiesState {
-  ArtFillSource: Enums.VideoSource
-  ArtCutSource: Enums.VideoSource
-  ArtOption: Enums.SuperSourceArtOption
-  ArtPreMultiplied: boolean
-  ArtClip: number
-  ArtGain: number
-  ArtInvertKey: boolean
+  artFillSource: Enums.VideoSource
+  artCutSource: Enums.VideoSource
+  artOption: Enums.SuperSourceArtOption
+  artPreMultiplied: boolean
+  artClip: number
+  artGain: number
+  artInvertKey: boolean
 }
 
 export interface SuperSourceState_BorderState {
-  Enabled: boolean
-  Bevel: Enums.BorderBevel
-  OuterWidth: number
-  InnerWidth: number
-  OuterSoftness: number
-  InnerSoftness: number
-  BevelSoftness: number
-  BevelPosition: number
-  Hue: number
-  Saturation: number
-  Luma: number
-  LightSourceDirection: number
-  LightSourceAltitude: number
+  enabled: boolean
+  bevel: Enums.BorderBevel
+  outerWidth: number
+  innerWidth: number
+  outerSoftness: number
+  innerSoftness: number
+  bevelSoftness: number
+  bevelPosition: number
+  hue: number
+  saturation: number
+  luma: number
+  lightSourceDirection: number
+  lightSourceAltitude: number
 }
 
 export interface AudioState_ProgramOutState {
-  Gain: number
-  Balance: number
-  FollowFadeToBlack: boolean
-  Levels: AudioState_LevelsState
+  gain: number
+  balance: number
+  followFadeToBlack: boolean
+  levels: AudioState_LevelsState
 }
 
 export interface AudioState_InputState {
-  IsMixedIn: boolean
-  Properties: AudioState_InputState_PropertiesState
-  Levels: AudioState_LevelsState
-  Analog: AudioState_InputState_AnalogState
+  isMixedIn: boolean
+  properties: AudioState_InputState_PropertiesState
+  levels: AudioState_LevelsState
+  analog: AudioState_InputState_AnalogState
 }
 
 export interface AudioState_MonitorOutputState {
-  Enabled: boolean
-  Gain: number
-  Mute: boolean
-  Solo: boolean
-  SoloSource: Enums.AudioSource
-  Dim: boolean
-  DimLevel: number
+  enabled: boolean
+  gain: number
+  mute: boolean
+  solo: boolean
+  soloSource: Enums.AudioSource
+  dim: boolean
+  dimLevel: number
 }
 
 export interface AudioState_HeadphoneOutputState {
-  Gain: number
-  ProgramOutGain: number
-  SidetoneGain: number
-  TalkbackGain: number
+  gain: number
+  programOutGain: number
+  sidetoneGain: number
+  talkbackGain: number
 }
 
 export interface FairlightAudioState_ProgramOutState {
-  Gain: number
-  FollowFadeToBlack: boolean
-  AudioFollowVideoCrossfadeTransitionEnabled: boolean
-  Dynamics: FairlightAudioState_DynamicsState
-  Equalizer: FairlightAudioState_EqualizerState
-  Levels: FairlightAudioState_LevelsState
+  gain: number
+  followFadeToBlack: boolean
+  audioFollowVideoCrossfadeTransitionEnabled: boolean
+  dynamics: FairlightAudioState_DynamicsState
+  equalizer: FairlightAudioState_EqualizerState
+  levels: FairlightAudioState_LevelsState
 }
 
 export interface FairlightAudioState_InputState {
-  InputType: Enums.FairlightInputType
-  SupportedConfigurations: Enums.FairlightInputConfiguration
-  ExternalPortType: Enums.ExternalPortType
-  ActiveConfiguration: Enums.FairlightInputConfiguration
-  Analog: FairlightAudioState_AnalogState
-  Sources: FairlightAudioState_InputSourceState[]
+  inputType: Enums.FairlightInputType
+  supportedConfigurations: Enums.FairlightInputConfiguration
+  externalPortType: Enums.ExternalPortType
+  activeConfiguration: Enums.FairlightInputConfiguration
+  analog: FairlightAudioState_AnalogState
+  sources: FairlightAudioState_InputSourceState[]
 }
 
 export interface FairlightAudioState_MonitorOutputState {
-  Gain: number
-  InputMasterGain: number
-  InputTalkbackGain: number
-  InputSidetoneGain: number
+  gain: number
+  inputMasterGain: number
+  inputTalkbackGain: number
+  inputSidetoneGain: number
 }
 
 export interface MacroState_ItemState {
-  IsUsed: boolean
-  HasUnsupportedOps: boolean
-  Name: string
-  Description: string
+  isUsed: boolean
+  hasUnsupportedOps: boolean
+  name: string
+  description: string
 }
 
 export interface MacroState_RecordStatusState {
-  IsRecording: boolean
-  RecordIndex: number
+  isRecording: boolean
+  recordIndex: number
 }
 
 export interface MacroState_RunStatusState {
-  RunStatus: MacroState_MacroRunStatus
-  RunIndex: number
-  Loop: boolean
+  runStatus: MacroState_MacroRunStatus
+  runIndex: number
+  loop: boolean
 }
 
 export interface MediaPoolState_StillState {
-  IsUsed: boolean
-  Hash: number[]
-  Filename: string
+  isUsed: boolean
+  hash: number[]
+  filename: string
 }
 
 export interface MediaPoolState_ClipState {
-  IsUsed: boolean
-  Name: string
-  MaxFrames: number
-  Frames: MediaPoolState_FrameState[]
+  isUsed: boolean
+  name: string
+  maxFrames: number
+  frames: MediaPoolState_FrameState[]
 }
 
 export interface MultiViewerState {
-  SupportsVuMeters: boolean
-  SupportsProgramPreviewSwapped: boolean
-  SupportsQuadrantLayout: boolean
-  SupportsToggleSafeArea: boolean
-  VuMeterOpacity: number
-  Properties: MultiViewerState_PropertiesState
-  Windows: MultiViewerState_WindowState[]
+  supportsVuMeters: boolean
+  supportsProgramPreviewSwapped: boolean
+  supportsQuadrantLayout: boolean
+  supportsToggleSafeArea: boolean
+  vuMeterOpacity: number
+  properties: MultiViewerState_PropertiesState
+  windows: MultiViewerState_WindowState[]
 }
 
 export interface InputState {
-  Properties: InputState_PropertiesState
-  Tally: InputState_TallyState
+  properties: InputState_PropertiesState
+  tally: InputState_TallyState
 }
 
 export interface SettingsState_HyperdeckState {
-  NetworkAddress: string
-  Input: Enums.VideoSource
-  AutoRoll: boolean
-  AutoRollFrameDelay: number
+  networkAddress: string
+  input: Enums.VideoSource
+  autoRoll: boolean
+  autoRollFrameDelay: number
 }
 
 export interface SettingsState_TalkbackState {
-  MuteSDI: boolean
-  Inputs: SettingsState_TalkbackInputState[]
+  muteSDI: boolean
+  inputs: SettingsState_TalkbackInputState[]
 }
 
 export interface SettingsState_MixMinusOutputState {
-  AudioInputId: Enums.AudioSource
-  SupportedModes: Enums.MixMinusMode
-  Mode: Enums.MixMinusMode
+  audioInputId: Enums.AudioSource
+  supportedModes: Enums.MixMinusMode
+  mode: Enums.MixMinusMode
 }
 
 export interface Timecode {
-  Hour: number
-  Minute: number
-  Second: number
-  Frame: number
-  DropFrame: boolean
+  hour: number
+  minute: number
+  second: number
+  frame: number
+  dropFrame: boolean
 }
 
 export interface VideoModeInfo {
-  Mode: Enums.VideoMode
-  RequiresReconfig: boolean
-  MultiviewModes: Enums.VideoMode[]
-  DownConvertModes: Enums.VideoMode[]
+  mode: Enums.VideoMode
+  requiresReconfig: boolean
+  multiviewModes: Enums.VideoMode[]
+  downConvertModes: Enums.VideoMode[]
 }
 
 export interface MixEffectState_KeyerLumaState {
-  PreMultiplied: boolean
-  Clip: number
-  Gain: number
-  Invert: boolean
+  preMultiplied: boolean
+  clip: number
+  gain: number
+  invert: boolean
 }
 
 export interface MixEffectState_KeyerChromaState {
-  Hue: number
-  Gain: number
-  YSuppress: number
-  Lift: number
-  Narrow: boolean
+  hue: number
+  gain: number
+  ySuppress: number
+  lift: number
+  narrow: boolean
 }
 
 export interface MixEffectState_KeyerAdvancedChromaState {
-  Sample: MixEffectState_KeyerAdvancedChromaSampleState
-  Properties: MixEffectState_KeyerAdvancedChromaPropertiesState
+  sample: MixEffectState_KeyerAdvancedChromaSampleState
+  properties: MixEffectState_KeyerAdvancedChromaPropertiesState
 }
 
 export interface MixEffectState_KeyerPatternState {
-  Pattern: Enums.Pattern
-  Size: number
-  Symmetry: number
-  Softness: number
-  XPosition: number
-  YPosition: number
-  Inverse: boolean
+  pattern: Enums.Pattern
+  size: number
+  symmetry: number
+  softness: number
+  xPosition: number
+  yPosition: number
+  inverse: boolean
 }
 
 export interface MixEffectState_KeyerDVEState {
-  SizeX: number
-  SizeY: number
-  PositionX: number
-  PositionY: number
-  Rotation: number
-  Rate: number
-  BorderEnabled: boolean
-  BorderShadowEnabled: boolean
-  BorderBevel: Enums.BorderBevel
-  BorderOuterWidth: number
-  BorderInnerWidth: number
-  BorderOuterSoftness: number
-  BorderInnerSoftness: number
-  BorderBevelSoftness: number
-  BorderBevelPosition: number
-  BorderOpacity: number
-  BorderHue: number
-  BorderSaturation: number
-  BorderLuma: number
-  LightSourceDirection: number
-  LightSourceAltitude: number
-  MaskEnabled: boolean
-  MaskTop: number
-  MaskBottom: number
-  MaskLeft: number
-  MaskRight: number
+  sizeX: number
+  sizeY: number
+  positionX: number
+  positionY: number
+  rotation: number
+  rate: number
+  borderEnabled: boolean
+  borderShadowEnabled: boolean
+  borderBevel: Enums.BorderBevel
+  borderOuterWidth: number
+  borderInnerWidth: number
+  borderOuterSoftness: number
+  borderInnerSoftness: number
+  borderBevelSoftness: number
+  borderBevelPosition: number
+  borderOpacity: number
+  borderHue: number
+  borderSaturation: number
+  borderLuma: number
+  lightSourceDirection: number
+  lightSourceAltitude: number
+  maskEnabled: boolean
+  maskTop: number
+  maskBottom: number
+  maskLeft: number
+  maskRight: number
 }
 
 export interface MixEffectState_KeyerFlyFrameState {
-  SizeX: number
-  SizeY: number
-  PositionX: number
-  PositionY: number
-  Rotation: number
-  OuterWidth: number
-  InnerWidth: number
-  OuterSoftness: number
-  InnerSoftness: number
-  BevelSoftness: number
-  BevelPosition: number
-  BorderOpacity: number
-  BorderHue: number
-  BorderSaturation: number
-  BorderLuma: number
-  LightSourceDirection: number
-  LightSourceAltitude: number
-  MaskTop: number
-  MaskBottom: number
-  MaskLeft: number
-  MaskRight: number
+  sizeX: number
+  sizeY: number
+  positionX: number
+  positionY: number
+  rotation: number
+  outerWidth: number
+  innerWidth: number
+  outerSoftness: number
+  innerSoftness: number
+  bevelSoftness: number
+  bevelPosition: number
+  borderOpacity: number
+  borderHue: number
+  borderSaturation: number
+  borderLuma: number
+  lightSourceDirection: number
+  lightSourceAltitude: number
+  maskTop: number
+  maskBottom: number
+  maskLeft: number
+  maskRight: number
 }
 
 export interface MixEffectState_KeyerPropertiesState {
-  KeyType: Enums.MixEffectKeyType
-  FlyEnabled: boolean
-  FillSource: Enums.VideoSource
-  CutSource: Enums.VideoSource
-  MaskEnabled: boolean
-  MaskTop: number
-  MaskBottom: number
-  MaskLeft: number
-  MaskRight: number
+  keyType: Enums.MixEffectKeyType
+  flyEnabled: boolean
+  fillSource: Enums.VideoSource
+  cutSource: Enums.VideoSource
+  maskEnabled: boolean
+  maskTop: number
+  maskBottom: number
+  maskLeft: number
+  maskRight: number
 }
 
 export interface MixEffectState_KeyerFlyProperties {
-  IsASet: boolean
-  IsBSet: boolean
-  IsAtKeyFrame: number
-  RunToInfinite: number
-  ActiveKeyFrame: number
+  isASet: boolean
+  isBSet: boolean
+  isAtKeyFrame: number
+  runToInfinite: number
+  activeKeyFrame: number
 }
 
 export interface MixEffectState_TransitionPropertiesState {
-  Style: Enums.TransitionStyle
-  NextStyle: Enums.TransitionStyle
-  Selection: Enums.TransitionLayer
-  NextSelection: Enums.TransitionLayer
-  Preview: boolean
-  IsInPreview: boolean
+  style: Enums.TransitionStyle
+  nextStyle: Enums.TransitionStyle
+  selection: Enums.TransitionLayer
+  nextSelection: Enums.TransitionLayer
+  preview: boolean
+  isInPreview: boolean
 }
 
 export interface MixEffectState_TransitionPositionState {
-  InTransition: boolean
-  RemainingFrames: number
-  HandlePosition: number
+  inTransition: boolean
+  remainingFrames: number
+  handlePosition: number
 }
 
 export interface MixEffectState_TransitionMixState {
-  Rate: number
+  rate: number
 }
 
 export interface MixEffectState_TransitionDipState {
-  Input: Enums.VideoSource
-  Rate: number
+  input: Enums.VideoSource
+  rate: number
 }
 
 export interface MixEffectState_TransitionWipeState {
-  Rate: number
-  Pattern: Enums.Pattern
-  BorderWidth: number
-  BorderInput: Enums.VideoSource
-  Symmetry: number
-  BorderSoftness: number
-  XPosition: number
-  YPosition: number
-  ReverseDirection: boolean
-  FlipFlop: boolean
+  rate: number
+  pattern: Enums.Pattern
+  borderWidth: number
+  borderInput: Enums.VideoSource
+  symmetry: number
+  borderSoftness: number
+  xPosition: number
+  yPosition: number
+  reverseDirection: boolean
+  flipFlop: boolean
 }
 
 export interface MixEffectState_TransitionStingerState {
-  Source: Enums.StingerSource
-  PreMultipliedKey: boolean
-  Clip: number
-  Gain: number
-  Invert: boolean
-  Preroll: number
-  ClipDuration: number
-  TriggerPoint: number
-  MixRate: number
+  source: Enums.StingerSource
+  preMultipliedKey: boolean
+  clip: number
+  gain: number
+  invert: boolean
+  preroll: number
+  clipDuration: number
+  triggerPoint: number
+  mixRate: number
 }
 
 export interface MixEffectState_TransitionDVEState {
-  Rate: number
-  LogoRate: number
-  Style: Enums.DVEEffect
-  FillSource: Enums.VideoSource
-  KeySource: Enums.VideoSource
-  EnableKey: boolean
-  PreMultiplied: boolean
-  Clip: number
-  Gain: number
-  InvertKey: boolean
-  Reverse: boolean
-  FlipFlop: boolean
+  rate: number
+  logoRate: number
+  style: Enums.DVEEffect
+  fillSource: Enums.VideoSource
+  keySource: Enums.VideoSource
+  enableKey: boolean
+  preMultiplied: boolean
+  clip: number
+  gain: number
+  invertKey: boolean
+  reverse: boolean
+  flipFlop: boolean
 }
 
 export interface MixEffectState_FadeToBlackStatusState {
-  IsFullyBlack: boolean
-  InTransition: boolean
-  RemainingFrames: number
+  isFullyBlack: boolean
+  inTransition: boolean
+  remainingFrames: number
 }
 
 export interface MixEffectState_FadeToBlackPropertiesState {
-  Rate: number
+  rate: number
 }
 
 export interface AudioState_LevelsState {
-  Levels: number[]
-  Peaks: number[]
+  levels: number[]
+  peaks: number[]
 }
 
 export interface AudioState_InputState_PropertiesState {
-  SourceType: Enums.AudioSourceType
-  PortType: Enums.AudioPortType
-  MixOption: Enums.AudioMixOption
-  Gain: number
-  Balance: number
+  sourceType: Enums.AudioSourceType
+  portType: Enums.AudioPortType
+  mixOption: Enums.AudioMixOption
+  gain: number
+  balance: number
 }
 
 export interface AudioState_InputState_AnalogState {
-  RcaToXlr: boolean
+  rcaToXlr: boolean
 }
 
 export interface FairlightAudioState_DynamicsState {
-  MakeUpGain: number
-  Limiter: FairlightAudioState_LimiterState
-  Compressor: FairlightAudioState_CompressorState
-  Expander: FairlightAudioState_ExpanderState
+  makeUpGain: number
+  limiter: FairlightAudioState_LimiterState
+  compressor: FairlightAudioState_CompressorState
+  expander: FairlightAudioState_ExpanderState
 }
 
 export interface FairlightAudioState_EqualizerState {
-  Enabled: boolean
-  Gain: number
-  Bands: FairlightAudioState_EqualizerBandState[]
+  enabled: boolean
+  gain: number
+  bands: FairlightAudioState_EqualizerBandState[]
 }
 
 export interface FairlightAudioState_LevelsState {
-  Levels: number[]
-  Peaks: number[]
-  DynamicsInputLevels: number[]
-  DynamicsInputPeaks: number[]
-  DynamicsOutputLevels: number[]
-  DynamicsOutputPeaks: number[]
-  ExpanderGainReductionLevel: number
-  CompressorGainReductionLevel: number
-  LimiterGainReductionLevel: number
+  levels: number[]
+  peaks: number[]
+  dynamicsInputLevels: number[]
+  dynamicsInputPeaks: number[]
+  dynamicsOutputLevels: number[]
+  dynamicsOutputPeaks: number[]
+  expanderGainReductionLevel: number
+  compressorGainReductionLevel: number
+  limiterGainReductionLevel: number
 }
 
 export interface FairlightAudioState_AnalogState {
-  SupportedInputLevel: Enums.FairlightAnalogInputLevel
-  InputLevel: Enums.FairlightAnalogInputLevel
+  supportedInputLevel: Enums.FairlightAnalogInputLevel
+  inputLevel: Enums.FairlightAnalogInputLevel
 }
 
 export interface FairlightAudioState_InputSourceState {
-  SourceId: number
-  SourceType: Enums.FairlightAudioSourceType
-  Gain: number
-  Balance: number
-  FaderGain: number
-  SupportedMixOptions: Enums.FairlightAudioMixOption
-  MixOption: Enums.FairlightAudioMixOption
-  MaxFramesDelay: number
-  FramesDelay: number
-  HasStereoSimulation: boolean
-  StereoSimulation: number
-  Dynamics: FairlightAudioState_DynamicsState
-  Equalizer: FairlightAudioState_EqualizerState
-  Levels: FairlightAudioState_LevelsState
+  sourceId: number
+  sourceType: Enums.FairlightAudioSourceType
+  gain: number
+  balance: number
+  faderGain: number
+  supportedMixOptions: Enums.FairlightAudioMixOption
+  mixOption: Enums.FairlightAudioMixOption
+  maxFramesDelay: number
+  framesDelay: number
+  hasStereoSimulation: boolean
+  stereoSimulation: number
+  dynamics: FairlightAudioState_DynamicsState
+  equalizer: FairlightAudioState_EqualizerState
+  levels: FairlightAudioState_LevelsState
 }
 
 export interface MacroState_MacroRunStatus {
 }
 
 export interface MediaPoolState_FrameState {
-  IsUsed: boolean
-  Filename: number[]
+  isUsed: boolean
+  filename: number[]
 }
 
 export interface MultiViewerState_PropertiesState {
-  Layout: Enums.MultiViewLayoutV8
-  ProgramPreviewSwapped: boolean
+  layout: Enums.MultiViewLayoutV8
+  programPreviewSwapped: boolean
 }
 
 export interface MultiViewerState_WindowState {
-  VuMeter: boolean
-  SupportsVuMeter: boolean
-  Source: Enums.VideoSource
-  SafeAreaEnabled: boolean
+  vuMeter: boolean
+  supportsVuMeter: boolean
+  source: Enums.VideoSource
+  safeAreaEnabled: boolean
 }
 
 export interface InputState_PropertiesState {
-  ShortName: string
-  LongName: string
-  InternalPortType: Enums.InternalPortType
-  AvailableExternalPortTypes: Enums.ExternalPortTypeFlags
-  CurrentExternalPortType: Enums.ExternalPortTypeFlags
+  shortName: string
+  longName: string
+  internalPortType: Enums.InternalPortType
+  availableExternalPortTypes: Enums.ExternalPortTypeFlags
+  currentExternalPortType: Enums.ExternalPortTypeFlags
 }
 
 export interface InputState_TallyState {
-  ProgramTally: boolean
-  PreviewTally: boolean
+  programTally: boolean
+  previewTally: boolean
 }
 
 export interface SettingsState_TalkbackInputState {
 }
 
 export interface MixEffectState_KeyerAdvancedChromaSampleState {
-  EnableCursor: boolean
-  Preview: boolean
-  CursorX: number
-  CursorY: number
-  CursorSize: number
-  SampledY: number
-  SampledCb: number
-  SampledCr: number
+  enableCursor: boolean
+  preview: boolean
+  cursorX: number
+  cursorY: number
+  cursorSize: number
+  sampledY: number
+  sampledCb: number
+  sampledCr: number
 }
 
 export interface MixEffectState_KeyerAdvancedChromaPropertiesState {
-  ForegroundLevel: number
-  BackgroundLevel: number
-  KeyEdge: number
-  SpillSuppression: number
-  FlareSuppression: number
-  Brightness: number
-  Contrast: number
-  Saturation: number
-  Red: number
-  Green: number
-  Blue: number
+  foregroundLevel: number
+  backgroundLevel: number
+  keyEdge: number
+  spillSuppression: number
+  flareSuppression: number
+  brightness: number
+  contrast: number
+  saturation: number
+  red: number
+  green: number
+  blue: number
 }
 
 export interface FairlightAudioState_LimiterState {
-  LimiterEnabled: boolean
-  Threshold: number
-  Attack: number
-  Hold: number
-  Release: number
+  limiterEnabled: boolean
+  threshold: number
+  attack: number
+  hold: number
+  release: number
 }
 
 export interface FairlightAudioState_CompressorState {
-  CompressorEnabled: boolean
-  Threshold: number
-  Ratio: number
-  Attack: number
-  Hold: number
-  Release: number
+  compressorEnabled: boolean
+  threshold: number
+  ratio: number
+  attack: number
+  hold: number
+  release: number
 }
 
 export interface FairlightAudioState_ExpanderState {
-  ExpanderEnabled: boolean
-  GateEnabled: boolean
-  Threshold: number
-  Range: number
-  Ratio: number
-  Attack: number
-  Hold: number
-  Release: number
+  expanderEnabled: boolean
+  gateEnabled: boolean
+  threshold: number
+  range: number
+  ratio: number
+  attack: number
+  hold: number
+  release: number
 }
 
 export interface FairlightAudioState_EqualizerBandState {
-  BandEnabled: boolean
-  SupportedShapes: Enums.FairlightEqualizerBandShape
-  Shape: Enums.FairlightEqualizerBandShape
-  SupportedFrequencyRanges: Enums.FairlightEqualizerFrequencyRange
-  FrequencyRange: Enums.FairlightEqualizerFrequencyRange
-  Frequency: number
-  Gain: number
-  QFactor: number
+  bandEnabled: boolean
+  supportedShapes: Enums.FairlightEqualizerBandShape
+  shape: Enums.FairlightEqualizerBandShape
+  supportedFrequencyRanges: Enums.FairlightEqualizerFrequencyRange
+  frequencyRange: Enums.FairlightEqualizerFrequencyRange
+  frequency: number
+  gain: number
+  qFactor: number
 }
 

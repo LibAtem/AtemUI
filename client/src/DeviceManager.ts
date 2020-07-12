@@ -1,13 +1,13 @@
 import React from 'react'
 import { AtemDeviceInfo } from './Devices/types'
-import * as LibAtem  from './libatem'
+import { LibAtemState, LibAtemProfile } from './generated'
 
 export interface DeviceContext {
   signalR: signalR.HubConnection | undefined
   devices: AtemDeviceInfo[]
   activeDeviceId: string | null
-  currentState: LibAtem.AtemState | null
-  currentProfile: LibAtem.DeviceProfile | null
+  currentState: LibAtemState.AtemState | null
+  currentProfile: LibAtemProfile.DeviceProfile | null
 }
 
 export const DeviceManagerContext = React.createContext<DeviceContext>({
