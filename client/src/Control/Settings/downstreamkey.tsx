@@ -52,7 +52,7 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
           <RateInput
             value={this.props.keyers[index].properties.rate}
             videoMode={this.props.videoMode}
-            callback={(e: string) => {
+            callback={(e) => {
               this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', { Index: index, Rate: e })
             }}
           />

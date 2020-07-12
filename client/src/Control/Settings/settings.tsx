@@ -184,7 +184,7 @@ class FadeToBlack extends React.Component<SubMenuProps, SubMenuState> {
           <RateInput
             value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames}
             videoMode={this.props.currentState.settings.videoMode}
-            callback={(e: string) => {
+            callback={(e) => {
               this.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', { Index: 0, Rate: e })
             }}
           />
@@ -433,8 +433,8 @@ export class MagicInput extends React.Component<MagicInputProps, MagicInputState
 }
 
 interface RateProps {
-  callback: any
-  value: any
+  callback: (val: number) => void
+  value: number
   disabled?: boolean
   videoMode: number
   className?: string

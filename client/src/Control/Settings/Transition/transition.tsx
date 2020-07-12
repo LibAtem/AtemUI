@@ -202,7 +202,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.mix.rate}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionMixSetCommand', {
                   Index: this.props.mixEffect,
                   Rate: e
@@ -221,7 +221,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dip.rate}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
                   Index: this.props.mixEffect,
                   Mask: 1,
@@ -291,7 +291,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.stinger.clipDuration}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
                   Index: this.props.mixEffect,
                   Mask: 64,
@@ -309,7 +309,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.stinger.triggerPoint}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
                   Index: this.props.mixEffect,
                   Mask: 128,
@@ -327,7 +327,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.stinger.mixRate}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
                   Index: this.props.mixEffect,
                   Mask: 256,
@@ -345,7 +345,7 @@ export class Transition extends React.Component<SubMenuProps, TransitionState> {
             <RateInput
               value={this.props.currentState.mixEffects[this.props.mixEffect].transition.stinger.preroll}
               videoMode={this.props.currentState.settings.videoMode}
-              callback={(e: string) => {
+              callback={(e) => {
                 this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
                   Index: this.props.mixEffect,
                   Mask: 32,

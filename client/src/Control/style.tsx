@@ -1,11 +1,11 @@
 import React from 'react'
 import { AtemButtonGeneric } from './button/button'
-import { SendCommand } from '../device-page-wrapper'
+import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
 import * as LibAtem  from '../libatem'
 
 interface StyleProps {
-  sendCommand: SendCommand
+  sendCommand: SendCommandStrict
   meIndex: number
   properties: LibAtem.MixEffectState_TransitionPropertiesState
   position: LibAtem.MixEffectState_TransitionPositionState
@@ -120,9 +120,9 @@ export function TransitionStylePanel(props: StyleProps) {
           <RateInput
             disabled={!currentStyle?.command}
             className={'rate-input'}
-            callback={(e: string) => {
+            callback={(e) => {
               if (currentStyle?.command) {
-                props.sendCommand(currentStyle.command, {
+                props.sendCommand(currentStyle.command as any, { // TODO fix typing
                   Index: props.meIndex,
                   Mask: currentStyle.mask,
                   Rate: e

@@ -9,7 +9,7 @@ import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
-import { DevicePageWrapper, sendCommand } from '../device-page-wrapper'
+import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
 import * as LibAtem from '../libatem'
 
 export class ControlPage extends DevicePageWrapper {
@@ -237,14 +237,14 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           isProgram={true}
           currentSource={currentME.sources.program}
           sources={sources}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
         <TransitionStylePanel
           meIndex={meIndex}
           properties={currentME.transition.properties}
           position={currentME.transition.position}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
         <BankPanel
           meIndex={meIndex}
@@ -252,24 +252,24 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           isProgram={false}
           currentSource={currentME.sources.preview}
           sources={sources}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
         <NextPanel
           meIndex={meIndex}
           transition={currentME.transition.properties}
           keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
         <DSKPanel
           downstreamKeyers={currentState.downstreamKeyers}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
         <FTBPanel
           meIndex={meIndex}
           videoMode={currentState.settings.videoMode}
           status={currentME.fadeToBlack.status}
-          sendCommand={(command, values) => sendCommand(this.props, command, values)}
+          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
         />
       </div>
     )

@@ -1,11 +1,11 @@
 import React from 'react'
 import { AtemButtonGeneric } from './button/button'
-import { SendCommand } from '../device-page-wrapper'
+import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
 import * as LibAtem  from '../libatem'
 
 interface FTBProps {
-  sendCommand: SendCommand
+  sendCommand: SendCommandStrict
   meIndex: number
   status: LibAtem.MixEffectState_FadeToBlackStatusState
   videoMode: LibAtem.VideoMode
@@ -21,7 +21,7 @@ export function FTBPanel(props: FTBProps) {
             Rate
             <RateInput
               className={'rate-input'}
-              callback={(e: string) => {
+              callback={(e) => {
                 props.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', { Index: props.meIndex, Rate: e })
               }}
               value={props.status.remainingFrames}

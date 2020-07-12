@@ -1,10 +1,11 @@
 import React from 'react'
 import { AtemButtonGeneric } from './button/button'
-import { SendCommand } from '../device-page-wrapper'
-import * as LibAtem  from '../libatem'
+import { SendCommandStrict } from '../device-page-wrapper'
+import * as LibAtem from '../libatem'
+import * as LibAtemCommands from '../generated/commands'
 
 interface NextProps {
-  sendCommand: SendCommand
+  sendCommand: SendCommandStrict
   meIndex: number
   transition: LibAtem.MixEffectState_TransitionPropertiesState
   keyers: Pick<LibAtem.MixEffectState_KeyerState, 'onAir'>[]
@@ -41,7 +42,7 @@ export function NextPanel(props: NextProps) {
           callback={() =>
             props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {
               Index: props.meIndex,
-              Mask: 2,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionPropertiesSetCommand_MaskFlags.NextSelection,
               NextSelection: setSelection(index + 1)
             })
           }
@@ -63,7 +64,7 @@ export function NextPanel(props: NextProps) {
             callback={() =>
               props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {
                 Index: props.meIndex,
-                Mask: 2,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionPropertiesSetCommand_MaskFlags.NextSelection,
                 NextSelection: setSelection(0)
               })
             }

@@ -1,7 +1,7 @@
 import { AtemButtonGeneric } from './button/button'
 import React from 'react'
 import { useMediaQuery } from 'react-responsive'
-import { SendCommand } from '../device-page-wrapper'
+import { SendCommandStrict } from '../device-page-wrapper'
 
 export interface InputProps {
   index: number
@@ -10,7 +10,7 @@ export interface InputProps {
 }
 
 interface BankProps {
-  sendCommand: SendCommand
+  sendCommand: SendCommandStrict
   meIndex: number
   inTransition: boolean
   isProgram: boolean
@@ -20,9 +20,6 @@ interface BankProps {
 
 export function BankPanel(props: BankProps) {
   const buttonColor = props.isProgram || props.inTransition ? 'red' : 'green'
-  const command = props.isProgram
-    ? 'LibAtem.Commands.MixEffects.ProgramInputSetCommand'
-    : 'LibAtem.Commands.MixEffects.PreviewInputSetCommand'
   const title = props.isProgram ? 'Program' : 'Preview'
 
   const createButton = (info: InputProps) => (
@@ -30,7 +27,19 @@ export function BankPanel(props: BankProps) {
       key={info.index}
       color={buttonColor}
       name={info.name}
-      callback={() => props.sendCommand(command, { Index: props.meIndex, Source: info.index })}
+      callback={() => {
+        if (props.isProgram) {
+          props.sendCommand('LibAtem.Commands.MixEffects.ProgramInputSetCommand', {
+            Index: props.meIndex,
+            Source: info.index
+          })
+        } else {
+          props.sendCommand('LibAtem.Commands.MixEffects.PreviewInputSetCommand', {
+            Index: props.meIndex,
+            Source: info.index
+          })
+        }
+      }}
       active={props.currentSource === info.index}
     />
   )

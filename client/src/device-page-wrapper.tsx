@@ -2,6 +2,7 @@ import React from 'react'
 import { DeviceManagerContext, GetActiveDevice, GetDeviceId } from './DeviceManager'
 import { AtemDeviceInfo } from './Devices/types'
 import { Row, Col, Container } from 'react-bootstrap'
+import { CommandTypes } from './generated/commands'
 
 export abstract class DevicePageWrapper extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -65,6 +66,26 @@ export function sendCommand(props: PropsBase, command: string, value: SendComman
       .invoke<void>('CommandSend', devId, command, JSON.stringify(value))
       .then(() => {
         console.log(value)
+        console.log('Control: sent')
+        console.log(command)
+      })
+      .catch(e => {
+        console.log('Control: Failed to send', e)
+      })
+  }
+}
+
+export type SendCommandStrict = (...args: CommandTypes) => void
+export function sendCommandStrict(props: PropsBase, ...rawArgs: CommandTypes): void {
+  const { device, signalR } = props
+  if (device.connected) {
+    const devId = GetDeviceId(device)
+    
+    const [command, args] = rawArgs
+    signalR
+      .invoke<void>('CommandSend', devId, command, JSON.stringify(args))
+      .then(() => {
+        console.log(args)
         console.log('Control: sent')
         console.log(command)
       })
