@@ -109,7 +109,7 @@ namespace AtemServer.Controllers
                         foreach (PropertyInfo prop in cmd.Item2.GetProperties(
                             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                         {
-                            // If prop cannot be deserialized, then ignore
+                            // If prop cannot be serialized, then ignore
                             if (!prop.CanWrite || prop.GetSetMethod() == null)
                                 continue;
 

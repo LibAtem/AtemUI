@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem.State", "LibAtem\Li
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem.State.Test", "LibAtem\LibAtem.State.Test\LibAtem.State.Test.csproj", "{B8FDD2D0-39C7-4BA6-8885-F8DA57778C0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypesGenerator", "TypesGenerator\TypesGenerator.csproj", "{873FD022-BF8E-430F-9F1E-D839E600089C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -114,5 +116,17 @@ Global
 		{B8FDD2D0-39C7-4BA6-8885-F8DA57778C0A}.Release|x64.Build.0 = Release|Any CPU
 		{B8FDD2D0-39C7-4BA6-8885-F8DA57778C0A}.Release|x86.ActiveCfg = Release|Any CPU
 		{B8FDD2D0-39C7-4BA6-8885-F8DA57778C0A}.Release|x86.Build.0 = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|x64.Build.0 = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Debug|x86.Build.0 = Debug|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|x64.ActiveCfg = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|x64.Build.0 = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|x86.ActiveCfg = Release|Any CPU
+		{873FD022-BF8E-430F-9F1E-D839E600089C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
