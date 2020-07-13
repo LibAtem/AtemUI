@@ -24,7 +24,7 @@ interface DVEState {
   page: number
 }
 
-export class DVE extends React.Component<DVEProps, DVEState> {
+export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
   constructor(props: DVEProps) {
     super(props)
     this.state = {

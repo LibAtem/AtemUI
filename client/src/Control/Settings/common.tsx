@@ -88,3 +88,45 @@ export function ToggleButton(props: { label: string; active: boolean; onClick: (
     </div>
   )
 }
+
+interface TabPanelProps {
+  default: number
+}
+export class TabPanel extends React.Component<TabPanelProps, { page: number }> {
+  constructor(props: TabPanelProps) {
+    super(props)
+
+    this.state = {
+      page: props.default
+    }
+  }
+  render() {
+    const children = React.Children.toArray(this.props.children)
+    return (
+      <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
+        <div className="ss-submenu-submenu">
+          {children.map((ch, i) => {
+            const ch2 = ch as Partial<TabPanelTab>
+
+            return (
+              <div
+                onClick={() => this.setState({ page: i })}
+                className={this.state.page === i ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
+              >
+                {ch2.props?.label ?? `Tab ${i}`}
+              </div>
+            )
+          })}
+        </div>
+
+        {children[this.state.page]}
+      </div>
+    )
+  }
+}
+
+export class TabPanelTab extends React.Component<{ label: string }> {
+  render() {
+    return <React.Fragment>{this.props.children}</React.Fragment>
+  }
+}

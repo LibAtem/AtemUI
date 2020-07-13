@@ -1,54 +1,42 @@
-import { AtemDeviceInfo } from '../../../Devices/types'
 import React from 'react'
 import { RateInput, MagicInput } from '../settings'
 import Slider from 'react-rangeslider'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
-import { videoIds } from '../../../ControlSettings/ids'
 import { AtemButtonBar } from '../../button/button'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
-import { WipePatterns, WipePatternInfo } from './wipe-patterns'
-import { sendCommandStrict } from '../../../device-page-wrapper'
-import { CommandTypes } from '../../../generated/commands'
+import { Patterns, PatternInfo } from '../../common/patterns'
+import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface WipeProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
 
   meIndex: number
   wipe: LibAtemState.MixEffectState_TransitionWipeState
-  sources: LibAtemState.InputState_PropertiesState[]
+  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
   videoMode: LibAtemEnums.VideoMode
 }
 
-export class Wipe extends React.Component<WipeProps> {
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
-  }
-
-  getSourceOptions() {
-    var inputs = Object.keys(this.props.sources)
-    var sources = inputs.filter(i => videoIds[i] < 4000)
-    var options = []
-    for (var i in sources) {
-      options.push(
-        <option key={i} value={videoIds[sources[i]]}>
-          {(this.props.sources as any)[sources[i]].properties.longName}
+export class WipeTransitionSettings extends React.Component<WipeProps> {
+  private getSourceOptions() {
+    return Array.from(this.props.sources.entries())
+      .filter(([i]) => i < 4000)
+      .map(([i, v]) => (
+        <option key={i} value={i}>
+          {v.longName}
         </option>
-      )
-    }
-    return options
+      ))
   }
 
   private renderPattern(pattern: LibAtemEnums.Pattern) {
     const isCurrent = this.props.wipe.pattern === pattern
-    const patternInfo = WipePatterns[pattern]
+    const patternInfo = Patterns[pattern]
 
     return (
       <div
         key={pattern}
         onClick={() =>
-          this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+          this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
             Index: this.props.meIndex,
             Pattern: pattern,
             Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Pattern
@@ -62,15 +50,13 @@ export class Wipe extends React.Component<WipeProps> {
   }
 
   render() {
-    const currentPatternInfo: WipePatternInfo | undefined = WipePatterns[this.props.wipe.pattern]
+    const currentPatternInfo: PatternInfo | undefined = Patterns[this.props.wipe.pattern]
     var disabled = false
     var diabledClass = !disabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
 
     return (
       <div>
-        <div className="ss-wipe-pattern-holder">
-          {Object.keys(WipePatterns).map(v => this.renderPattern(Number(v)))}
-        </div>
+        <div className="ss-wipe-pattern-holder">{Object.keys(Patterns).map(v => this.renderPattern(Number(v)))}</div>
 
         <div className="ss-row" style={{ marginTop: '20px', marginBottom: '20px' }}>
           <div className="ss-label">Rate:</div>
@@ -79,7 +65,7 @@ export class Wipe extends React.Component<WipeProps> {
               videoMode={this.props.videoMode}
               value={this.props.wipe.rate}
               callback={(e: number) =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
                   Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Rate,
                   Rate: e
@@ -95,9 +81,9 @@ export class Wipe extends React.Component<WipeProps> {
               tooltip={false}
               step={0.1}
               onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 16,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
                   Symmetry: e
                 })
               }
@@ -110,9 +96,9 @@ export class Wipe extends React.Component<WipeProps> {
             value={this.props.wipe.symmetry}
             callback={(value: any) => {
               if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 16,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
                   Symmetry: Math.min(100, Math.max(0, value))
                 })
               }
@@ -129,9 +115,9 @@ export class Wipe extends React.Component<WipeProps> {
             value={this.props.wipe.xPosition}
             callback={(value: any) => {
               if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 64,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.XPosition,
                   XPosition: Math.min(1, Math.max(0, value))
                 })
               }
@@ -144,9 +130,9 @@ export class Wipe extends React.Component<WipeProps> {
             value={this.props.wipe.yPosition}
             callback={(value: any) => {
               if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 128,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.YPosition,
                   YPosition: Math.min(1, Math.max(0, value))
                 })
               }
@@ -170,7 +156,7 @@ export class Wipe extends React.Component<WipeProps> {
             ]}
             selected={this.props.wipe.reverseDirection}
             onChange={v => {
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                 Index: this.props.meIndex,
                 ReverseDirection: v,
                 Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.ReverseDirection
@@ -184,10 +170,10 @@ export class Wipe extends React.Component<WipeProps> {
               type="checkbox"
               checked={this.props.wipe.flipFlop}
               onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
                   FlipFlop: !this.props.wipe.flipFlop,
-                  Mask: 512
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.FlipFlop
                 })
               }
             ></input>
@@ -201,9 +187,9 @@ export class Wipe extends React.Component<WipeProps> {
               tooltip={false}
               step={0.1}
               onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 32,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
                   BorderSoftness: e
                 })
               }
@@ -216,9 +202,9 @@ export class Wipe extends React.Component<WipeProps> {
             value={this.props.wipe.borderSoftness}
             callback={(value: any) => {
               if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 32,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
                   BorderSoftness: Math.min(100, Math.max(0, value))
                 })
               }
@@ -232,9 +218,9 @@ export class Wipe extends React.Component<WipeProps> {
               tooltip={false}
               step={0.1}
               onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 4,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
                   BorderWidth: e
                 })
               }
@@ -247,9 +233,9 @@ export class Wipe extends React.Component<WipeProps> {
             value={this.props.wipe.borderWidth}
             callback={(value: any) => {
               if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                   Index: this.props.meIndex,
-                  Mask: 4,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
                   BorderWidth: Math.min(100, Math.max(0, value))
                 })
               }
@@ -262,9 +248,9 @@ export class Wipe extends React.Component<WipeProps> {
           <select
             disabled={this.props.wipe.borderWidth === 0}
             onChange={e => {
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                 Index: this.props.meIndex,
-                Mask: 8,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderInput,
                 BorderInput: e.currentTarget.value as any
               })
             }}

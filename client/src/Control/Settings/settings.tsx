@@ -3,7 +3,7 @@ import { AtemDeviceInfo } from '../../Devices/types'
 import './settings.scss'
 import { ChromePicker } from 'react-color'
 import { GetDeviceId } from '../../DeviceManager'
-import { Transition } from './Transition/transition'
+import { TransitionSettings } from './Transition/transition'
 import { DownStreamKeys } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
 import { LibAtemState } from '../../generated'
@@ -87,13 +87,12 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           name={'Color Generators'}
         />
 
-        <Transition
+        <TransitionSettings
           mixEffect={0}
           key={'tran'}
           device={this.props.device}
           currentState={this.props.currentState}
           signalR={this.props.signalR}
-          name={'Transition'}
         />
 
         {upstreamKeys}

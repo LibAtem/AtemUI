@@ -1,13 +1,13 @@
 import React from 'react'
-import { LibAtemEnums } from '../../../generated'
+import { LibAtemEnums } from '../../generated'
 
-export interface WipePatternInfo {
+export interface PatternInfo {
   createSvg: (isCurrent: boolean) => JSX.Element
   symmetry: boolean
   x: boolean
   y: boolean
 }
-export const WipePatterns: { [key in LibAtemEnums.Pattern]: WipePatternInfo } = {
+export const Patterns: { [key in LibAtemEnums.Pattern]: PatternInfo } = {
   [LibAtemEnums.Pattern.LeftToRightBar]: {
     createSvg: isCurrent => (
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
