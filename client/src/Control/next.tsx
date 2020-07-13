@@ -11,12 +11,13 @@ interface NextProps {
 }
 
 export function NextPanel(props: NextProps) {
-  const hasSelection = (id: number): boolean => (props.transition.selection & (1 << id)) !== 0
+  const hasSelection = (id: number): boolean => (props.transition.nextSelection & (1 << id)) !== 0
   const setSelection = (id: number): number => {
+    // TODO - this is being dodgey..
     if (hasSelection(id)) {
-      return props.transition.selection ^ (1 << id)
+      return props.transition.nextSelection ^ (1 << id)
     } else {
-      return props.transition.selection | (1 << id)
+      return props.transition.nextSelection | (1 << id)
     }
   }
 

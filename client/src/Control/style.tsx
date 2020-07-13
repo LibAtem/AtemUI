@@ -2,11 +2,12 @@ import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
-import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'
+import { LibAtemState, LibAtemEnums, LibAtemCommands, LibAtemProfile } from '../generated'
 
 interface StyleProps {
   sendCommand: SendCommandStrict
   meIndex: number
+  profile: LibAtemProfile.DeviceProfile
   properties: LibAtemState.MixEffectState_TransitionPropertiesState
   position: LibAtemState.MixEffectState_TransitionPositionState
   videoMode: LibAtemEnums.VideoMode
@@ -15,6 +16,7 @@ interface StyleProps {
 interface TransStyleProps {
   name: string
   sendRate: ((props: StyleProps, rate: number) => void) | null
+  disabled: (profile: LibAtemProfile.DeviceProfile) => boolean
 }
 const styles: TransStyleProps[] = [
   {
@@ -25,6 +27,7 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
+    disabled: () => false
   },
   {
     name: 'DIP',
@@ -35,6 +38,7 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
+    disabled: () => false
   },
   {
     name: 'WIPE',
@@ -45,6 +49,7 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
+    disabled: () => false
   },
   {
     name: 'DVE',
@@ -55,10 +60,12 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
+    disabled: (p) => p.dVE === 0
   },
   {
     name: 'STING',
-    sendRate: null
+    sendRate: null,
+    disabled: (p) => p.mediaPoolClips === 0
   }
 ]
 
@@ -95,6 +102,7 @@ export function TransitionStylePanel(props: StyleProps) {
               })
             }
             active={checkStyle(index)}
+            disabled={style.disabled(props.profile)}
             name={style.name}
           />
         ))}
@@ -137,7 +145,7 @@ export function TransitionStylePanel(props: StyleProps) {
           <RateInput
             disabled={!currentStyle?.sendRate}
             className={'rate-input'}
-            callback={(e) => {
+            callback={e => {
               if (currentStyle?.sendRate) {
                 currentStyle.sendRate(props, e)
               }

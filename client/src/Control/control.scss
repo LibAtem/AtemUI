@@ -366,6 +366,10 @@ html {
     box-shadow: 0px 0px 5px 3px rgba(0, 0, 0, 0.856);
   }
 
+  &.btn-disabled {
+    background-image: url('/images/button_disabled.png');
+  }
+
   &.btn-red {
     background-image: url('/images/button_red5.png');
     // background-color: #ff0000;

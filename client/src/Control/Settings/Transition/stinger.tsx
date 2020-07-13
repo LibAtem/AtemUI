@@ -15,7 +15,7 @@ interface StingerTransitionSettingsProps {
 
 function getMediaPlayerOptions(props: StingerTransitionSettingsProps) {
   return Array.from(props.sources.entries())
-    .filter(([i]) => i === 3010 || i === 3020 || i === 3030 || i === 3040)
+    .filter(([i, v]) => v.internalPortType === LibAtemEnums.InternalPortType.MediaPlayerFill)
     .map(([i, v], x) => (
       <option key={i} value={x + 1}>
         {v.longName}

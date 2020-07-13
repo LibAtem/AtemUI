@@ -1,6 +1,5 @@
 import { RateInput } from './settings'
 import React from 'react'
-import { videoIds } from '../../ControlSettings/ids'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
@@ -9,7 +8,7 @@ interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
 
   keyers: LibAtemState.DownstreamKeyerState[]
-  inputs: Record<LibAtemEnums.VideoSource, LibAtemState.InputState>
+  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
   videoMode: LibAtemEnums.VideoMode
 }
 interface DownstreamKeyerSettingsState {
@@ -17,7 +16,10 @@ interface DownstreamKeyerSettingsState {
   page: number
 }
 
-export class DownstreamKeyerSettings extends React.Component<DownstreamKeyerSettingsProps, DownstreamKeyerSettingsState> {
+export class DownstreamKeyerSettings extends React.Component<
+  DownstreamKeyerSettingsProps,
+  DownstreamKeyerSettingsState
+> {
   constructor(props: DownstreamKeyerSettingsProps) {
     super(props)
     this.state = {
@@ -27,15 +29,13 @@ export class DownstreamKeyerSettings extends React.Component<DownstreamKeyerSett
   }
 
   private getSourceOptions() {
-    var inputs = Object.keys(this.props.inputs)
-    var sources = inputs.filter(i => videoIds[i] < 4000)
-    var options = []
-    for (var i in sources) {
-      options.push(
-        <option value={videoIds[sources[i]]}>{(this.props.inputs as any)[sources[i]].properties.longName}</option>
-      )
-    }
-    return options
+    return Array.from(this.props.sources.entries())
+      .filter(([i]) => i < 4000)
+      .map(([i, v]) => (
+        <option key={i} value={i}>
+          {v.longName}
+        </option>
+      ))
   }
 
   getTopBox(index: number) {

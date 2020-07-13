@@ -169,12 +169,20 @@ export class TabPanel extends React.Component<TabPanelProps> {
       <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
         <div className="ss-submenu-submenu">
           {children.map(ch => {
+            let classes = 'ss-submenu-submenu-item'
+            if (ch.props.disabled) {
+              classes += ' disabled'
+            } else if (this.props.page !== ch.props.id) {
+              classes += ' inactive'
+            }
             return (
               <div
-                onClick={() => this.props.onChange(ch.props.id)}
-                className={
-                  this.props.page === ch.props.id ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item inactive'
-                }
+                onClick={() => {
+                  if (!ch.props.disabled) {
+                    this.props.onChange(ch.props.id)
+                  }
+                }}
+                className={classes}
               >
                 {ch.props?.label ?? `?`}
               </div>
@@ -182,13 +190,13 @@ export class TabPanel extends React.Component<TabPanelProps> {
           })}
         </div>
 
-        {children.find(ch => ch.props.id === this.props.page)}
+        {children.find(ch => ch.props.id === this.props.page && !ch.props.disabled)}
       </div>
     )
   }
 }
 
-export class TabPanelTab extends React.Component<{ id: number; label: string }> {
+export class TabPanelTab extends React.Component<{ id: number; label: string; disabled?: boolean }> {
   render() {
     return <React.Fragment>{this.props.children}</React.Fragment>
   }

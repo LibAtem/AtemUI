@@ -364,7 +364,6 @@ class NavBar extends React.PureComponent<{
           </Nav>
           <Form inline>
             {this.renderDeviceSelection()}
-            <Button variant="outline-info">Search</Button>
           </Form>
         </Navbar.Collapse>
       </Navbar>

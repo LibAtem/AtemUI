@@ -4,17 +4,19 @@ import './settings.scss'
 import { TransitionSettings } from './Transition/transition'
 import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
-import { LibAtemState } from '../../generated'
+import { LibAtemState, LibAtemEnums, LibAtemProfile } from '../../generated'
 import { AtemButtonBar } from '../button/button'
 import { CommandTypes } from '../../generated/commands'
 import { sendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
+import { videoIds } from '../../ControlSettings/ids'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
+  profile: LibAtemProfile.DeviceProfile | null
   full: boolean
 }
 interface SwitcherSettingsState {
@@ -36,7 +38,9 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     sendCommandStrict(this.props, ...args)
   }
 
-  private getFtbAudioProps(state: LibAtemState.AtemState): Pick<FadeToBlackSettingsProps, 'ftbMode' | 'followFadeToBlack'> {
+  private getFtbAudioProps(
+    state: LibAtemState.AtemState
+  ): Pick<FadeToBlackSettingsProps, 'ftbMode' | 'followFadeToBlack'> {
     if (state.audio) {
       return {
         ftbMode: 'classic',
@@ -56,36 +60,24 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
   }
 
   render() {
-    if (!this.props.currentState || !this.props.signalR) {
+    if (!this.props.currentState || !this.props.signalR || !this.props.profile) {
       return <div style={this.props.full ? { height: '100%' } : { overflowY: 'auto' }} className="ss"></div>
+    }
+
+    const inputProperties = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
+    // TODO - memo this?
+    for (const [k, v] of Object.entries(this.props.currentState.settings.inputs)) {
+      const id = videoIds[k]
+      if (id !== undefined) {
+        inputProperties.set(id, v.properties)
+      }
     }
 
     const meIndex = 0
     const meProps = this.props.currentState.mixEffects[meIndex]
 
-    
-
-    var upstreamKeys = []
-    for (var i = 0; i < this.props.currentState.mixEffects[0].keyers.length; i++) {
-      upstreamKeys.push(
-        <UpstreamKey
-          key={'up' + i}
-          sendCommand={this.sendCommand}
-          currentState={this.props.currentState}
-          id={i}
-          name={'Upstream Key ' + (i + 1)}
-          mixEffect={0}
-        />
-      )
-    }
     return (
       <div style={this.props.full ? { height: '100%' } : { overflowY: 'scroll' }} className="ss">
-        {/* <div style={{ width: "0px", position: "relative" }} onClick={() => this.setState({ open: false })}>
-                    <div className="open-button"><svg style={{ position: "absolute", left: "4px" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange" width="25px" height="25px"><path d="M0 0h24v24H0V0z" fill="none" /><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" /></svg></div>
-                </div> */}
-
-        {/* <div style={{ overflowY: "scroll", height: "100%" }} > */}
-
         <AtemButtonBar
           style={{ margin: '10px' }}
           options={[
@@ -109,24 +101,33 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         />
 
         <ColorGeneratorSettings
-          key={'cg'}
           sendCommand={this.sendCommand}
           colorGenerators={this.props.currentState.colorGenerators}
         />
 
         <TransitionSettings
-          mixEffect={0}
-          key={'tran'}
+          mixEffect={meIndex}
           sendCommand={this.sendCommand}
           currentState={this.props.currentState}
+          profile={this.props.profile}
+          inputProperties={inputProperties}
         />
 
-        {upstreamKeys}
+        {meProps.keyers.map((key, i) => (
+          <UpstreamKey
+            key={'usk' + i}
+            sendCommand={this.sendCommand}
+            currentState={this.props.currentState}
+            id={i}
+            name={'Upstream Key ' + (i + 1)}
+            mixEffect={meIndex}
+          />
+        ))}
 
         <DownstreamKeyerSettings
           sendCommand={this.sendCommand}
           videoMode={this.props.currentState.settings.videoMode}
-          inputs={this.props.currentState.settings.inputs}
+          sources={inputProperties}
           keyers={this.props.currentState.downstreamKeyers}
         />
 

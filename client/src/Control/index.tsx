@@ -10,12 +10,19 @@ import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
-import { LibAtemState } from '../generated'
+import { LibAtemState, LibAtemProfile } from '../generated'
 import { AtemButtonBar } from './button/button'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
-    return <ControlPageInnerInner device={device} currentState={this.context.currentState} signalR={signalR} />
+    return (
+      <ControlPageInnerInner
+        device={device}
+        currentState={this.context.currentState}
+        signalR={signalR}
+        profile={this.context.currentProfile}
+      />
+    )
   }
 }
 
@@ -23,6 +30,7 @@ interface ControlPageInnerInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
+  profile: LibAtemProfile.DeviceProfile | null
 }
 interface ControlPageInnerInnerState {
   open: boolean
@@ -84,6 +92,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               <div className="control-page" style={{ gridTemplateColumns: '1fr 20px 310px' }}>
                 <MixEffectPanel
                   open={this.state.open}
+                  profile={this.props.profile}
                   device={this.props.device}
                   currentState={this.props.currentState}
                   signalR={this.props.signalR}
@@ -95,6 +104,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   full={false}
                   device={this.props.device}
                   currentState={this.props.currentState}
+                  profile={this.props.profile}
                   signalR={this.props.signalR}
                 />
               </div>
@@ -102,6 +112,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               <div className="control-page" style={{ gridTemplateColumns: '1fr 20px' }}>
                 <MixEffectPanel
                   open={this.state.open}
+                  profile={this.props.profile}
                   device={this.props.device}
                   currentState={this.props.currentState}
                   signalR={this.props.signalR}
@@ -132,6 +143,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 full={true}
                 device={this.props.device}
                 currentState={this.props.currentState}
+                profile={this.props.profile}
                 signalR={this.props.signalR}
               />
             </div>
@@ -155,6 +167,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
               <MixEffectPanel
                 device={this.props.device}
+                profile={this.props.profile}
                 currentState={this.props.currentState}
                 open={this.state.open}
                 signalR={this.props.signalR}
@@ -171,6 +184,7 @@ interface MixEffectPanelProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
+  profile: LibAtemProfile.DeviceProfile | null
   open: boolean
 }
 interface MixEffectPanelState {
@@ -204,12 +218,12 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
   }
 
   render() {
-    const { currentState } = this.props
+    const { currentState, profile } = this.props
     const { hasConnected } = this.state
 
     if (!hasConnected) {
       return <p>Device is not connected</p>
-    } else if (!currentState) {
+    } else if (!currentState || !profile) {
       return <p>Loading state...</p>
     }
 
@@ -244,6 +258,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
         />
         <TransitionStylePanel
           meIndex={meIndex}
+          profile={profile}
           properties={currentME.transition.properties}
           position={currentME.transition.position}
           videoMode={currentState.settings.videoMode}

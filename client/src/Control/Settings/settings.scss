@@ -529,14 +529,16 @@ input[type='number'] {
     line-height: 25px;
     box-shadow: -1px 0px 0px 0px #1a1a1a;
 
-    &.inactive {
+    &.inactive, &.disabled {
       background: rgb(41, 41, 41);
       background: linear-gradient(0deg, rgba(41, 41, 41, 1) 57%, rgba(49, 49, 49, 1) 94%);
       box-shadow: 0px 1px 0px 0px #1a1a1a, -1px 0px 0px 0px #1a1a1a;
-
-      &:hover {
-        background: linear-gradient(0deg, rgb(56, 56, 56) 57%, rgb(58, 58, 58) 94%);
-      }
+    }
+    &.inactive:hover {
+      background: linear-gradient(0deg, rgb(56, 56, 56) 57%, rgb(58, 58, 58) 94%);
+    }
+    &.disabled {
+      color: #505050;
     }
   }
 }
