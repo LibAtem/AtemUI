@@ -7,6 +7,8 @@ import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@
 import { videoIds } from '../../../ControlSettings/ids'
 import Slider from 'react-rangeslider'
 import { ToggleButton } from '../common'
+import { AtemButtonBar } from '../../button/button'
+import { LibAtemCommands, LibAtemEnums } from '../../../generated'
 
 interface DVEProps {
   device: AtemDeviceInfo
@@ -1454,14 +1456,23 @@ export class DVE extends React.Component<DVEProps, DVEState> {
       direction.push(
         <div className="ss-row" style={{ gridTemplateColumns: '1fr 1fr 1.5fr' }}>
           <div className="ss-label disabled">Direction:</div>
-          <div className="ss-direction-holder">
-            <div style={{ lineHeight: '25px' }} className="ss-button-inner ss-button-left disabled">
-              <FontAwesomeIcon icon={faAngleRight} />
-            </div>
-            <div style={{ lineHeight: '25px' }} className="ss-button-inner ss-button-right disabled">
-              <FontAwesomeIcon icon={faAngleLeft} />
-            </div>
-          </div>
+          <AtemButtonBar
+            innerStyle={{ lineHeight: '25px' }}
+            disabled={true}
+            options={[
+              {
+                label: <FontAwesomeIcon icon={faAngleRight} />,
+                value: false
+              },
+              {
+                label: <FontAwesomeIcon icon={faAngleLeft} />,
+                value: true
+              }
+            ]}
+            selected={false}
+            onChange={() => {}}
+          />
+
           <label
             className={
               this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style == 32 ||
@@ -1498,42 +1509,28 @@ export class DVE extends React.Component<DVEProps, DVEState> {
       direction.push(
         <div className="ss-row" style={{ gridTemplateColumns: '1fr 1fr 1.5fr' }}>
           <div className="ss-label">Direction:</div>
-          <div className="ss-direction-holder">
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: this.props.mixEffect,
-                  Reverse: false,
-                  Mask: 1024
-                })
+          <AtemButtonBar
+            innerStyle={{ lineHeight: '25px' }}
+            options={[
+              {
+                label: <FontAwesomeIcon icon={faAngleRight} />,
+                value: false
+              },
+              {
+                label: <FontAwesomeIcon icon={faAngleLeft} />,
+                value: true
               }
-              style={{ lineHeight: '25px' }}
-              className={
-                !this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse
-                  ? 'ss-button-inner ss-button-left ss-button-inner-selected'
-                  : 'ss-button-inner ss-button-left'
-              }
-            >
-              <FontAwesomeIcon icon={faAngleRight} />
-            </div>
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: this.props.mixEffect,
-                  Reverse: true,
-                  Mask: 1024
-                })
-              }
-              style={{ lineHeight: '25px' }}
-              className={
-                this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse
-                  ? 'ss-button-inner ss-button-right ss-button-inner-selected'
-                  : 'ss-button-inner ss-button-right'
-              }
-            >
-              <FontAwesomeIcon icon={faAngleLeft} />
-            </div>
-          </div>
+            ]}
+            selected={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse}
+            onChange={(v) => {
+              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: this.props.mixEffect,
+                Reverse: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Reverse
+              })
+            }}
+          />
+
           <label className="ss-checkbox-container">
             Flip Flop
             <input
@@ -1606,59 +1603,33 @@ export class DVE extends React.Component<DVEProps, DVEState> {
 
         {direction}
 
-        <div className="ss-row" style={{ gridTemplateColumns: '1fr 25px 25px 25px 1fr' }}>
+        <div className="ss-row" style={{ gridTemplateColumns: '1fr 100px 1fr' }}>
           <div className="ss-label">Effects: </div>
-          <div
-            onClick={() =>
+          <AtemButtonBar
+            innerStyle={{ lineHeight: '25px' }}
+            options={[
+              {
+                label: <FontAwesomeIcon icon={faUndoAlt} />,
+                value: LibAtemEnums.DVEEffect.GraphicCCWSpin
+              },
+              {
+                label: <FontAwesomeIcon icon={faRedoAlt} />,
+                value: LibAtemEnums.DVEEffect.GraphicCWSpin
+              },
+              {
+                label: <FontAwesomeIcon icon={faArrowRight} />,
+                value: LibAtemEnums.DVEEffect.GraphicLogoWipe
+              }
+            ]}
+            selected={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style}
+            onChange={(v) => {
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.mixEffect,
-                Mask: 4,
-                Style: 33
+                Style: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Style
               })
-            }
-            style={{ borderRadius: '10px', lineHeight: '25px' }}
-            className={
-              this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style == 33
-                ? 'ss-button-inner ss-button-inner-selected'
-                : 'ss-button-inner'
-            }
-          >
-            <FontAwesomeIcon icon={faUndoAlt} />
-          </div>
-          <div
-            onClick={() =>
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.mixEffect,
-                Mask: 4,
-                Style: 32
-              })
-            }
-            style={{ borderRadius: '10px', lineHeight: '25px' }}
-            className={
-              this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style == 32
-                ? 'ss-button-inner ss-button-inner-selected'
-                : 'ss-button-inner'
-            }
-          >
-            <FontAwesomeIcon icon={faRedoAlt} />
-          </div>
-          <div
-            onClick={() =>
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.mixEffect,
-                Mask: 4,
-                Style: 34
-              })
-            }
-            style={{ borderRadius: '10px', lineHeight: '25px' }}
-            className={
-              this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style == 34
-                ? 'ss-button-inner ss-button-inner-selected'
-                : 'ss-button-inner'
-            }
-          >
-            <FontAwesomeIcon icon={faArrowRight} />
-          </div>
+            }}
+          />
         </div>
 
         <div className="ss-row">

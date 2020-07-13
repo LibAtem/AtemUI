@@ -1,12 +1,13 @@
 import React from 'react'
 import { AtemDeviceInfo } from '../../Devices/types'
-import './settings.css'
+import './settings.scss'
 import { ChromePicker } from 'react-color'
 import { GetDeviceId } from '../../DeviceManager'
 import { Transition } from './Transition/transition'
 import { DownStreamKeys } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
 import { LibAtemState } from '../../generated'
+import { AtemButtonBar } from '../button/button'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
@@ -56,11 +57,27 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
 
         {/* <div style={{ overflowY: "scroll", height: "100%" }} > */}
 
-        <div className="ss-button-holder">
-          <div className="ss-button-inner ss-button-left ss-button-inner-selected">Palettes</div>
-          <div className="ss-button-inner ss-button-mid">Media Players</div>
-          <div className="ss-button-inner ss-button-right">Capture</div>
-        </div>
+        <AtemButtonBar
+          style={{ margin: '10px' }}
+          options={[
+            {
+              label: 'Palettes',
+              value: 0
+            },
+            {
+              label: 'Media Players',
+              value: 1,
+              disabled: true
+            },
+            {
+              label: 'Capture',
+              value: 2,
+              disabled: true
+            }
+          ]}
+          selected={0}
+          onChange={() => {}}
+        />
 
         <ColorMenu
           key={'cg'}
@@ -163,7 +180,7 @@ class FadeToBlack extends React.Component<SubMenuProps, SubMenuState> {
           <RateInput
             value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames}
             videoMode={this.props.currentState.settings.videoMode}
-            callback={(e) => {
+            callback={e => {
               this.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', { Index: 0, Rate: e })
             }}
           />
@@ -383,7 +400,7 @@ export class MagicInput extends React.Component<MagicInputProps, MagicInputState
     super(props)
     this.state = {
       focus: false,
-      tempValue: this.props.value,
+      tempValue: this.props.value
     }
   }
 

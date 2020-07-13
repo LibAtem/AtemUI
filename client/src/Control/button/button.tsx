@@ -33,3 +33,46 @@ export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
     )
   }
 }
+
+interface AtemButtonBarProps<T> {
+  style?: React.HTMLAttributes<HTMLDivElement>['style']
+  innerStyle?: React.HTMLAttributes<HTMLDivElement>['style']
+  selected: T
+  disabled?: boolean
+  options: Array<{
+    value: T
+    label: JSX.Element | string
+    disabled?: boolean
+  }>
+  onChange: (val: T) => void
+}
+export class AtemButtonBar<T> extends React.Component<AtemButtonBarProps<T>> {
+  render() {
+    return (
+      <div className="button-bar" style={this.props.style}>
+        {this.props.options.map((opt, i) => {
+          let classes = 'button-bar-inner'
+          if (opt.value === this.props.selected) {
+            classes += ' button-bar-inner-selected'
+          }
+          if (opt.disabled || this.props.disabled) {
+            classes += ' disabled'
+          }
+
+          return (
+            <div
+              key={i}
+              className={classes}
+              style={this.props.innerStyle}
+              onClick={() => {
+                this.props.onChange(opt.value)
+              }}
+            >
+              {opt.label}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+}

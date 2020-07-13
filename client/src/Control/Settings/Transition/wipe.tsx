@@ -6,6 +6,8 @@ import Slider from 'react-rangeslider'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { videoIds, patterns } from '../../../ControlSettings/ids'
+import { AtemButtonBar } from '../../button/button'
+import { LibAtemCommands } from '../../../generated'
 
 interface WipeProps {
   device: AtemDeviceInfo
@@ -690,42 +692,28 @@ export class Wipe extends React.Component<WipeProps, WipeState> {
 
         <div className="ss-row" style={{ gridTemplateColumns: '1fr 1fr 1.5fr' }}>
           <div className="ss-label">Direction:</div>
-          <div className="ss-direction-holder">
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.mixEffect,
-                  ReverseDirection: false,
-                  Mask: 256
-                })
+          <AtemButtonBar
+            innerStyle={{ lineHeight: '25px' }}
+            options={[
+              {
+                label: <FontAwesomeIcon icon={faAngleRight} />,
+                value: false
+              },
+              {
+                label: <FontAwesomeIcon icon={faAngleLeft} />,
+                value: true
               }
-              style={{ lineHeight: '25px' }}
-              className={
-                !this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.reverseDirection
-                  ? 'ss-button-inner ss-button-left ss-button-inner-selected'
-                  : 'ss-button-inner ss-button-left'
-              }
-            >
-              <FontAwesomeIcon icon={faAngleRight} />
-            </div>
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.mixEffect,
-                  ReverseDirection: true,
-                  Mask: 256
-                })
-              }
-              style={{ lineHeight: '25px' }}
-              className={
-                this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.reverseDirection
-                  ? 'ss-button-inner ss-button-right ss-button-inner-selected'
-                  : 'ss-button-inner ss-button-right'
-              }
-            >
-              <FontAwesomeIcon icon={faAngleLeft} />
-            </div>
-          </div>
+            ]}
+            selected={this.props.currentState.mixEffects[this.props.mixEffect].transition.wipe.reverseDirection}
+            onChange={(v) => {
+              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                Index: this.props.mixEffect,
+                ReverseDirection: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.ReverseDirection
+              })
+            }}
+          />
+          
           <label className="ss-checkbox-container">
             Flip Flop
             <input

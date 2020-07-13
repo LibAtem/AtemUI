@@ -11,16 +11,11 @@ import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState } from '../generated'
+import { AtemButtonBar } from './button/button'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
-    return (
-      <ControlPageInnerInner
-        device={device}
-        currentState={this.context.currentState}
-        signalR={signalR}
-      />
-    )
+    return <ControlPageInnerInner device={device} currentState={this.context.currentState} signalR={signalR} />
   }
 }
 
@@ -34,13 +29,49 @@ interface ControlPageInnerInnerState {
   openMobile: boolean
 }
 
+function OpenCloseButton(props: { open: boolean; change: (v: boolean) => void }) {
+  if (props.open) {
+    return (
+      <div onClick={() => props.change(false)} className="open-button">
+        <svg
+          style={{ position: 'absolute', top: '7px' }}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="orange"
+          width="25px"
+          height="25px"
+        >
+          <path d="M0 0h24v24H0V0z" fill="none" />
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+        </svg>
+      </div>
+    )
+  } else {
+    return (
+      <div onClick={() => props.change(true)} className="open-button">
+        <svg
+          style={{ position: 'absolute', left: '-1px', top: '7px' }}
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="orange"
+          width="25px"
+          height="25px"
+        >
+          <path d="M0 0h24v24H0V0z" fill="none" />
+          <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+        </svg>
+      </div>
+    )
+  }
+}
+
 //Handles Mobile Layout
 class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, ControlPageInnerInnerState> {
   constructor(props: MixEffectPanelProps) {
     super(props)
     this.state = {
       open: true,
-      openMobile: false,
+      openMobile: false
     }
   }
 
@@ -58,24 +89,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   signalR={this.props.signalR}
                 />
 
-                <div
-                  onClick={() => {
-                    this.setState({ open: false })
-                  }}
-                  className="open-button"
-                >
-                  <svg
-                    style={{ position: 'absolute', top: '7px' }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="orange"
-                    width="25px"
-                    height="25px"
-                  >
-                    <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                  </svg>
-                </div>
+                <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
 
                 <SwitcherSettings
                   full={false}
@@ -93,40 +107,26 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   signalR={this.props.signalR}
                 />
 
-                <div
-                  onClick={() => {
-                    this.setState({ open: true })
-                  }}
-                  className="open-button"
-                >
-                  <svg
-                    style={{ position: 'absolute', left: '-1px', top: '7px' }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="orange"
-                    width="25px"
-                    height="25px"
-                  >
-                    <path d="M0 0h24v24H0V0z" fill="none" />
-                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
-                  </svg>
-                </div>
+                <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
               </div>
             )
           ) : this.state.openMobile ? (
             <div className="control-page" style={{ display: 'box' }}>
-              <div className="ss-button-holder" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div className="ss-button-inner ss-button-left " onClick={() => this.setState({ openMobile: false })}>
-                  Control
-                </div>
-
-                <div
-                  className="ss-button-inner ss-button-right ss-button-inner-selected"
-                  onClick={() => this.setState({ openMobile: true })}
-                >
-                  Settings
-                </div>
-              </div>
+              <AtemButtonBar
+                style={{ margin: '10px' }}
+                options={[
+                  {
+                    label: 'Control',
+                    value: false
+                  },
+                  {
+                    label: 'Settings',
+                    value: true
+                  }
+                ]}
+                selected={this.state.openMobile}
+                onChange={v => this.setState({ openMobile: v })}
+              />
 
               <SwitcherSettings
                 full={true}
@@ -137,18 +137,21 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
             </div>
           ) : (
             <div className="control-page">
-              <div className="ss-button-holder" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div
-                  className="ss-button-inner ss-button-left ss-button-inner-selected"
-                  onClick={() => this.setState({ openMobile: false })}
-                >
-                  Control
-                </div>
-
-                <div className="ss-button-inner ss-button-right " onClick={() => this.setState({ openMobile: true })}>
-                  Settings
-                </div>
-              </div>
+              <AtemButtonBar
+                style={{ margin: '10px' }}
+                options={[
+                  {
+                    label: 'Control',
+                    value: false
+                  },
+                  {
+                    label: 'Settings',
+                    value: true
+                  }
+                ]}
+                selected={this.state.openMobile}
+                onChange={v => this.setState({ openMobile: v })}
+              />
 
               <MixEffectPanel
                 device={this.props.device}
