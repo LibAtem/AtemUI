@@ -5,20 +5,20 @@ import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 
-interface SubMenuProps {
+interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
 
   keyers: LibAtemState.DownstreamKeyerState[]
   inputs: Record<LibAtemEnums.VideoSource, LibAtemState.InputState>
   videoMode: LibAtemEnums.VideoMode
 }
-interface SubMenuState {
+interface DownstreamKeyerSettingsState {
   open: boolean
   page: number
 }
 
-export class DownstreamKeyerSettings extends React.Component<SubMenuProps, SubMenuState> {
-  constructor(props: SubMenuProps) {
+export class DownstreamKeyerSettings extends React.Component<DownstreamKeyerSettingsProps, DownstreamKeyerSettingsState> {
+  constructor(props: DownstreamKeyerSettingsProps) {
     super(props)
     this.state = {
       open: false,
