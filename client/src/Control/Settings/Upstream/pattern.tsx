@@ -1,11 +1,12 @@
 import React from 'react'
 import { videoIds } from '../../../ControlSettings/ids'
-import { Mask, FlyingKey, KeyFrame } from './upstream'
+import { FlyingKey, KeyFrame } from './upstream'
 import { MagicInput } from '../settings'
 import Slider from 'react-rangeslider'
 import { Patterns, PatternInfo } from '../../common/patterns'
 import { LibAtemEnums, LibAtemCommands } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { KeyerMaskProperties } from './mask'
 
 interface PatternProps {
   sendCommand: SendCommandStrict
@@ -30,7 +31,8 @@ export class Pattern extends React.Component<PatternProps> {
   }
 
   private renderPattern(pattern: LibAtemEnums.Pattern) {
-    const isCurrent = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern.pattern === pattern
+    const isCurrent =
+      this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern.pattern === pattern
     const patternInfo = Patterns[pattern]
 
     return (
@@ -53,7 +55,11 @@ export class Pattern extends React.Component<PatternProps> {
 
   render() {
     const keyerProps = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties
-    const currentPatternInfo: PatternInfo | undefined = Patterns[this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern.pattern as LibAtemEnums.Pattern]
+    const currentPatternInfo: PatternInfo | undefined =
+      Patterns[
+        this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern
+          .pattern as LibAtemEnums.Pattern
+      ]
     // var pattern = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern.pattern
     return (
       <div>
@@ -70,15 +76,12 @@ export class Pattern extends React.Component<PatternProps> {
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.fillSource}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>
         </div>
 
-        <div className="ss-wipe-pattern-holder">
-          {Object.keys(Patterns).map(v => this.renderPattern(Number(v)))}
-        </div>
+        <div className="ss-wipe-pattern-holder">{Object.keys(Patterns).map(v => this.renderPattern(Number(v)))}</div>
 
         <label className="ss-checkbox-container">
           Invert Pattern
@@ -231,7 +234,7 @@ export class Pattern extends React.Component<PatternProps> {
           />
         </div>
 
-        <Mask
+        <KeyerMaskProperties
           meIndex={this.props.mixEffect}
           keyerIndex={this.props.id}
           keyerProps={keyerProps}

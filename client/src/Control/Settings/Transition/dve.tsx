@@ -192,7 +192,6 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }}
             value={this.props.dve.fillSource}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>
@@ -227,7 +226,6 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }}
             value={this.props.dve.keySource}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>

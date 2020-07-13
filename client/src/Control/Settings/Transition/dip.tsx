@@ -13,6 +13,7 @@ interface DipTransitionSettingsProps {
 }
 
 function getSourceOptions(props: DipTransitionSettingsProps) {
+  // TODO - this needs to be corrected
   return Array.from(props.sources.entries())
     .filter(([i]) => i < 4000)
     .map(([i, v]) => (
@@ -53,7 +54,6 @@ export function DipTransitionSettings(props: DipTransitionSettingsProps) {
           }}
           value={props.dip.input}
           className="ss-dropdown"
-          id="cars"
         >
           {getSourceOptions(props)}
         </select>

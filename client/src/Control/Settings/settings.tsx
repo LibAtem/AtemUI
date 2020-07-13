@@ -75,6 +75,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
 
     const meIndex = 0
     const meProps = this.props.currentState.mixEffects[meIndex]
+    const videoMode = this.props.currentState.settings.videoMode
 
     return (
       <div style={this.props.full ? { height: '100%' } : { overflowY: 'scroll' }} className="ss">
@@ -118,10 +119,11 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           <UpstreamKey
             key={'usk' + i}
             sendCommand={this.sendCommand}
-            currentState={this.props.currentState}
-            id={i}
-            name={'Upstream Key ' + (i + 1)}
-            mixEffect={meIndex}
+            keyer={key}
+            meIndex={meIndex}
+            keyerIndex={i}
+            sources={inputProperties}
+            videoMode={videoMode}
           />
         ))}
 

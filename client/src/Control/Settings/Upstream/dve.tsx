@@ -51,7 +51,6 @@ export class DVE extends React.Component<DVEProps> {
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.fillSource}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>
@@ -178,7 +177,7 @@ export class DVE extends React.Component<DVEProps> {
           keyerIndex={this.props.id}
           mixEffectIndex={this.props.mixEffect}
           sendCommand={this.props.sendCommand}
-        ></Mask>
+        />
         <Shadow
           properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
           keyerIndex={this.props.id}
@@ -456,7 +455,6 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
             }}
             value={this.props.properties.borderBevel}
             className="ss-dropdown"
-            id="cars"
           >
             <option value={0}>No Bevel</option>
             <option value={1}>Bevel In Out</option>

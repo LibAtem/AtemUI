@@ -1,34 +1,36 @@
 import React from 'react'
-import { videoIds } from '../../../ControlSettings/ids'
-import { Mask, FlyingKey, KeyFrame } from './upstream'
+import { FlyingKey, KeyFrame } from './upstream'
 import { MagicInput } from '../settings'
 import Slider from 'react-rangeslider'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { KeyerMaskProperties } from './mask'
+import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 
-interface ChromaProps {
+interface ChromaKeyerClassicPropertiesProps {
   sendCommand: SendCommandStrict
-  currentState: any
-  mixEffect: number
-  id: number
+  meIndex: number
+  keyerIndex: number
+  keyer: LibAtemState.MixEffectState_KeyerState // & Required<Pick<LibAtemState.MixEffectState_KeyerState, 'chroma'>>
+  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  videoMode: LibAtemEnums.VideoMode
 }
 
-export class Chroma extends React.Component<ChromaProps> {
-  getSourceOptions() {
-    var inputs = Object.keys(this.props.currentState.settings.inputs)
-    var sources = inputs.filter(i => videoIds[i] < 4000)
-    var options = []
-    for (var i in sources) {
-      options.push(
-        <option value={videoIds[sources[i]]}>
-          {this.props.currentState.settings.inputs[sources[i]].properties.longName}
+export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerClassicPropertiesProps> {
+  private getSourceOptions() {
+    // TODO - this needs to be corrected
+    return Array.from(this.props.sources.entries())
+      .filter(([i]) => i < 4000)
+      .map(([i, v]) => (
+        <option key={i} value={i}>
+          {v.longName}
         </option>
-      )
-    }
-    return options
+      ))
   }
 
   render() {
-    const keyerProps = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties
+    if (!this.props.keyer.chroma) {
+      return null
+    }
 
     return (
       <div>
@@ -38,14 +40,13 @@ export class Chroma extends React.Component<ChromaProps> {
           <select
             onChange={e => {
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.mixEffect,
-                KeyerIndex: this.props.id,
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
                 FillSource: e.currentTarget.value as any
               })
             }}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.fillSource}
+            value={this.props.keyer.properties.fillSource}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>
@@ -59,24 +60,24 @@ export class Chroma extends React.Component<ChromaProps> {
               step={0.1}
               onChange={e =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 1,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Hue,
                   Hue: e
                 })
               }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.hue}
+              value={this.props.keyer.chroma.hue}
             />
             <div className="ss-slider-label">Hue:</div>
           </div>
           <MagicInput
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.hue}
+            value={this.props.keyer.chroma.hue}
             callback={(value: any) => {
               if (value != '') {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 1,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Hue,
                   Hue: Math.min(360, Math.max(0, value))
                 })
               }
@@ -91,24 +92,24 @@ export class Chroma extends React.Component<ChromaProps> {
               step={0.1}
               onChange={e =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 2,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Gain,
                   Gain: e
                 })
               }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.gain}
+              value={this.props.keyer.chroma.gain}
             />
             <div className="ss-slider-label">Gain:</div>
           </div>
           <MagicInput
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.gain}
+            value={this.props.keyer.chroma.gain}
             callback={(value: any) => {
               if (value != '') {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 2,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Gain,
                   Gain: Math.min(100, Math.max(0, value))
                 })
               }
@@ -123,24 +124,24 @@ export class Chroma extends React.Component<ChromaProps> {
               step={0.1}
               onChange={e =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 4,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.YSuppress,
                   YSuppress: e
                 })
               }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.ySuppress}
+              value={this.props.keyer.chroma.ySuppress}
             />
             <div className="ss-slider-label">Y Suppress:</div>
           </div>
           <MagicInput
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.ySuppress}
+            value={this.props.keyer.chroma.ySuppress}
             callback={(value: any) => {
               if (value != '') {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 4,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.YSuppress,
                   YSuppress: Math.min(100, Math.max(0, value))
                 })
               }
@@ -155,24 +156,24 @@ export class Chroma extends React.Component<ChromaProps> {
               step={0.1}
               onChange={e =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 8,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Lift,
                   Lift: e
                 })
               }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.lift}
+              value={this.props.keyer.chroma.lift}
             />
             <div className="ss-slider-label">Gain:</div>
           </div>
           <MagicInput
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.lift}
+            value={this.props.keyer.chroma.lift}
             callback={(value: any) => {
               if (value != '') {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 8,
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Lift,
                   Lift: Math.min(100, Math.max(0, value))
                 })
               }
@@ -184,44 +185,40 @@ export class Chroma extends React.Component<ChromaProps> {
           Narrow Chroma Key Range
           <input
             type="checkbox"
-            checked={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.narrow}
+            checked={this.props.keyer.chroma.narrow}
             onClick={() =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                MixEffectIndex: this.props.mixEffect,
-                KeyerIndex: this.props.id,
-                Mask: 16,
-                Narrow: !this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].chroma.narrow
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Narrow,
+                Narrow: !this.props.keyer.chroma?.narrow
               })
             }
           ></input>
           <span className="checkmark"></span>
         </label>
 
-        <Mask
-          meIndex={this.props.mixEffect}
-          keyerIndex={this.props.id}
-          keyerProps={keyerProps}
+        <KeyerMaskProperties
+          meIndex={this.props.meIndex}
+          keyerIndex={this.props.keyerIndex}
+          keyerProps={this.props.keyer.properties}
           sendCommand={this.props.sendCommand}
         />
 
         <FlyingKey
-          flyEnabled={
-            this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.flyEnabled
-          }
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          keyerIndex={this.props.id}
-          mixEffectIndex={this.props.mixEffect}
+          flyEnabled={this.props.keyer.properties.flyEnabled}
+          properties={this.props.keyer.dve}
+          keyerIndex={this.props.keyerIndex}
+          mixEffectIndex={this.props.meIndex}
           sendCommand={this.props.sendCommand}
         ></FlyingKey>
         <KeyFrame
-          videoMode={this.props.currentState.settings.videoMode}
-          dve={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          flyEnabled={
-            this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.flyEnabled
-          }
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].flyProperties}
-          keyerIndex={this.props.id}
-          mixEffect={this.props.mixEffect}
+          videoMode={this.props.videoMode}
+          dve={this.props.keyer.dve}
+          flyEnabled={this.props.keyer.properties.flyEnabled}
+          properties={this.props.keyer.flyProperties}
+          keyerIndex={this.props.keyerIndex}
+          mixEffect={this.props.meIndex}
           sendCommand={this.props.sendCommand}
         ></KeyFrame>
       </div>

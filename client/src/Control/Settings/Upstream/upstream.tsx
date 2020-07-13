@@ -1,11 +1,11 @@
 import React from 'react'
 import { RateInput } from '../../common'
 import { MagicInput } from '../settings'
-import { Luma } from './luma'
-import { Chroma } from './chroma'
+import { LumaKeyerSettings } from './luma'
+import { ChromaKeyerClassicProperties } from './chroma'
 import { Pattern } from './pattern'
 import { DVE } from './dve'
-import { ToggleButton, TabPanelTab, TabPanel, MaskProperties } from '../common'
+import { ToggleButton, TabPanelTab, TabPanel } from '../common'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
@@ -15,10 +15,11 @@ interface UpstreamKeyState {
 
 interface SubMenuProps {
   sendCommand: SendCommandStrict
-  currentState: any
-  name: string
-  id: number
-  mixEffect: number
+  meIndex: number
+  keyerIndex: number
+  keyer: LibAtemState.MixEffectState_KeyerState
+  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  videoMode: LibAtemEnums.VideoMode
 }
 
 export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState> {
@@ -43,7 +44,7 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
               this.setState({ open: !this.state.open })
             }}
           >
-            {this.props.name}
+            Upstream Key {this.props.keyerIndex + 1}
           </div>
           <div className="ss-submenu-box"></div>
         </div>
@@ -58,115 +59,66 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
             this.setState({ open: !this.state.open })
           }}
         >
-          {this.props.name}
+          Upstream Key {this.props.keyerIndex + 1}
         </div>
         <TabPanel
-          page={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keyType}
+          page={this.props.keyer.properties.keyType}
           onChange={newPage => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-              KeyerIndex: this.props.id,
-              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.keyerIndex,
+              MixEffectIndex: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags.KeyType,
               KeyType: newPage
             })
           }}
         >
-          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Luma} label={'Luma'}>
-            <Luma
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Luma} label={'Luma'} disabled={!this.props.keyer.luma}>
+            <LumaKeyerSettings
               sendCommand={this.props.sendCommand}
-              id={this.props.id}
-              mixEffect={this.props.mixEffect}
-              currentState={this.props.currentState}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              keyer={this.props.keyer}
+              sources={this.props.sources}
+              videoMode={this.props.videoMode}
             />
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Chroma} label={'Chroma'}>
-            <Chroma
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Chroma} label={'Chroma'} disabled={!this.props.keyer.chroma}>
+            <ChromaKeyerClassicProperties
               sendCommand={this.props.sendCommand}
-              mixEffect={this.props.mixEffect}
-              id={this.props.id}
-              currentState={this.props.currentState}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              keyer={this.props.keyer}
+              sources={this.props.sources}
+              videoMode={this.props.videoMode}
             />
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Pattern} label={'Pattern'}>
-            <Pattern
+          <TabPanelTab
+            id={LibAtemEnums.MixEffectKeyType.Pattern}
+            label={'Pattern'}
+            disabled={!this.props.keyer.pattern}
+          >
+            {/* <Pattern
               sendCommand={this.props.sendCommand}
-              id={this.props.id}
-              mixEffect={this.props.mixEffect}
+              id={this.props.keyerIndex}
+              mixEffect={this.props.meIndex}
               currentState={this.props.currentState}
-            />
+            /> */}
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'}>
-            <DVE
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'} disabled={!this.props.keyer.dve}>
+            {/* <DVE
               sendCommand={this.props.sendCommand}
-              id={this.props.id}
-              mixEffect={this.props.mixEffect}
+              id={this.props.keyerIndex}
+              mixEffect={this.props.meIndex}
               currentState={this.props.currentState}
-            />
+            /> */}
           </TabPanelTab>
         </TabPanel>
       </div>
     )
   }
-}
-
-export function Mask(props: {
-  meIndex: number
-  keyerIndex: number
-  keyerProps: LibAtemState.MixEffectState_KeyerPropertiesState
-  sendCommand: SendCommandStrict
-}) {
-  return (
-    <MaskProperties
-      maskEnabled={props.keyerProps.maskEnabled}
-      maskTop={props.keyerProps.maskTop}
-      maskLeft={props.keyerProps.maskLeft}
-      maskRight={props.keyerProps.maskRight}
-      maskBottom={props.keyerProps.maskBottom}
-      setMaskEnabled={v => {
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.meIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskEnabled,
-          MaskEnabled: v
-        })
-      }}
-      setMaskTop={v => {
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.meIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskTop,
-          MaskTop: v
-        })
-      }}
-      setMaskLeft={v => {
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.meIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskLeft,
-          MaskLeft: v
-        })
-      }}
-      setMaskRight={v => {
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.meIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskRight,
-          MaskRight: v
-        })
-      }}
-      setMaskBottom={v => {
-        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-          MixEffectIndex: props.meIndex,
-          KeyerIndex: props.keyerIndex,
-          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskBottom,
-          MaskBottom: v
-        })
-      }}
-    />
-  )
 }
 
 export function FlyingKey(props: {

@@ -64,7 +64,6 @@ export class DownstreamKeyerSettings extends React.Component<
           }}
           value={this.props.keyers[index].sources.fillSource}
           className="ss-dropdown"
-          id="cars"
         >
           {this.getSourceOptions()}
         </select>
@@ -78,7 +77,6 @@ export class DownstreamKeyerSettings extends React.Component<
           }}
           value={this.props.keyers[index].sources.cutSource}
           className="ss-dropdown"
-          id="cars"
         >
           {this.getSourceOptions()}
         </select>

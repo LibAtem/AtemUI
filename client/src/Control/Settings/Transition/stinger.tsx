@@ -38,7 +38,6 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
           }}
           value={props.stinger.source}
           className="ss-dropdown"
-          id="cars"
         >
           {getMediaPlayerOptions(props)}
         </select>

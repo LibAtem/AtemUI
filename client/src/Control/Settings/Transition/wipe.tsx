@@ -256,7 +256,6 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
             }}
             value={this.props.wipe.borderInput}
             className="ss-dropdown"
-            id="cars"
           >
             {this.getSourceOptions()}
           </select>
