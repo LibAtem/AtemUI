@@ -1,7 +1,6 @@
 import React from 'react'
 import { AtemDeviceInfo } from '../../Devices/types'
 import './settings.scss'
-import { GetDeviceId } from '../../DeviceManager'
 import { TransitionSettings } from './Transition/transition'
 import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
@@ -10,6 +9,7 @@ import { AtemButtonBar } from '../button/button'
 import { CommandTypes } from '../../generated/commands'
 import { sendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
+import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
@@ -18,7 +18,6 @@ interface SwitcherSettingsProps {
   full: boolean
 }
 interface SwitcherSettingsState {
-  hasConnected: boolean
   page: number
   // full: boolean
 }
@@ -27,7 +26,6 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
   constructor(props: SwitcherSettingsProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
       page: 0
     }
 
@@ -38,10 +36,34 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     sendCommandStrict(this.props, ...args)
   }
 
+  private getFtbAudioProps(state: LibAtemState.AtemState): Pick<FadeToBlackSettingsProps, 'ftbMode' | 'followFadeToBlack'> {
+    if (state.audio) {
+      return {
+        ftbMode: 'classic',
+        followFadeToBlack: state.audio.programOut.followFadeToBlack
+      }
+    } else if (state.fairlight) {
+      return {
+        ftbMode: 'fairlight',
+        followFadeToBlack: state.fairlight.programOut.followFadeToBlack
+      }
+    } else {
+      return {
+        ftbMode: null,
+        followFadeToBlack: false
+      }
+    }
+  }
+
   render() {
     if (!this.props.currentState || !this.props.signalR) {
       return <div style={this.props.full ? { height: '100%' } : { overflowY: 'auto' }} className="ss"></div>
     }
+
+    const meIndex = 0
+    const meProps = this.props.currentState.mixEffects[meIndex]
+
+    
 
     var upstreamKeys = []
     for (var i = 0; i < this.props.currentState.mixEffects[0].keyers.length; i++) {
@@ -108,122 +130,17 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           keyers={this.props.currentState.downstreamKeyers}
         />
 
-        <FadeToBlack
-          key={'ftb'}
-          device={this.props.device}
-          currentState={this.props.currentState}
-          signalR={this.props.signalR}
-          name={'Fade To Black'}
+        <FadeToBlackSettings
+          sendCommand={this.sendCommand}
+          meIndex={meIndex}
+          ftb={meProps.fadeToBlack}
+          videoMode={this.props.currentState.settings.videoMode}
+          {...this.getFtbAudioProps(this.props.currentState)}
         />
       </div>
     )
   }
 }
-
-interface SubMenuProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: any
-  name: string
-}
-interface SubMenuState {
-  hasConnected: boolean
-  state: any | null
-  currentState: any
-  open: boolean
-}
-
-class FadeToBlack extends React.Component<SubMenuProps, SubMenuState> {
-  constructor(props: SubMenuProps) {
-    super(props)
-    this.state = {
-      open: false,
-      hasConnected: props.device.connected,
-      state: props.currentState,
-      currentState: null
-    }
-  }
-
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    ///console.log(device ,signalR)
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
-  render() {
-    var rate = []
-    var box = []
-    if (this.state.open) {
-      rate.push(
-        <div className="ss-rate">
-          <RateInput
-            value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames}
-            videoMode={this.props.currentState.settings.videoMode}
-            callback={e => {
-              this.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', { Index: 0, Rate: e })
-            }}
-          />
-        </div>
-      )
-      box.push(
-        <div className="ss-rate-holder">
-          <MagicLabel
-            callback={(e: string) => {
-              this.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', {
-                Index: 0,
-                Rate: Math.min(250, Math.max(parseInt(e), 0))
-              })
-            }}
-            value={this.props.currentState.mixEffects[0].fadeToBlack.status.remainingFrames}
-            label={'Rate:'}
-          />
-          {rate}
-          <label className="ss-checkbox-container">
-            Audio Follow Video
-            <input
-              type="checkbox"
-              checked={this.props.currentState.audio.programOut.followFadeToBlack}
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-                  FollowFadeToBlack: !this.props.currentState.audio.programOut.followFadeToBlack,
-                  Mask: 4
-                })
-              }
-            ></input>
-            <span className="checkmark"></span>
-          </label>
-        </div>
-      )
-    }
-
-    return (
-      <div className="ss-submenu">
-        <div
-          className="ss-submenu-title"
-          onClick={e => {
-            this.setState({ open: !this.state.open })
-          }}
-        >
-          Fade to Black
-        </div>
-        <div className="ss-submenu-box">{box}</div>
-      </div>
-    )
-  }
-}
-
 
 interface MagicInputProps {
   callback: any
