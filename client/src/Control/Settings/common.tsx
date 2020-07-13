@@ -1,6 +1,6 @@
 import React from 'react'
-import { MagicInput } from './settings'
-import Slider from 'react-rangeslider'
+import { DecimalInput, CheckboxInput } from '../common'
+import { DecimalWithSliderInput, DecimalInputWithLabel } from '../common/decimal'
 
 interface MaskPropertiesProps {
   maskEnabled: boolean
@@ -17,65 +17,47 @@ interface MaskPropertiesProps {
 }
 
 export function MaskProperties(props: MaskPropertiesProps) {
-  const enabled = props.maskEnabled
-  const labelClass = enabled ? 'ss-label' : 'ss-label disabled'
-
   return (
     <div className="ss-mask-box">
-      <ToggleButton label="Mask" active={props.maskEnabled} onClick={() => props.setMaskEnabled(!props.maskEnabled)} />
+      <ToggleButton label="Mask" active={props.maskEnabled} onClick={v => props.setMaskEnabled(v)} />
+
       <div className="ss-mask-holder">
-        <div className={labelClass}>Top:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.maskTop}
-            callback={(value: any) => {
-              if (value != '') {
-                props.setMaskTop(Math.min(9, Math.max(-9, value)))
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Bottom:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.maskBottom}
-            callback={(value: any) => {
-              if (value != '') {
-                props.setMaskBottom(Math.min(9, Math.max(-9, value)))
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Left:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.maskLeft}
-            callback={(value: any) => {
-              if (value != '') {
-                props.setMaskLeft(Math.min(9, Math.max(-9, value)))
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Right:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.maskRight}
-            callback={(value: any) => {
-              if (value != '') {
-                props.setMaskRight(Math.min(9, Math.max(-9, value)))
-              }
-            }}
-          />
-        </div>
+        <DecimalInputWithLabel
+          label="Top"
+          disabled={!props.maskEnabled}
+          value={props.maskTop}
+          step={0.01}
+          min={-9}
+          max={9}
+          onChange={value => props.setMaskTop(value)}
+        />
+        <DecimalInputWithLabel
+          label="Bottom"
+          disabled={!props.maskEnabled}
+          value={props.maskBottom}
+          step={0.01}
+          min={-9}
+          max={9}
+          onChange={value => props.setMaskBottom(value)}
+        />
+        <DecimalInputWithLabel
+          label="Left"
+          disabled={!props.maskEnabled}
+          value={props.maskLeft}
+          step={0.01}
+          min={-16}
+          max={16}
+          onChange={value => props.setMaskLeft(value)}
+        />
+        <DecimalInputWithLabel
+          label="Right"
+          disabled={!props.maskEnabled}
+          value={props.maskRight}
+          step={0.01}
+          min={-16}
+          max={16}
+          onChange={value => props.setMaskRight(value)}
+        />
       </div>
     </div>
   )
@@ -97,62 +79,57 @@ interface PreMultipliedKeyPropertiesProps {
 
 export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProps) {
   const disableControls = props.enabled || props.disabled
-  const labelClass = !disableControls ? 'ss-slider-label' : 'ss-slider-label disabled'
-  const sliderClass = !disableControls ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
 
   return (
     <div className="ss-pmk">
-      <ToggleButton disabled={props.disabled} active={props.enabled} label={'Pre Multiplied Key'} onClick={() => props.setEnabled(!props.enabled)} />
+      <ToggleButton
+        disabled={props.disabled}
+        active={props.enabled}
+        label={'Pre Multiplied Key'}
+        onClick={() => props.setEnabled(!props.enabled)}
+      />
 
-      <div className="ss-slider-holder">
-        <div className={sliderClass}>
-          <Slider tooltip={false} step={0.1} onChange={e => props.setClip(e)} value={props.clip} />
-          <div className={labelClass}>Clip:</div>
-        </div>
-        <MagicInput
-          disabled={disableControls}
-          value={props.clip}
-          callback={(value: any) => {
-            if (value != '') {
-              props.setClip(Math.min(100, Math.max(0, value)))
-            }
-          }}
-        />
-      </div>
+      <DecimalWithSliderInput
+        disabled={disableControls}
+        label="Clip"
+        value={props.clip}
+        step={0.1}
+        min={0}
+        max={100}
+        onChange={e => props.setClip(e)}
+      />
 
-      <div className="ss-slider-holder">
-        <div className={sliderClass}>
-          <Slider tooltip={false} step={0.1} onChange={e => props.setGain(e)} value={props.gain} />
-          <div className={labelClass}>Gain:</div>
-        </div>
-        <MagicInput
-          disabled={disableControls}
-          value={props.gain}
-          callback={(value: any) => {
-            if (value != '') {
-              props.setGain(Math.min(100, Math.max(0, value)))
-            }
-          }}
-        />
-      </div>
+      <DecimalWithSliderInput
+        disabled={disableControls}
+        label="Gain"
+        value={props.gain}
+        step={0.1}
+        min={0}
+        max={100}
+        onChange={e => props.setGain(e)}
+      />
 
-      <label className={!disableControls ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
-        Invert
-        <input
-          type="checkbox"
-          disabled={disableControls}
-          checked={props.invert}
-          onClick={() => props.setInvert(!props.invert)}
-        />
-        <span className="checkmark"></span>
-      </label>
+      <CheckboxInput
+        label="Invert"
+        disabled={disableControls}
+        value={props.invert}
+        onChange={e => props.setInvert(e)}
+      />
     </div>
   )
 }
 
-export function ToggleButton(props: { label: string; active: boolean; onClick: () => void; disabled?: boolean }) {
+export function ToggleButton(props: {
+  label: string
+  active: boolean
+  onClick: (val: boolean) => void
+  disabled?: boolean
+}) {
   return (
-    <div className="ss-circle-button-holder" onClick={() => !props.disabled ? props.onClick() : undefined}>
+    <div
+      className="ss-circle-button-holder"
+      onClick={() => (!props.disabled ? props.onClick(!props.active) : undefined)}
+    >
       <div className="ss-circle-button">{props.active ? <div className="ss-circle-button-inner"></div> : ''}</div>
       <div className={`ss-heading ${props.disabled ? 'disabled' : ''}`}>{props.label}</div>
     </div>

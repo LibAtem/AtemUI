@@ -99,12 +99,14 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
             label={'Pattern'}
             disabled={!this.props.keyer.pattern}
           >
-            {/* <Pattern
+            <Pattern
               sendCommand={this.props.sendCommand}
-              id={this.props.keyerIndex}
-              mixEffect={this.props.meIndex}
-              currentState={this.props.currentState}
-            /> */}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              keyer={this.props.keyer}
+              sources={this.props.sources}
+              videoMode={this.props.videoMode}
+            />
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'} disabled={!this.props.keyer.dve}>

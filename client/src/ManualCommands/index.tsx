@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Form, Col, Row, FormControl, FormControlProps, Button } from 'react-bootstrap'
+import { Container, Form, Col, Row, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from './types'

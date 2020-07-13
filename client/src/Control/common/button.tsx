@@ -92,3 +92,28 @@ export class AtemButtonBar<T> extends React.Component<AtemButtonBarProps<T>> {
     )
   }
 }
+
+interface CheckboxInputProps {
+  label: string
+  disabled?: boolean
+  value: boolean
+  onChange: (val: boolean) => void
+}
+export function CheckboxInput(props: CheckboxInputProps) {
+  return (
+    <label className={props.disabled ? 'ss-checkbox-container disabled' : 'ss-checkbox-container'}>
+      {props.label}
+      <input
+        type="checkbox"
+        disabled={props.disabled}
+        checked={props.value}
+        onClick={e => {
+          if (!props.disabled) {
+            props.onChange(e.currentTarget.checked)
+          }
+        }}
+      />
+      <span className="checkmark"></span>
+    </label>
+  )
+}
