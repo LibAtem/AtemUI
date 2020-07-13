@@ -27,6 +27,10 @@ namespace TypesGenerator
             {
                 new ClassSpecGenerator(profileFile, "LibAtem.DeviceProfile.", typeof(DeviceProfile)).RunIt("LibAtem.DeviceProfile.DeviceProfile");
             }
+            using (var videoModeInfoFile = new StreamWriter("../client/src/generated/videomode.ts"))
+            {
+                new VideoModeInfoGenerator(videoModeInfoFile).RunIt();
+            }
 
         }
     }

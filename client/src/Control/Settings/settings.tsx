@@ -4,13 +4,15 @@ import './settings.scss'
 import { TransitionSettings } from './Transition/transition'
 import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
-import { LibAtemState, LibAtemEnums, LibAtemProfile } from '../../generated'
+import { LibAtemState, LibAtemEnums, LibAtemProfile, VideoModeInfoSet } from '../../generated'
 import { AtemButtonBar } from '../button/button'
 import { CommandTypes } from '../../generated/commands'
 import { sendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 import { videoIds } from '../../ControlSettings/ids'
+import { VideoMode } from '../../generated/common-enums'
+import * as _ from 'underscore'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
@@ -108,7 +110,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         <TransitionSettings
           meIndex={meIndex}
           sendCommand={this.sendCommand}
-          currentState={this.props.currentState}
+          transition={meProps.transition}
           profile={this.props.profile}
           inputProperties={inputProperties}
           videoMode={this.props.currentState.settings.videoMode}
@@ -188,20 +190,20 @@ export class MagicInput extends React.Component<MagicInputProps, MagicInputState
   }
 }
 
-interface RateProps {
-  callback: (val: number) => void
+interface RateInputProps {
+  callback: (frames: number) => void
   value: number
   disabled?: boolean
-  videoMode: number
+  videoMode: VideoMode
   className?: string
 }
-interface RateState {
+interface RateInputState {
   focus: boolean
   tempValue: string
 }
 
-export class RateInput extends React.Component<RateProps, RateState> {
-  constructor(props: RateProps) {
+export class RateInput extends React.Component<RateInputProps, RateInputState> {
+  constructor(props: RateInputProps) {
     super(props)
     this.state = {
       focus: false,
@@ -209,72 +211,65 @@ export class RateInput extends React.Component<RateProps, RateState> {
     }
   }
 
-  shouldComponentUpdate(nextProps: RateProps, nextState: RateState) {
-    const changedVideoMode = this.props.videoMode !== nextProps.videoMode
-    const changedValue = this.props.value !== nextProps.value
-    const changedDisabled = this.props.disabled !== nextProps.disabled
-    const changedTempValue = this.state.tempValue !== nextState.tempValue
-    const changedFocus = this.state.focus !== nextState.focus
-
-    return changedValue || changedVideoMode || changedFocus || changedTempValue || changedDisabled
-  }
-
-  rateToFrames(rate: string) {
-    console.log(rate)
-    var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.videoMode]
+  shouldComponentUpdate(nextProps: RateInputProps, nextState: RateInputState) {
     return (
-      parseInt(
-        rate
-          .replace(':', '')
-          .padStart(4, '0')
-          .substr(0, 2)
-      ) *
-        fps +
-      parseInt(
-        rate
-          .replace(':', '')
-          .padStart(4, '0')
-          .substr(2, 3)
-      )
+      !_.isEqual(_.omit(nextProps, 'callback'), _.omit(this.props, 'callback')) || !_.isEqual(nextState, this.state)
     )
   }
 
-  framesToRate(frames: number) {
-    var fps = [30, 25, 30, 25, 50, 60, 25, 30, 24, 24, 25, 30, 50][this.props.videoMode]
-    var framesRemaining = frames % fps
-    var seconds = Math.floor(frames / fps)
-    return seconds.toString() + ':' + framesRemaining.toString().padStart(2, '0')
+  private rateToFrames(rate: string): number {
+    let res = 0
+
+    const rateMatch = rate.match(/^(([0-9]*):|)([0-9]*)$/)
+    if (rateMatch) {
+      const frames = Number(rateMatch[3])
+      const seconds = Number(rateMatch[2])
+      if (!Number.isNaN(frames) && !Number.isNaN(seconds)) {
+        const fps = VideoModeInfoSet[this.props.videoMode]?.framerate ?? 30
+        res = seconds * fps + frames
+      } else if (!Number.isNaN(frames)) {
+        res = frames
+      }
+    }
+
+    return Math.min(res, 250)
   }
 
-  onChange(e: React.ChangeEvent<HTMLInputElement>) {
-    var value = e.currentTarget.value
-    if (value.match(/^(([0-9]|[0-9][0-9]|)(:)([0-9]|[0-9][0-9]|))$/g)) {
-      this.setState({ tempValue: value })
-    } else if (Number.isInteger(Number(value)) && value.length <= 3) {
-      this.setState({ tempValue: value })
-    }
+  private framesToRate(frames: number) {
+    const fps = VideoModeInfoSet[this.props.videoMode]?.framerate ?? 30
+    const framesRemaining = `${frames % fps}`.padStart(2, '0')
+    const seconds = Math.floor(frames / fps)
+    return `${seconds}:${framesRemaining}`
+  }
+
+  private cleanRate(rate: string) {
+    return this.framesToRate(this.rateToFrames(rate))
+  }
+
+  private onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({ tempValue: e.currentTarget.value })
   }
 
   render() {
-    var className = this.props.className || 'ss-rate-input'
+    const className = this.props.className || 'ss-rate-input'
     return (
       <input
         disabled={this.props.disabled}
         onBlur={e => {
           this.setState({ focus: false })
-          this.props.callback(Math.min(this.rateToFrames(this.state.tempValue), 250))
+          this.props.callback(this.rateToFrames(this.state.tempValue))
         }}
         onFocus={e => this.setState({ focus: true, tempValue: this.framesToRate(this.props.value) })}
         value={this.state.focus ? this.state.tempValue : this.framesToRate(this.props.value)}
         onChange={e => this.onChange(e)}
         onKeyPress={e => {
           if (e.key === 'Enter') {
-            this.props.callback(Math.min(this.rateToFrames(this.state.tempValue), 250))
-            this.setState({ tempValue: this.framesToRate(this.rateToFrames(this.state.tempValue)) })
+            this.props.callback(this.rateToFrames(this.state.tempValue))
+            this.setState({ tempValue: this.cleanRate(this.state.tempValue) })
           }
         }}
         className={className}
-      ></input>
+      />
     )
   }
 }
@@ -307,7 +302,6 @@ export class MagicLabel extends React.Component<MagicLabelProps, MagicLabelState
   }
 
   render() {
-    var step = this.props.step || 1
     return (
       <div
         style={{ overscrollBehavior: 'contain', touchAction: 'none' }}
