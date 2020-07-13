@@ -1,4 +1,4 @@
-import { RateInput } from './settings'
+import { RateInput } from '../common'
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'

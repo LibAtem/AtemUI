@@ -1,5 +1,6 @@
 import React from 'react'
-import { MagicInput, RateInput } from '../settings'
+import { RateInput } from '../../common'
+import { MagicInput } from '../settings'
 import { Luma } from './luma'
 import { Chroma } from './chroma'
 import { Pattern } from './pattern'
@@ -24,7 +25,7 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
   constructor(props: SubMenuProps) {
     super(props)
     this.state = {
-      open: false,
+      open: false
     }
   }
 

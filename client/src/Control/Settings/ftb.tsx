@@ -1,6 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
-import { RateInput, MagicLabel } from './settings'
+import { RateInput } from '../common'
+import { MagicLabel } from './settings'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 
 export interface FadeToBlackSettingsProps {

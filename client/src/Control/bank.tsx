@@ -1,4 +1,4 @@
-import { AtemButtonGeneric } from './button/button'
+import { AtemButtonGeneric } from './common'
 import React from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { SendCommandStrict } from '../device-page-wrapper'

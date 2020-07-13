@@ -11,7 +11,7 @@ import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
 import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemProfile } from '../generated'
-import { AtemButtonBar } from './button/button'
+import { AtemButtonBar } from './common'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {

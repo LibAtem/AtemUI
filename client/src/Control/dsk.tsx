@@ -1,5 +1,4 @@
-import { AtemButtonGeneric } from './button/button'
-import { RateInput } from './Settings/settings'
+import { AtemButtonGeneric, RateInput } from './common'
 import React from 'react'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'
@@ -33,7 +32,7 @@ export function DSKPanel(props: DSKProps) {
           Rate
           <RateInput
             className={'rate-input'}
-            callback={(e) => {
+            callback={e => {
               props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', { Index: index, Rate: e })
             }}
             value={dsk.state.remainingFrames}

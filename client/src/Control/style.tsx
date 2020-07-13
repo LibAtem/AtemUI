@@ -1,7 +1,7 @@
 import React from 'react'
-import { AtemButtonGeneric } from './button/button'
+import { AtemButtonGeneric } from './common'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { RateInput } from './Settings/settings'
+import { RateInput } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands, LibAtemProfile } from '../generated'
 
 interface StyleProps {
@@ -60,12 +60,12 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
-    disabled: (p) => p.dve === 0
+    disabled: p => p.dve === 0
   },
   {
     name: 'STING',
     sendRate: null,
-    disabled: (p) => p.mediaPoolClips === 0
+    disabled: p => p.mediaPoolClips === 0
   }
 ]
 
