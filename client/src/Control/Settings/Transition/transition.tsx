@@ -1,7 +1,6 @@
 import React from 'react'
 import { WipeTransitionSettings } from './wipe'
 import { DVETransitionSettings } from './dve'
-import { AtemDeviceInfo } from '../../../Devices/types'
 import { LibAtemState, LibAtemEnums } from '../../../generated'
 import { DipTransitionSettings } from './dip'
 import { StingerTransitionSettings } from './stinger'
@@ -9,8 +8,7 @@ import { VideoSource } from '../../../generated/common-enums'
 import { videoIds } from '../../../ControlSettings/ids'
 import { TabPanel, TabPanelTab } from '../common'
 import { MixTransitionSettings } from './mix'
-import { CommandTypes } from '../../../generated/commands'
-import { sendCommandStrict } from '../../../device-page-wrapper'
+import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface TransitionSettingsState {
   open: boolean
@@ -18,8 +16,7 @@ interface TransitionSettingsState {
 }
 
 interface TransitionSettingsProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState // | null
   mixEffect: number
 }
@@ -31,10 +28,6 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
       open: false,
       page: 0
     }
-  }
-
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
   }
 
   private toggleOpen() {
@@ -78,7 +71,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Mix} label={'Mix'}>
             {meProps.transition.mix ? (
               <MixTransitionSettings
-                sendCommand={this.sendCommand}
+                sendCommand={this.props.sendCommand}
                 meIndex={this.props.mixEffect}
                 mix={meProps.transition.mix}
                 videoMode={this.props.currentState.settings.videoMode}
@@ -91,7 +84,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Dip} label={'Dip'}>
             {meProps.transition.dip ? (
               <DipTransitionSettings
-                sendCommand={this.sendCommand}
+                sendCommand={this.props.sendCommand}
                 meIndex={this.props.mixEffect}
                 dip={meProps.transition.dip}
                 sources={inputProperties}
@@ -105,7 +98,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Wipe} label={'Wipe'}>
             {meProps.transition.wipe ? (
               <WipeTransitionSettings
-                sendCommand={this.sendCommand}
+                sendCommand={this.props.sendCommand}
                 meIndex={this.props.mixEffect}
                 wipe={meProps.transition.wipe}
                 sources={inputProperties}
@@ -119,7 +112,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Stinger} label={'Stinger'}>
             {meProps.transition.stinger ? (
               <StingerTransitionSettings
-                sendCommand={this.sendCommand}
+                sendCommand={this.props.sendCommand}
                 meIndex={this.props.mixEffect}
                 stinger={meProps.transition.stinger}
                 sources={inputProperties}
@@ -133,9 +126,8 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
           <TabPanelTab id={LibAtemEnums.TransitionStyle.DVE} label={'DVE'}>
             {meProps.transition.dVE ? (
               <DVETransitionSettings
+                sendCommand={this.props.sendCommand}
                 mixEffect={this.props.mixEffect}
-                device={this.props.device}
-                signalR={this.props.signalR}
                 currentState={this.props.currentState}
               />
             ) : (

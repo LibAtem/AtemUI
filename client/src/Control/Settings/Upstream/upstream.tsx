@@ -1,25 +1,19 @@
-import { GetDeviceId } from '../../../DeviceManager'
 import React from 'react'
 import { MagicInput, RateInput } from '../settings'
-
-import { AtemDeviceInfo } from '../../../Devices/types'
 import { Luma } from './luma'
 import { Chroma } from './chroma'
 import { Pattern } from './pattern'
 import { DVE } from './dve'
-import { ToggleButton, TabPanelTab, TabPanel } from '../common'
-import { LibAtemEnums, LibAtemCommands } from '../../../generated'
+import { ToggleButton, TabPanelTab, TabPanel, MaskProperties } from '../common'
+import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
+import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface UpstreamKeyState {
-  hasConnected: boolean
-  state: any | null
-  currentState: any
   open: boolean
 }
 
 interface SubMenuProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  sendCommand: SendCommandStrict
   currentState: any
   name: string
   id: number
@@ -31,27 +25,11 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
     super(props)
     this.state = {
       open: false,
-      hasConnected: props.device.connected,
-      state: props.currentState,
-      currentState: null
     }
   }
 
   shouldComponentUpdate(next: SubMenuProps, nextState: UpstreamKeyState) {
     return this.state.open !== nextState.open || this.state.open //only update if component is open
-  }
-
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {})
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
   }
 
   render() {
@@ -84,7 +62,7 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         <TabPanel
           page={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keyType}
           onChange={newPage => {
-            this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
               KeyerIndex: this.props.id,
               MixEffectIndex: this.props.mixEffect,
               Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags.KeyType,
@@ -94,40 +72,36 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         >
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Luma} label={'Luma'}>
             <Luma
+              sendCommand={this.props.sendCommand}
               id={this.props.id}
               mixEffect={this.props.mixEffect}
-              device={this.props.device}
-              signalR={this.props.signalR}
               currentState={this.props.currentState}
             />
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Chroma} label={'Chroma'}>
             <Chroma
-              id={this.props.id}
+              sendCommand={this.props.sendCommand}
               mixEffect={this.props.mixEffect}
-              device={this.props.device}
-              signalR={this.props.signalR}
+              id={this.props.id}
               currentState={this.props.currentState}
             />
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Pattern} label={'Pattern'}>
             <Pattern
+              sendCommand={this.props.sendCommand}
               id={this.props.id}
               mixEffect={this.props.mixEffect}
-              device={this.props.device}
-              signalR={this.props.signalR}
               currentState={this.props.currentState}
             />
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'}>
             <DVE
+              sendCommand={this.props.sendCommand}
               id={this.props.id}
               mixEffect={this.props.mixEffect}
-              device={this.props.device}
-              signalR={this.props.signalR}
               currentState={this.props.currentState}
             />
           </TabPanelTab>
@@ -137,99 +111,60 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
   }
 }
 
-export function Mask(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
-  var enabled = props.properties.maskEnabled
-  var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
-
+export function Mask(props: {
+  meIndex: number
+  keyerIndex: number
+  keyerProps: LibAtemState.MixEffectState_KeyerPropertiesState
+  sendCommand: SendCommandStrict
+}) {
   return (
-    <div className="ss-mask-box">
-      <ToggleButton
-        active={enabled}
-        label={'Mask'}
-        onClick={() => {
-          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-            MixEffectIndex: props.mixEffectIndex,
-            KeyerIndex: props.keyerIndex,
-            Mask: 1,
-            maskEnabled: !props.properties.maskEnabled
-          })
-        }}
-      />
-      <div className="ss-mask-holder">
-        <div className={labelClass}>Top:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskTop}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 2,
-                  MaskTop: Math.min(9, Math.max(-9, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Bottom:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskBottom}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 4,
-                  MaskBottom: Math.min(9, Math.max(-9, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Left:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskLeft}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 8,
-                  MaskLeft: Math.min(16, Math.max(-16, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Right:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskRight}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 16,
-                  MaskRight: Math.min(16, Math.max(-16, value))
-                })
-              }
-            }}
-          />
-        </div>
-      </div>
-    </div>
+    <MaskProperties
+      maskEnabled={props.keyerProps.maskEnabled}
+      maskTop={props.keyerProps.maskTop}
+      maskLeft={props.keyerProps.maskLeft}
+      maskRight={props.keyerProps.maskRight}
+      maskBottom={props.keyerProps.maskBottom}
+      setMaskEnabled={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskEnabled,
+          MaskEnabled: v
+        })
+      }}
+      setMaskTop={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskTop,
+          MaskTop: v
+        })
+      }}
+      setMaskLeft={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskLeft,
+          MaskLeft: v
+        })
+      }}
+      setMaskRight={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskRight,
+          MaskRight: v
+        })
+      }}
+      setMaskBottom={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskBottom,
+          MaskBottom: v
+        })
+      }}
+    />
   )
 }
 

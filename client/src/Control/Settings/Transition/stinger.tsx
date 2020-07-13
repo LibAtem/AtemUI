@@ -1,9 +1,8 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, MagicInput } from '../settings'
+import { RateInput } from '../settings'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { ToggleButton } from '../common'
-import Slider from 'react-rangeslider'
+import { PreMultipliedKeyProperties } from '../common'
 
 interface StingerTransitionSettingsProps {
   sendCommand: SendCommandStrict
@@ -22,104 +21,6 @@ function getMediaPlayerOptions(props: StingerTransitionSettingsProps) {
         {v.longName}
       </option>
     ))
-}
-
-function getPreMultBox(props: StingerTransitionSettingsProps) {
-  var enabled = props.stinger.preMultipliedKey
-  var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
-  return (
-    <div className="ss-pmk">
-      <ToggleButton
-        active={enabled}
-        label={'Pre Multiplied Key'}
-        onClick={() => {
-          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-            Index: props.meIndex,
-            Mask: 2,
-            PreMultipliedKey: !enabled
-          })
-        }}
-      />
-      <div className="ss-slider-holder">
-        <div className={diabledClass}>
-          <Slider
-            tooltip={false}
-            step={0.1}
-            onChange={e =>
-              props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-                Index: props.meIndex,
-                Mask: 4,
-                Clip: e
-              })
-            }
-            value={props.stinger.clip}
-          />
-          <div className="ss-slider-label">Clip:</div>
-        </div>
-        <MagicInput
-          disabled={enabled}
-          value={props.stinger.clip}
-          callback={(value: any) => {
-            if (value != '') {
-              props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-                Index: props.meIndex,
-                Mask: 4,
-                Clip: Math.min(100, Math.max(0, value))
-              })
-            }
-          }}
-        />
-      </div>
-
-      <div className="ss-slider-holder">
-        <div className={diabledClass}>
-          <Slider
-            tooltip={false}
-            step={0.1}
-            onChange={e =>
-              props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-                Index: props.meIndex,
-                Mask: 8,
-                Gain: e
-              })
-            }
-            value={props.stinger.gain}
-          />
-          <div className="ss-slider-label">Gain:</div>
-        </div>
-        <MagicInput
-          disabled={enabled}
-          value={props.stinger.gain}
-          callback={(value: any) => {
-            if (value != '') {
-              props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-                Index: props.meIndex,
-                Mask: 8,
-                Gain: Math.min(100, Math.max(0, value))
-              })
-            }
-          }}
-        />
-      </div>
-
-      <label className="ss-checkbox-container">
-        Invert
-        <input
-          type="checkbox"
-          disabled={enabled}
-          checked={props.stinger.invert}
-          onClick={() =>
-            props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-              Index: props.meIndex,
-              Mask: 16,
-              Invert: !props.stinger.invert
-            })
-          }
-        ></input>
-        <span className="checkmark"></span>
-      </label>
-    </div>
-  )
 }
 
 export function StingerTransitionSettings(props: StingerTransitionSettingsProps) {
@@ -208,7 +109,40 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
         </div>
       </div>
 
-      {getPreMultBox(props)}
+      <PreMultipliedKeyProperties
+        enabled={props.stinger.preMultipliedKey}
+        clip={props.stinger.clip}
+        gain={props.stinger.gain}
+        invert={props.stinger.invert}
+        setEnabled={v => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.PreMultipliedKey,
+            PreMultipliedKey: v
+          })
+        }}
+        setClip={v => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Clip,
+            Clip: v
+          })
+        }}
+        setGain={v => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Gain,
+            Gain: v
+          })
+        }}
+        setInvert={v => {
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Invert,
+            Invert: v
+          })
+        }}
+      />
     </React.Fragment>
   )
 }

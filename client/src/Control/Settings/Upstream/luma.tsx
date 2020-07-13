@@ -1,139 +1,18 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../../../Devices/types'
-import { GetDeviceId } from '../../../DeviceManager'
 import { videoIds } from '../../../ControlSettings/ids'
-import { Mask, FlyingKey, KeyFrame } from './upstream'
-import { MagicInput } from '../settings'
-import Slider from 'react-rangeslider'
-import { ToggleButton } from '../common'
+import { FlyingKey, KeyFrame, Mask } from './upstream'
+import { PreMultipliedKeyProperties } from '../common'
+import { LibAtemCommands, LibAtemState } from '../../../generated'
+import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface LumaProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  sendCommand: SendCommandStrict
   currentState: any
   mixEffect: number
   id: number
 }
 
 export class Luma extends React.Component<LumaProps> {
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-      console.log(value)
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {})
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
-  getPreMultBox(index: number) {
-    var enabled = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.preMultiplied
-    var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
-    return (
-      <div className="ss-pmk">
-        <ToggleButton
-          active={enabled}
-          label={'Pre Multiplied Key'}
-          onClick={() => {
-            this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-              MixEffectIndex: this.props.mixEffect,
-              KeyerIndex: this.props.id,
-              Mask: 1,
-              PreMultiplied: !enabled
-            })
-          }}
-        />
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 2,
-                  Clip: e
-                })
-              }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.clip}
-            />
-            <div className="ss-slider-label">Clip:</div>
-          </div>
-          <MagicInput
-            disabled={enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.clip}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 2,
-                  Clip: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 4,
-                  Gain: e
-                })
-              }
-              value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.gain}
-            />
-            <div className="ss-slider-label">Gain:</div>
-          </div>
-          <MagicInput
-            disabled={enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.gain}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-                  MixEffectIndex: this.props.mixEffect,
-                  KeyerIndex: this.props.id,
-                  Mask: 4,
-                  Gain: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <label className={!enabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
-          Invert
-          <input
-            type="checkbox"
-            disabled={enabled}
-            checked={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.invert}
-            onClick={() =>
-              this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
-                MixEffectIndex: this.props.mixEffect,
-                KeyerIndex: this.props.id,
-                Mask: 8,
-                Invert: !this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma.invert
-              })
-            }
-          ></input>
-          <span className={!enabled ? 'checkmark' : 'checkmark disabled'}></span>
-        </label>
-      </div>
-    )
-  }
-
   getSourceOptions() {
     var inputs = Object.keys(this.props.currentState.settings.inputs)
     var sources = inputs.filter(i => videoIds[i] < 4000)
@@ -149,7 +28,13 @@ export class Luma extends React.Component<LumaProps> {
   }
 
   render() {
-    if (this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].luma === null) {
+    const keyerProps: LibAtemState.MixEffectState_KeyerPropertiesState = this.props.currentState.mixEffects[
+      this.props.mixEffect
+    ].keyers[this.props.id].properties
+    const lumaProps: LibAtemState.MixEffectState_KeyerLumaState | undefined = this.props.currentState.mixEffects[
+      this.props.mixEffect
+    ].keyers[this.props.id].luma
+    if (!lumaProps) {
       return <div></div>
     }
 
@@ -160,10 +45,10 @@ export class Luma extends React.Component<LumaProps> {
           <div className="ss-label">Fill Source:</div>
           <select
             onChange={e => {
-              this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
                 MixEffectIndex: this.props.mixEffect,
                 KeyerIndex: this.props.id,
-                FillSource: e.currentTarget.value
+                FillSource: e.currentTarget.value as any
               })
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.fillSource}
@@ -178,10 +63,10 @@ export class Luma extends React.Component<LumaProps> {
           <div className="ss-label">Key Source:</div>
           <select
             onChange={e => {
-              this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
                 MixEffectIndex: this.props.mixEffect,
                 KeyerIndex: this.props.id,
-                CutSource: e.currentTarget.value
+                CutSource: e.currentTarget.value as any
               })
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keySource}
@@ -193,13 +78,51 @@ export class Luma extends React.Component<LumaProps> {
         </div>
 
         <Mask
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties}
+          meIndex={this.props.mixEffect}
           keyerIndex={this.props.id}
-          mixEffectIndex={this.props.mixEffect}
-          sendCommand={(cmd: string, values: any) => this.sendCommand(cmd, values)}
-        ></Mask>
+          keyerProps={keyerProps}
+          sendCommand={this.props.sendCommand}
+        />
 
-        {this.getPreMultBox(0)}
+        <PreMultipliedKeyProperties
+          enabled={lumaProps.preMultiplied}
+          clip={lumaProps.clip}
+          gain={lumaProps.gain}
+          invert={lumaProps.invert}
+          setEnabled={v => {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
+              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.id,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags.PreMultiplied,
+              PreMultiplied: v
+            })
+          }}
+          setClip={v => {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
+              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.id,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags.Clip,
+              Clip: v
+            })
+          }}
+          setGain={v => {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
+              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.id,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags.Gain,
+              Gain: v
+            })
+          }}
+          setInvert={v => {
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaSetCommand', {
+              MixEffectIndex: this.props.mixEffect,
+              KeyerIndex: this.props.id,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags.Invert,
+              Invert: v
+            })
+          }}
+        />
+
         <FlyingKey
           flyEnabled={
             this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.flyEnabled
@@ -207,7 +130,7 @@ export class Luma extends React.Component<LumaProps> {
           properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
           keyerIndex={this.props.id}
           mixEffectIndex={this.props.mixEffect}
-          sendCommand={(cmd: string, values: any) => this.sendCommand(cmd, values)}
+          sendCommand={this.props.sendCommand}
         ></FlyingKey>
         <KeyFrame
           videoMode={this.props.currentState.settings.videoMode}
@@ -218,7 +141,7 @@ export class Luma extends React.Component<LumaProps> {
           properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].flyProperties}
           keyerIndex={this.props.id}
           mixEffect={this.props.mixEffect}
-          sendCommand={(cmd: string, values: any) => this.sendCommand(cmd, values)}
+          sendCommand={this.props.sendCommand}
         ></KeyFrame>
       </div>
     )

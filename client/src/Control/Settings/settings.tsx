@@ -4,14 +4,16 @@ import './settings.scss'
 import { ChromePicker } from 'react-color'
 import { GetDeviceId } from '../../DeviceManager'
 import { TransitionSettings } from './Transition/transition'
-import { DownStreamKeys } from './downstreamkey'
+import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
 import { LibAtemState } from '../../generated'
 import { AtemButtonBar } from '../button/button'
+import { CommandTypes } from '../../generated/commands'
+import { sendCommandStrict } from '../../device-page-wrapper'
 
 interface SwitcherSettingsProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
   full: boolean
 }
@@ -28,6 +30,12 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
       hasConnected: props.device.connected,
       page: 0
     }
+
+    this.sendCommand = this.sendCommand.bind(this)
+  }
+
+  private sendCommand(...args: CommandTypes) {
+    sendCommandStrict(this.props, ...args)
   }
 
   render() {
@@ -40,9 +48,8 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
       upstreamKeys.push(
         <UpstreamKey
           key={'up' + i}
-          device={this.props.device}
+          sendCommand={this.sendCommand}
           currentState={this.props.currentState}
-          signalR={this.props.signalR}
           id={i}
           name={'Upstream Key ' + (i + 1)}
           mixEffect={0}
@@ -90,19 +97,17 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         <TransitionSettings
           mixEffect={0}
           key={'tran'}
-          device={this.props.device}
+          sendCommand={this.sendCommand}
           currentState={this.props.currentState}
-          signalR={this.props.signalR}
         />
 
         {upstreamKeys}
 
-        <DownStreamKeys
-          device={this.props.device}
+        <DownstreamKeyerSettings
+          sendCommand={this.sendCommand}
           videoMode={this.props.currentState.settings.videoMode}
           inputs={this.props.currentState.settings.inputs}
           keyers={this.props.currentState.downstreamKeyers}
-          signalR={this.props.signalR}
         />
 
         <FadeToBlack
@@ -112,19 +117,8 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           signalR={this.props.signalR}
           name={'Fade To Black'}
         />
-
-        {/* </div> */}
       </div>
     )
-
-    // }
-    // else{
-    //     return(
-    //         <div style={{width:"0px",position:"relative"}} onClick={()=>this.setState({open:true})}>
-    //             <div className="open-button"><svg style={{position:"absolute",left:"4px"}} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="orange" width="25px" height="25px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div>
-    //         </div>
-    //     )
-    // }
   }
 }
 

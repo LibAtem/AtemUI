@@ -1,26 +1,22 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../../../Devices/types'
-import { GetDeviceId } from '../../../DeviceManager'
 import { RateInput, MagicInput } from '../settings'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { videoIds } from '../../../ControlSettings/ids'
 import Slider from 'react-rangeslider'
-import { ToggleButton } from '../common'
+import { ToggleButton, PreMultipliedKeyProperties } from '../common'
 import { AtemButtonBar } from '../../button/button'
 import { LibAtemCommands, LibAtemEnums } from '../../../generated'
+import { SendCommandStrict } from '../../../device-page-wrapper'
+import { CommandTypes } from '../../../generated/commands'
 
 interface DVEProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  sendCommand: SendCommandStrict
   currentState: any
   mixEffect: number
 }
 
 interface DVEState {
-  hasConnected: boolean
-  state: any | null
-  currentState: any
   page: number
 }
 
@@ -28,24 +24,12 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
   constructor(props: DVEProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
-      state: props.currentState,
-      currentState: null,
       page: 2
     }
   }
 
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {})
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
+  private sendCommand(...args: CommandTypes) {
+    this.props.sendCommand(...args)
   }
   getSpin() {
     var style = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
@@ -1286,112 +1270,6 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
     return options
   }
 
-  getPreMultBox(index: number) {
-    const dve: any = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve
-    const supported = dve.enableKey && dve.style >= 32
-    const disabled = !supported || dve.preMultiplied
-
-    var diabledClass = !disabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
-    return (
-      <div className="ss-pmk">
-        <ToggleButton
-          disabled={!supported}
-          active={dve.preMultiplied}
-          label="Pre Multiplied Key"
-          onClick={() => {
-            if (supported) {
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: index,
-                Mask: 64,
-                PreMultiplied: !dve.preMultiplied
-              })
-            }
-          }}
-        />
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              disabled={disabled}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: index,
-                  Mask: 128,
-                  Clip: e
-                })
-              }
-              value={this.props.currentState.mixEffects[index].transition.dve.clip}
-            />
-            <div className="ss-slider-label">Clip:</div>
-          </div>
-          <MagicInput
-            disabled={disabled}
-            value={this.props.currentState.mixEffects[index].transition.dve.clip}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: index,
-                  Mask: 128,
-                  Clip: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              disabled={disabled}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: index,
-                  Mask: 256,
-                  Gain: e
-                })
-              }
-              value={this.props.currentState.mixEffects[index].transition.dve.gain}
-            />
-            <div className="ss-slider-label">Gain:</div>
-          </div>
-          <MagicInput
-            disabled={disabled}
-            value={this.props.currentState.mixEffects[index].transition.dve.gain}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: index,
-                  Mask: 256,
-                  Gain: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <label className={!disabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
-          Invert
-          <input
-            type="checkbox"
-            disabled={disabled}
-            checked={this.props.currentState.mixEffects[index].transition.dve.invert}
-            onClick={() =>
-              this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: index,
-                Mask: 512,
-                Invert: !this.props.currentState.mixEffects[index].transition.dve.invert
-              })
-            }
-          ></input>
-          <span className={!disabled ? 'checkmark' : 'checkmark disabled'}></span>
-        </label>
-      </div>
-    )
-  }
-
   render() {
     var styleHeding = ['Push', 'Squeeze', 'Spin', 'Swoosh'][this.state.page]
     var currentStyle = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style
@@ -1405,6 +1283,8 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
     } else if (this.state.page === 3) {
       style.push(this.getSwoosh())
     }
+
+    const dveProps = this.props.currentState.mixEffects[this.props.mixEffect].transition.dve
 
     var rate = []
 
@@ -1522,7 +1402,7 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
               }
             ]}
             selected={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.reverse}
-            onChange={(v) => {
+            onChange={v => {
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.mixEffect,
                 Reverse: v,
@@ -1622,7 +1502,7 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
               }
             ]}
             selected={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.style}
-            onChange={(v) => {
+            onChange={v => {
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.mixEffect,
                 Style: v,
@@ -1648,7 +1528,7 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.mixEffect,
                 Mask: 8,
-                FillSource: e.currentTarget.value
+                FillSource: e.currentTarget.value as any
               })
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.fillSource}
@@ -1707,7 +1587,7 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
               this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.mixEffect,
                 Mask: 16,
-                KeySource: e.currentTarget.value
+                KeySource: e.currentTarget.value as any
               })
             }}
             value={this.props.currentState.mixEffects[this.props.mixEffect].transition.dve.keySource}
@@ -1718,7 +1598,40 @@ export class DVETransitionSettings extends React.Component<DVEProps, DVEState> {
           </select>
         </div>
 
-        {this.getPreMultBox(0)}
+        <PreMultipliedKeyProperties
+          enabled={dveProps.preMultiplied}
+          clip={dveProps.clip}
+          gain={dveProps.gain}
+          invert={dveProps.invertKey}
+          setEnabled={v => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.mixEffect,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.PreMultiplied,
+              PreMultiplied: v
+            })
+          }}
+          setClip={v => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.mixEffect,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Clip,
+              Clip: v
+            })
+          }}
+          setGain={v => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.mixEffect,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Gain,
+              Gain: v
+            })
+          }}
+          setInvert={v => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.mixEffect,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.InvertKey,
+              InvertKey: v
+            })
+          }}
+        />
       </div>
     )
   }

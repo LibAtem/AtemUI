@@ -1,15 +1,13 @@
-import { MagicInput, RateInput } from './settings'
+import { RateInput } from './settings'
 import React from 'react'
-import Slider from 'react-rangeslider'
 import { videoIds } from '../../ControlSettings/ids'
-import { AtemDeviceInfo } from '../../Devices/types'
-import { sendCommand, SendCommandArgs } from '../../device-page-wrapper'
-import { MaskProperties, ToggleButton, TabPanel, TabPanelTab } from './common'
+import { SendCommandStrict } from '../../device-page-wrapper'
+import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 
 interface SubMenuProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
+
   keyers: LibAtemState.DownstreamKeyerState[]
   inputs: Record<LibAtemEnums.VideoSource, LibAtemState.InputState>
   videoMode: LibAtemEnums.VideoMode
@@ -19,7 +17,7 @@ interface SubMenuState {
   page: number
 }
 
-export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> {
+export class DownstreamKeyerSettings extends React.Component<SubMenuProps, SubMenuState> {
   constructor(props: SubMenuProps) {
     super(props)
     this.state = {
@@ -28,11 +26,7 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
     }
   }
 
-  private sendCommand(command: string, value: SendCommandArgs) {
-    sendCommand(this.props, command, value)
-  }
-
-  getSourceOptions() {
+  private getSourceOptions() {
     var inputs = Object.keys(this.props.inputs)
     var sources = inputs.filter(i => videoIds[i] < 4000)
     var options = []
@@ -53,16 +47,19 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
             value={this.props.keyers[index].properties.rate}
             videoMode={this.props.videoMode}
             callback={e => {
-              this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', { Index: index, Rate: e })
+              this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', {
+                Index: index,
+                Rate: e
+              })
             }}
           />
         </div>
         <div className="ss-label">Fill Source:</div>
         <select
           onChange={e => {
-            this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
+            this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
               Index: index,
-              FillSource: e.currentTarget.value
+              FillSource: e.currentTarget.value as any
             })
           }}
           value={this.props.keyers[index].sources.fillSource}
@@ -74,9 +71,9 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
         <div className="ss-label">Key Source:</div>
         <select
           onChange={e => {
-            this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {
+            this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {
               Index: index,
-              CutSource: e.currentTarget.value
+              CutSource: e.currentTarget.value as any
             })
           }}
           value={this.props.keyers[index].sources.cutSource}
@@ -85,104 +82,6 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
         >
           {this.getSourceOptions()}
         </select>
-      </div>
-    )
-  }
-
-  getPreMultBox(index: number) {
-    var enabled = this.props.keyers[index].properties.preMultipliedKey
-    var diabledClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
-    return (
-      <div className="ss-pmk">
-        <ToggleButton
-          active={enabled}
-          label={'Pre Multiplied Key'}
-          onClick={() => {
-            this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-              Index: index,
-              Mask: 1,
-              PreMultipliedKey: !this.props.keyers[index].properties.preMultipliedKey
-            })
-          }}
-        />
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-                  Index: index,
-                  Mask: 2,
-                  Clip: e
-                })
-              }
-              value={this.props.keyers[index].properties.clip}
-            />
-            <div className="ss-slider-label">Clip:</div>
-          </div>
-          <MagicInput
-            disabled={enabled}
-            value={this.props.keyers[index].properties.clip}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-                  Index: index,
-                  Mask: 2,
-                  Clip: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-                  Index: index,
-                  Mask: 4,
-                  Gain: e
-                })
-              }
-              value={this.props.keyers[index].properties.gain}
-            />
-            <div className="ss-slider-label">Gain:</div>
-          </div>
-          <MagicInput
-            disabled={enabled}
-            value={this.props.keyers[index].properties.gain}
-            callback={(value: any) => {
-              if (value != '') {
-                this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-                  Index: index,
-                  Mask: 4,
-                  Gain: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
-
-        <label className="ss-checkbox-container">
-          Invert
-          <input
-            type="checkbox"
-            disabled={enabled}
-            checked={this.props.keyers[index].properties.invert}
-            onClick={() =>
-              this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
-                Index: index,
-                Mask: 8,
-                Invert: !this.props.keyers[index].properties.invert
-              })
-            }
-          ></input>
-          <span className="checkmark"></span>
-        </label>
       </div>
     )
   }
@@ -207,42 +106,76 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
                   maskRight={dsk.properties?.maskRight ?? 0}
                   maskBottom={dsk.properties?.maskBottom ?? 0}
                   setMaskEnabled={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                       Index: i,
                       Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskEnabled,
-                      maskEnabled: v
+                      MaskEnabled: v
                     })
                   }}
                   setMaskTop={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                       Index: i,
                       Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskTop,
-                      maskTop: v
+                      MaskTop: v
                     })
                   }}
                   setMaskLeft={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                       Index: i,
                       Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskLeft,
-                      maskLeft: v
+                      MaskLeft: v
                     })
                   }}
                   setMaskRight={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                       Index: i,
                       Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskRight,
-                      maskRight: v
+                      MaskRight: v
                     })
                   }}
                   setMaskBottom={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                       Index: i,
                       Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskBottom,
-                      maskBottom: v
+                      MaskBottom: v
                     })
                   }}
                 />
-                {this.getPreMultBox(i)}
+
+                <PreMultipliedKeyProperties
+                  enabled={dsk.properties?.preMultipliedKey}
+                  clip={dsk.properties?.clip}
+                  gain={dsk.properties?.gain}
+                  invert={dsk.properties?.invert}
+                  setEnabled={v => {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.PreMultipliedKey,
+                      PreMultipliedKey: v
+                    })
+                  }}
+                  setClip={v => {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Clip,
+                      Clip: v
+                    })
+                  }}
+                  setGain={v => {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Gain,
+                      Gain: v
+                    })
+                  }}
+                  setInvert={v => {
+                    this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Invert,
+                      Invert: v
+                    })
+                  }}
+                />
               </div>
             </TabPanelTab>
           )

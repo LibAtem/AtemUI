@@ -240,7 +240,7 @@
 }
 
 .ss-checkbox-container.disabled {
-  color: #616161;
+  color: #505050;
   cursor: default;
 }
 
@@ -295,6 +295,11 @@
 /* Show the checkmark when checked */
 .ss-checkbox-container input:checked ~ .checkmark:after {
   display: block;
+}
+
+/* Show the checkmark when checked */
+.ss-checkbox-container input:disabled ~ .checkmark:after {
+  border-color: rgb(120, 120, 120);
 }
 
 /* Style the checkmark/indicator */
@@ -503,6 +508,10 @@ input[type='number'] {
   font-size: 12px;
   top: -15px;
   color: #858585;
+
+  &.disabled {
+    color: #505050;
+  }
 }
 
 .ss-pmk {

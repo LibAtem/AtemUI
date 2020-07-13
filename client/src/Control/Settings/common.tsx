@@ -1,5 +1,6 @@
 import React from 'react'
 import { MagicInput } from './settings'
+import Slider from 'react-rangeslider'
 
 interface MaskPropertiesProps {
   maskEnabled: boolean
@@ -76,6 +77,72 @@ export function MaskProperties(props: MaskPropertiesProps) {
           />
         </div>
       </div>
+    </div>
+  )
+}
+
+interface PreMultipliedKeyPropertiesProps {
+  enabled: boolean
+  clip: number
+  gain: number
+  invert: boolean
+
+  setEnabled: (val: boolean) => void
+  setClip: (val: number) => void
+  setGain: (val: number) => void
+  setInvert: (val: boolean) => void
+}
+
+export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProps) {
+  const enabled = props.enabled
+  const labelClass = !enabled ? 'ss-slider-label' : 'ss-slider-label disabled'
+  const sliderClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
+
+  return (
+    <div className="ss-pmk">
+      <ToggleButton active={enabled} label={'Pre Multiplied Key'} onClick={() => props.setEnabled(!props.enabled)} />
+      <div className="ss-slider-holder">
+        <div className={sliderClass}>
+          <Slider tooltip={false} step={0.1} onChange={e => props.setClip(e)} value={props.clip} />
+          <div className={labelClass}>Clip:</div>
+        </div>
+        <MagicInput
+          disabled={enabled}
+          value={props.clip}
+          callback={(value: any) => {
+            if (value != '') {
+              props.setClip(Math.min(100, Math.max(0, value)))
+            }
+          }}
+        />
+      </div>
+
+      <div className="ss-slider-holder">
+        <div className={sliderClass}>
+          <Slider tooltip={false} step={0.1} onChange={e => props.setGain(e)} value={props.gain} />
+          <div className={labelClass}>Gain:</div>
+        </div>
+        <MagicInput
+          disabled={enabled}
+          value={props.gain}
+          callback={(value: any) => {
+            if (value != '') {
+              props.setGain(Math.min(100, Math.max(0, value)))
+            }
+          }}
+        />
+      </div>
+
+      <label className={!enabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
+        Invert
+        <input
+          type="checkbox"
+          disabled={enabled}
+          checked={props.invert}
+          onClick={() => props.setInvert(!props.invert)}
+        />
+        <span className="checkmark"></span>
+      </label>
     </div>
   )
 }
