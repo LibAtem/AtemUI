@@ -512,24 +512,24 @@ input[type='number'] {
 .ss-submenu-submenu {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-}
 
-.ss-submenu-submenu-item {
-  font-size: 13px;
-  text-align: center;
-  color: #a5a5a5;
-  line-height: 25px;
-  box-shadow: -1px 0px 0px 0px #1a1a1a;
-}
+  .ss-submenu-submenu-item {
+    font-size: 13px;
+    text-align: center;
+    color: #a5a5a5;
+    line-height: 25px;
+    box-shadow: -1px 0px 0px 0px #1a1a1a;
 
-.ss-submenu-submenu-item.disabled {
-  background: rgb(41, 41, 41);
-  background: linear-gradient(0deg, rgba(41, 41, 41, 1) 57%, rgba(49, 49, 49, 1) 94%);
-  box-shadow: 0px 1px 0px 0px #1a1a1a, -1px 0px 0px 0px #1a1a1a;
-}
+    &.inactive {
+      background: rgb(41, 41, 41);
+      background: linear-gradient(0deg, rgba(41, 41, 41, 1) 57%, rgba(49, 49, 49, 1) 94%);
+      box-shadow: 0px 1px 0px 0px #1a1a1a, -1px 0px 0px 0px #1a1a1a;
 
-.ss-submenu-submenu-item.disabled:hover {
-  background: linear-gradient(0deg, rgb(56, 56, 56) 57%, rgb(58, 58, 58) 94%);
+      &:hover {
+        background: linear-gradient(0deg, rgb(56, 56, 56) 57%, rgb(58, 58, 58) 94%);
+      }
+    }
+  }
 }
 
 .ss-row {

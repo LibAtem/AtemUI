@@ -2,7 +2,7 @@ import React from 'react'
 import { WipeTransitionSettings } from './wipe'
 import { DVETransitionSettings } from './dve'
 import { AtemDeviceInfo } from '../../../Devices/types'
-import { LibAtemState } from '../../../generated'
+import { LibAtemState, LibAtemEnums } from '../../../generated'
 import { DipTransitionSettings } from './dip'
 import { StingerTransitionSettings } from './stinger'
 import { VideoSource } from '../../../generated/common-enums'
@@ -14,6 +14,7 @@ import { sendCommandStrict } from '../../../device-page-wrapper'
 
 interface TransitionSettingsState {
   open: boolean
+  page: number
 }
 
 interface TransitionSettingsProps {
@@ -27,7 +28,8 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
   constructor(props: TransitionSettingsProps) {
     super(props)
     this.state = {
-      open: false
+      open: false,
+      page: 0
     }
   }
 
@@ -35,16 +37,20 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
     sendCommandStrict(this.props, ...args)
   }
 
+  private toggleOpen() {
+    const meProps = this.props.currentState.mixEffects[this.props.mixEffect]
+
+    this.setState({
+      open: !this.state.open,
+      page: meProps.transition.properties.style
+    })
+  }
+
   render() {
     if (!this.state.open) {
       return (
         <div className="ss-submenu">
-          <div
-            className="ss-submenu-title"
-            onClick={e => {
-              this.setState({ open: !this.state.open })
-            }}
-          >
+          <div className="ss-submenu-title" onClick={() => this.toggleOpen()}>
             Transition
           </div>
           <div className="ss-submenu-box"></div>
@@ -65,16 +71,11 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
 
     return (
       <div className="ss-submenu">
-        <div
-          className="ss-submenu-title"
-          onClick={e => {
-            this.setState({ open: !this.state.open })
-          }}
-        >
+        <div className="ss-submenu-title" onClick={() => this.toggleOpen()}>
           Transition
         </div>
-        <TabPanel default={0}>
-          <TabPanelTab label={'Mix'}>
+        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.Mix} label={'Mix'}>
             {meProps.transition.mix ? (
               <MixTransitionSettings
                 sendCommand={this.sendCommand}
@@ -87,7 +88,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             )}
           </TabPanelTab>
 
-          <TabPanelTab label={'Dip'}>
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.Dip} label={'Dip'}>
             {meProps.transition.dip ? (
               <DipTransitionSettings
                 sendCommand={this.sendCommand}
@@ -101,7 +102,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             )}
           </TabPanelTab>
 
-          <TabPanelTab label={'Wipe'}>
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.Wipe} label={'Wipe'}>
             {meProps.transition.wipe ? (
               <WipeTransitionSettings
                 sendCommand={this.sendCommand}
@@ -115,7 +116,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             )}
           </TabPanelTab>
 
-          <TabPanelTab label={'Stinger'}>
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.Stinger} label={'Stinger'}>
             {meProps.transition.stinger ? (
               <StingerTransitionSettings
                 sendCommand={this.sendCommand}
@@ -129,7 +130,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             )}
           </TabPanelTab>
 
-          <TabPanelTab label={'DVE'}>
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.DVE} label={'DVE'}>
             {meProps.transition.dVE ? (
               <DVETransitionSettings
                 mixEffect={this.props.mixEffect}

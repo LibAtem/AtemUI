@@ -4,8 +4,8 @@ import Slider from 'react-rangeslider'
 import { videoIds } from '../../ControlSettings/ids'
 import { AtemDeviceInfo } from '../../Devices/types'
 import { sendCommand, SendCommandArgs } from '../../device-page-wrapper'
-import { MaskProperties, ToggleButton } from './common'
-import { LibAtemState, LibAtemEnums } from '../../generated'
+import { MaskProperties, ToggleButton, TabPanel, TabPanelTab } from './common'
+import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 
 interface SubMenuProps {
   device: AtemDeviceInfo
@@ -52,7 +52,7 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
           <RateInput
             value={this.props.keyers[index].properties.rate}
             videoMode={this.props.videoMode}
-            callback={(e) => {
+            callback={e => {
               this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', { Index: index, Rate: e })
             }}
           />
@@ -188,20 +188,66 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
   }
 
   render() {
-    const tabs: JSX.Element[] = []
-    for (let i = 0; i < this.props.keyers.length; i++) {
-      tabs.push(
-        <div
-          key={i}
-          onClick={() => this.setState({ page: i })}
-          className={this.state.page === i ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
-        >
-          DSK{i + 1}
-        </div>
-      )
-    }
-
-    const dsk = this.props.keyers[this.state.page]
+    const panels = this.state.open
+      ? this.props.keyers.map((dsk, i) => {
+          return (
+            <TabPanelTab key={i} id={i} label={`DSK${i + 1}`}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateRows: 'repeat(3, auto)',
+                  overflow: 'hidden'
+                }}
+              >
+                {this.getTopBox(i)}
+                <MaskProperties
+                  maskEnabled={dsk.properties?.maskEnabled ?? false}
+                  maskTop={dsk.properties?.maskTop ?? 0}
+                  maskLeft={dsk.properties?.maskLeft ?? 0}
+                  maskRight={dsk.properties?.maskRight ?? 0}
+                  maskBottom={dsk.properties?.maskBottom ?? 0}
+                  setMaskEnabled={v => {
+                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskEnabled,
+                      maskEnabled: v
+                    })
+                  }}
+                  setMaskTop={v => {
+                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskTop,
+                      maskTop: v
+                    })
+                  }}
+                  setMaskLeft={v => {
+                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskLeft,
+                      maskLeft: v
+                    })
+                  }}
+                  setMaskRight={v => {
+                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskRight,
+                      maskRight: v
+                    })
+                  }}
+                  setMaskBottom={v => {
+                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                      Index: i,
+                      Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskBottom,
+                      maskBottom: v
+                    })
+                  }}
+                />
+                {this.getPreMultBox(i)}
+              </div>
+            </TabPanelTab>
+          )
+        })
+      : []
 
     return (
       <div className="ss-submenu">
@@ -213,67 +259,9 @@ export class DownStreamKeys extends React.Component<SubMenuProps, SubMenuState> 
         >
           Downstream Keys
         </div>
-        <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
-          {this.state.open ? (
-            <React.Fragment>
-              <div className="ss-submenu-submenu">{tabs}</div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateRows: 'repeat(3, auto)',
-                  overflow: 'hidden'
-                }}
-              >
-                {this.getTopBox(this.state.page)}
-                <MaskProperties
-                  maskEnabled={dsk?.properties?.maskEnabled ?? false}
-                  maskTop={dsk?.properties?.maskTop ?? 0}
-                  maskLeft={dsk?.properties?.maskLeft ?? 0}
-                  maskRight={dsk?.properties?.maskRight ?? 0}
-                  maskBottom={dsk?.properties?.maskBottom ?? 0}
-                  setMaskEnabled={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-                      Index: this.state.page,
-                      Mask: 1,
-                      maskEnabled: v
-                    })
-                  }}
-                  setMaskTop={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-                      Index: this.state.page,
-                      Mask: 2,
-                      maskTop: v
-                    })
-                  }}
-                  setMaskLeft={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-                      Index: this.state.page,
-                      Mask: 8,
-                      maskLeft: v
-                    })
-                  }}
-                  setMaskRight={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-                      Index: this.state.page,
-                      Mask: 16,
-                      maskRight: v
-                    })
-                  }}
-                  setMaskBottom={v => {
-                    this.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-                      Index: this.state.page,
-                      Mask: 4,
-                      maskBottom: v
-                    })
-                  }}
-                />
-                {this.getPreMultBox(this.state.page)}
-              </div>
-            </React.Fragment>
-          ) : (
-            ''
-          )}
-        </div>
+        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+          {panels}
+        </TabPanel>
       </div>
     )
   }

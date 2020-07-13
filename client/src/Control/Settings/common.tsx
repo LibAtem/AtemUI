@@ -90,42 +90,38 @@ export function ToggleButton(props: { label: string; active: boolean; onClick: (
 }
 
 interface TabPanelProps {
-  default: number
+  page: number
+  onChange: (newPage: number) => void
 }
-export class TabPanel extends React.Component<TabPanelProps, { page: number }> {
-  constructor(props: TabPanelProps) {
-    super(props)
-
-    this.state = {
-      page: props.default
-    }
-  }
+export class TabPanel extends React.Component<TabPanelProps> {
   render() {
     const children = React.Children.toArray(this.props.children)
+      .filter(ch => (ch as Partial<TabPanelTab>).props?.id !== undefined)
+      .map(ch => ch as TabPanelTab)
     return (
       <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
         <div className="ss-submenu-submenu">
-          {children.map((ch, i) => {
-            const ch2 = ch as Partial<TabPanelTab>
-
+          {children.map(ch => {
             return (
               <div
-                onClick={() => this.setState({ page: i })}
-                className={this.state.page === i ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
+                onClick={() => this.props.onChange(ch.props.id)}
+                className={
+                  this.props.page === ch.props.id ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item inactive'
+                }
               >
-                {ch2.props?.label ?? `Tab ${i}`}
+                {ch.props?.label ?? `?`}
               </div>
             )
           })}
         </div>
 
-        {children[this.state.page]}
+        {children.find(ch => ch.props.id === this.props.page)}
       </div>
     )
   }
 }
 
-export class TabPanelTab extends React.Component<{ label: string }> {
+export class TabPanelTab extends React.Component<{ id: number; label: string }> {
   render() {
     return <React.Fragment>{this.props.children}</React.Fragment>
   }

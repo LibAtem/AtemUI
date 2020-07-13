@@ -1,15 +1,14 @@
 import { GetDeviceId } from '../../../DeviceManager'
 import React from 'react'
-import Slider from 'react-rangeslider'
 import { MagicInput, RateInput } from '../settings'
-import { videoIds } from '../../../ControlSettings/ids'
 
 import { AtemDeviceInfo } from '../../../Devices/types'
 import { Luma } from './luma'
 import { Chroma } from './chroma'
 import { Pattern } from './pattern'
 import { DVE } from './dve'
-import { ToggleButton } from '../common'
+import { ToggleButton, TabPanelTab, TabPanel } from '../common'
+import { LibAtemEnums, LibAtemCommands } from '../../../generated'
 
 interface UpstreamKeyState {
   hasConnected: boolean
@@ -72,50 +71,6 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
       )
     }
 
-    var inner = <></>
-    var page = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keyType
-    if (page === 0) {
-      inner = (
-        <Luma
-          id={this.props.id}
-          mixEffect={this.props.mixEffect}
-          device={this.props.device}
-          signalR={this.props.signalR}
-          currentState={this.props.currentState}
-        ></Luma>
-      )
-    } else if (page === 1) {
-      inner = (
-        <Chroma
-          id={this.props.id}
-          mixEffect={this.props.mixEffect}
-          device={this.props.device}
-          signalR={this.props.signalR}
-          currentState={this.props.currentState}
-        ></Chroma>
-      )
-    } else if (page === 2) {
-      inner = (
-        <Pattern
-          id={this.props.id}
-          mixEffect={this.props.mixEffect}
-          device={this.props.device}
-          signalR={this.props.signalR}
-          currentState={this.props.currentState}
-        ></Pattern>
-      )
-    } else {
-      inner = (
-        <DVE
-          id={this.props.id}
-          mixEffect={this.props.mixEffect}
-          device={this.props.device}
-          signalR={this.props.signalR}
-          currentState={this.props.currentState}
-        ></DVE>
-      )
-    }
-
     return (
       <div className="ss-submenu">
         <div
@@ -126,64 +81,57 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         >
           {this.props.name}
         </div>
-        <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
-          <div className="ss-submenu-submenu">
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 1,
-                  KeyType: 0
-                })
-              }
-              className={page === 0 ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
-            >
-              Luma
-            </div>
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 1,
-                  KeyType: 1
-                })
-              }
-              className={page === 1 ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
-            >
-              Chroma
-            </div>
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 1,
-                  KeyType: 2
-                })
-              }
-              className={page === 2 ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
-            >
-              Pattern
-            </div>
-            <div
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 1,
-                  KeyType: 3
-                })
-              }
-              className={page === 3 ? 'ss-submenu-submenu-item' : 'ss-submenu-submenu-item disabled'}
-            >
-              DVE
-            </div>
-          </div>
+        <TabPanel
+          page={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.keyType}
+          onChange={newPage => {
+            this.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
+              KeyerIndex: this.props.id,
+              MixEffectIndex: this.props.mixEffect,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags.KeyType,
+              KeyType: newPage
+            })
+          }}
+        >
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Luma} label={'Luma'}>
+            <Luma
+              id={this.props.id}
+              mixEffect={this.props.mixEffect}
+              device={this.props.device}
+              signalR={this.props.signalR}
+              currentState={this.props.currentState}
+            />
+          </TabPanelTab>
 
-          {inner}
-        </div>
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Chroma} label={'Chroma'}>
+            <Chroma
+              id={this.props.id}
+              mixEffect={this.props.mixEffect}
+              device={this.props.device}
+              signalR={this.props.signalR}
+              currentState={this.props.currentState}
+            />
+          </TabPanelTab>
+
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Pattern} label={'Pattern'}>
+            <Pattern
+              id={this.props.id}
+              mixEffect={this.props.mixEffect}
+              device={this.props.device}
+              signalR={this.props.signalR}
+              currentState={this.props.currentState}
+            />
+          </TabPanelTab>
+
+          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'}>
+            <DVE
+              id={this.props.id}
+              mixEffect={this.props.mixEffect}
+              device={this.props.device}
+              signalR={this.props.signalR}
+              currentState={this.props.currentState}
+            />
+          </TabPanelTab>
+        </TabPanel>
       </div>
     )
   }
