@@ -6,8 +6,8 @@ export interface AtemState {
   mediaPlayers: MediaPlayerState[]
   mixEffects: MixEffectState[]
   superSources: SuperSourceState[]
-  audio: AudioState
-  fairlight: FairlightAudioState
+  audio?: AudioState
+  fairlight?: FairlightAudioState
   macros: MacroState
   mediaPool: MediaPoolState
   settings: SettingsState
@@ -33,7 +33,7 @@ export interface DownstreamKeyerState {
 
 export interface MediaPlayerState {
   source: MediaPlayerState_SourceState
-  clipStatus: MediaPlayerState_ClipStatusState
+  clipStatus?: MediaPlayerState_ClipStatusState
 }
 
 export interface MixEffectState {
@@ -54,14 +54,14 @@ export interface AudioState {
   inputs: Record<number, AudioState_InputState>
   monitorOutputs: AudioState_MonitorOutputState[]
   headphoneOutputs: AudioState_HeadphoneOutputState[]
-  tally: Record<Enums.AudioSource, boolean>
+  tally?: Record<Enums.AudioSource, boolean>
 }
 
 export interface FairlightAudioState {
   programOut: FairlightAudioState_ProgramOutState
   inputs: Record<number, FairlightAudioState_InputState>
   monitors: FairlightAudioState_MonitorOutputState[]
-  tally: unknown
+  tally?: unknown
 }
 
 export interface MacroState {
@@ -79,7 +79,7 @@ export interface SettingsState {
   multiViewers: MultiViewerState[]
   inputs: Record<Enums.VideoSource, InputState>
   hyperdecks: SettingsState_HyperdeckState[]
-  talkback: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
+  talkback?: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
   mixMinusOutputs: SettingsState_MixMinusOutputState[]
   videoMode: Enums.VideoMode
   downConvertMode: Enums.DownConvertMode
@@ -92,7 +92,7 @@ export interface SettingsState {
 export interface InfoState {
   version: unknown
   timecodeLocked: boolean
-  lastTimecode: Timecode
+  lastTimecode?: Timecode
   model: Enums.ModelId
   productName: string
   supportedVideoModes: VideoModeInfo[]
@@ -139,25 +139,25 @@ export interface MediaPlayerState_ClipStatusState {
 }
 
 export interface MixEffectState_KeyerState {
-  luma: MixEffectState_KeyerLumaState
-  chroma: MixEffectState_KeyerChromaState
-  advancedChroma: MixEffectState_KeyerAdvancedChromaState
-  pattern: MixEffectState_KeyerPatternState
-  dVE: MixEffectState_KeyerDVEState
-  flyFrames: MixEffectState_KeyerFlyFrameState[]
+  luma?: MixEffectState_KeyerLumaState
+  chroma?: MixEffectState_KeyerChromaState
+  advancedChroma?: MixEffectState_KeyerAdvancedChromaState
+  pattern?: MixEffectState_KeyerPatternState
+  dVE?: MixEffectState_KeyerDVEState
+  flyFrames?: MixEffectState_KeyerFlyFrameState[]
   onAir: boolean
   properties: MixEffectState_KeyerPropertiesState
-  flyProperties: MixEffectState_KeyerFlyProperties
+  flyProperties?: MixEffectState_KeyerFlyProperties
 }
 
 export interface MixEffectState_TransitionState {
   properties: MixEffectState_TransitionPropertiesState
   position: MixEffectState_TransitionPositionState
-  mix: MixEffectState_TransitionMixState
-  dip: MixEffectState_TransitionDipState
-  wipe: MixEffectState_TransitionWipeState
-  stinger: MixEffectState_TransitionStingerState
-  dVE: MixEffectState_TransitionDVEState
+  mix?: MixEffectState_TransitionMixState
+  dip?: MixEffectState_TransitionDipState
+  wipe?: MixEffectState_TransitionWipeState
+  stinger?: MixEffectState_TransitionStingerState
+  dVE?: MixEffectState_TransitionDVEState
 }
 
 export interface MixEffectState_SourcesState {
@@ -213,14 +213,14 @@ export interface AudioState_ProgramOutState {
   gain: number
   balance: number
   followFadeToBlack: boolean
-  levels: AudioState_LevelsState
+  levels?: AudioState_LevelsState
 }
 
 export interface AudioState_InputState {
   isMixedIn: boolean
   properties: AudioState_InputState_PropertiesState
-  levels: AudioState_LevelsState
-  analog: AudioState_InputState_AnalogState
+  levels?: AudioState_LevelsState
+  analog?: AudioState_InputState_AnalogState
 }
 
 export interface AudioState_MonitorOutputState {
@@ -246,7 +246,7 @@ export interface FairlightAudioState_ProgramOutState {
   audioFollowVideoCrossfadeTransitionEnabled: boolean
   dynamics: FairlightAudioState_DynamicsState
   equalizer: FairlightAudioState_EqualizerState
-  levels: FairlightAudioState_LevelsState
+  levels?: FairlightAudioState_LevelsState
 }
 
 export interface FairlightAudioState_InputState {
@@ -254,7 +254,7 @@ export interface FairlightAudioState_InputState {
   supportedConfigurations: Enums.FairlightInputConfiguration
   externalPortType: Enums.ExternalPortType
   activeConfiguration: Enums.FairlightInputConfiguration
-  analog: FairlightAudioState_AnalogState
+  analog?: FairlightAudioState_AnalogState
   sources: FairlightAudioState_InputSourceState[]
 }
 
@@ -285,7 +285,7 @@ export interface MacroState_RunStatusState {
 
 export interface MediaPoolState_StillState {
   isUsed: boolean
-  hash: number[]
+  hash?: number[]
   filename: string
 }
 
@@ -540,9 +540,9 @@ export interface AudioState_InputState_AnalogState {
 
 export interface FairlightAudioState_DynamicsState {
   makeUpGain: number
-  limiter: FairlightAudioState_LimiterState
-  compressor: FairlightAudioState_CompressorState
-  expander: FairlightAudioState_ExpanderState
+  limiter?: FairlightAudioState_LimiterState
+  compressor?: FairlightAudioState_CompressorState
+  expander?: FairlightAudioState_ExpanderState
 }
 
 export interface FairlightAudioState_EqualizerState {
@@ -582,7 +582,7 @@ export interface FairlightAudioState_InputSourceState {
   stereoSimulation: number
   dynamics: FairlightAudioState_DynamicsState
   equalizer: FairlightAudioState_EqualizerState
-  levels: FairlightAudioState_LevelsState
+  levels?: FairlightAudioState_LevelsState
 }
 
 export interface MacroState_MacroRunStatus {
@@ -590,7 +590,7 @@ export interface MacroState_MacroRunStatus {
 
 export interface MediaPoolState_FrameState {
   isUsed: boolean
-  filename: number[]
+  filename?: number[]
 }
 
 export interface MultiViewerState_PropertiesState {

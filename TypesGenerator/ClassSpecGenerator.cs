@@ -66,7 +66,7 @@ namespace TypesGenerator
                 var types = t.GetGenericArguments();
                 if (translateType(types[0]) != "unknown")
                 {
-                    return $"Record<{translateType(types[0])}, {translateType(types[1])}>";   
+                    return $"Record<{translateType(types[0])}, {translateType(types[1])}>"; // | undefined>"; // TODO - this is safer, but is it a good idea?   
                 }
             }
             if (t.IsArray)
@@ -111,12 +111,18 @@ namespace TypesGenerator
             if (t != null)
             {
                 _file.WriteLine($"export interface {SafeName(fullname)} {{");
+                
+                var sampleClass = Activator.CreateInstance(t);
 
                 foreach (PropertyInfo prop in t.GetProperties(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
                     var name = Char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
-                    _file.WriteLine($"  {name}: {translateType(prop.PropertyType)}");
+                    var isOptional = !prop.PropertyType.IsValueType && prop.CanWrite &&
+                                     (prop.GetSetMethod(true)?.IsPublic).GetValueOrDefault(false) &&
+                                     prop.GetValue(sampleClass) == null && prop.PropertyType != typeof(string);
+                    var optionalStr = isOptional ? "?" : "";
+                    _file.WriteLine($"  {name}{optionalStr}: {translateType(prop.PropertyType)}");
                 }
 
                 _file.WriteLine($"}}\n");

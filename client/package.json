@@ -47,7 +47,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate-types": "csharp-models-to-typescript --config=csharp-models.json"
+    "generate-types": "cd ../TypesGenerator/; dotnet run"
   },
   "eslintConfig": {
     "extends": "react-app"

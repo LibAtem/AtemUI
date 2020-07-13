@@ -3,15 +3,15 @@ export interface DeviceProfile {
   model: Enums.ModelId
   product: string
   mixEffectBlocks: number
-  sources: DevicePort[]
-  audioSources: Enums.AudioSource[]
+  sources?: DevicePort[]
+  audioSources?: Enums.AudioSource[]
   auxiliaries: number
   downstreamKeys: number
   upstreamKeys: number
   routableKeyMasks: boolean
   hyperDecks: number
   stingers: number
-  multiView: MultiView
+  multiView?: MultiView
   dVE: number
   superSource: number
   mediaPlayers: number
@@ -20,13 +20,13 @@ export interface DeviceProfile {
   macroCount: number
   serialPort: number
   audioMonitor: boolean
-  videoModes: VideoModeSet
+  videoModes?: VideoModeSet
   mixMinusOutputs: number
 }
 
 export interface DevicePort {
   id: Enums.VideoSource
-  port: Enums.ExternalPortType[]
+  port?: Enums.ExternalPortType[]
 }
 
 export interface MultiView {
@@ -39,8 +39,8 @@ export interface MultiView {
 }
 
 export interface VideoModeSet {
-  supportedModes: Enums.VideoMode[]
-  maxFrames: MaxFramesSet
+  supportedModes?: Enums.VideoMode[]
+  maxFrames?: MaxFramesSet
 }
 
 export interface MaxFramesSet {

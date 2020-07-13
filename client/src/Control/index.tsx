@@ -216,7 +216,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
     const sources = compact(
       Object.entries(currentState.settings.inputs).map(([id, src]) => {
         const val = videoIds[id as any]
-        if (val !== undefined) {
+        if (val !== undefined && src) {
           const r: InputProps = {
             index: val,
             name: src.properties.shortName,
