@@ -57,6 +57,7 @@ interface AtemButtonBarProps<T> {
     value: T
     label: JSX.Element | string
     disabled?: boolean
+    tooltip?: string
   }>
   onChange: (val: T) => void
 }
@@ -81,6 +82,7 @@ export class AtemButtonBar<T> extends React.Component<AtemButtonBarProps<T>> {
               onClick={() => {
                 this.props.onChange(opt.value)
               }}
+              title={opt.tooltip}
             >
               {opt.label}
             </div>

@@ -16,9 +16,10 @@ interface TransitionSettingsState {
 interface TransitionSettingsProps {
   sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState
-  profile: LibAtemProfile.DeviceProfile 
-  mixEffect: number
+  profile: LibAtemProfile.DeviceProfile
+  meIndex: number
   inputProperties: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  videoMode: LibAtemEnums.VideoMode
 }
 
 export class TransitionSettings extends React.Component<TransitionSettingsProps, TransitionSettingsState> {
@@ -31,7 +32,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
   }
 
   private toggleOpen() {
-    const meProps = this.props.currentState.mixEffects[this.props.mixEffect]
+    const meProps = this.props.currentState.mixEffects[this.props.meIndex]
 
     this.setState({
       open: !this.state.open,
@@ -51,7 +52,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
       )
     }
 
-    const meProps = this.props.currentState.mixEffects[this.props.mixEffect]
+    const meProps = this.props.currentState.mixEffects[this.props.meIndex]
 
     return (
       <div className="ss-submenu">
@@ -63,9 +64,9 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             {meProps.transition.mix ? (
               <MixTransitionSettings
                 sendCommand={this.props.sendCommand}
-                meIndex={this.props.mixEffect}
+                meIndex={this.props.meIndex}
                 mix={meProps.transition.mix}
-                videoMode={this.props.currentState.settings.videoMode}
+                videoMode={this.props.videoMode}
               />
             ) : (
               undefined
@@ -76,10 +77,10 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             {meProps.transition.dip ? (
               <DipTransitionSettings
                 sendCommand={this.props.sendCommand}
-                meIndex={this.props.mixEffect}
+                meIndex={this.props.meIndex}
                 dip={meProps.transition.dip}
                 sources={this.props.inputProperties}
-                videoMode={this.props.currentState.settings.videoMode}
+                videoMode={this.props.videoMode}
               />
             ) : (
               undefined
@@ -90,36 +91,42 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
             {meProps.transition.wipe ? (
               <WipeTransitionSettings
                 sendCommand={this.props.sendCommand}
-                meIndex={this.props.mixEffect}
+                meIndex={this.props.meIndex}
                 wipe={meProps.transition.wipe}
                 sources={this.props.inputProperties}
-                videoMode={this.props.currentState.settings.videoMode}
+                videoMode={this.props.videoMode}
               />
             ) : (
               undefined
             )}
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.TransitionStyle.Stinger} label={'Stinger'} disabled={this.props.profile.mediaPoolClips === 0}>
+          <TabPanelTab
+            id={LibAtemEnums.TransitionStyle.Stinger}
+            label={'Stinger'}
+            disabled={this.props.profile.mediaPoolClips === 0}
+          >
             {meProps.transition.stinger ? (
               <StingerTransitionSettings
                 sendCommand={this.props.sendCommand}
-                meIndex={this.props.mixEffect}
+                meIndex={this.props.meIndex}
                 stinger={meProps.transition.stinger}
                 sources={this.props.inputProperties}
-                videoMode={this.props.currentState.settings.videoMode}
+                videoMode={this.props.videoMode}
               />
             ) : (
               undefined
             )}
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.TransitionStyle.DVE} label={'DVE'} disabled={this.props.profile.dVE === 0}>
-            {meProps.transition.dVE ? (
+          <TabPanelTab id={LibAtemEnums.TransitionStyle.DVE} label={'DVE'} disabled={this.props.profile.dve === 0}>
+            {meProps.transition.dve ? (
               <DVETransitionSettings
                 sendCommand={this.props.sendCommand}
-                mixEffect={this.props.mixEffect}
-                currentState={this.props.currentState}
+                meIndex={this.props.meIndex}
+                dve={meProps.transition.dve}
+                sources={this.props.inputProperties}
+                videoMode={this.props.videoMode}
               />
             ) : (
               undefined

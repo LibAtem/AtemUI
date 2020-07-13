@@ -600,7 +600,8 @@ input[type='number'] {
   margin: 10px auto;
   display: grid;
   column-gap: 10px;
-  grid-template-columns: 8px 8px 8px 8px;
+  grid-auto-columns: 8px;
+  grid-auto-flow: column;
   width: fit-content;
 }
 .ss-dve-style-page-button {

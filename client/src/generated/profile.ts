@@ -12,7 +12,7 @@ export interface DeviceProfile {
   hyperDecks: number
   stingers: number
   multiView?: MultiView
-  dVE: number
+  dve: number
   superSource: number
   mediaPlayers: number
   mediaPoolClips: number
@@ -44,9 +44,9 @@ export interface VideoModeSet {
 }
 
 export interface MaxFramesSet {
-  sD: number
+  sd: number
   _720: number
   _1080: number
-  _4K: number
+  _4k: number
 }
 

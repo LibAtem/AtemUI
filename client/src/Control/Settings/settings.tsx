@@ -106,11 +106,12 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         />
 
         <TransitionSettings
-          mixEffect={meIndex}
+          meIndex={meIndex}
           sendCommand={this.sendCommand}
           currentState={this.props.currentState}
           profile={this.props.profile}
           inputProperties={inputProperties}
+          videoMode={this.props.currentState.settings.videoMode}
         />
 
         {meProps.keyers.map((key, i) => (

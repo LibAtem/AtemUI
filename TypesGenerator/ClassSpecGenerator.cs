@@ -117,7 +117,9 @@ namespace TypesGenerator
                 foreach (PropertyInfo prop in t.GetProperties(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
-                    var name = Char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
+                    var name = prop.Name.ToUpper() == prop.Name
+                        ? prop.Name.ToLower()
+                        : Char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
                     var isOptional = !prop.PropertyType.IsValueType && prop.CanWrite &&
                                      (prop.GetSetMethod(true)?.IsPublic).GetValueOrDefault(false) &&
                                      prop.GetValue(sampleClass) == null && prop.PropertyType != typeof(string);

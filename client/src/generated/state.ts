@@ -143,7 +143,7 @@ export interface MixEffectState_KeyerState {
   chroma?: MixEffectState_KeyerChromaState
   advancedChroma?: MixEffectState_KeyerAdvancedChromaState
   pattern?: MixEffectState_KeyerPatternState
-  dVE?: MixEffectState_KeyerDVEState
+  dve?: MixEffectState_KeyerDVEState
   flyFrames?: MixEffectState_KeyerFlyFrameState[]
   onAir: boolean
   properties: MixEffectState_KeyerPropertiesState
@@ -157,7 +157,7 @@ export interface MixEffectState_TransitionState {
   dip?: MixEffectState_TransitionDipState
   wipe?: MixEffectState_TransitionWipeState
   stinger?: MixEffectState_TransitionStingerState
-  dVE?: MixEffectState_TransitionDVEState
+  dve?: MixEffectState_TransitionDVEState
 }
 
 export interface MixEffectState_SourcesState {

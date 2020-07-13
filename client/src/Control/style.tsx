@@ -60,7 +60,7 @@ const styles: TransStyleProps[] = [
         Rate: val
       })
     },
-    disabled: (p) => p.dVE === 0
+    disabled: (p) => p.dve === 0
   },
   {
     name: 'STING',

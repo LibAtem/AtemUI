@@ -82,6 +82,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
 }
 
 interface PreMultipliedKeyPropertiesProps {
+  disabled?: boolean
+
   enabled: boolean
   clip: number
   gain: number
@@ -94,20 +96,21 @@ interface PreMultipliedKeyPropertiesProps {
 }
 
 export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProps) {
-  const enabled = props.enabled
-  const labelClass = !enabled ? 'ss-slider-label' : 'ss-slider-label disabled'
-  const sliderClass = !enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
+  const disableControls = props.enabled || props.disabled
+  const labelClass = !disableControls ? 'ss-slider-label' : 'ss-slider-label disabled'
+  const sliderClass = !disableControls ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
 
   return (
     <div className="ss-pmk">
-      <ToggleButton active={enabled} label={'Pre Multiplied Key'} onClick={() => props.setEnabled(!props.enabled)} />
+      <ToggleButton disabled={props.disabled} active={props.enabled} label={'Pre Multiplied Key'} onClick={() => props.setEnabled(!props.enabled)} />
+
       <div className="ss-slider-holder">
         <div className={sliderClass}>
           <Slider tooltip={false} step={0.1} onChange={e => props.setClip(e)} value={props.clip} />
           <div className={labelClass}>Clip:</div>
         </div>
         <MagicInput
-          disabled={enabled}
+          disabled={disableControls}
           value={props.clip}
           callback={(value: any) => {
             if (value != '') {
@@ -123,7 +126,7 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
           <div className={labelClass}>Gain:</div>
         </div>
         <MagicInput
-          disabled={enabled}
+          disabled={disableControls}
           value={props.gain}
           callback={(value: any) => {
             if (value != '') {
@@ -133,11 +136,11 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
         />
       </div>
 
-      <label className={!enabled ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
+      <label className={!disableControls ? 'ss-checkbox-container' : 'ss-checkbox-container disabled'}>
         Invert
         <input
           type="checkbox"
-          disabled={enabled}
+          disabled={disableControls}
           checked={props.invert}
           onClick={() => props.setInvert(!props.invert)}
         />
@@ -149,7 +152,7 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
 
 export function ToggleButton(props: { label: string; active: boolean; onClick: () => void; disabled?: boolean }) {
   return (
-    <div className="ss-circle-button-holder" onClick={() => props.onClick()}>
+    <div className="ss-circle-button-holder" onClick={() => !props.disabled ? props.onClick() : undefined}>
       <div className="ss-circle-button">{props.active ? <div className="ss-circle-button-inner"></div> : ''}</div>
       <div className={`ss-heading ${props.disabled ? 'disabled' : ''}`}>{props.label}</div>
     </div>
