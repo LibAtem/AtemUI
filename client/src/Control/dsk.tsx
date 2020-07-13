@@ -2,7 +2,7 @@ import { AtemButtonGeneric } from './button/button'
 import { RateInput } from './Settings/settings'
 import React from 'react'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { LibAtemState, LibAtemEnums } from '../generated'
+import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'
 
 interface DSKProps {
   sendCommand: SendCommandStrict
@@ -58,6 +58,7 @@ export function DSKPanel(props: DSKProps) {
           callback={() =>
             props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyAutoV8Command', {
               Index: index,
+              Mask: LibAtemCommands.DownstreamKey_DownstreamKeyAutoV8Command_MaskFlags.IsTowardsOnAir,
               IsTowardsOnAir: !dsk.state.isTowardsOnAir
             })
           }

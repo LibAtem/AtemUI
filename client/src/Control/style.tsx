@@ -2,7 +2,7 @@ import React from 'react'
 import { AtemButtonGeneric } from './button/button'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { RateInput } from './Settings/settings'
-import { LibAtemState, LibAtemEnums } from '../generated'
+import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'
 
 interface StyleProps {
   sendCommand: SendCommandStrict
@@ -14,34 +14,51 @@ interface StyleProps {
 
 interface TransStyleProps {
   name: string
-  command: string | null
-  mask: number
+  sendRate: ((props: StyleProps, rate: number) => void) | null
 }
 const styles: TransStyleProps[] = [
   {
     name: 'MIX',
-    command: 'LibAtem.Commands.MixEffects.Transition.TransitionMixSetCommand',
-    mask: 1
+    sendRate: (props: StyleProps, val: number) => {
+      props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionMixSetCommand', {
+        Index: props.meIndex,
+        Rate: val
+      })
+    },
   },
   {
     name: 'DIP',
-    command: 'LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand',
-    mask: 1
+    sendRate: (props: StyleProps, val: number) => {
+      props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
+        Index: props.meIndex,
+        Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Rate,
+        Rate: val
+      })
+    },
   },
   {
     name: 'WIPE',
-    command: 'LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand',
-    mask: 1
+    sendRate: (props: StyleProps, val: number) => {
+      props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+        Index: props.meIndex,
+        Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Rate,
+        Rate: val
+      })
+    },
   },
   {
     name: 'DVE',
-    command: 'LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand',
-    mask: 1
+    sendRate: (props: StyleProps, val: number) => {
+      props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+        Index: props.meIndex,
+        Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Rate,
+        Rate: val
+      })
+    },
   },
   {
     name: 'STING',
-    command: null,
-    mask: 0
+    sendRate: null
   }
 ]
 
@@ -118,15 +135,11 @@ export function TransitionStylePanel(props: StyleProps) {
           {' '}
           Rate
           <RateInput
-            disabled={!currentStyle?.command}
+            disabled={!currentStyle?.sendRate}
             className={'rate-input'}
             callback={(e) => {
-              if (currentStyle?.command) {
-                props.sendCommand(currentStyle.command as any, { // TODO fix typing
-                  Index: props.meIndex,
-                  Mask: currentStyle.mask,
-                  Rate: e
-                })
+              if (currentStyle?.sendRate) {
+                currentStyle.sendRate(props, e)
               }
             }}
             value={props.position.remainingFrames}

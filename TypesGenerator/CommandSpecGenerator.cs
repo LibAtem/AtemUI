@@ -67,7 +67,7 @@ namespace TypesGenerator
                             if (!prop.CanWrite || prop.GetSetMethod() == null)
                                 continue;
 
-                            bool isOptional = hasMask && (!prop.GetCustomAttributes<CommandIdAttribute>().Any() || prop.Name == "Mask");
+                            bool isOptional = hasMask && (!prop.GetCustomAttributes<CommandIdAttribute>().Any() && prop.Name != "Mask");
 
                             if (prop.GetCustomAttribute<BoolAttribute>() != null)
                             {

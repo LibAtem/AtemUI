@@ -17,7 +17,7 @@ export interface ColorGeneratorGetCommand {
 }
 
 export interface ColorGeneratorSetCommand {
-  Mask?: ColorGeneratorSetCommand_MaskFlags
+  Mask: ColorGeneratorSetCommand_MaskFlags
   Index: Enums.ColorGeneratorId
   Hue?: number
   Saturation?: number
@@ -83,7 +83,7 @@ export interface SuperSource_SuperSourceBorderGetCommand {
 }
 
 export interface SuperSource_SuperSourceBorderSetCommand {
-  Mask?: SuperSource_SuperSourceBorderSetCommand_MaskFlags
+  Mask: SuperSource_SuperSourceBorderSetCommand_MaskFlags
   SSrcId: Enums.SuperSourceId
   Enabled?: boolean
   Bevel?: Enums.BorderBevel
@@ -130,7 +130,7 @@ export interface SuperSource_SuperSourceBoxGetV8Command {
 }
 
 export interface SuperSource_SuperSourceBoxSetCommand {
-  Mask?: SuperSource_SuperSourceBoxSetCommand_MaskFlags
+  Mask: SuperSource_SuperSourceBoxSetCommand_MaskFlags
   BoxIndex: Enums.SuperSourceBoxId
   Enabled?: boolean
   Source?: Enums.VideoSource
@@ -145,7 +145,7 @@ export interface SuperSource_SuperSourceBoxSetCommand {
 }
 
 export interface SuperSource_SuperSourceBoxSetV8Command {
-  Mask?: SuperSource_SuperSourceBoxSetV8Command_MaskFlags
+  Mask: SuperSource_SuperSourceBoxSetV8Command_MaskFlags
   SSrcId: Enums.SuperSourceId
   BoxIndex: Enums.SuperSourceBoxId
   Enabled?: boolean
@@ -199,7 +199,7 @@ export interface SuperSource_SuperSourcePropertiesGetV8Command {
 }
 
 export interface SuperSource_SuperSourcePropertiesSetCommand {
-  Mask?: SuperSource_SuperSourcePropertiesSetCommand_MaskFlags
+  Mask: SuperSource_SuperSourcePropertiesSetCommand_MaskFlags
   ArtFillSource?: Enums.VideoSource
   ArtCutSource?: Enums.VideoSource
   ArtOption?: Enums.SuperSourceArtOption
@@ -223,7 +223,7 @@ export interface SuperSource_SuperSourcePropertiesSetCommand {
 }
 
 export interface SuperSource_SuperSourcePropertiesSetV8Command {
-  Mask?: SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags
+  Mask: SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags
   SSrcId: Enums.SuperSourceId
   ArtFillSource?: Enums.VideoSource
   ArtCutSource?: Enums.VideoSource
@@ -252,7 +252,7 @@ export interface Settings_InputPropertiesGetCommand {
 }
 
 export interface Settings_InputPropertiesSetCommand {
-  Mask?: Settings_InputPropertiesSetCommand_MaskFlags
+  Mask: Settings_InputPropertiesSetCommand_MaskFlags
   Id: Enums.VideoSource
   LongName?: string
   ShortName?: string
@@ -267,7 +267,7 @@ export interface Settings_MixMinusOutputGetCommand {
 }
 
 export interface Settings_MixMinusOutputSetCommand {
-  Mask?: Settings_MixMinusOutputSetCommand_MaskFlags
+  Mask: Settings_MixMinusOutputSetCommand_MaskFlags
   Id: number
   Mode?: Enums.MixMinusMode
 }
@@ -311,7 +311,7 @@ export interface Settings_Multiview_MultiviewPropertiesGetV8Command {
 }
 
 export interface Settings_Multiview_MultiviewPropertiesSetCommand {
-  Mask?: Settings_Multiview_MultiviewPropertiesSetCommand_MaskFlags
+  Mask: Settings_Multiview_MultiviewPropertiesSetCommand_MaskFlags
   MultiviewIndex: number
   Layout?: Enums.MultiViewLayout
   SafeAreaEnabled?: boolean
@@ -319,7 +319,7 @@ export interface Settings_Multiview_MultiviewPropertiesSetCommand {
 }
 
 export interface Settings_Multiview_MultiviewPropertiesSetV8Command {
-  Mask?: Settings_Multiview_MultiviewPropertiesSetV8Command_MaskFlags
+  Mask: Settings_Multiview_MultiviewPropertiesSetV8Command_MaskFlags
   MultiviewIndex: number
   Layout?: Enums.MultiViewLayoutV8
   ProgramPreviewSwapped?: boolean
@@ -382,7 +382,7 @@ export interface Settings_HyperDeck_HyperDeckSettingsGetCommand {
 }
 
 export interface Settings_HyperDeck_HyperDeckSettingsSetCommand {
-  Mask?: Settings_HyperDeck_HyperDeckSettingsSetCommand_MaskFlags
+  Mask: Settings_HyperDeck_HyperDeckSettingsSetCommand_MaskFlags
   Id: number
   NetworkAddressStr?: number
   Source?: Enums.VideoSource
@@ -451,7 +451,7 @@ export interface MixEffects_Transition_TransitionDipGetCommand {
 }
 
 export interface MixEffects_Transition_TransitionDipSetCommand {
-  Mask?: MixEffects_Transition_TransitionDipSetCommand_MaskFlags
+  Mask: MixEffects_Transition_TransitionDipSetCommand_MaskFlags
   Index: Enums.MixEffectBlockId
   Rate?: number
   Input?: Enums.VideoSource
@@ -474,7 +474,7 @@ export interface MixEffects_Transition_TransitionDVEGetCommand {
 }
 
 export interface MixEffects_Transition_TransitionDVESetCommand {
-  Mask?: MixEffects_Transition_TransitionDVESetCommand_MaskFlags
+  Mask: MixEffects_Transition_TransitionDVESetCommand_MaskFlags
   Index: Enums.MixEffectBlockId
   Rate?: number
   LogoRate?: number
@@ -531,7 +531,7 @@ export interface MixEffects_Transition_TransitionPropertiesGetCommand {
 }
 
 export interface MixEffects_Transition_TransitionPropertiesSetCommand {
-  Mask?: MixEffects_Transition_TransitionPropertiesSetCommand_MaskFlags
+  Mask: MixEffects_Transition_TransitionPropertiesSetCommand_MaskFlags
   Index: Enums.MixEffectBlockId
   NextStyle?: Enums.TransitionStyle
   NextSelection?: Enums.TransitionLayer
@@ -551,7 +551,7 @@ export interface MixEffects_Transition_TransitionStingerGetCommand {
 }
 
 export interface MixEffects_Transition_TransitionStingerSetCommand {
-  Mask?: MixEffects_Transition_TransitionStingerSetCommand_MaskFlags
+  Mask: MixEffects_Transition_TransitionStingerSetCommand_MaskFlags
   Index: Enums.MixEffectBlockId
   Source?: Enums.StingerSource
   PreMultipliedKey?: boolean
@@ -579,7 +579,7 @@ export interface MixEffects_Transition_TransitionWipeGetCommand {
 }
 
 export interface MixEffects_Transition_TransitionWipeSetCommand {
-  Mask?: MixEffects_Transition_TransitionWipeSetCommand_MaskFlags
+  Mask: MixEffects_Transition_TransitionWipeSetCommand_MaskFlags
   Index: Enums.MixEffectBlockId
   Rate?: number
   Pattern?: Enums.Pattern
@@ -610,7 +610,7 @@ export interface MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   ForegroundLevel?: number
@@ -648,7 +648,7 @@ export interface MixEffects_Key_MixEffectKeyAdvancedChromaSampleGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   EnableCursor?: boolean
@@ -672,7 +672,7 @@ export interface MixEffects_Key_MixEffectKeyChromaGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyChromaSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   Hue?: number
@@ -720,7 +720,7 @@ export interface MixEffects_Key_MixEffectKeyDVEGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyDVESetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   SizeX?: number
@@ -785,7 +785,7 @@ export interface MixEffects_Key_MixEffectKeyFlyKeyframeGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   KeyFrame: Enums.FlyKeyKeyFrameId
@@ -817,7 +817,7 @@ export interface MixEffects_Key_MixEffectKeyFlyPropertiesGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyFlyRunSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   KeyFrame?: Enums.FlyKeyKeyFrameType
@@ -834,7 +834,7 @@ export interface MixEffects_Key_MixEffectKeyLumaGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyLumaSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   PreMultiplied?: boolean
@@ -844,7 +844,7 @@ export interface MixEffects_Key_MixEffectKeyLumaSetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyMaskSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   MaskEnabled?: boolean
@@ -879,7 +879,7 @@ export interface MixEffects_Key_MixEffectKeyPatternGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyPatternSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   Pattern?: Enums.Pattern
@@ -906,7 +906,7 @@ export interface MixEffects_Key_MixEffectKeyPropertiesGetCommand {
 }
 
 export interface MixEffects_Key_MixEffectKeyTypeSetCommand {
-  Mask?: MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags
+  Mask: MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   KeyType?: Enums.MixEffectKeyType
@@ -922,7 +922,7 @@ export interface Media_MediaPlayerClipStatusGetCommand {
 }
 
 export interface Media_MediaPlayerClipStatusSetCommand {
-  Mask?: Media_MediaPlayerClipStatusSetCommand_MaskFlags
+  Mask: Media_MediaPlayerClipStatusSetCommand_MaskFlags
   Index: Enums.MediaPlayerId
   Playing?: boolean
   Loop?: boolean
@@ -937,7 +937,7 @@ export interface Media_MediaPlayerSourceGetCommand {
 }
 
 export interface Media_MediaPlayerSourceSetCommand {
-  Mask?: Media_MediaPlayerSourceSetCommand_MaskFlags
+  Mask: Media_MediaPlayerSourceSetCommand_MaskFlags
   Index: Enums.MediaPlayerId
   SourceType?: Enums.MediaPlayerSource
   StillIndex?: number
@@ -1018,7 +1018,7 @@ export interface Macro_MacroPropertiesGetCommand {
 }
 
 export interface Macro_MacroPropertiesSetCommand {
-  Mask?: Macro_MacroPropertiesSetCommand_MaskFlags
+  Mask: Macro_MacroPropertiesSetCommand_MaskFlags
   Index: number
   Name?: string
   Description?: string
@@ -1036,7 +1036,7 @@ export interface Macro_MacroRecordingStatusGetCommand {
 }
 
 export interface Macro_MacroRunStatusSetCommand {
-  Mask?: Macro_MacroRunStatusSetCommand_MaskFlags
+  Mask: Macro_MacroRunStatusSetCommand_MaskFlags
   Loop?: boolean
 }
 
@@ -1052,7 +1052,7 @@ export interface DownstreamKey_DownstreamKeyAutoCommand {
 }
 
 export interface DownstreamKey_DownstreamKeyAutoV8Command {
-  Mask?: DownstreamKey_DownstreamKeyAutoV8Command_MaskFlags
+  Mask: DownstreamKey_DownstreamKeyAutoV8Command_MaskFlags
   Index: Enums.DownstreamKeyId
   IsTowardsOnAir?: boolean
 }
@@ -1068,7 +1068,7 @@ export interface DownstreamKey_DownstreamKeyFillSourceSetCommand {
 }
 
 export interface DownstreamKey_DownstreamKeyGeneralSetCommand {
-  Mask?: DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags
+  Mask: DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags
   Index: Enums.DownstreamKeyId
   PreMultipliedKey?: boolean
   Clip?: number
@@ -1077,7 +1077,7 @@ export interface DownstreamKey_DownstreamKeyGeneralSetCommand {
 }
 
 export interface DownstreamKey_DownstreamKeyMaskSetCommand {
-  Mask?: DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags
+  Mask: DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags
   Index: Enums.DownstreamKeyId
   MaskEnabled?: boolean
   MaskTop?: number
@@ -1332,7 +1332,7 @@ export interface Audio_AudioMixerHeadphoneGetCommand {
 }
 
 export interface Audio_AudioMixerHeadphoneSetCommand {
-  Mask?: Audio_AudioMixerHeadphoneSetCommand_MaskFlags
+  Mask: Audio_AudioMixerHeadphoneSetCommand_MaskFlags
   Gain?: number
   ProgramOutGain?: number
   TalkbackGain?: number
@@ -1362,7 +1362,7 @@ export interface Audio_AudioMixerInputGetV8Command {
 }
 
 export interface Audio_AudioMixerInputSetCommand {
-  Mask?: Audio_AudioMixerInputSetCommand_MaskFlags
+  Mask: Audio_AudioMixerInputSetCommand_MaskFlags
   Index: Enums.AudioSource
   MixOption?: Enums.AudioMixOption
   Gain?: number
@@ -1381,7 +1381,7 @@ export interface Audio_AudioMixerMasterGetCommand {
 }
 
 export interface Audio_AudioMixerMasterSetCommand {
-  Mask?: Audio_AudioMixerMasterSetCommand_MaskFlags
+  Mask: Audio_AudioMixerMasterSetCommand_MaskFlags
   Gain?: number
   Balance?: number
   FollowFadeToBlack?: boolean
@@ -1398,7 +1398,7 @@ export interface Audio_AudioMixerMonitorGetCommand {
 }
 
 export interface Audio_AudioMixerMonitorSetCommand {
-  Mask?: Audio_AudioMixerMonitorSetCommand_MaskFlags
+  Mask: Audio_AudioMixerMonitorSetCommand_MaskFlags
   Enabled?: boolean
   Gain?: number
   Mute?: boolean
@@ -1413,12 +1413,12 @@ export interface Audio_AudioMixerPropertiesGetCommand {
 }
 
 export interface Audio_AudioMixerPropertiesSetCommand {
-  Mask?: Audio_AudioMixerPropertiesSetCommand_MaskFlags
+  Mask: Audio_AudioMixerPropertiesSetCommand_MaskFlags
   AudioFollowVideo?: boolean
 }
 
 export interface Audio_AudioMixerResetPeaksCommand {
-  Mask?: Audio_AudioMixerResetPeaksCommand_MaskFlags
+  Mask: Audio_AudioMixerResetPeaksCommand_MaskFlags
   Input?: Enums.AudioSource
 }
 
@@ -1431,7 +1431,7 @@ export interface Audio_AudioMixerTalkbackPropertiesGetCommand {
 }
 
 export interface Audio_AudioMixerTalkbackPropertiesSetCommand {
-  Mask?: Audio_AudioMixerTalkbackPropertiesSetCommand_MaskFlags
+  Mask: Audio_AudioMixerTalkbackPropertiesSetCommand_MaskFlags
   MuteSDI?: boolean
 }
 
@@ -1446,7 +1446,7 @@ export interface Audio_TalkbackMixerInputPropertiesGetCommand {
 }
 
 export interface Audio_TalkbackMixerInputPropertiesSetCommand {
-  Mask?: Audio_TalkbackMixerInputPropertiesSetCommand_MaskFlags
+  Mask: Audio_TalkbackMixerInputPropertiesSetCommand_MaskFlags
   Channel: Enums.TalkbackChannel
   Index: Enums.VideoSource
   MuteSDI?: boolean
@@ -1484,14 +1484,14 @@ export interface Audio_Fairlight_FairlightMixerInputGetV811Command {
 }
 
 export interface Audio_Fairlight_FairlightMixerInputSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerInputSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerInputSetCommand_MaskFlags
   Index: Enums.AudioSource
   RcaToXlrEnabled?: boolean
   ActiveConfiguration?: Enums.FairlightInputConfiguration
 }
 
 export interface Audio_Fairlight_FairlightMixerInputSetV811Command {
-  Mask?: Audio_Fairlight_FairlightMixerInputSetV811Command_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerInputSetV811Command_MaskFlags
   Index: Enums.AudioSource
   ActiveConfiguration?: Enums.FairlightInputConfiguration
   ActiveInputLevel?: Enums.FairlightAnalogInputLevel
@@ -1507,7 +1507,7 @@ export interface Audio_Fairlight_FairlightMixerMasterCompressorGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterCompressorSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMasterCompressorSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMasterCompressorSetCommand_MaskFlags
   CompressorEnabled?: boolean
   Threshold?: number
   Ratio?: number
@@ -1534,7 +1534,7 @@ export interface Audio_Fairlight_FairlightMixerMasterEqualizerBandGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterEqualizerBandSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMasterEqualizerBandSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMasterEqualizerBandSetCommand_MaskFlags
   Band: number
   BandEnabled?: boolean
   Shape?: Enums.FairlightEqualizerBandShape
@@ -1582,7 +1582,7 @@ export interface Audio_Fairlight_FairlightMixerMasterLimiterGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterLimiterSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMasterLimiterSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMasterLimiterSetCommand_MaskFlags
   LimiterEnabled?: boolean
   Threshold?: number
   Attack?: number
@@ -1595,12 +1595,12 @@ export interface Audio_Fairlight_FairlightMixerMasterPropertiesGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
   AudioFollowVideoCrossfadeTransitionEnabled?: boolean
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMasterSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMasterSetCommand_MaskFlags
   EqualizerEnabled?: boolean
   EqualizerGain?: number
   MakeUpGain?: number
@@ -1616,7 +1616,7 @@ export interface Audio_Fairlight_FairlightMixerMonitorGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMonitorSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerMonitorSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerMonitorSetCommand_MaskFlags
   Gain?: number
   InputMasterGain?: number
   InputTalkbackGain?: number
@@ -1644,7 +1644,7 @@ export interface Audio_Fairlight_FairlightMixerSourceCompressorGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceCompressorSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerSourceCompressorSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerSourceCompressorSetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
   CompressorEnabled?: boolean
@@ -1684,7 +1684,7 @@ export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
   Band: number
@@ -1716,7 +1716,7 @@ export interface Audio_Fairlight_FairlightMixerSourceExpanderGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceExpanderSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerSourceExpanderSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerSourceExpanderSetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
   ExpanderEnabled?: boolean
@@ -1779,7 +1779,7 @@ export interface Audio_Fairlight_FairlightMixerSourceLimiterGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceLimiterSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerSourceLimiterSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerSourceLimiterSetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
   LimiterEnabled?: boolean
@@ -1798,7 +1798,7 @@ export interface Audio_Fairlight_FairlightMixerSourceResetPeakLevelsCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceSetCommand {
-  Mask?: Audio_Fairlight_FairlightMixerSourceSetCommand_MaskFlags
+  Mask: Audio_Fairlight_FairlightMixerSourceSetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
   FramesDelay?: number
