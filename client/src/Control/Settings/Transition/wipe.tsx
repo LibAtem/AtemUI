@@ -1,12 +1,11 @@
 import React from 'react'
-import { AtemButtonBar, RateInput } from '../../common'
-import { MagicInput } from '../settings'
-import Slider from 'react-rangeslider'
+import { AtemButtonBar, RateInput, CheckboxInput } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
 import { Patterns, PatternInfo } from '../../common/patterns'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { DecimalWithSliderInput, DecimalInput } from '../../common/decimal'
 
 interface WipeProps {
   sendCommand: SendCommandStrict
@@ -51,8 +50,6 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
 
   render() {
     const currentPatternInfo: PatternInfo | undefined = Patterns[this.props.wipe.pattern]
-    var disabled = false
-    var diabledClass = !disabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'
 
     return (
       <div>
@@ -75,68 +72,53 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
           </div>
         </div>
 
-        <div className="ss-slider-holder">
-          <div className={currentPatternInfo?.symmetry ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
-                  Symmetry: e
-                })
-              }
-              value={this.props.wipe.symmetry}
-            />
-            <div className="ss-slider-label">Symmetry:</div>
-          </div>
-          <MagicInput
-            disabled={currentPatternInfo?.symmetry}
-            value={this.props.wipe.symmetry}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
-                  Symmetry: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label={'Symmetry'}
+          disabled={!currentPatternInfo?.symmetry}
+          value={this.props.wipe.symmetry}
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
+              Symmetry: e
+            })
+          }
+        />
 
         <div className="ss-row xy">
           <div className="ss-label">Position:</div>
           <div className={currentPatternInfo?.x ? 'ss-label right' : 'ss-label disabled right'}>X:</div>
-          <MagicInput
+          <DecimalInput
             step={0.0001}
+            min={0}
+            max={1}
             disabled={!currentPatternInfo?.x}
             value={this.props.wipe.xPosition}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.XPosition,
-                  XPosition: Math.min(1, Math.max(0, value))
-                })
-              }
-            }}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                Index: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.XPosition,
+                XPosition: value
+              })
+            }
           />
           <div className={currentPatternInfo?.y ? 'ss-label right' : 'ss-label disabled right'}>Y:</div>
-          <MagicInput
+          <DecimalInput
             step={0.0001}
+            min={0}
+            max={1}
             disabled={!currentPatternInfo?.y}
             value={this.props.wipe.yPosition}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.YPosition,
-                  YPosition: Math.min(1, Math.max(0, value))
-                })
-              }
-            }}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                Index: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.YPosition,
+                YPosition: value
+              })
+            }
           />
         </div>
 
@@ -164,84 +146,49 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
             }}
           />
 
-          <label className="ss-checkbox-container">
-            Flip Flop
-            <input
-              type="checkbox"
-              checked={this.props.wipe.flipFlop}
-              onClick={() =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  FlipFlop: !this.props.wipe.flipFlop,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.FlipFlop
-                })
-              }
-            ></input>
-            <span className="checkmark"></span>
-          </label>
-        </div>
-        <div className="ss-heading">Border</div>
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
-                  BorderSoftness: e
-                })
-              }
-              value={this.props.wipe.borderSoftness}
-            />
-            <div className="ss-slider-label">Softness:</div>
-          </div>
-          <MagicInput
-            disabled={disabled}
-            value={this.props.wipe.borderSoftness}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
-                  BorderSoftness: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
+          <CheckboxInput
+            label="Flip Flop"
+            value={this.props.wipe.flipFlop}
+            onChange={v =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                Index: this.props.meIndex,
+                FlipFlop: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.FlipFlop
+              })
+            }
           />
         </div>
 
-        <div className="ss-slider-holder">
-          <div className={diabledClass}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
-                  BorderWidth: e
-                })
-              }
-              value={this.props.wipe.borderWidth}
-            />
-            <div className="ss-slider-label">Width:</div>
-          </div>
-          <MagicInput
-            disabled={disabled}
-            value={this.props.wipe.borderWidth}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                  Index: this.props.meIndex,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
-                  BorderWidth: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <div className="ss-heading">Border</div>
+        <DecimalWithSliderInput
+          label="Softness"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
+              BorderSoftness: e
+            })
+          }
+          value={this.props.wipe.borderSoftness}
+        />
+
+        <DecimalWithSliderInput
+          label="Width"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
+              BorderWidth: e
+            })
+          }
+          value={this.props.wipe.borderWidth}
+        />
 
         <div className="ss-row">
           <div className={this.props.wipe.borderWidth === 0 ? 'ss-label disabled' : 'ss-label'}>Fill Source:</div>

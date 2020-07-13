@@ -1,10 +1,10 @@
 import React from 'react'
 import { FlyingKey, KeyFrame } from './upstream'
-import { MagicInput } from '../settings'
-import Slider from 'react-rangeslider'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties } from './mask'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
+import { DecimalWithSliderInput } from '../../common/decimal'
+import { CheckboxInput } from '../../common'
 
 interface ChromaKeyerClassicPropertiesProps {
   sendCommand: SendCommandStrict
@@ -52,151 +52,82 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
           </select>
         </div>
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer hue">
-            <Slider
-              max={359.9}
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Hue,
-                  Hue: e
-                })
-              }
-              value={this.props.keyer.chroma.hue}
-            />
-            <div className="ss-slider-label">Hue:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.chroma.hue}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Hue,
-                  Hue: Math.min(360, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Hue"
+          step={0.1}
+          min={0}
+          max={359.9}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Hue,
+              Hue: e
+            })
+          }
+          value={this.props.keyer.chroma.hue}
+        />
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer">
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Gain,
-                  Gain: e
-                })
-              }
-              value={this.props.keyer.chroma.gain}
-            />
-            <div className="ss-slider-label">Gain:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.chroma.gain}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Gain,
-                  Gain: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Gain"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Gain,
+              Gain: e
+            })
+          }
+          value={this.props.keyer.chroma.gain}
+        />
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer">
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.YSuppress,
-                  YSuppress: e
-                })
-              }
-              value={this.props.keyer.chroma.ySuppress}
-            />
-            <div className="ss-slider-label">Y Suppress:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.chroma.ySuppress}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.YSuppress,
-                  YSuppress: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Y Suppress"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.YSuppress,
+              YSuppress: e
+            })
+          }
+          value={this.props.keyer.chroma.ySuppress}
+        />
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer">
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Lift,
-                  Lift: e
-                })
-              }
-              value={this.props.keyer.chroma.lift}
-            />
-            <div className="ss-slider-label">Gain:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.chroma.lift}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Lift,
-                  Lift: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Lift"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Lift,
+              Lift: e
+            })
+          }
+          value={this.props.keyer.chroma.lift}
+        />
 
-        <label className="ss-checkbox-container">
-          Narrow Chroma Key Range
-          <input
-            type="checkbox"
-            checked={this.props.keyer.chroma.narrow}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Narrow,
-                Narrow: !this.props.keyer.chroma?.narrow
-              })
-            }
-          ></input>
-          <span className="checkmark"></span>
-        </label>
+        <CheckboxInput
+          label="Narrow Chroma Key Range"
+          value={this.props.keyer.chroma.narrow}
+          onChange={v =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyChromaSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyChromaSetCommand_MaskFlags.Narrow,
+              Narrow: v
+            })
+          }
+        />
 
         <KeyerMaskProperties
           meIndex={this.props.meIndex}

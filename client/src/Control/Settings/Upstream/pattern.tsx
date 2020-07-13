@@ -1,11 +1,11 @@
 import React from 'react'
 import { FlyingKey, KeyFrame } from './upstream'
-import { MagicInput } from '../settings'
-import Slider from 'react-rangeslider'
 import { Patterns, PatternInfo } from '../../common/patterns'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties } from './mask'
+import { CheckboxInput } from '../../common'
+import { DecimalWithSliderInput, DecimalInput } from '../../common/decimal'
 
 interface PatternProps {
   sendCommand: SendCommandStrict
@@ -82,154 +82,101 @@ export class Pattern extends React.Component<PatternProps> {
           {Object.keys(Patterns).map(v => this.renderPattern(currentPattern, Number(v)))}
         </div>
 
-        <label className="ss-checkbox-container">
-          Invert Pattern
-          <input
-            type="checkbox"
-            checked={this.props.keyer.pattern.inverse}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                Mask: 64,
-                Inverse: !this.props.keyer.pattern?.inverse
-              })
-            }
-          ></input>
-          <span className="checkmark"></span>
-        </label>
+        <CheckboxInput
+          label="Invert Pattern"
+          value={this.props.keyer.pattern.inverse}
+          onChange={v =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Inverse,
+              Inverse: v
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer">
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 2,
-                  Size: e
-                })
-              }
-              value={this.props.keyer.pattern.size}
-            />
-            <div className="ss-slider-label">Size:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.pattern.size}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 2,
-                  Size: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Size"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Size,
+              Size: e
+            })
+          }
+          value={this.props.keyer.pattern.size}
+        />
 
-        <div className="ss-slider-holder">
-          <div className={currentPatternInfo?.symmetry ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              tooltip={false}
-              step={0.1}
-              disabled={!currentPatternInfo?.symmetry}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 4,
-                  Symmetry: e
-                })
-              }
-              value={this.props.keyer.pattern.symmetry}
-            />
-            <div className="ss-slider-label">Symmetry:</div>
-          </div>
-          <MagicInput
-            disabled={!currentPatternInfo?.symmetry}
-            value={this.props.keyer.pattern.symmetry}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 4,
-                  Symmetry: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Symmetry"
+          disabled={!currentPatternInfo?.symmetry}
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Symmetry,
+              Symmetry: e
+            })
+          }
+          value={this.props.keyer.pattern.symmetry}
+        />
 
-        <div className="ss-slider-holder">
-          <div className="sss ss-slider-outer">
-            <Slider
-              tooltip={false}
-              step={0.1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 8,
-                  Softness: e
-                })
-              }
-              value={this.props.keyer.pattern.softness}
-            />
-            <div className="ss-slider-label">Softness:</div>
-          </div>
-          <MagicInput
-            value={this.props.keyer.pattern.softness}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 8,
-                  Softness: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Softness"
+          step={0.1}
+          min={0}
+          max={100}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Softness,
+              Softness: e
+            })
+          }
+          value={this.props.keyer.pattern.softness}
+        />
 
         <div className="ss-row xy">
           <div className="ss-label">Position:</div>
           <div className={currentPatternInfo?.x ? 'ss-label right' : 'ss-label disabled right'}>X:</div>
-          <MagicInput
+          <DecimalInput
             step={0.0001}
+            min={0}
+            max={1}
             disabled={!currentPatternInfo?.x}
             value={this.props.keyer.pattern.xPosition}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 16,
-                  XPosition: Math.min(1, Math.max(0, value))
-                })
-              }
-            }}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.XPosition,
+                XPosition: value
+              })
+            }
           />
           <div className={currentPatternInfo?.y ? 'ss-label right' : 'ss-label disabled right'}>Y:</div>
-          <MagicInput
+          <DecimalInput
             step={0.0001}
+            min={0}
+            max={1}
             disabled={!currentPatternInfo?.y}
             value={this.props.keyer.pattern.yPosition}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-                  MixEffectIndex: this.props.meIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 32,
-                  YPosition: Math.min(1, Math.max(0, value))
-                })
-              }
-            }}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.YPosition,
+                YPosition: value
+              })
+            }
           />
         </div>
 

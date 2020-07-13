@@ -1,6 +1,6 @@
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
-import { RateInput } from '../common'
+import { RateInput, CheckboxInput } from '../common'
 import { MagicLabel } from './settings'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 
@@ -25,7 +25,6 @@ export class FadeToBlackSettings extends React.Component<FadeToBlackSettingsProp
   }
 
   render() {
-    const disableAfv = this.props.meIndex !== 0 || this.props.ftbMode === null
     return (
       <div className="ss-submenu">
         <div
@@ -61,37 +60,34 @@ export class FadeToBlackSettings extends React.Component<FadeToBlackSettingsProp
                   }}
                 />
               </div>
-              <label className={`ss-checkbox-container ${disableAfv ? 'disabled' : ''}`}>
-                Audio Follow Video
-                <input
-                  type="checkbox"
-                  checked={this.props.followFadeToBlack}
-                  disabled={this.props.meIndex !== 0 || this.props.ftbMode === null}
-                  onClick={() => {
-                    switch (this.props.ftbMode) {
-                      case 'classic':
-                        this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-                          FollowFadeToBlack: !this.props.followFadeToBlack,
-                          Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.FollowFadeToBlack
-                        })
-                        break
-                      case 'fairlight':
-                        // TODO - this isnt working..
-                        this.props.sendCommand(
-                          'LibAtem.Commands.Audio.Fairlight.FairlightMixerMasterPropertiesSetCommand',
-                          {
-                            AudioFollowVideoCrossfadeTransitionEnabled: !this.props.followFadeToBlack,
-                            Mask:
-                              LibAtemCommands.Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
-                                .AudioFollowVideoCrossfadeTransitionEnabled
-                          }
-                        )
-                        break
-                    }
-                  }}
-                ></input>
-                <span className="checkmark"></span>
-              </label>
+
+              <CheckboxInput
+                label="Audio Follow Video"
+                value={this.props.followFadeToBlack}
+                disabled={this.props.meIndex !== 0 || this.props.ftbMode === null}
+                onChange={v => {
+                  switch (this.props.ftbMode) {
+                    case 'classic':
+                      this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
+                        FollowFadeToBlack: v,
+                        Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.FollowFadeToBlack
+                      })
+                      break
+                    case 'fairlight':
+                      // TODO - this isnt working..
+                      this.props.sendCommand(
+                        'LibAtem.Commands.Audio.Fairlight.FairlightMixerMasterPropertiesSetCommand',
+                        {
+                          AudioFollowVideoCrossfadeTransitionEnabled: v,
+                          Mask:
+                            LibAtemCommands.Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
+                              .AudioFollowVideoCrossfadeTransitionEnabled
+                        }
+                      )
+                      break
+                  }
+                }}
+              />
             </div>
           ) : (
             undefined

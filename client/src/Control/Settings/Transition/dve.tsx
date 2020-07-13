@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'
@@ -129,22 +129,18 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }}
           />
 
-          <label className="ss-checkbox-container">
-            Flip Flop
-            <input
-              type="checkbox"
-              checked={this.props.dve.flipFlop}
-              disabled={isGraphicsSpin}
-              onClick={() =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                  Index: this.props.meIndex,
-                  FlipFlop: !this.props.dve.flipFlop,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop
-                })
-              }
-            ></input>
-            <span className={isGraphicsSpin ? 'checkmark disabled' : 'checkmark'}></span>
-          </label>
+          <CheckboxInput
+            label="Flip Flop"
+            value={this.props.dve.flipFlop}
+            disabled={isGraphicsSpin}
+            onChange={v =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: this.props.meIndex,
+                FlipFlop: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop
+              })
+            }
+          />
         </div>
 
         <div className="ss-row" style={{ gridTemplateColumns: '1fr 100px 1fr' }}>
@@ -197,21 +193,18 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           </select>
         </div>
 
-        <label className={!isGraphics ? 'ss-checkbox-container disabled' : 'ss-checkbox-container'}>
-          Enable Key
-          <input
-            type="checkbox"
-            checked={this.props.dve.enableKey}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.meIndex,
-                EnableKey: !this.props.dve.enableKey,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey
-              })
-            }
-          ></input>
-          <span className={!isGraphics ? 'checkmark disabled' : 'checkmark'}></span>
-        </label>
+        <CheckboxInput
+          label="Enable Key"
+          value={this.props.dve.enableKey}
+          disabled={!isGraphics}
+          onChange={v =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.meIndex,
+              EnableKey: v,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey
+            })
+          }
+        />
 
         <div className="ss-row">
           <div className={!isGraphics || !this.props.dve.enableKey ? 'ss-label disabled' : 'ss-label'}>Key Source:</div>

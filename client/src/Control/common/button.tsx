@@ -113,7 +113,7 @@ export function CheckboxInput(props: CheckboxInputProps) {
           }
         }}
       />
-      <span className="checkmark"></span>
+      <span className={props.disabled ? 'checkmark disabled' : 'checkmark'}></span>
     </label>
   )
 }
