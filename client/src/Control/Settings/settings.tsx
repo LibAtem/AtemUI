@@ -16,8 +16,6 @@ interface SwitcherSettingsProps {
 }
 interface SwitcherSettingsState {
   hasConnected: boolean
-  state: any | null
-  currentState: any
   page: number
   // full: boolean
 }
@@ -27,26 +25,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     super(props)
     this.state = {
       hasConnected: props.device.connected,
-      state: props.currentState,
-      currentState: null,
       page: 0
-    }
-    if (props.device.connected) {
-      this.loadDeviceState(props)
-    }
-  }
-
-  loadDeviceState(props: SwitcherSettingsProps) {
-    if (props.signalR) {
-      props.signalR
-        .invoke<any>('sendState', GetDeviceId(props.device))
-        .then(state => {})
-        .catch(err => {
-          console.error('StateViewer: Failed to load state:', err)
-          this.setState({
-            state: null
-          })
-        })
     }
   }
 

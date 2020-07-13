@@ -4,7 +4,7 @@ import 'react-rangeslider/lib/index.css'
 
 import React, { FormEvent } from 'react'
 import './App.css'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import { Navbar, Nav, Form, Button, FormControl, Container } from 'react-bootstrap'
 import { LinkContainer, IndexLinkContainer } from 'react-router-bootstrap'
 import { DevicesPage } from './Devices'
@@ -254,7 +254,7 @@ export default class App extends React.Component<{}, AppState> {
             {connected !== ConnectionStatus.Disconnected ? (
               <Switch>
                 <Route exact path="/">
-                  <Home />
+                  <Redirect to={{ pathname: '/control' }} />
                 </Route>
                 <Route path="/commands">
                   <ManualCommandsPage />
@@ -289,17 +289,6 @@ export default class App extends React.Component<{}, AppState> {
       </DeviceManagerContext.Provider>
     )
   }
-}
-
-// You can think of these components as "pages"
-// in your app.
-
-function Home() {
-  return (
-    <Container>
-      <h2>Home</h2>
-    </Container>
-  )
 }
 
 class NavBar extends React.PureComponent<{

@@ -71,11 +71,11 @@ namespace AtemServer.Hubs
         }
         #endregion Devices
 
-        private static IReadOnlyDictionary<string, Type> typesMap;
+        private static IReadOnlyDictionary<string, Type> commandTypesMap;
 
         private static Type TranslateToType(string fullName)
         {
-            if (typesMap == null)
+            if (commandTypesMap == null)
             {
                 var newTypesMap = new Dictionary<string, Type>();
                 foreach (var commandSet in CommandManager.GetAllTypes())
@@ -86,10 +86,10 @@ namespace AtemServer.Hubs
                     }
                 }
 
-                typesMap = newTypesMap;
+                commandTypesMap = newTypesMap;
             }
 
-            return typesMap.TryGetValue(fullName, out Type value) ? value : null;
+            return commandTypesMap.TryGetValue(fullName, out Type value) ? value : null;
         }
 
         public async Task CommandSend(string deviceId, string commandName, string propertiesStr)
@@ -116,9 +116,7 @@ namespace AtemServer.Hubs
 
             client.Client.SendCommand(cmd);
             //updateLabel(deviceId);
-
         }
-
 
         public void updateLabel(string deviceId, string name, uint id)
         {
@@ -132,36 +130,6 @@ namespace AtemServer.Hubs
 
             client.Client.DataTransfer.QueueJob(job);
         }
-
-     /*   public void addImage(string deviceId, string name, uint id)
-        {
-            var client = repo_.GetConnection(deviceId);
-            if (client == null)
-            {
-                throw new Exception("Bad deviceId");
-            }
-
-            var data = new byte[8294400];
-            var img720 = new Bitmap(1920, 1080);
-            Graphics drawing = Graphics.FromImage(img720);
-            drawing.Clear(Color.Blue);
-
-            for (int i = 0; i < img720.Width; i++)
-            {
-                for (int j = 0; j < img720.Height; j++)
-                {
-                    Color pixel = img720.GetPixel(i, j);
-                    data[(i + (1920 * j)) * 4] = pixel.R;
-                    data[(i + (1920 * j)) * 4+1] = pixel.G;
-                    data[(i + (1920 * j)) * 4+2] = pixel.B;
-                    data[(i + (1920 * j)) * 4+3] = pixel.A;
-
-                }
-            }
-           var job = new UploadMediaStillJob(8, AtemFrame.FromRGBA(name, data,ColourSpace.BT709), uploadResult);
-
-            client.Client.DataTransfer.QueueJob(job);
-        }*/
 
         public void uploadResult(bool result)
         {
@@ -177,17 +145,6 @@ namespace AtemServer.Hubs
         public async void UnsubscribeState(string deviceId)
         {
             repo_.UnsubscribeClient(Context.ConnectionId, deviceId);
-        }
-
-        public async void SendState(string deviceId)
-        {
-            var client = repo_.GetConnection(deviceId);
-            if (client == null)
-            {
-                throw new Exception("Bad deviceId");
-            }
-            
-            await Clients.All.SendAsync("state", client.GetState());
         }
 
         public Task<DeviceProfile> SendProfile(string deviceId)
