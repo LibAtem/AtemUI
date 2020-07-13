@@ -9,9 +9,10 @@ import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel, InputProps } from './bank'
-import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, sendCommandStrict, SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemProfile } from '../generated'
 import { AtemButtonBar } from './common'
+import { CommandTypes } from '../generated/commands'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -75,12 +76,18 @@ function OpenCloseButton(props: { open: boolean; change: (v: boolean) => void })
 
 //Handles Mobile Layout
 class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, ControlPageInnerInnerState> {
-  constructor(props: MixEffectPanelProps) {
+  constructor(props: ControlPageInnerInnerProps) {
     super(props)
     this.state = {
       open: true,
       openMobile: false
     }
+
+    this.sendCommand = this.sendCommand.bind(this)
+  }
+
+  private sendCommand(...args: CommandTypes) {
+    sendCommandStrict(this.props, ...args)
   }
 
   render() {
@@ -88,64 +95,30 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
       <MediaQuery minWidth="950px">
         {matches =>
           matches ? (
-            this.state.open ? (
-              <div className="control-page" style={{ gridTemplateColumns: '1fr 20px 310px' }}>
-                <MixEffectPanel
-                  open={this.state.open}
-                  profile={this.props.profile}
-                  device={this.props.device}
-                  currentState={this.props.currentState}
-                  signalR={this.props.signalR}
-                />
-
-                <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
-
-                <SwitcherSettings
-                  full={false}
-                  device={this.props.device}
-                  currentState={this.props.currentState}
-                  profile={this.props.profile}
-                  signalR={this.props.signalR}
-                />
-              </div>
-            ) : (
-              <div className="control-page" style={{ gridTemplateColumns: '1fr 20px' }}>
-                <MixEffectPanel
-                  open={this.state.open}
-                  profile={this.props.profile}
-                  device={this.props.device}
-                  currentState={this.props.currentState}
-                  signalR={this.props.signalR}
-                />
-
-                <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
-              </div>
-            )
-          ) : this.state.openMobile ? (
-            <div className="control-page" style={{ display: 'box' }}>
-              <AtemButtonBar
-                style={{ margin: '10px' }}
-                options={[
-                  {
-                    label: 'Control',
-                    value: false
-                  },
-                  {
-                    label: 'Settings',
-                    value: true
-                  }
-                ]}
-                selected={this.state.openMobile}
-                onChange={v => this.setState({ openMobile: v })}
-              />
-
-              <SwitcherSettings
-                full={true}
+            <div
+              className="control-page"
+              style={{ gridTemplateColumns: this.state.open ? '1fr 20px 310px' : '1fr 20px' }}
+            >
+              <MixEffectPanel
+                open={this.state.open}
+                profile={this.props.profile}
                 device={this.props.device}
                 currentState={this.props.currentState}
-                profile={this.props.profile}
-                signalR={this.props.signalR}
+                sendCommand={this.sendCommand}
               />
+
+              <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
+
+              {this.state.open ? (
+                <SwitcherSettings
+                  full={false}
+                  currentState={this.props.currentState}
+                  profile={this.props.profile}
+                  sendCommand={this.sendCommand}
+                />
+              ) : (
+                undefined
+              )}
             </div>
           ) : (
             <div className="control-page">
@@ -165,13 +138,22 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 onChange={v => this.setState({ openMobile: v })}
               />
 
-              <MixEffectPanel
-                device={this.props.device}
-                profile={this.props.profile}
-                currentState={this.props.currentState}
-                open={this.state.open}
-                signalR={this.props.signalR}
-              />
+              {this.state.openMobile ? (
+                <SwitcherSettings
+                  full={true}
+                  currentState={this.props.currentState}
+                  profile={this.props.profile}
+                  sendCommand={this.sendCommand}
+                />
+              ) : (
+                <MixEffectPanel
+                  profile={this.props.profile}
+                  device={this.props.device}
+                  currentState={this.props.currentState}
+                  open={this.state.open}
+                  sendCommand={this.sendCommand}
+                />
+              )}
             </div>
           )
         }
@@ -181,8 +163,8 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 }
 
 interface MixEffectPanelProps {
+  sendCommand: SendCommandStrict
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
   open: boolean
@@ -254,7 +236,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           isProgram={true}
           currentSource={currentME.sources.program}
           sources={sources}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
         <TransitionStylePanel
           meIndex={meIndex}
@@ -262,7 +244,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           properties={currentME.transition.properties}
           position={currentME.transition.position}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
         <BankPanel
           meIndex={meIndex}
@@ -270,24 +252,24 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           isProgram={false}
           currentSource={currentME.sources.preview}
           sources={sources}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
         <NextPanel
           meIndex={meIndex}
           transition={currentME.transition.properties}
           keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
         <DSKPanel
           downstreamKeyers={currentState.downstreamKeyers}
           videoMode={currentState.settings.videoMode}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
         <FTBPanel
           meIndex={meIndex}
           videoMode={currentState.settings.videoMode}
           status={currentME.fadeToBlack.status}
-          sendCommand={(...args) => sendCommandStrict(this.props, ...args)}
+          sendCommand={this.props.sendCommand}
         />
       </div>
     )

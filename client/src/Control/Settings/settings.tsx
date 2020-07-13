@@ -1,27 +1,23 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../../Devices/types'
 import './settings.scss'
 import { TransitionSettings } from './Transition/transition'
 import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
 import { LibAtemState, LibAtemEnums, LibAtemProfile } from '../../generated'
 import { AtemButtonBar } from '../common'
-import { CommandTypes } from '../../generated/commands'
-import { sendCommandStrict } from '../../device-page-wrapper'
+import { SendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 import { videoIds } from '../../ControlSettings/ids'
 
 interface SwitcherSettingsProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
   full: boolean
 }
 interface SwitcherSettingsState {
   page: number
-  // full: boolean
 }
 
 export class SwitcherSettings extends React.Component<SwitcherSettingsProps, SwitcherSettingsState> {
@@ -30,12 +26,6 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     this.state = {
       page: 0
     }
-
-    this.sendCommand = this.sendCommand.bind(this)
-  }
-
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
   }
 
   private getFtbAudioProps(
@@ -60,7 +50,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
   }
 
   render() {
-    if (!this.props.currentState || !this.props.signalR || !this.props.profile) {
+    if (!this.props.currentState || !this.props.profile) {
       return <div style={this.props.full ? { height: '100%' } : { overflowY: 'auto' }} className="ss"></div>
     }
 
@@ -102,13 +92,13 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         />
 
         <ColorGeneratorSettings
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           colorGenerators={this.props.currentState.colorGenerators}
         />
 
         <TransitionSettings
           meIndex={meIndex}
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           transition={meProps.transition}
           profile={this.props.profile}
           inputProperties={inputProperties}
@@ -118,7 +108,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         {meProps.keyers.map((key, i) => (
           <UpstreamKey
             key={'usk' + i}
-            sendCommand={this.sendCommand}
+            sendCommand={this.props.sendCommand}
             keyer={key}
             meIndex={meIndex}
             keyerIndex={i}
@@ -128,14 +118,14 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         ))}
 
         <DownstreamKeyerSettings
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           videoMode={this.props.currentState.settings.videoMode}
           sources={inputProperties}
           keyers={this.props.currentState.downstreamKeyers}
         />
 
         <FadeToBlackSettings
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           meIndex={meIndex}
           ftb={meProps.fadeToBlack}
           videoMode={this.props.currentState.settings.videoMode}
