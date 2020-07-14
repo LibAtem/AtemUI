@@ -1,55 +1,62 @@
 import React from 'react'
-import { videoIds } from '../../../ControlSettings/ids'
 import { KeyFrame } from './upstream'
-import { MagicInput } from '../settings'
-import Slider from 'react-rangeslider'
 import { ChromePicker } from 'react-color'
-import { ToggleButton } from '../common'
+import { ToggleButton, MaskProperties } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { DecimalInput, DecimalWithSliderInput } from '../../common/decimal'
+import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
+import { SelectInput } from '../../common'
 
-interface DVEProps {
+interface DveSubPanelProps {
   sendCommand: SendCommandStrict
-  currentState: any
-  mixEffect: number
-  id: number
+  meIndex: number
+  keyerIndex: number
+  keyerProps: LibAtemState.MixEffectState_KeyerDVEState
 }
 
-export class DVE extends React.Component<DVEProps> {
-  getSourceOptions() {
-    var inputs = Object.keys(this.props.currentState.settings.inputs)
-    var sources = inputs.filter(i => videoIds[i] < 4000)
-    var options = []
-    for (var i in sources) {
-      options.push(
-        <option value={videoIds[sources[i]]}>
-          {this.props.currentState.settings.inputs[sources[i]].properties.longName}
+interface DveKeyerPropertiesProps {
+  sendCommand: SendCommandStrict
+  meIndex: number
+  keyerIndex: number
+  keyer: LibAtemState.MixEffectState_KeyerState
+  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  videoMode: LibAtemEnums.VideoMode
+}
+
+export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps> {
+  private getSourceOptions() {
+    // TODO - this needs to be corrected
+    return Array.from(this.props.sources.entries())
+      .filter(([i]) => i < 4000)
+      .map(([i, v]) => (
+        <option key={i} value={i}>
+          {v.longName}
         </option>
-      )
-    }
-    return options
+      ))
   }
 
   render() {
-    if (this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve === null) {
+    const keyerProps = this.props.keyer
+    if (!this.props.keyer.dve) {
       return <div></div>
     }
 
-    var enabled = true
-    var rotation = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve.rotation
+    const rotationCoarse = Math.floor(this.props.keyer.dve.rotation / 360)
+    const rotationFine = this.props.keyer.dve.rotation - rotationCoarse * 360
     return (
       <div>
         <div className="ss-heading">Settings</div>
         <div className="ss-row">
           <div className="ss-label">Fill Source:</div>
           <select
-            onChange={e => {
+            onChange={e =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.mixEffect,
-                KeyerIndex: this.props.id,
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
                 FillSource: e.currentTarget.value as any
               })
-            }}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.fillSource}
+            }
+            value={keyerProps.properties.fillSource}
             className="ss-dropdown"
           >
             {this.getSourceOptions()}
@@ -61,36 +68,34 @@ export class DVE extends React.Component<DVEProps> {
             Position:
           </div>
           <div className="ss-label right">X:</div>
-          <MagicInput
+          <DecimalInput
             step={0.01}
-            disabled={!enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve.positionX}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 4,
-                  PositionX: Math.min(1000, Math.max(-1000, value))
-                })
-              }
-            }}
+            min={-1000}
+            max={1000}
+            value={this.props.keyer.dve.positionX}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionX,
+                PositionX: value
+              })
+            }
           />
           <div className="ss-label right">Y:</div>
-          <MagicInput
+          <DecimalInput
             step={0.01}
-            disabled={!enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve.positionY}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 8,
-                  PositionY: Math.min(1000, Math.max(-1000, value))
-                })
-              }
-            }}
+            min={-1000}
+            max={1000}
+            value={this.props.keyer.dve.positionY}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionY,
+                PositionY: value
+              })
+            }
           />
         </div>
 
@@ -99,36 +104,35 @@ export class DVE extends React.Component<DVEProps> {
             Scale:
           </div>
           <div className="ss-label right">X:</div>
-          <MagicInput
+          <DecimalInput
             step={0.01}
-            disabled={!enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve.sizeX}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 1,
-                  SizeX: Math.min(99.99, Math.max(0, value))
-                })
-              }
-            }}
+            min={0}
+            max={99.99}
+            value={this.props.keyer.dve.sizeX}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeX,
+                SizeX: value
+              })
+            }
           />
+          {/* TODO - link */}
           <div className="ss-label right">Y:</div>
-          <MagicInput
+          <DecimalInput
             step={0.01}
-            disabled={!enabled}
-            value={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve.sizeY}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 2,
-                  SizeY: Math.min(99.99, Math.max(0, value))
-                })
-              }
-            }}
+            min={0}
+            max={99.99}
+            value={this.props.keyer.dve.sizeY}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeY,
+                SizeY: value
+              })
+            }
           />
         </div>
 
@@ -137,226 +141,178 @@ export class DVE extends React.Component<DVEProps> {
             Rotation:
           </div>
           <div className="ss-label right">360°:</div>
-          <MagicInput
+          <DecimalInput
             step={1}
-            disabled={!enabled}
-            value={Math.floor(rotation / 360)}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 16,
-                  Rotation: (rotation - Math.floor(rotation / 360) * 360 + Math.floor(value) * 360) / 100
-                })
-              }
-            }}
+            min={-90}
+            max={89}
+            value={rotationCoarse}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+                Rotation: (Math.floor(value) * 360 + rotationFine) / 100 // TODO - the set and get command units dont match
+              })
+            }
           />
           <div style={{ fontSize: '12px' }} className="ss-label right">
             + 1°:
           </div>
-          <MagicInput
+          <DecimalInput
             step={1}
-            disabled={!enabled}
-            value={rotation - Math.floor(rotation / 360) * 360}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  KeyerIndex: this.props.id,
-                  MixEffectIndex: this.props.mixEffect,
-                  Mask: 16,
-                  Rotation: (Math.floor(rotation / 360) * 360 + parseInt(value)) / 100
-                })
-              }
-            }}
+            value={rotationFine}
+            onChange={value =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                KeyerIndex: this.props.keyerIndex,
+                MixEffectIndex: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+                Rotation: (rotationCoarse * 360 + value) / 100 // TODO - the set and get command units dont match
+              })
+            }
           />
         </div>
 
-        <Mask
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          keyerIndex={this.props.id}
-          mixEffectIndex={this.props.mixEffect}
+        <DVEMaskProperties
+          sendCommand={this.props.sendCommand}
+          meIndex={this.props.meIndex}
+          keyerIndex={this.props.keyerIndex}
+          keyerProps={this.props.keyer.dve}
+        />
+        <ShadowProperties
+          sendCommand={this.props.sendCommand}
+          meIndex={this.props.meIndex}
+          keyerIndex={this.props.keyerIndex}
+          keyerProps={this.props.keyer.dve}
+        />
+        <Border
+          sendCommand={this.props.sendCommand}
+          meIndex={this.props.meIndex}
+          keyerIndex={this.props.keyerIndex}
+          keyerProps={this.props.keyer.dve}
+        />
+
+        <KeyFrame
+          videoMode={this.props.videoMode}
+          dve={this.props.keyer.dve}
+          flyEnabled={true}
+          properties={this.props.keyer.flyProperties}
+          keyerIndex={this.props.keyerIndex}
+          mixEffect={this.props.meIndex}
           sendCommand={this.props.sendCommand}
         />
-        <Shadow
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          keyerIndex={this.props.id}
-          mixEffectIndex={this.props.mixEffect}
-          sendCommand={this.props.sendCommand}
-        ></Shadow>
-        <Border
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          keyerIndex={this.props.id}
-          mixEffectIndex={this.props.mixEffect}
-          sendCommand={this.props.sendCommand}
-        ></Border>
-
-        {/* <FlyingKey flyEnabled={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].properties.flyEnabled} properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve} keyerIndex={this.props.id} mixEffectIndex={this.props.mixEffect} sendCommand={(cmd:string,values:any)=>this.props.sendCommand(cmd,values)}></FlyingKey> */}
-        <KeyFrame
-          videoMode={this.props.currentState.settings.videoMode}
-          dve={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].dve}
-          flyEnabled={true}
-          properties={this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].flyProperties}
-          keyerIndex={this.props.id}
-          mixEffect={this.props.mixEffect}
-          sendCommand={this.props.sendCommand}
-        ></KeyFrame>
       </div>
     )
   }
 }
 
-function Mask(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
-  var enabled = props.properties.maskEnabled
-  var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
-
+function DVEMaskProperties(props: DveSubPanelProps) {
   return (
-    <div className="ss-mask-box">
-      <ToggleButton
-        active={enabled}
-        label={'Mask'}
-        onClick={() => {
-          props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-            MixEffectIndex: props.mixEffectIndex,
-            KeyerIndex: props.keyerIndex,
-            Mask: 1048576,
-            MaskEnabled: !props.properties.maskEnabled
-          })
-        }}
-      />
-      <div className="ss-mask-holder">
-        <div className={labelClass}>Top:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskTop}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 2097152,
-                  MaskTop: Math.min(9, Math.max(-9, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Bottom:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskBottom}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 4194304,
-                  MaskBottom: Math.min(9, Math.max(-9, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Left:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskLeft}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 8388608,
-                  MaskLeft: Math.min(16, Math.max(-16, value))
-                })
-              }
-            }}
-          />
-        </div>
-        <div className={labelClass}>Right:</div>
-        <div className="ss-rate">
-          {' '}
-          <MagicInput
-            disabled={!enabled}
-            value={props.properties.maskRight}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 16777216,
-                  MaskRight: Math.min(16, Math.max(-16, value))
-                })
-              }
-            }}
-          />
-        </div>
-      </div>
-    </div>
+    <MaskProperties
+      isDVE={true}
+      maskEnabled={props.keyerProps.maskEnabled}
+      maskTop={props.keyerProps.maskTop}
+      maskLeft={props.keyerProps.maskLeft}
+      maskRight={props.keyerProps.maskRight}
+      maskBottom={props.keyerProps.maskBottom}
+      setMaskEnabled={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.MaskEnabled,
+          MaskEnabled: v
+        })
+      }}
+      setMaskTop={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.MaskTop,
+          MaskTop: v
+        })
+      }}
+      setMaskLeft={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.MaskLeft,
+          MaskLeft: v
+        })
+      }}
+      setMaskRight={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.MaskRight,
+          MaskRight: v
+        })
+      }}
+      setMaskBottom={v => {
+        props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          MixEffectIndex: props.meIndex,
+          KeyerIndex: props.keyerIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.MaskBottom,
+          MaskBottom: v
+        })
+      }}
+    />
   )
 }
 
-function Shadow(props: { keyerIndex: number; mixEffectIndex: number; properties: any; sendCommand: any }) {
-  var enabled = props.properties.borderShadowEnabled
-  var labelClass = enabled ? 'ss-label' : 'ss-label disabled'
+function ShadowProperties(props: DveSubPanelProps) {
+  const labelClass = props.keyerProps.borderShadowEnabled ? 'ss-label' : 'ss-label disabled'
 
   return (
     <div>
       <ToggleButton
-        active={enabled}
+        active={props.keyerProps.borderShadowEnabled}
         label={'Shadow'}
-        onClick={() => {
+        onClick={v =>
           props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-            MixEffectIndex: props.mixEffectIndex,
+            MixEffectIndex: props.meIndex,
             KeyerIndex: props.keyerIndex,
-            Mask: 64,
-            BorderShadowEnabled: !enabled
+            Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderShadowEnabled,
+            BorderShadowEnabled: v
           })
-        }}
+        }
       />
+
       <div style={{ gridTemplateRows: '1fr' }} className="ss-mask-holder">
         <div className={labelClass}>Angle:</div>
         <div className="ss-rate">
           {' '}
-          <MagicInput
+          <DecimalInput
             step={1}
-            disabled={!enabled}
-            value={props.properties.lightSourceDirection}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 262144,
-                  LightSourceDirection: Math.min(360, Math.max(0, value))
-                })
-              }
-            }}
+            min={0}
+            max={359}
+            disabled={!props.keyerProps.borderShadowEnabled}
+            value={props.keyerProps.lightSourceDirection}
+            onChange={value =>
+              props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                MixEffectIndex: props.meIndex,
+                KeyerIndex: props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.LightSourceDirection,
+                LightSourceDirection: value
+              })
+            }
           />
         </div>
         <div className={labelClass}>Altitude:</div>
         <div className="ss-rate">
           {' '}
-          <MagicInput
+          <DecimalInput
             step={1}
-            disabled={!enabled}
-            value={props.properties.lightSourceAltitude}
-            callback={(value: any) => {
-              if (value != '') {
-                props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: props.mixEffectIndex,
-                  KeyerIndex: props.keyerIndex,
-                  Mask: 524288,
-                  LightSourceAltitude: Math.min(100, Math.max(10, value))
-                })
-              }
-            }}
+            min={10}
+            max={100}
+            disabled={!props.keyerProps.borderShadowEnabled}
+            value={props.keyerProps.lightSourceAltitude}
+            onChange={value =>
+              props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                MixEffectIndex: props.meIndex,
+                KeyerIndex: props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.LightSourceAltitude,
+                LightSourceAltitude: value
+              })
+            }
           />
         </div>
       </div>
@@ -364,15 +320,27 @@ function Shadow(props: { keyerIndex: number; mixEffectIndex: number; properties:
   )
 }
 
-interface BorderProps {
-  keyerIndex: number
-  mixEffectIndex: number
-  properties: any
-  sendCommand: any
-}
+const BorderBevelOptions: Array<{ id: LibAtemEnums.BorderBevel; label: string }> = [
+  {
+    id: LibAtemEnums.BorderBevel.None,
+    label: 'No Bevel'
+  },
+  {
+    id: LibAtemEnums.BorderBevel.InOut,
+    label: 'Bevel In Out'
+  },
+  {
+    id: LibAtemEnums.BorderBevel.In,
+    label: 'Bevel In'
+  },
+  {
+    id: LibAtemEnums.BorderBevel.Out,
+    label: 'Bevel Out'
+  }
+]
 
-class Border extends React.Component<BorderProps, { displayColorPicker: boolean }> {
-  constructor(props: BorderProps) {
+class Border extends React.Component<DveSubPanelProps, { displayColorPicker: boolean }> {
+  constructor(props: DveSubPanelProps) {
     super(props)
     this.state = {
       displayColorPicker: false
@@ -380,28 +348,30 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
   }
 
   render() {
-    var enabled = this.props.properties.borderEnabled
-    var labelClass = enabled ? 'ss-slider-label' : 'ss-slider-label disabled'
+    const enabled = this.props.keyerProps.borderEnabled
 
-    var picker = this.state.displayColorPicker ? (
+    const colorPicker = this.state.displayColorPicker ? (
       <div className="color-picker-popover">
         <div className="color-picker-cover" onClick={() => this.setState({ displayColorPicker: false })} />
         <ChromePicker
           onChange={color => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-              MixEffectIndex: this.props.mixEffectIndex,
+              MixEffectIndex: this.props.meIndex,
               KeyerIndex: this.props.keyerIndex,
               BorderHue: color.hsl.h,
               BorderSaturation: color.hsl.s * 100,
               BorderLuma: color.hsl.l * 100,
-              Mask: 229376
+              Mask:
+                LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderHue |
+                LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderSaturation |
+                LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderLuma
             })
           }}
           disableAlpha={true}
           color={{
-            h: this.props.properties.borderHue,
-            s: this.props.properties.borderSaturation,
-            l: this.props.properties.borderLuma
+            h: this.props.keyerProps.borderHue,
+            s: this.props.keyerProps.borderSaturation,
+            l: this.props.keyerProps.borderLuma
           }}
         />
       </div>
@@ -411,13 +381,13 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
       <div className="ss-mask-box">
         <ToggleButton
           active={enabled}
-          label={'Border'}
-          onClick={() => {
+          label="Border"
+          onClick={v => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-              MixEffectIndex: this.props.mixEffectIndex,
+              MixEffectIndex: this.props.meIndex,
               KeyerIndex: this.props.keyerIndex,
-              Mask: 32,
-              BorderEnabled: !enabled
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderEnabled,
+              BorderEnabled: v
             })
           }}
         />
@@ -428,283 +398,146 @@ class Border extends React.Component<BorderProps, { displayColorPicker: boolean 
             className="ss-color-picker"
             onClick={() => (enabled ? this.setState({ displayColorPicker: !this.state.displayColorPicker }) : null)}
             style={{
-              background:
-                'hsl(' +
-                this.props.properties.borderHue +
-                ',' +
-                (enabled ? this.props.properties.borderSaturation : this.props.properties.borderSaturation * 0.2) +
-                '%,' +
-                this.props.properties.borderLuma +
-                '%)'
+              background: `hsl(${this.props.keyerProps.borderHue}, ${this.props.keyerProps.borderSaturation}%, ${this.props.keyerProps.borderLuma}%)`,
+              opacity: enabled ? 1 : 0.5
             }}
           ></div>
-          {picker}
+          {colorPicker}
         </div>
 
-        <div className="ss-row">
-          <div className={enabled ? 'ss-label' : 'ss-label disabled'}>Fill Source:</div>
-          <select
-            disabled={!enabled}
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                MixEffectIndex: this.props.mixEffectIndex,
-                KeyerIndex: this.props.keyerIndex,
-                Mask: 128,
-                BorderBevel: e.currentTarget.value
-              })
-            }}
-            value={this.props.properties.borderBevel}
-            className="ss-dropdown"
-          >
-            <option value={0}>No Bevel</option>
-            <option value={1}>Bevel In Out</option>
-            <option value={2}>Bevel In</option>
-            <option value={3}>Bevel Out</option>
-          </select>
-        </div>
+        <SelectInput
+          label="Color"
+          value={this.props.keyerProps.borderBevel}
+          disabled={!enabled}
+          options={BorderBevelOptions}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderBevel,
+              BorderBevel: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={16}
-              tooltip={false}
-              step={0.01}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 256,
-                  borderOuterWidth: e
-                })
-              }
-              value={this.props.properties.borderOuterWidth}
-            />
-            <div className={labelClass}>Outer Width:</div>
-          </div>
-          <MagicInput
-            disabled={!enabled}
-            value={this.props.properties.borderOuterWidth}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 256,
-                  borderOuterWidth: Math.min(16, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Outer Width"
+          step={0.01}
+          min={0}
+          max={16}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderOuterWidth}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderOuterWidth,
+              BorderOuterWidth: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={16}
-              tooltip={false}
-              step={0.01}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 512,
-                  BorderInnerWidth: e
-                })
-              }
-              value={this.props.properties.borderInnerWidth}
-            />
-            <div className={labelClass}>Inner Width:</div>
-          </div>
-          <MagicInput
-            disabled={!enabled}
-            value={this.props.properties.borderInnerWidth}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 512,
-                  BorderInnerWidth: Math.min(16, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Inner Width"
+          step={0.01}
+          min={0}
+          max={16}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderInnerWidth}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderInnerWidth,
+              BorderInnerWidth: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={100}
-              tooltip={false}
-              step={1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 1024,
-                  BorderOuterSoftness: e
-                })
-              }
-              value={this.props.properties.borderOuterSoftness}
-            />
-            <div className={labelClass}>Outer Soften:</div>
-          </div>
-          <MagicInput
-            step={1}
-            disabled={!enabled}
-            value={this.props.properties.borderOuterSoftness}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 1024,
-                  BorderOuterSoftness: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Outer Soften"
+          step={1}
+          min={0}
+          max={100}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderOuterSoftness}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderOuterSoftness,
+              BorderOuterSoftness: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={100}
-              tooltip={false}
-              step={1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 2048,
-                  BorderInnerSoftness: e
-                })
-              }
-              value={this.props.properties.borderInnerSoftness}
-            />
-            <div className={labelClass}>Inner Soften:</div>
-          </div>
-          <MagicInput
-            step={1}
-            disabled={!enabled}
-            value={this.props.properties.borderInnerSoftness}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 2048,
-                  BorderInnerSoftness: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Inner Soften"
+          step={1}
+          min={0}
+          max={100}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderInnerSoftness}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderInnerSoftness,
+              BorderInnerSoftness: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={100}
-              tooltip={false}
-              step={1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 16384,
-                  BorderOpacity: e
-                })
-              }
-              value={this.props.properties.borderOpacity}
-            />
-            <div className={labelClass}>Border Opacity:</div>
-          </div>
-          <MagicInput
-            step={1}
-            disabled={!enabled}
-            value={this.props.properties.borderOpacity}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 16384,
-                  BorderOpacity: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Border Opacity"
+          step={1}
+          min={0}
+          max={100}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderOpacity}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderOpacity,
+              BorderOpacity: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={100}
-              tooltip={false}
-              step={1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 8192,
-                  BorderBevelPosition: e
-                })
-              }
-              value={this.props.properties.borderBevelPosition}
-            />
-            <div className={labelClass}>Border Position:</div>
-          </div>
-          <MagicInput
-            step={1}
-            disabled={!enabled}
-            value={this.props.properties.borderBevelPosition}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 8192,
-                  BorderBevelPosition: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Border Position"
+          step={1}
+          min={0}
+          max={100}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderBevelPosition}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderBevelPosition,
+              BorderBevelPosition: e
+            })
+          }
+        />
 
-        <div className="ss-slider-holder">
-          <div className={enabled ? 'sss ss-slider-outer' : 'sss ss-slider-outer disabled'}>
-            <Slider
-              max={100}
-              tooltip={false}
-              step={1}
-              onChange={e =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 4096,
-                  BorderBevelSoftness: e
-                })
-              }
-              value={this.props.properties.borderBevelSoftness}
-            />
-            <div className={labelClass}>Border Position:</div>
-          </div>
-          <MagicInput
-            step={1}
-            disabled={!enabled}
-            value={this.props.properties.borderBevelSoftness}
-            callback={(value: any) => {
-              if (value != '') {
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                  MixEffectIndex: this.props.mixEffectIndex,
-                  KeyerIndex: this.props.keyerIndex,
-                  Mask: 4096,
-                  BorderBevelSoftness: Math.min(100, Math.max(0, value))
-                })
-              }
-            }}
-          />
-        </div>
+        <DecimalWithSliderInput
+          label="Bevel Soften"
+          step={1}
+          min={0}
+          max={100}
+          disabled={!enabled}
+          value={this.props.keyerProps.borderBevelSoftness}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.BorderBevelSoftness,
+              BorderBevelSoftness: e
+            })
+          }
+        />
       </div>
     )
   }

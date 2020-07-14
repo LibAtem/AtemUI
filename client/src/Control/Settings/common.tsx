@@ -1,8 +1,10 @@
 import React from 'react'
-import { DecimalInput, CheckboxInput } from '../common'
+import { CheckboxInput } from '../common'
 import { DecimalWithSliderInput, DecimalInputWithLabel } from '../common/decimal'
 
 interface MaskPropertiesProps {
+  isDVE?: boolean
+
   maskEnabled: boolean
   maskTop: number
   maskBottom: number
@@ -17,6 +19,12 @@ interface MaskPropertiesProps {
 }
 
 export function MaskProperties(props: MaskPropertiesProps) {
+  const minY = props.isDVE ? 0 : -9
+  const maxY = props.isDVE ? 38 : 9
+
+  const minX = props.isDVE ? 0 : -16
+  const maxX = props.isDVE ? 53 : 16
+
   return (
     <div className="ss-mask-box">
       <ToggleButton label="Mask" active={props.maskEnabled} onClick={v => props.setMaskEnabled(v)} />
@@ -27,8 +35,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
           disabled={!props.maskEnabled}
           value={props.maskTop}
           step={0.01}
-          min={-9}
-          max={9}
+          min={minY}
+          max={maxY}
           onChange={value => props.setMaskTop(value)}
         />
         <DecimalInputWithLabel
@@ -36,8 +44,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
           disabled={!props.maskEnabled}
           value={props.maskBottom}
           step={0.01}
-          min={-9}
-          max={9}
+          min={minY}
+          max={maxY}
           onChange={value => props.setMaskBottom(value)}
         />
         <DecimalInputWithLabel
@@ -45,8 +53,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
           disabled={!props.maskEnabled}
           value={props.maskLeft}
           step={0.01}
-          min={-16}
-          max={16}
+          min={minX}
+          max={maxX}
           onChange={value => props.setMaskLeft(value)}
         />
         <DecimalInputWithLabel
@@ -54,8 +62,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
           disabled={!props.maskEnabled}
           value={props.maskRight}
           step={0.01}
-          min={-16}
-          max={16}
+          min={minX}
+          max={maxX}
           onChange={value => props.setMaskRight(value)}
         />
       </div>

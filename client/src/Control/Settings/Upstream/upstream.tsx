@@ -4,7 +4,7 @@ import { MagicInput } from '../settings'
 import { LumaKeyerSettings } from './luma'
 import { ChromaKeyerClassicProperties } from './chroma'
 import { Pattern } from './pattern'
-import { DVE } from './dve'
+import { DveKeyerProperties } from './dve'
 import { ToggleButton, TabPanelTab, TabPanel } from '../common'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
@@ -110,12 +110,14 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.MixEffectKeyType.DVE} label={'DVE'} disabled={!this.props.keyer.dve}>
-            {/* <DVE
+            <DveKeyerProperties
               sendCommand={this.props.sendCommand}
-              id={this.props.keyerIndex}
-              mixEffect={this.props.meIndex}
-              currentState={this.props.currentState}
-            /> */}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              keyer={this.props.keyer}
+              sources={this.props.sources}
+              videoMode={this.props.videoMode}
+            />
           </TabPanelTab>
         </TabPanel>
       </div>
