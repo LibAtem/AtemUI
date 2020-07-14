@@ -82,7 +82,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
               disabled: true
             },
             {
-              label: 'Capture',
+              label: 'Output',
               value: 2,
               disabled: true
             }
@@ -132,50 +132,6 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           {...this.getFtbAudioProps(this.props.currentState)}
         />
       </div>
-    )
-  }
-}
-
-interface MagicInputProps {
-  callback: any
-  value: any
-  disabled?: boolean
-  step?: number
-}
-interface MagicInputState {
-  focus: boolean
-  tempValue: any
-}
-
-export class MagicInput extends React.Component<MagicInputProps, MagicInputState> {
-  constructor(props: MagicInputProps) {
-    super(props)
-    this.state = {
-      focus: false,
-      tempValue: this.props.value
-    }
-  }
-
-  render() {
-    return (
-      <input
-        type="number"
-        step={this.props.step || 0.01}
-        disabled={this.props.disabled}
-        onBlur={e => {
-          this.setState({ focus: false })
-          this.props.callback(e.currentTarget.value)
-        }}
-        onFocus={e => this.setState({ focus: true, tempValue: this.props.value })}
-        onChange={e => this.setState({ tempValue: e.currentTarget.value })}
-        value={this.state.focus ? this.state.tempValue : this.props.value}
-        onKeyPress={e => {
-          if (e.key === 'Enter') {
-            this.props.callback(e.currentTarget.value)
-          }
-        }}
-        className="ss-rate-input"
-      ></input>
     )
   }
 }
