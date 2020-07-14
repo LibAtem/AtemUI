@@ -1,9 +1,11 @@
 import React from 'react'
 import { CheckboxInput } from '../common'
 import { DecimalWithSliderInput, DecimalInputWithLabel } from '../common/decimal'
+import { REPL_MODE_SLOPPY } from 'repl'
 
 interface MaskPropertiesProps {
-  isDVE?: boolean
+  type: 'key' | 'dve' | 'ssrc-box'
+  disabled?: boolean
 
   maskEnabled: boolean
   maskTop: number
@@ -19,20 +21,25 @@ interface MaskPropertiesProps {
 }
 
 export function MaskProperties(props: MaskPropertiesProps) {
-  const minY = props.isDVE ? 0 : -9
-  const maxY = props.isDVE ? 38 : 9
+  const minY = props.type === 'dve' ? 0 : -9
+  const maxY = props.type === 'dve' ? 38 : props.type === 'ssrc-box' ? 18 : 9
 
-  const minX = props.isDVE ? 0 : -16
-  const maxX = props.isDVE ? 53 : 16
+  const minX = props.type === 'dve' ? 0 : -16
+  const maxX = props.type === 'dve' ? 53 : props.type === 'ssrc-box' ? 32 : 16
 
   return (
     <div className="ss-mask-box">
-      <ToggleButton label="Mask" active={props.maskEnabled} onClick={v => props.setMaskEnabled(v)} />
+      <ToggleButton
+        label={props.type === 'ssrc-box' ? 'Crop' : 'Mask'}
+        active={props.maskEnabled}
+        disabled={props.disabled}
+        onClick={v => props.setMaskEnabled(v)}
+      />
 
       <div className="ss-mask-holder">
         <DecimalInputWithLabel
           label="Top"
-          disabled={!props.maskEnabled}
+          disabled={!props.maskEnabled || props.disabled}
           value={props.maskTop}
           step={0.01}
           min={minY}
@@ -41,7 +48,7 @@ export function MaskProperties(props: MaskPropertiesProps) {
         />
         <DecimalInputWithLabel
           label="Bottom"
-          disabled={!props.maskEnabled}
+          disabled={!props.maskEnabled || props.disabled}
           value={props.maskBottom}
           step={0.01}
           min={minY}
@@ -50,7 +57,7 @@ export function MaskProperties(props: MaskPropertiesProps) {
         />
         <DecimalInputWithLabel
           label="Left"
-          disabled={!props.maskEnabled}
+          disabled={!props.maskEnabled || props.disabled}
           value={props.maskLeft}
           step={0.01}
           min={minX}
@@ -59,7 +66,7 @@ export function MaskProperties(props: MaskPropertiesProps) {
         />
         <DecimalInputWithLabel
           label="Right"
-          disabled={!props.maskEnabled}
+          disabled={!props.maskEnabled || props.disabled}
           value={props.maskRight}
           step={0.01}
           min={minX}

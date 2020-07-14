@@ -98,6 +98,7 @@ export class DownstreamKeyerSettings extends React.Component<
               >
                 {this.getTopBox(i)}
                 <MaskProperties
+                  type="key"
                   maskEnabled={dsk.properties?.maskEnabled ?? false}
                   maskTop={dsk.properties?.maskTop ?? 0}
                   maskLeft={dsk.properties?.maskLeft ?? 0}

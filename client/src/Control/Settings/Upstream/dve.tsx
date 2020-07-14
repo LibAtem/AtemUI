@@ -232,7 +232,7 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
 function DVEMaskProperties(props: DveSubPanelProps) {
   return (
     <MaskProperties
-      isDVE={true}
+      type="dve"
       maskEnabled={props.keyerProps.maskEnabled}
       maskTop={props.keyerProps.maskTop}
       maskLeft={props.keyerProps.maskLeft}

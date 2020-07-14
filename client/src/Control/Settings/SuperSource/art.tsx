@@ -33,7 +33,7 @@ interface SuperSourceArtSettingsProps {
   ssrcProps: LibAtemState.SuperSourceState_PropertiesState
   borderProps: LibAtemState.SuperSourceState_BorderState
   sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
-  version: unknown // TODO - ProtocolVersion
+  version: LibAtemEnums.ProtocolVersion | undefined
 }
 
 export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {

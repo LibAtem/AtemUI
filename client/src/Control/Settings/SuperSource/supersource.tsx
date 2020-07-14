@@ -3,6 +3,7 @@ import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemEnums } from '../../../generated'
 import { TabPanelTab, TabPanel } from '../common'
 import { SuperSourceArtSettings } from './art'
+import { SuperSourcePropertiesSettings, SuperSourceBoxSettings } from './properties'
 
 interface SuperSourceSettingsProps {
   sendCommand: SendCommandStrict
@@ -10,12 +11,13 @@ interface SuperSourceSettingsProps {
   hasMultiple: boolean
   ssrcProps: LibAtemState.SuperSourceState
   sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
-  version: unknown // TODO - ProtocolVersion
+  version: LibAtemEnums.ProtocolVersion | undefined
 }
 
 interface SuperSourceSettingsState {
   open: boolean
   page: number
+  box: number
 }
 
 export class SuperSourceSettings extends React.Component<SuperSourceSettingsProps, SuperSourceSettingsState> {
@@ -23,7 +25,8 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
     super(props)
     this.state = {
       open: false,
-      page: 1
+      page: 0,
+      box: 0
     }
   }
 
@@ -38,11 +41,43 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
         >
           SuperSource {this.props.hasMultiple ? this.props.index + 1 : ''}
         </div>
-        <div className="ss-submenu-box">
-          {this.state.open ? (
-            <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
-              <TabPanelTab id={0} label={'Presets'}>
-                {/* {this.props.transition.mix ? (
+
+        {this.state.open ? (
+          <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+            <TabPanelTab id={0} label={'Presets'}>
+              <SuperSourcePropertiesSettings
+                sendCommand={this.props.sendCommand}
+                index={this.props.index}
+                version={this.props.version}
+              />
+              <div className="ss-heading">Box Control</div>
+              <TabPanel page={this.state.box} onChange={newBox => this.setState({ box: newBox })}>
+                {this.props.ssrcProps.boxes.map((box, i) => (
+                  <TabPanelTab key={i} id={i} label={`Box ${i + 1}`}>
+                    <SuperSourceBoxSettings
+                      sendCommand={this.props.sendCommand}
+                      index={this.props.index}
+                      boxIndex={i}
+                      boxProps={box}
+                      sources={this.props.sources}
+                      version={this.props.version}
+                    />
+                  </TabPanelTab>
+                ))}
+              </TabPanel>
+            </TabPanelTab>
+            <TabPanelTab id={1} label={'Art'}>
+              <SuperSourceArtSettings
+                sendCommand={this.props.sendCommand}
+                index={this.props.index}
+                ssrcProps={this.props.ssrcProps.properties}
+                borderProps={this.props.ssrcProps.border}
+                sources={this.props.sources}
+                version={this.props.version}
+              />
+            </TabPanelTab>
+            <TabPanelTab id={2} label={'Copy'} disabled={true}>
+              {/* {this.props.transition.mix ? (
                   <MixTransitionSettings
                     sendCommand={this.props.sendCommand}
                     meIndex={this.props.meIndex}
@@ -52,34 +87,11 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
                 ) : (
                   undefined
                 )} */}
-              </TabPanelTab>
-              <TabPanelTab id={1} label={'Art'}>
-                <SuperSourceArtSettings
-                  sendCommand={this.props.sendCommand}
-                  index={this.props.index}
-                  ssrcProps={this.props.ssrcProps.properties}
-                  borderProps={this.props.ssrcProps.border}
-                  sources={this.props.sources}
-                  version={this.props.version}
-                />
-              </TabPanelTab>
-              <TabPanelTab id={2} label={'Copy'} disabled={true}>
-                {/* {this.props.transition.mix ? (
-                  <MixTransitionSettings
-                    sendCommand={this.props.sendCommand}
-                    meIndex={this.props.meIndex}
-                    mix={this.props.transition.mix}
-                    videoMode={this.props.videoMode}
-                  />
-                ) : (
-                  undefined
-                )} */}
-              </TabPanelTab>
-            </TabPanel>
-          ) : (
-            undefined
-          )}
-        </div>
+            </TabPanelTab>
+          </TabPanel>
+        ) : (
+          <div className="ss-submenu-box"></div>
+        )}
       </div>
     )
   }

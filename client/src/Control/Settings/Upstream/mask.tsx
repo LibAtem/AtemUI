@@ -11,6 +11,7 @@ export function KeyerMaskProperties(props: {
 }) {
   return (
     <MaskProperties
+      type="key"
       maskEnabled={props.keyerProps.maskEnabled}
       maskTop={props.keyerProps.maskTop}
       maskLeft={props.keyerProps.maskLeft}
