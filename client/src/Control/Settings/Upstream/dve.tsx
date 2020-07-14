@@ -1,11 +1,11 @@
 import React from 'react'
-import { KeyFrame } from './upstream'
 import { ChromePicker } from 'react-color'
 import { ToggleButton, MaskProperties } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { DecimalInput, DecimalWithSliderInput } from '../../common/decimal'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SelectInput } from '../../common'
+import { FlyingKeyFrameProperties } from './flying'
 
 interface DveSubPanelProps {
   sendCommand: SendCommandStrict
@@ -41,8 +41,6 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
       return <div></div>
     }
 
-    const rotationCoarse = Math.floor(this.props.keyer.dve.rotation / 360)
-    const rotationFine = this.props.keyer.dve.rotation - rotationCoarse * 360
     return (
       <div>
         <div className="ss-heading">Settings</div>
@@ -63,114 +61,13 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
           </select>
         </div>
 
-        <div className="ss-row xy">
-          <div style={{ minWidth: '50px' }} className="ss-label">
-            Position:
-          </div>
-          <div className="ss-label right">X:</div>
-          <DecimalInput
-            step={0.01}
-            min={-1000}
-            max={1000}
-            value={this.props.keyer.dve.positionX}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionX,
-                PositionX: value
-              })
-            }
-          />
-          <div className="ss-label right">Y:</div>
-          <DecimalInput
-            step={0.01}
-            min={-1000}
-            max={1000}
-            value={this.props.keyer.dve.positionY}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionY,
-                PositionY: value
-              })
-            }
-          />
-        </div>
-
-        <div className="ss-row xy">
-          <div style={{ minWidth: '50px' }} className="ss-label">
-            Scale:
-          </div>
-          <div className="ss-label right">X:</div>
-          <DecimalInput
-            step={0.01}
-            min={0}
-            max={99.99}
-            value={this.props.keyer.dve.sizeX}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeX,
-                SizeX: value
-              })
-            }
-          />
-          {/* TODO - link */}
-          <div className="ss-label right">Y:</div>
-          <DecimalInput
-            step={0.01}
-            min={0}
-            max={99.99}
-            value={this.props.keyer.dve.sizeY}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeY,
-                SizeY: value
-              })
-            }
-          />
-        </div>
-
-        <div className="ss-row xy">
-          <div style={{ minWidth: '50px' }} className="ss-label">
-            Rotation:
-          </div>
-          <div className="ss-label right">360°:</div>
-          <DecimalInput
-            step={1}
-            min={-90}
-            max={89}
-            value={rotationCoarse}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
-                Rotation: (Math.floor(value) * 360 + rotationFine) / 100 // TODO - the set and get command units dont match
-              })
-            }
-          />
-          <div style={{ fontSize: '12px' }} className="ss-label right">
-            + 1°:
-          </div>
-          <DecimalInput
-            step={1}
-            value={rotationFine}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
-                KeyerIndex: this.props.keyerIndex,
-                MixEffectIndex: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
-                Rotation: (rotationCoarse * 360 + value) / 100 // TODO - the set and get command units dont match
-              })
-            }
-          />
-        </div>
+        <DVECommonProprties
+          sendCommand={this.props.sendCommand}
+          disabled={false}
+          meIndex={this.props.meIndex}
+          keyerIndex={this.props.keyerIndex}
+          keyerProps={this.props.keyer.dve}
+        />
 
         <DVEMaskProperties
           sendCommand={this.props.sendCommand}
@@ -191,18 +88,146 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
           keyerProps={this.props.keyer.dve}
         />
 
-        <KeyFrame
-          videoMode={this.props.videoMode}
-          dve={this.props.keyer.dve}
-          flyEnabled={true}
-          properties={this.props.keyer.flyProperties}
-          keyerIndex={this.props.keyerIndex}
-          mixEffect={this.props.meIndex}
-          sendCommand={this.props.sendCommand}
-        />
+        {this.props.keyer.dve && this.props.keyer.flyProperties ? (
+          <FlyingKeyFrameProperties
+            videoMode={this.props.videoMode}
+            keyerProps={this.props.keyer.dve}
+            flyEnabled={this.props.keyer.properties.flyEnabled}
+            flyProps={this.props.keyer.flyProperties}
+            keyerIndex={this.props.keyerIndex}
+            meIndex={this.props.meIndex}
+            sendCommand={this.props.sendCommand}
+          />
+        ) : (
+          undefined
+        )}
       </div>
     )
   }
+}
+
+export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean }) {
+  const rotationCoarse = Math.floor(props.keyerProps.rotation / 360)
+  const rotationFine = props.keyerProps.rotation - rotationCoarse * 360
+
+  return (
+    <React.Fragment>
+      <div className="ss-row xy">
+        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
+          Position:
+        </div>
+        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
+        <DecimalInput
+          step={0.01}
+          min={-1000}
+          max={1000}
+          value={props.keyerProps.positionX}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionX,
+              PositionX: value
+            })
+          }
+        />
+        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
+        <DecimalInput
+          step={0.01}
+          min={-1000}
+          max={1000}
+          value={props.keyerProps.positionY}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionY,
+              PositionY: value
+            })
+          }
+        />
+      </div>
+
+      <div className="ss-row xy">
+        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
+          Scale:
+        </div>
+        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
+        <DecimalInput
+          step={0.01}
+          min={0}
+          max={99.99}
+          value={props.keyerProps.sizeX}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeX,
+              SizeX: value
+            })
+          }
+        />
+        {/* TODO - link */}
+        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
+        <DecimalInput
+          step={0.01}
+          min={0}
+          max={99.99}
+          value={props.keyerProps.sizeY}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeY,
+              SizeY: value
+            })
+          }
+        />
+      </div>
+
+      <div className="ss-row xy">
+        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
+          Rotation:
+        </div>
+        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>360°:</div>
+        <DecimalInput
+          step={1}
+          min={-90}
+          max={89}
+          value={rotationCoarse}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+              Rotation: (Math.floor(value) * 360 + rotationFine) / 100 // TODO - the set and get command units dont match
+            })
+          }
+        />
+        <div style={{ fontSize: '12px' }} className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>
+          + 1°:
+        </div>
+        <DecimalInput
+          step={1}
+          value={rotationFine}
+          disabled={props.disabled}
+          onChange={value =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+              KeyerIndex: props.keyerIndex,
+              MixEffectIndex: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+              Rotation: (rotationCoarse * 360 + value) / 100 // TODO - the set and get command units dont match
+            })
+          }
+        />
+      </div>
+    </React.Fragment>
+  )
 }
 
 function DVEMaskProperties(props: DveSubPanelProps) {

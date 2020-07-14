@@ -9,6 +9,7 @@ interface RateInputProps {
   disabled?: boolean
   videoMode: VideoMode
   className?: string
+  maxSeconds?: number
 }
 interface RateInputState {
   focus: boolean
@@ -33,19 +34,20 @@ export class RateInput extends React.Component<RateInputProps, RateInputState> {
   private rateToFrames(rate: string): number {
     let res = 0
 
+    const fps = VideoModeInfoSet[this.props.videoMode]?.framerate ?? 30
     const rateMatch = rate.match(/^(([0-9]*):|)([0-9]*)$/)
     if (rateMatch) {
       const frames = Number(rateMatch[3])
       const seconds = Number(rateMatch[2])
       if (!Number.isNaN(frames) && !Number.isNaN(seconds)) {
-        const fps = VideoModeInfoSet[this.props.videoMode]?.framerate ?? 30
         res = seconds * fps + frames
       } else if (!Number.isNaN(frames)) {
         res = frames
       }
     }
 
-    return Math.min(res, 250)
+    const max = this.props.maxSeconds ? this.props.maxSeconds * fps : 250
+    return Math.min(res, max)
   }
 
   private framesToRate(frames: number) {

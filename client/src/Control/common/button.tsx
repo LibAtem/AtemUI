@@ -117,3 +117,23 @@ export function CheckboxInput(props: CheckboxInputProps) {
     </label>
   )
 }
+
+interface RunButtonProps {
+  label: string
+  disabled?: boolean
+  active?: boolean
+  onClick: () => void
+}
+export function RunButton(props: RunButtonProps) {
+  let classes = 'ss-run-button'
+  if (props.disabled) {
+    classes += ' disabled'
+  } else if (props.active) {
+    classes += ' active'
+  }
+  return (
+    <div style={{ width: '50px' }} onClick={() => (!props.disabled ? props.onClick() : undefined)} className={classes}>
+      {props.label}
+    </div>
+  )
+}

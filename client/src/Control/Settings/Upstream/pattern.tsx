@@ -1,11 +1,11 @@
 import React from 'react'
-import { FlyingKey, KeyFrame } from './upstream'
 import { Patterns, PatternInfo } from '../../common/patterns'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties } from './mask'
 import { CheckboxInput } from '../../common'
 import { DecimalWithSliderInput, DecimalInput } from '../../common/decimal'
+import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 
 interface PatternProps {
   sendCommand: SendCommandStrict
@@ -187,22 +187,28 @@ export class Pattern extends React.Component<PatternProps> {
           sendCommand={this.props.sendCommand}
         />
 
-        <FlyingKey
-          flyEnabled={this.props.keyer.properties.flyEnabled}
-          properties={this.props.keyer.dve}
-          keyerIndex={this.props.keyerIndex}
-          mixEffectIndex={this.props.meIndex}
-          sendCommand={this.props.sendCommand}
-        ></FlyingKey>
-        <KeyFrame
-          videoMode={this.props.videoMode}
-          dve={this.props.keyer.dve}
-          flyEnabled={this.props.keyer.properties.flyEnabled}
-          properties={this.props.keyer.flyProperties}
-          keyerIndex={this.props.keyerIndex}
-          mixEffect={this.props.meIndex}
-          sendCommand={this.props.sendCommand}
-        ></KeyFrame>
+        {this.props.keyer.dve && this.props.keyer.flyProperties ? (
+          <>
+            <FlyingKeyerProperties
+              sendCommand={this.props.sendCommand}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              flyEnabled={this.props.keyer.properties.flyEnabled}
+              keyerProps={this.props.keyer.dve}
+            />
+            <FlyingKeyFrameProperties
+              videoMode={this.props.videoMode}
+              keyerProps={this.props.keyer.dve}
+              flyEnabled={this.props.keyer.properties.flyEnabled}
+              flyProps={this.props.keyer.flyProperties}
+              keyerIndex={this.props.keyerIndex}
+              meIndex={this.props.meIndex}
+              sendCommand={this.props.sendCommand}
+            />
+          </>
+        ) : (
+          undefined
+        )}
       </div>
     )
   }

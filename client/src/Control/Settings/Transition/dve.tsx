@@ -75,7 +75,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               classes += ' currentItem'
             }
 
-            return <div onClick={() => this.setState({ stylePage: i })} className={classes}></div>
+            return <div key={i} onClick={() => this.setState({ stylePage: i })} className={classes}></div>
           })}
         </div>
 
