@@ -139,6 +139,7 @@ export function ToggleButton(props: {
 interface TabPanelProps {
   page: number
   onChange: (newPage: number) => void
+  hideSingle?: boolean
 }
 export class TabPanel extends React.Component<TabPanelProps> {
   render() {
@@ -148,26 +149,28 @@ export class TabPanel extends React.Component<TabPanelProps> {
     return (
       <div className="ss-submenu-box" style={{ overflow: 'hidden' }}>
         <div className="ss-submenu-submenu">
-          {children.map(ch => {
-            let classes = 'ss-submenu-submenu-item'
-            if (ch.props.disabled) {
-              classes += ' disabled'
-            } else if (this.props.page !== ch.props.id) {
-              classes += ' inactive'
-            }
-            return (
-              <div
-                onClick={() => {
-                  if (!ch.props.disabled) {
-                    this.props.onChange(ch.props.id)
-                  }
-                }}
-                className={classes}
-              >
-                {ch.props?.label ?? `?`}
-              </div>
-            )
-          })}
+          {children.length <= 1 && this.props.hideSingle
+            ? undefined
+            : children.map(ch => {
+                let classes = 'ss-submenu-submenu-item'
+                if (ch.props.disabled) {
+                  classes += ' disabled'
+                } else if (this.props.page !== ch.props.id) {
+                  classes += ' inactive'
+                }
+                return (
+                  <div
+                    onClick={() => {
+                      if (!ch.props.disabled) {
+                        this.props.onChange(ch.props.id)
+                      }
+                    }}
+                    className={classes}
+                  >
+                    {ch.props?.label ?? `?`}
+                  </div>
+                )
+              })}
         </div>
 
         {children.find(ch => ch.props.id === this.props.page && !ch.props.disabled)}

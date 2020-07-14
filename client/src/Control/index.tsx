@@ -36,6 +36,7 @@ interface ControlPageInnerInnerProps {
 interface ControlPageInnerInnerState {
   open: boolean
   openMobile: boolean
+  meIndex: number
 }
 
 function OpenCloseButton(props: { open: boolean; change: (v: boolean) => void }) {
@@ -80,7 +81,8 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
     super(props)
     this.state = {
       open: true,
-      openMobile: false
+      openMobile: false,
+      meIndex: 0
     }
 
     this.sendCommand = this.sendCommand.bind(this)
@@ -88,6 +90,28 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
   private sendCommand(...args: CommandTypes) {
     sendCommandStrict(this.props, ...args)
+  }
+
+  private renderMeSelection(isMobile: boolean) {
+    const mixEffects = this.props.currentState?.mixEffects ?? []
+    if (mixEffects.length <= 1) {
+      return null
+    }
+
+    return (
+      <AtemButtonBar
+        style={{
+          margin: isMobile ? '10px' : '10px auto',
+          width: isMobile ? undefined : `${150 * mixEffects.length}px`
+        }}
+        options={mixEffects.map((me, i) => ({
+          label: `Mix Effects ${i + 1}`,
+          value: i
+        }))}
+        selected={this.state.meIndex}
+        onChange={v => this.setState({ meIndex: v })}
+      />
+    )
   }
 
   render() {
@@ -99,13 +123,17 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               className="control-page"
               style={{ gridTemplateColumns: this.state.open ? '1fr 20px 310px' : '1fr 20px' }}
             >
-              <MixEffectPanel
-                open={this.state.open}
-                profile={this.props.profile}
-                device={this.props.device}
-                currentState={this.props.currentState}
-                sendCommand={this.sendCommand}
-              />
+              <div>
+                {this.renderMeSelection(false)}
+                <MixEffectPanel
+                  open={this.state.open}
+                  profile={this.props.profile}
+                  device={this.props.device}
+                  currentState={this.props.currentState}
+                  meIndex={this.state.meIndex}
+                  sendCommand={this.sendCommand}
+                />
+              </div>
 
               <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
 
@@ -113,6 +141,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <SwitcherSettings
                   full={false}
                   currentState={this.props.currentState}
+                  meIndex={this.state.meIndex}
                   profile={this.props.profile}
                   sendCommand={this.sendCommand}
                 />
@@ -122,6 +151,8 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
             </div>
           ) : (
             <div className="control-page">
+              {this.renderMeSelection(true)}
+
               <AtemButtonBar
                 style={{ margin: '10px' }}
                 options={[
@@ -142,6 +173,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <SwitcherSettings
                   full={true}
                   currentState={this.props.currentState}
+                  meIndex={this.state.meIndex}
                   profile={this.props.profile}
                   sendCommand={this.sendCommand}
                 />
@@ -150,6 +182,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   profile={this.props.profile}
                   device={this.props.device}
                   currentState={this.props.currentState}
+                  meIndex={this.state.meIndex}
                   open={this.state.open}
                   sendCommand={this.sendCommand}
                 />
@@ -168,6 +201,7 @@ interface MixEffectPanelProps {
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
   open: boolean
+  meIndex: number
 }
 interface MixEffectPanelState {
   hasConnected: boolean
@@ -209,8 +243,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
       return <p>Loading state...</p>
     }
 
-    const meIndex = 0
-    const currentME = currentState.mixEffects[meIndex]
+    const currentME = currentState.mixEffects[this.props.meIndex]
 
     const sources = compact(
       Object.entries(currentState.settings.inputs).map(([id, src]) => {
@@ -231,7 +264,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
     return (
       <div className={this.props.open ? 'page-wrapper-control open' : 'page-wrapper-control'}>
         <BankPanel
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           inTransition={false}
           isProgram={true}
           currentSource={currentME.sources.program}
@@ -239,7 +272,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           sendCommand={this.props.sendCommand}
         />
         <TransitionStylePanel
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           profile={profile}
           properties={currentME.transition.properties}
           position={currentME.transition.position}
@@ -247,7 +280,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           sendCommand={this.props.sendCommand}
         />
         <BankPanel
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           inTransition={currentME.transition.position.inTransition}
           isProgram={false}
           currentSource={currentME.sources.preview}
@@ -255,7 +288,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           sendCommand={this.props.sendCommand}
         />
         <NextPanel
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           transition={currentME.transition.properties}
           keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
           sendCommand={this.props.sendCommand}
@@ -266,7 +299,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           sendCommand={this.props.sendCommand}
         />
         <FTBPanel
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           videoMode={currentState.settings.videoMode}
           status={currentME.fadeToBlack.status}
           sendCommand={this.props.sendCommand}

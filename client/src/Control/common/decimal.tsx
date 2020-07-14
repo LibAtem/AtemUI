@@ -23,7 +23,7 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
     }
   }
 
-  private finishValue(val: string) {
+  private finishValue(val: string, unfocus?: boolean) {
     let valNum = Number(val)
     if (val !== '' && !isNaN(valNum)) {
       if (this.props.max !== undefined) {
@@ -33,23 +33,30 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
         valNum = Math.max(this.props.min, valNum)
       }
 
+      // this.setState({
+      //   tempValue: `${valNum}`,
+      //   focus: unfocus ? false : this.state.focus
+      // })
       this.props.onChange(valNum)
     }
   }
 
   render() {
+    const step = this.props.step || 0.01
+    const roundedValue = Math.round(this.props.value / step) * step
+
     return (
       <input
         type="number"
-        step={this.props.step || 0.01}
+        step={step}
         disabled={this.props.disabled}
         onBlur={e => {
           this.setState({ focus: false })
-          this.finishValue(e.currentTarget.value)
+          this.finishValue(e.currentTarget.value, true)
         }}
-        onFocus={e => this.setState({ focus: true, tempValue: `${this.props.value}` })}
+        onFocus={e => this.setState({ focus: true, tempValue: `${roundedValue}` })}
         onChange={e => this.setState({ tempValue: e.currentTarget.value })}
-        value={this.state.focus ? this.state.tempValue : this.props.value}
+        value={this.state.focus ? this.state.tempValue : roundedValue}
         onKeyPress={e => {
           if (e.key === 'Enter') {
             this.finishValue(e.currentTarget.value)

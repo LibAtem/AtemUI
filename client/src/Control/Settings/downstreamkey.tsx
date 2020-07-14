@@ -190,7 +190,7 @@ export class DownstreamKeyerSettings extends React.Component<
         >
           Downstream Keys
         </div>
-        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })} hideSingle={true}>
           {panels}
         </TabPanel>
       </div>

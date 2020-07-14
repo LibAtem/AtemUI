@@ -93,6 +93,7 @@ export function TransitionStylePanel(props: StyleProps) {
       <div className="box-style">
         {styles.map((style, index) => (
           <AtemButtonGeneric
+            key={index}
             color="yellow"
             callback={() =>
               props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {

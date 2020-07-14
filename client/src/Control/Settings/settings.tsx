@@ -15,6 +15,7 @@ interface SwitcherSettingsProps {
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
   full: boolean
+  meIndex: number
 }
 interface SwitcherSettingsState {
   page: number
@@ -63,8 +64,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
       }
     }
 
-    const meIndex = 0
-    const meProps = this.props.currentState.mixEffects[meIndex]
+    const meProps = this.props.currentState.mixEffects[this.props.meIndex]
     const videoMode = this.props.currentState.settings.videoMode
 
     return (
@@ -97,7 +97,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         />
 
         <TransitionSettings
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           sendCommand={this.props.sendCommand}
           transition={meProps.transition}
           profile={this.props.profile}
@@ -110,7 +110,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
             key={'usk' + i}
             sendCommand={this.props.sendCommand}
             keyer={key}
-            meIndex={meIndex}
+            meIndex={this.props.meIndex}
             keyerIndex={i}
             sources={inputProperties}
             videoMode={videoMode}
@@ -126,7 +126,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
 
         <FadeToBlackSettings
           sendCommand={this.props.sendCommand}
-          meIndex={meIndex}
+          meIndex={this.props.meIndex}
           ftb={meProps.fadeToBlack}
           videoMode={this.props.currentState.settings.videoMode}
           {...this.getFtbAudioProps(this.props.currentState)}
