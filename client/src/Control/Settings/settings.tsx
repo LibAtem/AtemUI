@@ -9,6 +9,7 @@ import { SendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 import { videoIds } from '../../ControlSettings/ids'
+import { SuperSourceSettings } from './SuperSource/supersource'
 
 interface SwitcherSettingsProps {
   sendCommand: SendCommandStrict
@@ -104,6 +105,18 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           inputProperties={inputProperties}
           videoMode={this.props.currentState.settings.videoMode}
         />
+
+        {this.props.currentState.superSources.map((ssrc, i) => (
+          <SuperSourceSettings
+            key={`ssrc${i}`}
+            sendCommand={this.props.sendCommand}
+            index={i}
+            hasMultiple={(this.props.currentState?.superSources.length ?? 0) > 1}
+            ssrcProps={ssrc}
+            sources={inputProperties}
+            version={this.props.currentState?.info.version}
+          />
+        ))}
 
         {meProps.keyers.map((key, i) => (
           <UpstreamKey
