@@ -73,6 +73,10 @@ namespace TypesGenerator
             {
                 return translateType(t.GetElementType()) + "[]";
             }
+            if (t == typeof(ProtocolVersion))
+            {
+                return "Enums.ProtocolVersion";
+            }
             if (t.FullName.StartsWith(commonPrefix))
             {
                 return "Enums." + t.FullName.Substring(commonPrefix.Length);

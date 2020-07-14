@@ -24,29 +24,46 @@ namespace TypesGenerator
         {
             _file = file;
         }
+        
+        private static string simplePrefix = "LibAtem.";
+        private static string prefix = "LibAtem.Common.";
 
         private static string SafeName(string rawName)
         {
+            if (rawName.StartsWith(prefix))
+            {
+                rawName = rawName.Substring(prefix.Length);
+            }
+            if (rawName.StartsWith(simplePrefix))
+            {
+                rawName = rawName.Substring(simplePrefix.Length);
+            }
+            
             return rawName.Replace(".", "_");
         }
         
         private void RunIt()
         {
-            string prefix = "LibAtem.Common.";
+            ProcessEnum(typeof(ProtocolVersion));
+                
             var assembly = typeof(ProtocolVersion).GetTypeInfo().Assembly;
             foreach (Type type in assembly.GetTypes())
             {
                 if (!type.GetTypeInfo().IsEnum) continue;
                 if (!type.FullName.StartsWith(prefix)) continue;
-                
-                _file.WriteLine($"export enum {SafeName(type.FullName.Substring(prefix.Length))} {{");
-                foreach (object val in Enum.GetValues(type))
-                {
-                    _file.WriteLine($"  {val.ToString()} = {(int) val},");
-                }
-                _file.WriteLine($"}}\n");
-                
+
+                ProcessEnum(type);
             }
+        }
+
+        private void ProcessEnum(Type type)
+        {
+            _file.WriteLine($"export enum {SafeName(type.FullName)} {{");
+            foreach (object val in Enum.GetValues(type).OfType<object>().Distinct<object>())
+            {
+                _file.WriteLine($"  {val.ToString()} = {(int) val},");
+            }
+            _file.WriteLine($"}}\n");
         }
     }
 }

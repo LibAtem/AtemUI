@@ -1,3 +1,11 @@
+export enum ProtocolVersion {
+  V7_2 = 131094,
+  V7_X = 131097,
+  V8_0 = 131100,
+  V8_0_1 = 131101,
+  V8_1_1 = 131102,
+}
+
 export enum AudioMixOption {
   Off = 0,
   On = 1,

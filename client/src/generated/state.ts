@@ -90,7 +90,7 @@ export interface SettingsState {
 }
 
 export interface InfoState {
-  version: unknown
+  version: Enums.ProtocolVersion
   timecodeLocked: boolean
   lastTimecode?: Timecode
   model: Enums.ModelId
