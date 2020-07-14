@@ -107,7 +107,7 @@ export function CheckboxInput(props: CheckboxInputProps) {
         type="checkbox"
         disabled={props.disabled}
         checked={props.value}
-        onClick={e => {
+        onChange={e => {
           if (!props.disabled) {
             props.onChange(e.currentTarget.checked)
           }
