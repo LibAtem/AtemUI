@@ -128,7 +128,7 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
 }
 
 export function ToggleButton(props: {
-  label: string
+  label: string | JSX.Element
   active: boolean
   onClick: (val: boolean) => void
   disabled?: boolean

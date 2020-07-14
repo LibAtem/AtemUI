@@ -123,6 +123,7 @@ interface RunButtonProps {
   disabled?: boolean
   active?: boolean
   onClick: () => void
+  style?: React.HTMLAttributes<HTMLDivElement>['style']
 }
 export function RunButton(props: RunButtonProps) {
   let classes = 'ss-run-button'
@@ -132,7 +133,11 @@ export function RunButton(props: RunButtonProps) {
     classes += ' active'
   }
   return (
-    <div style={{ width: '50px' }} onClick={() => (!props.disabled ? props.onClick() : undefined)} className={classes}>
+    <div
+      style={props.style ?? { width: '50px' }}
+      onClick={() => (!props.disabled ? props.onClick() : undefined)}
+      className={classes}
+    >
       {props.label}
     </div>
   )

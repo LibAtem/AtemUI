@@ -6,6 +6,7 @@ import { DveKeyerProperties } from './dve'
 import { TabPanelTab, TabPanel } from '../common'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { ChromaKeyerAdvancedProperties } from './chroma-advanced'
 
 interface UpstreamKeyState {
   open: boolean
@@ -81,8 +82,20 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
             />
           </TabPanelTab>
 
-          <TabPanelTab id={LibAtemEnums.MixEffectKeyType.Chroma} label={'Chroma'} disabled={!this.props.keyer.chroma}>
+          <TabPanelTab
+            id={LibAtemEnums.MixEffectKeyType.Chroma}
+            label={'Chroma'}
+            disabled={!this.props.keyer.chroma && !this.props.keyer.advancedChroma}
+          >
             <ChromaKeyerClassicProperties
+              sendCommand={this.props.sendCommand}
+              meIndex={this.props.meIndex}
+              keyerIndex={this.props.keyerIndex}
+              keyer={this.props.keyer}
+              sources={this.props.sources}
+              videoMode={this.props.videoMode}
+            />
+            <ChromaKeyerAdvancedProperties
               sendCommand={this.props.sendCommand}
               meIndex={this.props.meIndex}
               keyerIndex={this.props.keyerIndex}
