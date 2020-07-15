@@ -1,7 +1,6 @@
 import React from 'react'
 import { CheckboxInput } from '../common'
 import { DecimalWithSliderInput, DecimalInputWithLabel } from '../common/decimal'
-import { REPL_MODE_SLOPPY } from 'repl'
 
 interface MaskPropertiesProps {
   type: 'key' | 'dve' | 'ssrc-box'

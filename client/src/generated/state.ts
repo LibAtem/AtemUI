@@ -609,6 +609,8 @@ export interface InputState_PropertiesState {
   shortName: string
   longName: string
   internalPortType: Enums.InternalPortType
+  sourceAvailability: Enums.SourceAvailability
+  meAvailability: Enums.MeAvailability
   availableExternalPortTypes: Enums.ExternalPortTypeFlags
   currentExternalPortType: Enums.ExternalPortTypeFlags
 }

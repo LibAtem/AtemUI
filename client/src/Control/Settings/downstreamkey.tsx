@@ -1,8 +1,10 @@
-import { RateInput } from '../common'
+import { RateInput, DropdownMenu } from '../common'
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
+import { SourceSelectInput } from '../common/sources'
+import { DropdownMenuItem } from '../common/dropdown-menu'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
@@ -28,58 +30,73 @@ export class DownstreamKeyerSettings extends React.Component<
     }
   }
 
-  private getSourceOptions() {
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
-  getTopBox(index: number) {
+  private getTopBox(index: number) {
     return (
-      <div className="ss-dsk-top">
-        <div className="ss-label">Rate:</div>
-        <div className="ss-rate">
-          <RateInput
-            value={this.props.keyers[index].properties.rate}
-            videoMode={this.props.videoMode}
-            callback={e => {
-              this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', {
-                Index: index,
-                Rate: e
-              })
-            }}
-          />
+      <div>
+        <div className="ss-row">
+          <div className="ss-label">Rate:</div>
+          <div style={{ display: 'grid', gridAutoFlow: 'column' }}>
+            <div className="ss-rate">
+              <RateInput
+                value={this.props.keyers[index].properties.rate}
+                videoMode={this.props.videoMode}
+                callback={e => {
+                  this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', {
+                    Index: index,
+                    Rate: e
+                  })
+                }}
+              />
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuItem
+                onClick={() => {
+                  this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
+                    Index: index,
+                    Mask:
+                      LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskTop |
+                      LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskBottom |
+                      LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskLeft |
+                      LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskRight,
+                    MaskTop: 9,
+                    MaskBottom: -9,
+                    MaskLeft: -16,
+                    MaskRight: 16
+                  })
+                }}
+              >
+                Reset Mask
+              </DropdownMenuItem>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="ss-label">Fill Source:</div>
-        <select
-          onChange={e => {
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={LibAtemEnums.MeAvailability.Me1}
+          value={this.props.keyers[index].sources.fillSource}
+          onChange={e =>
             this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
               Index: index,
-              FillSource: e.currentTarget.value as any
+              FillSource: e
             })
-          }}
-          value={this.props.keyers[index].sources.fillSource}
-          className="ss-dropdown"
-        >
-          {this.getSourceOptions()}
-        </select>
-        <div className="ss-label">Key Source:</div>
-        <select
-          onChange={e => {
+          }
+        />
+        <SourceSelectInput
+          label="Key Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
+          meAvailability={LibAtemEnums.MeAvailability.Me1}
+          value={this.props.keyers[index].sources.cutSource}
+          onChange={e =>
             this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {
               Index: index,
-              CutSource: e.currentTarget.value as any
+              CutSource: e
             })
-          }}
-          value={this.props.keyers[index].sources.cutSource}
-          className="ss-dropdown"
-        >
-          {this.getSourceOptions()}
-        </select>
+          }
+        />
       </div>
     )
   }
@@ -97,6 +114,7 @@ export class DownstreamKeyerSettings extends React.Component<
                 }}
               >
                 {this.getTopBox(i)}
+
                 <MaskProperties
                   type="key"
                   maskEnabled={dsk.properties?.maskEnabled ?? false}

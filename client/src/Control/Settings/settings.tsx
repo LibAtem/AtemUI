@@ -65,8 +65,12 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
       }
     }
 
-    const meProps = this.props.currentState.mixEffects[this.props.meIndex]
+    const meProps = this.props.currentState.mixEffects[this.props.meIndex] as LibAtemState.MixEffectState | undefined
     const videoMode = this.props.currentState.settings.videoMode
+
+    if (!meProps) {
+      return <p>Bad ME</p>
+    }
 
     return (
       <div style={this.props.full ? { height: '100%' } : { overflowY: 'scroll' }} className="ss">

@@ -243,7 +243,10 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
       return <p>Loading state...</p>
     }
 
-    const currentME = currentState.mixEffects[this.props.meIndex]
+    const currentME = currentState.mixEffects[this.props.meIndex] as LibAtemState.MixEffectState | undefined
+    if (!currentME) {
+      return <p>Bad ME</p>
+    }
 
     const sources = compact(
       Object.entries(currentState.settings.inputs).map(([id, src]) => {
