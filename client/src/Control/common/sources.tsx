@@ -1,7 +1,7 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums } from '../../generated'
 
-export function getSourceOptions(
+function getSourceOptions(
   sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>,
   sourceAvailability: LibAtemEnums.SourceAvailability,
   meAvailability: LibAtemEnums.MeAvailability = LibAtemEnums.MeAvailability.None

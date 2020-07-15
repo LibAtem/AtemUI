@@ -2,6 +2,31 @@ import React from 'react'
 import { MaskProperties } from '../common'
 import { LibAtemState, LibAtemCommands } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { DropdownMenuItem } from '../../common/dropdown-menu'
+
+export function ResetKeyerMask(sendCommand: SendCommandStrict, meIndex: number, keyerIndex: number) {
+  return (
+    <DropdownMenuItem
+      onClick={() =>
+        sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyMaskSetCommand', {
+          MixEffectIndex: meIndex,
+          KeyerIndex: keyerIndex,
+          Mask:
+            LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskTop |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskBottom |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskLeft |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyMaskSetCommand_MaskFlags.MaskRight,
+          MaskTop: 9,
+          MaskBottom: -9,
+          MaskLeft: -16,
+          MaskRight: 16
+        })
+      }
+    >
+      Reset Mask
+    </DropdownMenuItem>
+  )
+}
 
 export function KeyerMaskProperties(props: {
   meIndex: number

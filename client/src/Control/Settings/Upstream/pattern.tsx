@@ -1,11 +1,18 @@
 import React from 'react'
-import { Patterns, PatternInfo } from '../../common/patterns'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { KeyerMaskProperties } from './mask'
-import { CheckboxInput } from '../../common'
-import { DecimalWithSliderInput, DecimalInput } from '../../common/decimal'
+import { KeyerMaskProperties, ResetKeyerMask } from './mask'
+import {
+  CheckboxInput,
+  DropdownMenu,
+  SourceSelectInput,
+  DecimalWithSliderInput,
+  DecimalInput,
+  Patterns,
+  PatternInfo
+} from '../../common'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
+import { ResetDVE } from './dve'
 
 interface PatternProps {
   sendCommand: SendCommandStrict
@@ -17,17 +24,6 @@ interface PatternProps {
 }
 
 export class Pattern extends React.Component<PatternProps> {
-  private getSourceOptions() {
-    // TODO - this needs to be corrected
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
   private renderPattern(currentPattern: LibAtemEnums.Pattern, pattern: LibAtemEnums.Pattern) {
     const isCurrent = currentPattern === pattern
     const patternInfo = Patterns[pattern]
@@ -57,26 +53,31 @@ export class Pattern extends React.Component<PatternProps> {
 
     const currentPattern = this.props.keyer.pattern.pattern
     const currentPatternInfo: PatternInfo | undefined = Patterns[currentPattern]
-    // var pattern = this.props.currentState.mixEffects[this.props.mixEffect].keyers[this.props.id].pattern.pattern
+
     return (
       <div>
-        <div className="ss-heading">Settings</div>
-        <div className="ss-row">
-          <div className="ss-label">Fill Source:</div>
-          <select
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                FillSource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.keyer.properties.fillSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
+        <div className="ss-heading">
+          Settings
+          <DropdownMenu resetAll={true}>
+            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+          </DropdownMenu>
         </div>
+
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.keyer.properties.fillSource}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              FillSource: e
+            })
+          }
+        />
 
         <div className="ss-wipe-pattern-holder">
           {Object.keys(Patterns).map(v => this.renderPattern(currentPattern, Number(v)))}

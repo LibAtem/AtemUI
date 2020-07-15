@@ -1,10 +1,9 @@
-import { RateInput, DropdownMenu } from '../common'
+import { RateInput, DropdownMenu, DropdownMenuItem } from '../common'
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 import { SourceSelectInput } from '../common/sources'
-import { DropdownMenuItem } from '../common/dropdown-menu'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict

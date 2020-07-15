@@ -1,10 +1,10 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { KeyerMaskProperties } from './mask'
+import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
-import { DecimalWithSliderInput } from '../../common/decimal'
-import { CheckboxInput } from '../../common'
+import { CheckboxInput, DropdownMenu, DecimalWithSliderInput, SourceSelectInput } from '../../common'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
+import { ResetDVE } from './dve'
 
 interface ChromaKeyerClassicPropertiesProps {
   sendCommand: SendCommandStrict
@@ -16,17 +16,6 @@ interface ChromaKeyerClassicPropertiesProps {
 }
 
 export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerClassicPropertiesProps> {
-  private getSourceOptions() {
-    // TODO - this needs to be corrected
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
   render() {
     if (!this.props.keyer.chroma) {
       return null
@@ -34,23 +23,28 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
 
     return (
       <div>
-        <div className="ss-heading">Settings</div>
-        <div className="ss-row">
-          <div className="ss-label">Fill Source:</div>
-          <select
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                FillSource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.keyer.properties.fillSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
+        <div className="ss-heading">
+          Settings
+          <DropdownMenu resetAll={true}>
+            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+          </DropdownMenu>
         </div>
+
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.keyer.properties.fillSource}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              FillSource: e
+            })
+          }
+        />
 
         <DecimalWithSliderInput
           label="Hue"

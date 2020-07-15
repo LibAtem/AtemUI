@@ -1,10 +1,11 @@
 import React from 'react'
 import { ToggleButton, MaskProperties } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DecimalInput } from '../../common/decimal'
+import { DecimalInput, DropdownMenuItem, DropdownMenu, SourceSelectInput } from '../../common'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { FlyingKeyFrameProperties } from './flying'
 import { BorderProperties, ShadowProperties } from '../border'
+import { ResetKeyerMask } from './mask'
 
 interface DveSubPanelProps {
   sendCommand: SendCommandStrict
@@ -23,42 +24,35 @@ interface DveKeyerPropertiesProps {
 }
 
 export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps> {
-  private getSourceOptions() {
-    // TODO - this needs to be corrected
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
   render() {
-    const keyerProps = this.props.keyer
     if (!this.props.keyer.dve) {
       return <div></div>
     }
 
     return (
       <div>
-        <div className="ss-heading">Settings</div>
-        <div className="ss-row">
-          <div className="ss-label">Fill Source:</div>
-          <select
-            onChange={e =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                FillSource: e.currentTarget.value as any
-              })
-            }
-            value={keyerProps.properties.fillSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
+        <div className="ss-heading">
+          Settings
+          <DropdownMenu resetAll={true}>
+            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+          </DropdownMenu>
         </div>
+
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.keyer.properties.fillSource}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              FillSource: e
+            })
+          }
+        />
 
         <DVECommonProprties
           sendCommand={this.props.sendCommand}
@@ -103,6 +97,70 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
       </div>
     )
   }
+}
+
+export function ResetDVE(sendCommand: SendCommandStrict, meIndex: number, keyerIndex: number) {
+  return [
+    <DropdownMenuItem
+      key="dve"
+      onClick={() =>
+        sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          KeyerIndex: keyerIndex,
+          MixEffectIndex: meIndex,
+          Mask:
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeX |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeY |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionX |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionY |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+          SizeX: 0.5,
+          SizeY: 0.5,
+          PositionX: 0,
+          PositionY: 0,
+          Rotation: 0
+        })
+      }
+    >
+      Reset DVE
+    </DropdownMenuItem>,
+    <DropdownMenuItem
+      key="dve-full"
+      skipInAll={true}
+      onClick={() =>
+        sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          KeyerIndex: keyerIndex,
+          MixEffectIndex: meIndex,
+          Mask:
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeX |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.SizeY |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionX |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.PositionY |
+            LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+          SizeX: 1,
+          SizeY: 1,
+          PositionX: 0,
+          PositionY: 0,
+          Rotation: 0
+        })
+      }
+    >
+      Reset DVE Full
+    </DropdownMenuItem>,
+    <DropdownMenuItem
+      key="rotation"
+      skipInAll={true}
+      onClick={() =>
+        sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+          KeyerIndex: keyerIndex,
+          MixEffectIndex: meIndex,
+          Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rotation,
+          Rotation: 0
+        })
+      }
+    >
+      Reset Rotation
+    </DropdownMenuItem>
+  ]
 }
 
 export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean }) {

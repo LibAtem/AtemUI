@@ -2,8 +2,10 @@ import React from 'react'
 import { PreMultipliedKeyProperties } from '../common'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { KeyerMaskProperties } from './mask'
+import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
+import { DropdownMenu, SourceSelectInput } from '../../common'
+import { ResetDVE } from './dve'
 
 interface LumaKeyerSettingsProps {
   sendCommand: SendCommandStrict
@@ -15,17 +17,6 @@ interface LumaKeyerSettingsProps {
 }
 
 export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
-  private getSourceOptions() {
-    // TODO - this needs to be corrected
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
   render() {
     if (!this.props.keyer.luma) {
       return null
@@ -33,40 +24,42 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
 
     return (
       <div>
-        <div className="ss-heading">Settings</div>
-        <div className="ss-row">
-          <div className="ss-label">Fill Source:</div>
-          <select
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                FillSource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.keyer.properties.fillSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
+        <div className="ss-heading">
+          Settings
+          <DropdownMenu resetAll={true}>
+            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+          </DropdownMenu>
         </div>
 
-        <div className="ss-row">
-          <div className="ss-label">Key Source:</div>
-          <select
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                CutSource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.keyer.properties.cutSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
-        </div>
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.keyer.properties.fillSource}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              FillSource: e
+            })
+          }
+        />
+        <SourceSelectInput
+          label="Key Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.keyer.properties.cutSource}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
+              MixEffectIndex: this.props.meIndex,
+              KeyerIndex: this.props.keyerIndex,
+              CutSource: e
+            })
+          }
+        />
 
         <KeyerMaskProperties
           meIndex={this.props.meIndex}
