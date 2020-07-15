@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput } from '../../common'
+import { RateInput, SourceSelectInput } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface DipTransitionSettingsProps {
@@ -10,17 +10,6 @@ interface DipTransitionSettingsProps {
   dip: LibAtemState.MixEffectState_TransitionDipState
   sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
   videoMode: LibAtemEnums.VideoMode
-}
-
-function getSourceOptions(props: DipTransitionSettingsProps) {
-  // TODO - this needs to be corrected
-  return Array.from(props.sources.entries())
-    .filter(([i]) => i < 4000)
-    .map(([i, v]) => (
-      <option key={i} value={i}>
-        {v.longName}
-      </option>
-    ))
 }
 
 export function DipTransitionSettings(props: DipTransitionSettingsProps) {
@@ -42,22 +31,21 @@ export function DipTransitionSettings(props: DipTransitionSettingsProps) {
           />
         </div>
       </div>
-      <div className="ss-row">
-        <div className="ss-label">Dip Source:</div>
-        <select
-          onChange={e => {
-            props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
-              Index: props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Input,
-              Input: e.currentTarget.value as any
-            })
-          }}
-          value={props.dip.input}
-          className="ss-dropdown"
-        >
-          {getSourceOptions(props)}
-        </select>
-      </div>
+
+      <SourceSelectInput
+        label="Dip Source"
+        sources={props.sources}
+        sourceAvailability={LibAtemEnums.SourceAvailability.None}
+        meAvailability={props.meIndex + 1}
+        value={props.dip.input}
+        onChange={e =>
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Input,
+            Input: e
+          })
+        }
+      />
     </React.Fragment>
   )
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput } from '../../common'
+import { RateInput, SelectInput } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { PreMultipliedKeyProperties } from '../common'
 
@@ -14,34 +14,26 @@ interface StingerTransitionSettingsProps {
 }
 
 function getMediaPlayerOptions(props: StingerTransitionSettingsProps) {
-  return Array.from(props.sources.entries())
-    .filter(([i, v]) => v.internalPortType === LibAtemEnums.InternalPortType.MediaPlayerFill)
-    .map(([i, v], x) => (
-      <option key={i} value={x + 1}>
-        {v.longName}
-      </option>
-    ))
+  return Array.from(props.sources.values())
+    .filter(v => v.internalPortType === LibAtemEnums.InternalPortType.MediaPlayerFill)
+    .map((v, x) => ({ id: x + 1, label: v.longName }))
 }
 
 export function StingerTransitionSettings(props: StingerTransitionSettingsProps) {
   return (
     <React.Fragment>
-      <div className="ss-row">
-        <div className="ss-label">Source:</div>
-        <select
-          onChange={e => {
-            props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-              Index: props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Source,
-              Source: e.currentTarget.value as any
-            })
-          }}
-          value={props.stinger.source}
-          className="ss-dropdown"
-        >
-          {getMediaPlayerOptions(props)}
-        </select>
-      </div>
+      <SelectInput
+        label="Source"
+        value={props.stinger.source}
+        options={getMediaPlayerOptions(props)}
+        onChange={v =>
+          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+            Index: props.meIndex,
+            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Source,
+            Source: v
+          })
+        }
+      />
 
       <div className="ss-row">
         <div className="ss-label">Clip Duration:</div>{' '}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar, CheckboxInput } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'
@@ -37,17 +37,6 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
       Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Style,
       Style: style
     })
-  }
-
-  private getSourceOptions() {
-    // TODO - this needs to be corrected
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
   }
 
   render() {
@@ -175,23 +164,21 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           />
         </div>
 
-        <div className="ss-row">
-          <div className={!isGraphics ? 'ss-label disabled' : 'ss-label'}>Fill Source:</div>
-          <select
-            disabled={!isGraphics}
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FillSource,
-                FillSource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.dve.fillSource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
-        </div>
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.dve.fillSource}
+          disabled={!isGraphics}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FillSource,
+              FillSource: e
+            })
+          }
+        />
 
         <CheckboxInput
           label="Enable Key"
@@ -206,23 +193,21 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           }
         />
 
-        <div className="ss-row">
-          <div className={!isGraphics || !this.props.dve.enableKey ? 'ss-label disabled' : 'ss-label'}>Key Source:</div>
-          <select
-            disabled={!isGraphics || !this.props.dve.enableKey}
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.KeySource,
-                KeySource: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.dve.keySource}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
-        </div>
+        <SourceSelectInput
+          label="Key Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.dve.keySource}
+          disabled={!isGraphics || !this.props.dve.enableKey}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.KeySource,
+              KeySource: e
+            })
+          }
+        />
 
         <PreMultipliedKeyProperties
           disabled={!isGraphics || !this.props.dve.enableKey}

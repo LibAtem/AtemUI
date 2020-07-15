@@ -1,5 +1,5 @@
 import React from 'react'
-import { AtemButtonBar, RateInput, CheckboxInput } from '../../common'
+import { AtemButtonBar, RateInput, CheckboxInput, SourceSelectInput } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
@@ -17,16 +17,6 @@ interface WipeProps {
 }
 
 export class WipeTransitionSettings extends React.Component<WipeProps> {
-  private getSourceOptions() {
-    return Array.from(this.props.sources.entries())
-      .filter(([i]) => i < 4000)
-      .map(([i, v]) => (
-        <option key={i} value={i}>
-          {v.longName}
-        </option>
-      ))
-  }
-
   private renderPattern(pattern: LibAtemEnums.Pattern) {
     const isCurrent = this.props.wipe.pattern === pattern
     const patternInfo = Patterns[pattern]
@@ -190,23 +180,21 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
           value={this.props.wipe.borderWidth}
         />
 
-        <div className="ss-row">
-          <div className={this.props.wipe.borderWidth === 0 ? 'ss-label disabled' : 'ss-label'}>Fill Source:</div>
-          <select
-            disabled={this.props.wipe.borderWidth === 0}
-            onChange={e => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                Index: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderInput,
-                BorderInput: e.currentTarget.value as any
-              })
-            }}
-            value={this.props.wipe.borderInput}
-            className="ss-dropdown"
-          >
-            {this.getSourceOptions()}
-          </select>
-        </div>
+        <SourceSelectInput
+          label="Fill Source"
+          sources={this.props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.None}
+          meAvailability={this.props.meIndex + 1}
+          value={this.props.wipe.borderInput}
+          disabled={this.props.wipe.borderWidth === 0}
+          onChange={e =>
+            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+              Index: this.props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderInput,
+              BorderInput: e
+            })
+          }
+        />
       </div>
     )
   }
