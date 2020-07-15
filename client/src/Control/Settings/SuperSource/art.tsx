@@ -1,20 +1,9 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../../generated'
-import { SelectInput } from '../../common'
+import { SelectInput, SourceSelectInput } from '../../common'
 import { PreMultipliedKeyProperties } from '../common'
 import { BorderProperties, ShadowProperties } from '../border'
-
-function getSourceOptions(sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>) {
-  // TODO - this needs to be corrected
-  return Array.from(sources.entries())
-    .filter(([i]) => i < 4000)
-    .map(([i, v]) => (
-      <option key={i} value={i}>
-        {v.longName}
-      </option>
-    ))
-}
 
 const ArtOptions = [
   {
@@ -56,39 +45,34 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         }
       />
 
-      <div className="ss-row">
-        <div className={'ss-label'}>Fill Source:</div>
-        <select
-          onChange={e =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
-              ArtFillSource: e.currentTarget.value as any
-            })
-          }
-          value={props.ssrcProps.artFillSource}
-          className="ss-dropdown"
-        >
-          {getSourceOptions(props.sources)}
-        </select>
-      </div>
-      <div className="ss-row">
-        <div className={!artKeyEnabled ? 'ss-label disabled' : 'ss-label'}>Key Source:</div>
-        <select
-          disabled={!artKeyEnabled}
-          onChange={e =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
-              ArtCutSource: e.currentTarget.value as any
-            })
-          }
-          value={props.ssrcProps.artCutSource}
-          className="ss-dropdown"
-        >
-          {getSourceOptions(props.sources)}
-        </select>
-      </div>
+      <SourceSelectInput
+        label="Fill Source"
+        sources={props.sources}
+        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt}
+        value={props.ssrcProps.artFillSource}
+        onChange={e =>
+          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+            SSrcId: props.index,
+            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
+            ArtFillSource: e
+          })
+        }
+      />
+
+      <SourceSelectInput
+        label="Key Source"
+        sources={props.sources}
+        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt | LibAtemEnums.SourceAvailability.KeySource}
+        value={props.ssrcProps.artCutSource}
+        disabled={!artKeyEnabled}
+        onChange={e =>
+          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+            SSrcId: props.index,
+            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
+            ArtCutSource: e
+          })
+        }
+      />
 
       <PreMultipliedKeyProperties
         disabled={!artKeyEnabled}

@@ -2,22 +2,12 @@ import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { ToggleButton, MaskProperties } from '../common'
-import { DecimalInput } from '../../common'
+import { DecimalInput, SourceSelectInput } from '../../common'
 
 interface SuperSourcePropertiesSettingsProps {
   sendCommand: SendCommandStrict
   index: number
   version: LibAtemEnums.ProtocolVersion | undefined
-}
-
-function getSourceOptions(sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>) {
-  return Array.from(sources.entries())
-    .filter(([i]) => i < 4000)
-    .map(([i, v]) => (
-      <option key={i} value={i}>
-        {v.longName}
-      </option>
-    ))
 }
 
 export function SuperSourcePropertiesSettings(props: SuperSourcePropertiesSettingsProps) {
@@ -59,24 +49,21 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
         }
       />
 
-      <div className="ss-row">
-        <div className={`ss-label ${!props.boxProps.enabled ? 'disabled' : ''}`}>Source:</div>
-        <select
-          disabled={!props.boxProps.enabled}
-          onChange={e => {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
-              Source: e.currentTarget.value as any
-            })
-          }}
-          value={props.boxProps.source}
-          className="ss-dropdown"
-        >
-          {getSourceOptions(props.sources)}
-        </select>
-      </div>
+      <SourceSelectInput
+        label="Source"
+        sources={props.sources}
+        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceBox}
+        value={props.boxProps.source}
+        disabled={!props.boxProps.enabled}
+        onChange={e =>
+          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+            SSrcId: props.index,
+            BoxIndex: props.boxIndex,
+            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
+            Source: e
+          })
+        }
+      />
 
       <div className="ss-row xy">
         <div style={{ minWidth: '50px' }} className={`ss-label ${!props.boxProps.enabled ? 'disabled' : ''}`}>

@@ -10,8 +10,8 @@ function getSourceOptions(
     .filter(
       ([i, v]) =>
         (sourceAvailability === LibAtemEnums.SourceAvailability.None ||
-          (v.sourceAvailability & sourceAvailability) > 0) &&
-        (meAvailability === LibAtemEnums.MeAvailability.None || (v.meAvailability & meAvailability) > 0)
+          (v.sourceAvailability & sourceAvailability) === sourceAvailability) &&
+        (meAvailability === LibAtemEnums.MeAvailability.None || (v.meAvailability & meAvailability) === meAvailability)
     )
     .sort((a, b) => a[0] - b[0])
     .map(([i, v]) => (
