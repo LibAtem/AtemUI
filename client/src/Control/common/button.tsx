@@ -49,8 +49,8 @@ export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
 }
 
 interface AtemButtonBarProps<T> {
-  style?: React.HTMLAttributes<HTMLDivElement>['style']
-  innerStyle?: React.HTMLAttributes<HTMLDivElement>['style']
+  style?: React.CSSProperties
+  innerStyle?: React.CSSProperties
   selected: T
   disabled?: boolean
   options: Array<{
@@ -123,7 +123,7 @@ interface RunButtonProps {
   disabled?: boolean
   active?: boolean
   onClick: () => void
-  style?: React.HTMLAttributes<HTMLDivElement>['style']
+  style?: React.CSSProperties
 }
 export function RunButton(props: RunButtonProps) {
   let classes = 'ss-run-button'

@@ -2,7 +2,8 @@ import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { ToggleButton, MaskProperties } from '../common'
-import { DecimalInput, SourceSelectInput } from '../../common'
+import { DecimalInput, SourceSelectInput, DropdownMenu, DropdownMenuItem } from '../../common'
+import { Layouts } from './layouts'
 
 interface SuperSourcePropertiesSettingsProps {
   sendCommand: SendCommandStrict
@@ -10,16 +11,22 @@ interface SuperSourcePropertiesSettingsProps {
   version: LibAtemEnums.ProtocolVersion | undefined
 }
 
-export function SuperSourcePropertiesSettings(props: SuperSourcePropertiesSettingsProps) {
-  // TODO - protcol version support
+export class SuperSourcePropertiesSettings extends React.PureComponent<SuperSourcePropertiesSettingsProps> {
+  render() {
+    return (
+      <div>
+        <div className="ss-heading">Layout</div>
 
-  return (
-    <div>
-      <div className="ss-heading">Layout</div>
-      {/* TODO */}
-      <div className="ss-heading">TODO</div>
-    </div>
-  )
+        <div className="ss-ssrc-layout-grid">
+          {Layouts.map((l, i) => (
+            <div key={i} onClick={() => l.apply(this.props.sendCommand, this.props.version, this.props.index)}>
+              {l.icon()}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 }
 
 interface SuperSourceBoxSettingsProps {
@@ -36,18 +43,69 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
 
   return (
     <div>
-      <ToggleButton
-        label="Enable box"
-        active={props.boxProps.enabled}
-        onClick={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Enabled,
-            Enabled: v
-          })
-        }
-      />
+      <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
+        <ToggleButton
+          label="Enable box"
+          active={props.boxProps.enabled}
+          onClick={v =>
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Enabled,
+              Enabled: v
+            })
+          }
+        />
+
+        <DropdownMenu style={{ margin: '10px 10px 0' }} resetAll={true}>
+          <DropdownMenuItem
+            onClick={() =>
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask:
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX |
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
+                PositionX: 0,
+                PositionY: 0
+              })
+            }
+          >
+            Reset Pos
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
+                Size: 0.5
+              })
+            }
+          >
+            Reset Size
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask:
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop |
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom |
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft |
+                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
+                CropTop: 0,
+                CropBottom: 0,
+                CropLeft: 0,
+                CropRight: 0
+              })
+            }
+          >
+            Reset Crop
+          </DropdownMenuItem>
+        </DropdownMenu>
+      </div>
 
       <SourceSelectInput
         label="Source"

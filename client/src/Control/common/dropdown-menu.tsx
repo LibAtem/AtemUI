@@ -7,12 +7,13 @@ import { DropdownItemProps } from 'react-bootstrap/esm/DropdownItem'
 interface DropdownMenuProps {
   resetAll?: boolean
   className?: string
+  style?: React.CSSProperties
 }
 
 export class DropdownMenu extends React.Component<DropdownMenuProps> {
   render() {
     return (
-      <Dropdown className={`right ${this.props.className ?? ''}`}>
+      <Dropdown className={`right ${this.props.className ?? ''}`} style={this.props.style}>
         <Dropdown.Toggle variant="reset">
           <FontAwesomeIcon icon={faBars} />
         </Dropdown.Toggle>

@@ -796,3 +796,27 @@ input[type='number'] {
     }
   }
 }
+
+.ss-ssrc-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 5px;
+  column-gap: 5px;
+  margin: 0 40px;
+
+  >div {
+    background: #2c2c2c;
+    background: linear-gradient(0deg, rgba(35, 35, 35, 1) 0%, rgba(44, 44, 44, 1) 60%, rgb(46, 46, 46) 93%);
+    color: #858585;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #1a1a1a;
+
+    padding: 1px;
+    // padding-top: 56.25%;
+
+    &:active {
+      background: linear-gradient(0deg, rgb(27, 27, 27) 0%, rgb(32, 32, 32) 60%, rgb(34, 34, 34) 93%);
+    }
+  }
+}
