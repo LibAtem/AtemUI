@@ -8,11 +8,15 @@ interface SuperSourceLayoutInfo {
   apply: (sendCommand: SendCommandStrict, version: ProtocolVersion | undefined, index: number) => void
 }
 
-function setBoxProps(
+export type BoxPropsValues = Omit<
+  Required<LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command>,
+  'Mask' | 'Source' | 'SSrcId'
+>
+export function setBoxProps(
   sendCommand: SendCommandStrict,
   version: ProtocolVersion | undefined,
   index: number,
-  props: Omit<Required<LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command>, 'Mask' | 'Source' | 'SSrcId'>
+  props: BoxPropsValues
 ) {
   if (!version || version >= LibAtemEnums.ProtocolVersion.V8_0) {
     sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {

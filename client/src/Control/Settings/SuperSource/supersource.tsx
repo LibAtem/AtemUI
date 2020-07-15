@@ -5,6 +5,7 @@ import { TabPanelTab, TabPanel } from '../common'
 import { SuperSourceArtSettings } from './art'
 import { SuperSourcePropertiesSettings, SuperSourceBoxSettings } from './properties'
 import { SourcesMap } from '../../common'
+import { SuperSourceBoxCopySettings } from './copy'
 
 interface SuperSourceSettingsProps {
   sendCommand: SendCommandStrict
@@ -77,17 +78,13 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
                 version={this.props.version}
               />
             </TabPanelTab>
-            <TabPanelTab id={2} label={'Copy'} disabled={true}>
-              {/* {this.props.transition.mix ? (
-                  <MixTransitionSettings
-                    sendCommand={this.props.sendCommand}
-                    meIndex={this.props.meIndex}
-                    mix={this.props.transition.mix}
-                    videoMode={this.props.videoMode}
-                  />
-                ) : (
-                  undefined
-                )} */}
+            <TabPanelTab id={2} label={'Copy'}>
+              <SuperSourceBoxCopySettings
+                sendCommand={this.props.sendCommand}
+                index={this.props.index}
+                boxProps={this.props.ssrcProps.boxes}
+                version={this.props.version}
+              />
             </TabPanelTab>
           </TabPanel>
         ) : (

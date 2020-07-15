@@ -820,3 +820,36 @@ input[type='number'] {
     }
   }
 }
+
+.ss-ssrc-copy-boxes {
+  display: grid;
+  grid-template-columns: 1fr 10px 1fr;
+  column-gap: 5px;
+  padding: 0 1rem;
+
+  .ss-heading {
+    font-size: 13px;
+  }
+
+  svg {
+    height: 100%;
+    color: #858585;
+    font-size: 13px;
+  }
+
+  .ss-boxes-option-group {
+    display: grid;
+    grid-auto-flow: row;
+
+    border: 1px solid #858585;
+    border-radius: 5px;
+
+    padding: 0.5rem
+  }
+
+  .ss-run-button {
+    margin: 10px 0;
+    float: right;
+  }
+
+}
