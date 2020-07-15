@@ -1,6 +1,11 @@
 import React from 'react'
-import { CheckboxInput } from '../common'
-import { DecimalWithSliderInput, DecimalInputWithLabel } from '../common/decimal'
+import {
+  CheckboxInput2,
+  ToggleButton2,
+  DecimalWithSliderInput2,
+  DecimalWithSliderInput,
+  DecimalInputWithLabel
+} from '../common'
 
 interface MaskPropertiesProps {
   type: 'key' | 'dve' | 'ssrc-box'
@@ -27,8 +32,8 @@ export function MaskProperties(props: MaskPropertiesProps) {
   const maxX = props.type === 'dve' ? 53 : props.type === 'ssrc-box' ? 32 : 16
 
   return (
-    <div className="ss-mask-box">
-      <ToggleButton
+    <div className="atem-form">
+      <ToggleButton2
         label={props.type === 'ssrc-box' ? 'Crop' : 'Mask'}
         active={props.maskEnabled}
         disabled={props.disabled}
@@ -95,15 +100,15 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
   const disableControls = props.enabled || props.disabled
 
   return (
-    <div className="ss-pmk">
-      <ToggleButton
+    <div className="atem-form">
+      <ToggleButton2
         disabled={props.disabled}
         active={props.enabled}
         label={'Pre Multiplied Key'}
         onClick={() => props.setEnabled(!props.enabled)}
       />
 
-      <DecimalWithSliderInput
+      <DecimalWithSliderInput2
         disabled={disableControls}
         label="Clip"
         value={props.clip}
@@ -113,7 +118,7 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
         onChange={e => props.setClip(e)}
       />
 
-      <DecimalWithSliderInput
+      <DecimalWithSliderInput2
         disabled={disableControls}
         label="Gain"
         value={props.gain}
@@ -123,9 +128,10 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
         onChange={e => props.setGain(e)}
       />
 
-      <CheckboxInput
+      <CheckboxInput2
         label="Invert"
         disabled={disableControls}
+        style={{ gridColumn: 'span 2' }}
         value={props.invert}
         onChange={e => props.setInvert(e)}
       />
@@ -187,7 +193,7 @@ export class TabPanel extends React.Component<TabPanelProps> {
               })}
         </div>
 
-        {children.find(ch => ch.props.id === this.props.page && !ch.props.disabled)}
+        <div>{children.find(ch => ch.props.id === this.props.page && !ch.props.disabled)}</div>
       </div>
     )
   }

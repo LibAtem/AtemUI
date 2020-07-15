@@ -3,10 +3,10 @@ import {
   AtemButtonBar,
   RateInput,
   CheckboxInput,
-  SourceSelectInput,
   SourcesMap,
-  DecimalWithSliderInput,
-  DecimalInput
+  DecimalInput,
+  DecimalWithSliderInput2,
+  SourceSelectInput2
 } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
@@ -52,8 +52,8 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
       <div>
         <div className="ss-wipe-pattern-holder">{Object.keys(Patterns).map(v => this.renderPattern(Number(v)))}</div>
 
-        <div className="ss-row" style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <div className="ss-label">Rate:</div>
+        <div className="atem-form no-border">
+          <div className="atem-label">Rate:</div>
           <div className="ss-rate">
             <RateInput
               videoMode={this.props.videoMode}
@@ -67,141 +67,141 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
               }
             />
           </div>
-        </div>
 
-        <DecimalWithSliderInput
-          label={'Symmetry'}
-          disabled={!currentPatternInfo?.symmetry}
-          value={this.props.wipe.symmetry}
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
-              Symmetry: e
-            })
-          }
-        />
-
-        <div className="ss-row xy">
-          <div className="ss-label">Position:</div>
-          <div className={currentPatternInfo?.x ? 'ss-label right' : 'ss-label disabled right'}>X:</div>
-          <DecimalInput
-            step={0.0001}
+          <DecimalWithSliderInput2
+            label={'Symmetry'}
+            disabled={!currentPatternInfo?.symmetry}
+            value={this.props.wipe.symmetry}
+            step={0.1}
             min={0}
-            max={1}
-            disabled={!currentPatternInfo?.x}
-            value={this.props.wipe.xPosition}
-            onChange={value =>
+            max={100}
+            onChange={e =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                 Index: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.XPosition,
-                XPosition: value
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Symmetry,
+                Symmetry: e
               })
             }
           />
-          <div className={currentPatternInfo?.y ? 'ss-label right' : 'ss-label disabled right'}>Y:</div>
-          <DecimalInput
-            step={0.0001}
-            min={0}
-            max={1}
-            disabled={!currentPatternInfo?.y}
-            value={this.props.wipe.yPosition}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-                Index: this.props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.YPosition,
-                YPosition: value
-              })
-            }
-          />
-        </div>
 
-        <div className="ss-row" style={{ gridTemplateColumns: '1fr 1fr 1.5fr' }}>
-          <div className="ss-label">Direction:</div>
-          <AtemButtonBar
-            innerStyle={{ lineHeight: '25px' }}
-            options={[
-              {
-                label: <FontAwesomeIcon icon={faAngleRight} />,
-                value: false
-              },
-              {
-                label: <FontAwesomeIcon icon={faAngleLeft} />,
-                value: true
+          <div className="atem-label">Position:</div>
+          <div className="content-xy">
+            <div className={currentPatternInfo?.x ? 'atem-label right' : 'atem-label disabled right'}>X:</div>
+            <DecimalInput
+              step={0.0001}
+              min={0}
+              max={1}
+              disabled={!currentPatternInfo?.x}
+              value={this.props.wipe.xPosition}
+              onChange={value =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                  Index: this.props.meIndex,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.XPosition,
+                  XPosition: value
+                })
               }
-            ]}
-            selected={this.props.wipe.reverseDirection}
-            onChange={v => {
+            />
+            <div className={currentPatternInfo?.y ? 'atem-label right' : 'atem-label disabled right'}>Y:</div>
+            <DecimalInput
+              step={0.0001}
+              min={0}
+              max={1}
+              disabled={!currentPatternInfo?.y}
+              value={this.props.wipe.yPosition}
+              onChange={value =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                  Index: this.props.meIndex,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.YPosition,
+                  YPosition: value
+                })
+              }
+            />
+          </div>
+
+          <div className="atem-label">Direction:</div>
+          <div className="content-split">
+            <AtemButtonBar
+              innerStyle={{ lineHeight: '25px', fontSize: '16px' }}
+              options={[
+                {
+                  label: <FontAwesomeIcon icon={faAngleRight} style={{ width: '20px' }} />,
+                  value: false
+                },
+                {
+                  label: <FontAwesomeIcon icon={faAngleLeft} />,
+                  value: true
+                }
+              ]}
+              selected={this.props.wipe.reverseDirection}
+              onChange={v => {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                  Index: this.props.meIndex,
+                  ReverseDirection: v,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.ReverseDirection
+                })
+              }}
+            />
+
+            <CheckboxInput
+              label="Flip Flop"
+              value={this.props.wipe.flipFlop}
+              onChange={v =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                  Index: this.props.meIndex,
+                  FlipFlop: v,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.FlipFlop
+                })
+              }
+            />
+          </div>
+
+          <div className="atem-heading">Border</div>
+          <DecimalWithSliderInput2
+            label="Softness"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                 Index: this.props.meIndex,
-                ReverseDirection: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.ReverseDirection
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
+                BorderSoftness: e
               })
-            }}
+            }
+            value={this.props.wipe.borderSoftness}
           />
 
-          <CheckboxInput
-            label="Flip Flop"
-            value={this.props.wipe.flipFlop}
-            onChange={v =>
+          <DecimalWithSliderInput2
+            label="Width"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
                 Index: this.props.meIndex,
-                FlipFlop: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.FlipFlop
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
+                BorderWidth: e
+              })
+            }
+            value={this.props.wipe.borderWidth}
+          />
+
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.wipe.borderInput}
+            disabled={this.props.wipe.borderWidth === 0}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
+                Index: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderInput,
+                BorderInput: e
               })
             }
           />
         </div>
-
-        <div className="ss-heading">Border</div>
-        <DecimalWithSliderInput
-          label="Softness"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderSoftness,
-              BorderSoftness: e
-            })
-          }
-          value={this.props.wipe.borderSoftness}
-        />
-
-        <DecimalWithSliderInput
-          label="Width"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderWidth,
-              BorderWidth: e
-            })
-          }
-          value={this.props.wipe.borderWidth}
-        />
-
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.wipe.borderInput}
-          disabled={this.props.wipe.borderWidth === 0}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.BorderInput,
-              BorderInput: e
-            })
-          }
-        />
       </div>
     )
   }

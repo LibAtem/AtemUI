@@ -1,17 +1,18 @@
 import React from 'react'
-import './settings.css'
+import './settings.scss'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import { Container, ButtonGroup, Button, Form, Row, Col, Nav } from 'react-bootstrap'
-import { prettyDecimal } from '../util'
-import Slider from 'react-rangeslider'
+import { Container, ButtonGroup, Button, Form, Row, Col } from 'react-bootstrap'
 import multiview1 from './assets/multiview1.svg'
 import multiview2 from './assets/multiview2.svg'
 import multiview3 from './assets/multiview3.svg'
 import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
 import { LibAtemState, LibAtemProfile } from '../generated'
-import { sendCommand } from '../device-page-wrapper'
+import { sendCommand, sendCommandStrict } from '../device-page-wrapper'
+import { AtemButtonBar } from '../Control/common'
+import { GeneralSettings } from './general'
+import { CommandTypes } from '../generated/commands'
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -22,22 +23,51 @@ export class ControlSettingsPage extends React.Component {
     const device = GetActiveDevice(this.context)
 
     return (
-      <Container>
-        {device && this.context.signalR ? (
-          <ControlSettingsPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            currentState={this.context.currentState}
-            currentProfile={this.context.currentProfile}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
-      </Container>
+      <div className="settings-page">
+        <Container>
+          {device && this.context.signalR ? (
+            <ControlSettingsPageInner
+              key={this.context.activeDeviceId || ''}
+              device={device}
+              currentState={this.context.currentState}
+              currentProfile={this.context.currentProfile}
+              signalR={this.context.signalR}
+            />
+          ) : (
+            <p>No device selected</p>
+          )}
+        </Container>
+      </div>
     )
   }
 }
+
+const NavOptions = [
+  {
+    value: 0,
+    label: 'General'
+  },
+  {
+    value: 1,
+    label: 'Audio'
+  },
+  {
+    value: 2,
+    label: 'Multi View'
+  },
+  {
+    value: 3,
+    label: 'Labels'
+  },
+  {
+    value: 4,
+    label: 'HyperDeck'
+  },
+  {
+    value: 5,
+    label: 'Remote'
+  }
+]
 
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
@@ -52,13 +82,19 @@ interface ControlSettingsPageInnerState {
 }
 
 class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerProps, ControlSettingsPageInnerState> {
-  state = {
-    hasConnected: this.props.device.connected,
-    page: 0,
+  constructor(props: ControlSettingsPageInnerProps) {
+    super(props)
+
+    this.state = {
+      hasConnected: this.props.device.connected,
+      page: 0
+    }
+
+    this.sendCommand = this.sendCommand.bind(this)
   }
 
-  public sendCommand(command: string, value: any) {
-    sendCommand(this.props, command, value)
+  private sendCommand(...args: CommandTypes) {
+    sendCommandStrict(this.props, ...args)
   }
 
   public updateLabel(name: string, id: number) {
@@ -94,388 +130,64 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
   render() {
     const { device, currentState } = this.props
-    const { hasConnected  } = this.state
+    const { hasConnected } = this.state
 
     if (!hasConnected) {
       return <p className="mt-5">Device is not connected</p>
     } else if (!currentState) {
       return <p className="mt-5">Loading state...</p>
     }
-    var content = <></>
-    if (this.state.page == 0) {
-      content = (
-        <GeneralSettings
-          key={this.context.activeDeviceId || ''}
-          device={device}
-          currentState={currentState}
-          signalR={this.props.signalR}
-          currentProfile={this.props.currentProfile}
-        />
-      )
-    } else if (this.state.page == 2) {
-      content = (
-        <MultiViewSettings
-          key={this.context.activeDeviceId || ''}
-          device={device}
-          currentState={currentState}
-          signalR={this.props.signalR}
-          currentProfile={this.props.currentProfile}
-        />
-      )
-    } else if (this.state.page == 3) {
-      content = (
-        <LabelSettings
-          key={this.context.activeDeviceId || ''}
-          device={device}
-          currentState={currentState}
-          signalR={this.props.signalR}
-          currentProfile={this.props.currentProfile}
-          sendCommand={this.sendCommand}
-          updateLabel={this.updateLabel}
-        />
-      )
-    }
 
     return (
-      <div>
-        <Nav justify className="mt-5" variant="pills" defaultActiveKey="/home">
-          <Nav.Item onClick={() => this.setState({ page: 0 })}>
-            <Nav.Link eventKey="link-1">General</Nav.Link>
-          </Nav.Item>
-          <Nav.Item onClick={() => this.setState({ page: 1 })}>
-            <Nav.Link eventKey="link-2">Audio</Nav.Link>
-          </Nav.Item>
-          <Nav.Item onClick={() => this.setState({ page: 2 })}>
-            <Nav.Link eventKey="link-3">Multi View</Nav.Link>
-          </Nav.Item>
-          <Nav.Item onClick={() => this.setState({ page: 3 })}>
-            <Nav.Link eventKey="link-4">Labels</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-5">HyperDeck</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-6">Remote</Nav.Link>
-          </Nav.Item>
-        </Nav>
+      <div className="settings-content">
+        <AtemButtonBar
+          selected={this.state.page}
+          options={NavOptions}
+          onChange={newPage => this.setState({ page: newPage })}
+        />
 
-        {content}
+        {this.state.page === 0 ? (
+          <GeneralSettings
+            sendCommand={this.sendCommand}
+            device={device}
+            currentState={currentState}
+            signalR={this.props.signalR}
+            currentProfile={this.props.currentProfile}
+          />
+        ) : (
+          undefined
+        )}
+
+        {/* TODO Audio */}
+
+        {this.state.page === 2 ? (
+          <MultiViewSettings
+            device={device}
+            currentState={currentState}
+            signalR={this.props.signalR}
+            currentProfile={this.props.currentProfile}
+          />
+        ) : (
+          undefined
+        )}
+
+        {this.state.page === 3 ? (
+          <LabelSettings
+            device={device}
+            currentState={currentState}
+            signalR={this.props.signalR}
+            currentProfile={this.props.currentProfile}
+            sendCommand={this.sendCommand}
+            updateLabel={this.updateLabel}
+          />
+        ) : (
+          undefined
+        )}
+
+        {/* TODO HyperDeck */}
+
+        {/* TODO Remote */}
       </div>
-    )
-  }
-}
-
-interface GeneralSettingsProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
-}
-interface GeneralSettingsState {
-  hasConnected: boolean
-  currentState: any
-  videoMode: number
-  multiViewMode: number
-  downConvertMode: number
-  clip1Length: number
-  clip2Length: number
-}
-
-class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSettingsState> {
-  constructor(props: GeneralSettingsProps) {
-    super(props)
-    this.state = {
-      hasConnected: props.device.connected,
-      currentState: props.currentState,
-      videoMode: props.currentState.settings.videoMode,
-      multiViewMode: 0, //Set all of the bellow to the correct value
-      downConvertMode: 0,
-      clip1Length: props.currentState.mediaPool.clips[0].maxFrames,
-      clip2Length: props.currentState.mediaPool.clips[1].maxFrames
-    }
-  }
-
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
-  private updateLable() {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('updateLabel', devId)
-        .then(res => {
-          // console.log(value)
-          console.log('ManualCommands: sent')
-          // console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
-  changeVideoMode(event: any) {
-    this.setState({ videoMode: event.target.value })
-  }
-
-  changeDownConvertMode(event: any) {
-    this.setState({ downConvertMode: event.target.value })
-  }
-
-  changeMultiViewMode(event: any) {
-    this.setState({ multiViewMode: event.target.value })
-  }
-
-  render() {
-    const { currentState, currentProfile } = this.props
-    const { hasConnected, videoMode } = this.state
-    console.log(currentProfile, currentState, currentProfile.videoModes.supportedModes.length)
-    var videoModes = []
-    var videModeNames = [
-      '525i59.94 NTSC',
-      '625i50 PAL',
-      '525i59.94 16:9',
-      '625i50 16:9',
-      '720p50',
-      '720p59.94',
-      '1080i50',
-      '1080i59.94',
-      '1080p23.98',
-      '1080p24',
-      '1080p25',
-      '1080p29.97',
-      '1080p50',
-      '1080p59.94',
-      '4KHDp23.98',
-      '4KHDp24',
-      '4KHDp25',
-      '4KHDp29.97',
-      '4KHDp50',
-      '4KHDp59.94'
-    ]
-    var multiViewModes = [
-      [7],
-      [6],
-      [7],
-      [6],
-      [4],
-      [5],
-      [6],
-      [7],
-      [8],
-      [9],
-      [10, 6],
-      [11, 7],
-      [12, 6],
-      [13, 7],
-      [8],
-      [9],
-      [6],
-      [7],
-      [6],
-      [7]
-    ] //remove this
-    for (var i = 0; i < currentState.info.supportedVideoModes.length; i++) {
-      videoModes.push(
-        <option value={currentState.info.supportedVideoModes[i].mode}>
-          {videModeNames[currentState.info.supportedVideoModes[i].mode]}
-        </option>
-      )
-    }
-    var multiviewMode = []
-    var pos = currentState.info.supportedVideoModes.findIndex((item: any) => item.mode == videoMode)
-    if (pos != -1) {
-      console.log(pos)
-      for (var i = 0; i < currentState.info.supportedVideoModes[pos].multiviewModes.length; i++) {
-        multiviewMode.push(
-          <option value={i}>{videModeNames[currentState.info.supportedVideoModes[pos].multiviewModes[i]]}</option>
-        )
-      }
-    }
-
-    var maxFrames = 0
-    for (var i = 0; i < currentState.mediaPool.clips.length; i++) {
-      maxFrames += currentState.mediaPool.clips[i].maxFrames
-    }
-    return (
-      <Container className="p-5 maxW">
-        <h3>Video</h3>
-        <Form>
-          <Form.Group as={Row} controlId="exampleForm.ControlSelect1">
-            <Form.Label column sm="4">
-              Set video standard to:
-            </Form.Label>
-            <Col sm="6">
-              <Form.Control defaultValue={videoMode} onChange={e => this.changeVideoMode(e)} as="select">
-                {videoModes}
-              </Form.Control>
-            </Col>
-            <Col>
-              {' '}
-              <Button
-                onClick={() =>
-                  this.sendCommand('LibAtem.Commands.Settings.VideoModeSetCommand', { videoMode: this.state.videoMode })
-                }
-                variant="primary"
-              >
-                Set
-              </Button>
-            </Col>
-          </Form.Group>
-
-          <Form.Group as={Row} controlId="exampleForm.ControlSelect1">
-            <Form.Label column sm="4">
-              Set multi view standard to:
-            </Form.Label>
-            <Col sm="8">
-              <Form.Control
-                defaultValue={this.state.multiViewMode}
-                onChange={e => this.changeMultiViewMode(e)}
-                disabled={multiViewModes[currentState.settings.videoMode].length == 1}
-                as="select"
-              >
-                {multiviewMode}
-              </Form.Control>
-              <small id="emailHelp" className="form-text text-muted">
-                Not implemented correctly as can't test.
-              </small>
-            </Col>
-          </Form.Group>
-          <Form.Group as={Row} controlId="exampleForm.ControlSelect1">
-            <Form.Label column sm="4">
-              Down convert as:
-            </Form.Label>
-            <Col sm="8">
-              <Form.Control
-                defaultValue={this.state.downConvertMode}
-                onChange={e => this.changeDownConvertMode(e)}
-                as="select"
-              >
-                <option value={0}>Center cut</option>
-                <option value={1}>Letterbox</option>
-                <option value={2}>Anamaorphic</option>
-              </Form.Control>
-            </Col>
-          </Form.Group>
-          {/* <Button onClick={() => this.updateLable()} variant="primary" >
-            Set
-  </Button> */}
-        </Form>
-        <h3>Media Pool</h3>
-        <small id="emailHelp" className="form-text text-muted">
-          There are {maxFrames} frames to share between the clips
-        </small>
-
-        <Form.Group as={Row}>
-          <Form.Label column sm="4">
-            Clip 1 Length:
-          </Form.Label>
-          <Col sm="6">
-            <Slider
-              key={0}
-              min={0}
-              max={maxFrames}
-              step={1}
-              // labels={"horizontalLabels"}
-              onChange={v => {
-                this.setState({
-                  clip1Length: v,
-                  clip2Length: maxFrames - v
-                })
-              }}
-              value={this.state.clip1Length}
-              // defaultValue={0}
-              format={prettyDecimal}
-            />
-            <br key={1} />
-          </Col>
-          <Col sm="2">
-            <Form.Control
-              key={2}
-              type="number"
-              placeholder={''}
-              min={0}
-              max={maxFrames}
-              value={prettyDecimal(this.state.clip1Length)}
-              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-                if (e.currentTarget.value) {
-                  this.setState({
-                    clip1Length: parseInt(e.currentTarget.value),
-                    clip2Length: maxFrames - parseInt(e.currentTarget.value)
-                  })
-                }
-              }}
-            />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row}>
-          <Form.Label column sm="4">
-            Clip 2 Length:
-          </Form.Label>
-          <Col sm="6">
-            <Slider
-              key={0}
-              min={0}
-              max={maxFrames}
-              step={1}
-              onChange={v => {
-                this.setState({
-                  clip2Length: v,
-                  clip1Length: maxFrames - v
-                })
-              }}
-              value={this.state.clip2Length}
-              format={prettyDecimal}
-            />
-            <br key={1} />
-          </Col>
-          <Col sm="2">
-            <Form.Control
-              key={2}
-              type="number"
-              placeholder={''}
-              min={0}
-              max={maxFrames}
-              value={prettyDecimal(this.state.clip2Length)}
-              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-                if (e.currentTarget.value) {
-                  this.setState({
-                    clip2Length: parseInt(e.currentTarget.value),
-                    clip1Length: maxFrames - parseInt(e.currentTarget.value)
-                  })
-                }
-              }}
-            />
-          </Col>
-        </Form.Group>
-        <Button
-          onClick={() =>
-            this.sendCommand('LibAtem.Commands.Settings.VideoModeSetCommand', { videoMode: this.state.videoMode })
-          }
-          variant="primary"
-        >
-          Set
-        </Button>
-
-        <h3>Camera Control</h3>
-      </Container>
     )
   }
 }

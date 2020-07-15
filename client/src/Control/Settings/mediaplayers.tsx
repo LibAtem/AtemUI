@@ -87,7 +87,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                 return (
                   <div key={id} className="ss-mediaplayer-panel">
                     <div className="buttons">
-                      <div className="ss-label">MP{id + 1}</div>
+                      <div className="atem-label">MP{id + 1}</div>
                       <MediaButton
                         disabled={!hasClip}
                         active={mp.clipStatus?.atBeginning}

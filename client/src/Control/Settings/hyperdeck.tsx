@@ -33,7 +33,7 @@ export class HyperdeckSettings extends React.Component<HyperdeckSettingsProps, H
         <div className="ss-submenu-box">
           {this.state.open ? (
             <div className="ss-mediaplayer-panel-holder">
-              <div className="ss-label">Not implemented</div>
+              <div className="atem-label">Not implemented</div>
             </div>
           ) : (
             undefined

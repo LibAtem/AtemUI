@@ -72,8 +72,8 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
             <div className="ss-color-holder">
               {this.props.colorGenerators.map((col, id) => {
                 return (
-                  <div key={id} className="ss-color-inner">
-                    <div className="ss-label">Color {id + 1}</div>
+                  <div key={id} className="ss-color-inner" style={{ margin: '10px' }}>
+                    <div className="atem-label">Color {id + 1}</div>
                     <div
                       className="ss-color-picker"
                       onClick={() => this.setState({ displayPicker: this.state.displayPicker === id ? null : id })}

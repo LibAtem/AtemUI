@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'react-rangeslider/lib/index.css'
-// import 'react-simple-tree-menu/dist/main.css'
+import 'react-simple-tree-menu/dist/main.css'
 
 import React, { FormEvent } from 'react'
 import './App.css'
@@ -362,9 +362,7 @@ class NavBar extends React.PureComponent<{
               <Nav.Link>Devices</Nav.Link>
             </LinkContainer>
           </Nav>
-          <Form inline>
-            {this.renderDeviceSelection()}
-          </Form>
+          <Form inline>{this.renderDeviceSelection()}</Form>
         </Navbar.Collapse>
       </Navbar>
     )

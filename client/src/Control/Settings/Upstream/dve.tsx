@@ -1,7 +1,14 @@
 import React from 'react'
-import { ToggleButton, MaskProperties } from '../common'
+import { MaskProperties } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DecimalInput, DropdownMenuItem, DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
+import {
+  DecimalInput,
+  DropdownMenuItem,
+  DropdownMenu,
+  SourceSelectInput2,
+  SourcesMap,
+  ToggleButton2
+} from '../../common'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { FlyingKeyFrameProperties } from './flying'
 import { BorderProperties, ShadowProperties } from '../border'
@@ -30,37 +37,39 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
     }
 
     return (
-      <div>
-        <div className="ss-heading">
-          Settings
-          <DropdownMenu resetAll={true}>
-            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-          </DropdownMenu>
+      <>
+        <div className="atem-form">
+          <div className="atem-heading">
+            Settings
+            <DropdownMenu resetAll={true}>
+              {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+              {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            </DropdownMenu>
+          </div>
+
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.keyer.properties.fillSource}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                FillSource: e
+              })
+            }
+          />
+
+          <DVECommonProprties
+            sendCommand={this.props.sendCommand}
+            disabled={false}
+            meIndex={this.props.meIndex}
+            keyerIndex={this.props.keyerIndex}
+            keyerProps={this.props.keyer.dve}
+          />
         </div>
-
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.keyer.properties.fillSource}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              FillSource: e
-            })
-          }
-        />
-
-        <DVECommonProprties
-          sendCommand={this.props.sendCommand}
-          disabled={false}
-          meIndex={this.props.meIndex}
-          keyerIndex={this.props.keyerIndex}
-          keyerProps={this.props.keyer.dve}
-        />
 
         <DVEMaskProperties
           sendCommand={this.props.sendCommand}
@@ -82,19 +91,21 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
         />
 
         {this.props.keyer.dve && this.props.keyer.flyProperties ? (
-          <FlyingKeyFrameProperties
-            videoMode={this.props.videoMode}
-            keyerProps={this.props.keyer.dve}
-            flyEnabled={this.props.keyer.properties.flyEnabled}
-            flyProps={this.props.keyer.flyProperties}
-            keyerIndex={this.props.keyerIndex}
-            meIndex={this.props.meIndex}
-            sendCommand={this.props.sendCommand}
-          />
+          <div className="atem-form no-border">
+            <FlyingKeyFrameProperties
+              videoMode={this.props.videoMode}
+              keyerProps={this.props.keyer.dve}
+              flyEnabled={this.props.keyer.properties.flyEnabled}
+              flyProps={this.props.keyer.flyProperties}
+              keyerIndex={this.props.keyerIndex}
+              meIndex={this.props.meIndex}
+              sendCommand={this.props.sendCommand}
+            />
+          </div>
         ) : (
           undefined
         )}
-      </div>
+      </>
     )
   }
 }
@@ -168,12 +179,10 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
   const rotationFine = props.keyerProps.rotation - rotationCoarse * 360
 
   return (
-    <React.Fragment>
-      <div className="ss-row xy">
-        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
-          Position:
-        </div>
-        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
+    <>
+      <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>Position:</div>
+      <div className="content-xy">
+        <div className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
         <DecimalInput
           step={0.01}
           min={-1000}
@@ -189,7 +198,7 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
             })
           }
         />
-        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
+        <div className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
         <DecimalInput
           step={0.01}
           min={-1000}
@@ -207,11 +216,9 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
         />
       </div>
 
-      <div className="ss-row xy">
-        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
-          Scale:
-        </div>
-        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
+      <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>Scale:</div>
+      <div className="content-xy">
+        <div className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>X:</div>
         <DecimalInput
           step={0.01}
           min={0}
@@ -228,7 +235,7 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
           }
         />
         {/* TODO - link */}
-        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
+        <div className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>Y:</div>
         <DecimalInput
           step={0.01}
           min={0}
@@ -246,11 +253,9 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
         />
       </div>
 
-      <div className="ss-row xy">
-        <div style={{ minWidth: '50px' }} className={`ss-label ${props.disabled ? 'disabled' : ''}`}>
-          Rotation:
-        </div>
-        <div className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>360°:</div>
+      <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>Rotation:</div>
+      <div className="content-xy">
+        <div className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>360°:</div>
         <DecimalInput
           step={1}
           min={-90}
@@ -266,7 +271,7 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
             })
           }
         />
-        <div style={{ fontSize: '12px' }} className={`ss-label right ${props.disabled ? 'disabled' : ''}`}>
+        <div style={{ fontSize: '12px' }} className={`atem-label right ${props.disabled ? 'disabled' : ''}`}>
           + 1°:
         </div>
         <DecimalInput
@@ -283,7 +288,7 @@ export function DVECommonProprties(props: DveSubPanelProps & { disabled: boolean
           }
         />
       </div>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -342,8 +347,8 @@ function DVEMaskProperties(props: DveSubPanelProps) {
 
 function Shadow(props: DveSubPanelProps) {
   return (
-    <div>
-      <ToggleButton
+    <div className="atem-form">
+      <ToggleButton2
         active={props.keyerProps.borderShadowEnabled}
         label={'Shadow'}
         onClick={v =>

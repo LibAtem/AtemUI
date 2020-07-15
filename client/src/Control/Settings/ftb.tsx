@@ -37,7 +37,7 @@ export class FadeToBlackSettings extends React.Component<FadeToBlackSettingsProp
         </div>
         <div className="ss-submenu-box">
           {this.state.open ? (
-            <div className="ss-rate-holder">
+            <div className="atem-form">
               <MagicLabel
                 callback={(e: string) => {
                   this.props.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', {
@@ -48,46 +48,47 @@ export class FadeToBlackSettings extends React.Component<FadeToBlackSettingsProp
                 value={this.props.ftb.status.remainingFrames}
                 label={'Rate:'}
               />
-              <div className="ss-rate">
-                <RateInput
-                  value={this.props.ftb.status.remainingFrames}
-                  videoMode={this.props.videoMode}
-                  callback={e => {
-                    this.props.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', {
-                      Index: this.props.meIndex,
-                      Rate: e
-                    })
+              <div className="content-split">
+                <div className="ss-rate">
+                  <RateInput
+                    value={this.props.ftb.status.remainingFrames}
+                    videoMode={this.props.videoMode}
+                    callback={e => {
+                      this.props.sendCommand('LibAtem.Commands.MixEffects.FadeToBlackRateSetCommand', {
+                        Index: this.props.meIndex,
+                        Rate: e
+                      })
+                    }}
+                  />
+                </div>
+                <CheckboxInput
+                  label="Audio Follow Video"
+                  value={this.props.followFadeToBlack}
+                  disabled={this.props.meIndex !== 0 || this.props.ftbMode === null}
+                  onChange={v => {
+                    switch (this.props.ftbMode) {
+                      case 'classic':
+                        this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
+                          FollowFadeToBlack: v,
+                          Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.FollowFadeToBlack
+                        })
+                        break
+                      case 'fairlight':
+                        // TODO - this isnt working..
+                        this.props.sendCommand(
+                          'LibAtem.Commands.Audio.Fairlight.FairlightMixerMasterPropertiesSetCommand',
+                          {
+                            AudioFollowVideoCrossfadeTransitionEnabled: v,
+                            Mask:
+                              LibAtemCommands.Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
+                                .AudioFollowVideoCrossfadeTransitionEnabled
+                          }
+                        )
+                        break
+                    }
                   }}
                 />
               </div>
-
-              <CheckboxInput
-                label="Audio Follow Video"
-                value={this.props.followFadeToBlack}
-                disabled={this.props.meIndex !== 0 || this.props.ftbMode === null}
-                onChange={v => {
-                  switch (this.props.ftbMode) {
-                    case 'classic':
-                      this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-                        FollowFadeToBlack: v,
-                        Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.FollowFadeToBlack
-                      })
-                      break
-                    case 'fairlight':
-                      // TODO - this isnt working..
-                      this.props.sendCommand(
-                        'LibAtem.Commands.Audio.Fairlight.FairlightMixerMasterPropertiesSetCommand',
-                        {
-                          AudioFollowVideoCrossfadeTransitionEnabled: v,
-                          Mask:
-                            LibAtemCommands.Audio_Fairlight_FairlightMixerMasterPropertiesSetCommand_MaskFlags
-                              .AudioFollowVideoCrossfadeTransitionEnabled
-                        }
-                      )
-                      break
-                  }
-                }}
-              />
             </div>
           ) : (
             undefined

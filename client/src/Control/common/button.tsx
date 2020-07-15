@@ -100,10 +100,33 @@ interface CheckboxInputProps {
   disabled?: boolean
   value: boolean
   onChange: (val: boolean) => void
+  style?: React.CSSProperties
 }
 export function CheckboxInput(props: CheckboxInputProps) {
   return (
-    <label className={props.disabled ? 'ss-checkbox-container disabled' : 'ss-checkbox-container'}>
+    <label className={props.disabled ? 'ss-checkbox-container disabled' : 'ss-checkbox-container'} style={props.style}>
+      {props.label}
+      <input
+        type="checkbox"
+        disabled={props.disabled}
+        checked={props.value}
+        onChange={e => {
+          if (!props.disabled) {
+            props.onChange(e.currentTarget.checked)
+          }
+        }}
+      />
+      <span className={props.disabled ? 'checkmark disabled' : 'checkmark'}></span>
+    </label>
+  )
+}
+
+export function CheckboxInput2(props: CheckboxInputProps) {
+  return (
+    <label
+      className={props.disabled ? 'atem-checkbox-container disabled' : 'atem-checkbox-container'}
+      style={props.style}
+    >
       {props.label}
       <input
         type="checkbox"
@@ -141,6 +164,30 @@ export function RunButton(props: RunButtonProps) {
       className={classes}
     >
       {props.label}
+    </div>
+  )
+}
+
+export function ToggleButton2(props: {
+  label: string | JSX.Element
+  active: boolean
+  onClick: (val: boolean) => void
+  disabled?: boolean
+}) {
+  return (
+    <div className="atem-toggle-heading-holder">
+      <div
+        className="atem-toggle-circle-button"
+        onClick={() => (!props.disabled ? props.onClick(!props.active) : undefined)}
+      >
+        {props.active ? <div className="atem-toggle-circle-button-inner"></div> : ''}
+      </div>
+      <div
+        className={`atem-heading ${props.disabled ? 'disabled' : ''}`}
+        onClick={() => (!props.disabled ? props.onClick(!props.active) : undefined)}
+      >
+        {props.label}
+      </div>
     </div>
   )
 }

@@ -202,7 +202,7 @@ export class MagicLabel extends React.Component<MagicLabelProps, MagicLabelState
           this.setState({ xCoord: e.touches.item(0).clientX, yCoord: e.touches.item(0).clientY })
         }}
         onTouchStart={e => this.setState({ xCoord: e.touches.item(0).clientX, yCoord: e.touches.item(0).clientY })}
-        className="ss-label"
+        className="atem-label"
       >
         {this.props.label}
       </div>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SelectInput, SourcesMap } from '../../common'
+import { RateInput, SelectInput, SourcesMap, SelectInput2 } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { PreMultipliedKeyProperties } from '../common'
 
@@ -21,22 +21,21 @@ function getMediaPlayerOptions(props: StingerTransitionSettingsProps) {
 
 export function StingerTransitionSettings(props: StingerTransitionSettingsProps) {
   return (
-    <React.Fragment>
-      <SelectInput
-        label="Source"
-        value={props.stinger.source}
-        options={getMediaPlayerOptions(props)}
-        onChange={v =>
-          props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
-            Index: props.meIndex,
-            Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Source,
-            Source: v
-          })
-        }
-      />
-
-      <div className="ss-row">
-        <div className="ss-label">Clip Duration:</div>{' '}
+    <>
+      <div className="atem-form">
+        <SelectInput2
+          label="Source"
+          value={props.stinger.source}
+          options={getMediaPlayerOptions(props)}
+          onChange={v =>
+            props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionStingerSetCommand', {
+              Index: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionStingerSetCommand_MaskFlags.Source,
+              Source: v
+            })
+          }
+        />
+        <div className="atem-label">Clip Duration:</div>{' '}
         <div className="ss-rate">
           <RateInput
             value={props.stinger.clipDuration}
@@ -50,9 +49,7 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
             }}
           />
         </div>
-      </div>
-      <div className="ss-row">
-        <div className="ss-label">Trigger Point:</div>{' '}
+        <div className="atem-label">Trigger Point:</div>{' '}
         <div className="ss-rate">
           <RateInput
             value={props.stinger.triggerPoint}
@@ -66,9 +63,7 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
             }}
           />
         </div>
-      </div>
-      <div className="ss-row">
-        <div className="ss-label">Mix Rate:</div>{' '}
+        <div className="atem-label">Mix Rate:</div>{' '}
         <div className="ss-rate">
           <RateInput
             value={props.stinger.mixRate}
@@ -82,9 +77,7 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
             }}
           />
         </div>
-      </div>
-      <div className="ss-row">
-        <div className="ss-label">Pre Roll:</div>{' '}
+        <div className="atem-label">Pre Roll:</div>{' '}
         <div className="ss-rate">
           <RateInput
             value={props.stinger.preroll}
@@ -99,7 +92,6 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
           />
         </div>
       </div>
-
       <PreMultipliedKeyProperties
         enabled={props.stinger.preMultipliedKey}
         clip={props.stinger.clip}
@@ -134,6 +126,6 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
           })
         }}
       />
-    </React.Fragment>
+    </>
   )
 }

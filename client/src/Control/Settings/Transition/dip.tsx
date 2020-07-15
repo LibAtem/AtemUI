@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SourceSelectInput, SourcesMap } from '../../common'
+import { RateInput, SourceSelectInput2, SourcesMap } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface DipTransitionSettingsProps {
@@ -14,25 +14,23 @@ interface DipTransitionSettingsProps {
 
 export function DipTransitionSettings(props: DipTransitionSettingsProps) {
   return (
-    <React.Fragment>
-      <div className="ss-row">
-        <div className="ss-label">Rate:</div>{' '}
-        <div className="ss-rate">
-          <RateInput
-            value={props.dip.rate}
-            videoMode={props.videoMode}
-            callback={e => {
-              props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
-                Index: props.meIndex,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Rate,
-                Rate: e
-              })
-            }}
-          />
-        </div>
+    <div className="atem-form">
+      <div className="atem-label">Rate:</div>
+      <div className="ss-rate">
+        <RateInput
+          value={props.dip.rate}
+          videoMode={props.videoMode}
+          callback={e => {
+            props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
+              Index: props.meIndex,
+              Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Rate,
+              Rate: e
+            })
+          }}
+        />
       </div>
 
-      <SourceSelectInput
+      <SourceSelectInput2
         label="Dip Source"
         sources={props.sources}
         sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -46,6 +44,6 @@ export function DipTransitionSettings(props: DipTransitionSettingsProps) {
           })
         }
       />
-    </React.Fragment>
+    </div>
   )
 }

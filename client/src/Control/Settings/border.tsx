@@ -1,9 +1,7 @@
 import React from 'react'
-import { DecimalWithSliderInput, DecimalInput } from '../common/decimal'
 import { LibAtemEnums } from '../../generated'
 import { ChromePicker } from 'react-color'
-import { ToggleButton } from './common'
-import { SelectInput } from '../common'
+import { ToggleButton2, SelectInput2, DecimalWithSliderInput2, DecimalInput } from '../common'
 
 const BorderBevelOptions: Array<{ id: LibAtemEnums.BorderBevel; label: string }> = [
   {
@@ -76,16 +74,16 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
       ) : null
 
     return (
-      <div className="ss-mask-box">
-        <ToggleButton
+      <div className="atem-form">
+        <ToggleButton2
           active={enabled}
           label="Border"
           onClick={v => this.props.setEnabled(v)}
           disabled={this.props.disabled}
         />
 
+        <div className={enabled ? 'atem-label' : 'atem-label disabled'}>Color: </div>
         <div className="ss-color-inner">
-          <div className={enabled ? 'ss-label' : 'ss-label disabled'}>Color: </div>
           <div
             className="ss-color-picker"
             onClick={() => (enabled ? this.setState({ displayColorPicker: !this.state.displayColorPicker }) : null)}
@@ -97,7 +95,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           {colorPicker}
         </div>
 
-        <SelectInput
+        <SelectInput2
           label="Bevel"
           value={this.props.bevel}
           disabled={!enabled}
@@ -105,7 +103,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           onChange={e => this.props.setBevel(e)}
         />
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Outer Width"
           step={0.01}
           min={0}
@@ -115,7 +113,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           onChange={e => this.props.setOuterWidth(e)}
         />
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Inner Width"
           step={0.01}
           min={0}
@@ -125,7 +123,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           onChange={e => this.props.setInnerWidth(e)}
         />
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Outer Soften"
           step={1}
           min={0}
@@ -135,7 +133,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           onChange={e => this.props.setOuterSoftness(e)}
         />
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Inner Soften"
           step={1}
           min={0}
@@ -146,7 +144,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
         />
 
         {!this.props.isSsrc ? (
-          <DecimalWithSliderInput
+          <DecimalWithSliderInput2
             label="Border Opacity"
             step={1}
             min={0}
@@ -159,7 +157,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           undefined
         )}
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Bevel Position"
           step={1}
           min={0}
@@ -169,7 +167,7 @@ export class BorderProperties extends React.Component<BorderPropertiesProps, { d
           onChange={e => this.props.setBevelPosition(e)}
         />
 
-        <DecimalWithSliderInput
+        <DecimalWithSliderInput2
           label="Bevel Soften"
           step={1}
           min={0}
@@ -193,7 +191,7 @@ interface ShadowPropertiesProps {
   setAltitude: (val: number) => void
 }
 export function ShadowProperties(props: ShadowPropertiesProps) {
-  const labelClass = !props.disabled ? 'ss-label' : 'ss-label disabled'
+  const labelClass = !props.disabled ? 'atem-label' : 'atem-label disabled'
 
   return (
     <div style={{ gridTemplateRows: '1fr' }} className="ss-mask-holder">

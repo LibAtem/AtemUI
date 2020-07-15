@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../../generated'
-import { SelectInput, SourceSelectInput, SourcesMap } from '../../common'
+import { SelectInput2, SourceSelectInput2, SourcesMap } from '../../common'
 import { PreMultipliedKeyProperties } from '../common'
 import { BorderProperties, ShadowProperties } from '../border'
 
@@ -29,69 +29,73 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
   const artKeyEnabled = props.ssrcProps.artOption === LibAtemEnums.SuperSourceArtOption.Foreground
 
   return (
-    <div>
-      <SelectInput
-        label="Place In"
-        value={props.ssrcProps.artOption}
-        options={ArtOptions}
-        onChange={v => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtOption,
-              ArtOption: v
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtOption,
-              ArtOption: v
-            })
-          }
-        }}
-      />
+    <>
+      <div className="atem-form">
+        <SelectInput2
+          label="Place In"
+          value={props.ssrcProps.artOption}
+          options={ArtOptions}
+          onChange={v => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+                SSrcId: props.index,
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtOption,
+                ArtOption: v
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtOption,
+                ArtOption: v
+              })
+            }
+          }}
+        />
 
-      <SourceSelectInput
-        label="Fill Source"
-        sources={props.sources}
-        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt}
-        value={props.ssrcProps.artFillSource}
-        onChange={e => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
-              ArtFillSource: e
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtFillSource,
-              ArtFillSource: e
-            })
-          }
-        }}
-      />
+        <SourceSelectInput2
+          label="Fill Source"
+          sources={props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt}
+          value={props.ssrcProps.artFillSource}
+          onChange={e => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+                SSrcId: props.index,
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
+                ArtFillSource: e
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtFillSource,
+                ArtFillSource: e
+              })
+            }
+          }}
+        />
 
-      <SourceSelectInput
-        label="Key Source"
-        sources={props.sources}
-        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt | LibAtemEnums.SourceAvailability.KeySource}
-        value={props.ssrcProps.artCutSource}
-        disabled={!artKeyEnabled}
-        onChange={e => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
-              ArtCutSource: e
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtCutSource,
-              ArtCutSource: e
-            })
+        <SourceSelectInput2
+          label="Key Source"
+          sources={props.sources}
+          sourceAvailability={
+            LibAtemEnums.SourceAvailability.SuperSourceArt | LibAtemEnums.SourceAvailability.KeySource
           }
-        }}
-      />
+          value={props.ssrcProps.artCutSource}
+          disabled={!artKeyEnabled}
+          onChange={e => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+                SSrcId: props.index,
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
+                ArtCutSource: e
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtCutSource,
+                ArtCutSource: e
+              })
+            }
+          }}
+        />
+      </div>
 
       <PreMultipliedKeyProperties
         disabled={!artKeyEnabled}
@@ -308,41 +312,43 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         }}
       />
 
-      <ShadowProperties
-        disabled={
-          artKeyEnabled || !props.borderProps.enabled || props.borderProps.bevel === LibAtemEnums.BorderBevel.None
-        }
-        altitude={props.borderProps.lightSourceAltitude}
-        direction={props.borderProps.lightSourceDirection}
-        setAltitude={v => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceAltitude,
-              LightSourceAltitude: v
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceAltitude,
-              BorderLightSourceAltitude: v
-            })
+      <div className="atem-form no-border">
+        <ShadowProperties
+          disabled={
+            artKeyEnabled || !props.borderProps.enabled || props.borderProps.bevel === LibAtemEnums.BorderBevel.None
           }
-        }}
-        setDirection={v => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-              SSrcId: props.index,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceDirection,
-              LightSourceDirection: v
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
-              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceDirection,
-              BorderLightSourceDirection: v
-            })
-          }
-        }}
-      />
-    </div>
+          altitude={props.borderProps.lightSourceAltitude}
+          direction={props.borderProps.lightSourceDirection}
+          setAltitude={v => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+                SSrcId: props.index,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceAltitude,
+                LightSourceAltitude: v
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceAltitude,
+                BorderLightSourceAltitude: v
+              })
+            }
+          }}
+          setDirection={v => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+                SSrcId: props.index,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceDirection,
+                LightSourceDirection: v
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+                Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceDirection,
+                BorderLightSourceDirection: v
+              })
+            }
+          }}
+        />
+      </div>
+    </>
   )
 }

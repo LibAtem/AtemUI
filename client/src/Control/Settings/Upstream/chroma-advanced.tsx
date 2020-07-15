@@ -8,8 +8,8 @@ import Slider from 'react-rangeslider'
 import {
   DropdownMenu,
   RunButton,
-  DecimalWithSliderInput,
-  SourceSelectInput,
+  DecimalWithSliderInput2,
+  SourceSelectInput2,
   DropdownMenuItem,
   SourcesMap
 } from '../../common'
@@ -32,285 +32,292 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
     }
 
     return (
-      <div>
-        <div className="ss-heading">
-          Settings
-          <DropdownMenu resetAll={true}>
-            <DropdownMenuItem
-              onClick={() =>
-                this.props.sendCommand(
-                  'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
-                  {
-                    MixEffectIndex: this.props.meIndex,
-                    KeyerIndex: this.props.keyerIndex,
-                    Mask:
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .ForegroundLevel |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .BackgroundLevel |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
-                    ForegroundLevel: 0,
-                    BackgroundLevel: 0,
-                    KeyEdge: 50
-                  }
-                )
-              }
-            >
-              Reset Key Adjustments
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                this.props.sendCommand(
-                  'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
-                  {
-                    MixEffectIndex: this.props.meIndex,
-                    KeyerIndex: this.props.keyerIndex,
-                    Mask:
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .SpillSuppression |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .FlareSuppression,
-                    SpillSuppression: 0,
-                    FlareSuppression: 0
-                  }
-                )
-              }
-            >
-              Reset Chroma Correction
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() =>
-                this.props.sendCommand(
-                  'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
-                  {
-                    MixEffectIndex: this.props.meIndex,
-                    KeyerIndex: this.props.keyerIndex,
-                    Mask:
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .Brightness |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Contrast |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                        .Saturation |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Red |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Green |
-                      LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Blue,
-                    Brightness: 0,
-                    Contrast: 0,
-                    Saturation: 100,
-                    Red: 0,
-                    Green: 0,
-                    Blue: 0
-                  }
-                )
-              }
-            >
-              Reset Color Adjustments
-            </DropdownMenuItem>
-            <hr />
-            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-          </DropdownMenu>
+      <>
+        <div className="atem-form">
+          <div className="atem-heading">
+            Settings
+            <DropdownMenu resetAll={true}>
+              <DropdownMenuItem
+                onClick={() =>
+                  this.props.sendCommand(
+                    'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
+                    {
+                      MixEffectIndex: this.props.meIndex,
+                      KeyerIndex: this.props.keyerIndex,
+                      Mask:
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .ForegroundLevel |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .BackgroundLevel |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
+                      ForegroundLevel: 0,
+                      BackgroundLevel: 0,
+                      KeyEdge: 50
+                    }
+                  )
+                }
+              >
+                Reset Key Adjustments
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  this.props.sendCommand(
+                    'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
+                    {
+                      MixEffectIndex: this.props.meIndex,
+                      KeyerIndex: this.props.keyerIndex,
+                      Mask:
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .SpillSuppression |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .FlareSuppression,
+                      SpillSuppression: 0,
+                      FlareSuppression: 0
+                    }
+                  )
+                }
+              >
+                Reset Chroma Correction
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  this.props.sendCommand(
+                    'LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand',
+                    {
+                      MixEffectIndex: this.props.meIndex,
+                      KeyerIndex: this.props.keyerIndex,
+                      Mask:
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .Brightness |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .Contrast |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                          .Saturation |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Red |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Green |
+                        LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Blue,
+                      Brightness: 0,
+                      Contrast: 0,
+                      Saturation: 100,
+                      Red: 0,
+                      Green: 0,
+                      Blue: 0
+                    }
+                  )
+                }
+              >
+                Reset Color Adjustments
+              </DropdownMenuItem>
+              <hr />
+              {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+              {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            </DropdownMenu>
+          </div>
+
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.keyer.properties.fillSource}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                FillSource: e
+              })
+            }
+          />
+
+          <ChromaSample
+            sendCommand={this.props.sendCommand}
+            meIndex={this.props.meIndex}
+            keyerIndex={this.props.keyerIndex}
+            props={this.props.keyer.advancedChroma.sample}
+          />
+
+          <div className="atem-heading">Key Adjustments</div>
+          <DecimalWithSliderInput2
+            label="Foreground"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                    .ForegroundLevel,
+                ForegroundLevel: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.foregroundLevel}
+          />
+          <DecimalWithSliderInput2
+            label="Background"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                    .BackgroundLevel,
+                BackgroundLevel: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.backgroundLevel}
+          />
+          <DecimalWithSliderInput2
+            label="Key Edge"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
+                KeyEdge: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.keyEdge}
+          />
+
+          <div className="atem-heading">Chroma Correction</div>
+          <DecimalWithSliderInput2
+            label="Spill"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                    .SpillSuppression,
+                SpillSuppression: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.spillSuppression}
+          />
+          <DecimalWithSliderInput2
+            label="Flare Suppression"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
+                    .FlareSuppression,
+                FlareSuppression: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.flareSuppression}
+          />
+
+          <div className="atem-heading">Color Adjustments</div>
+          <DecimalWithSliderInput2
+            label="Brightness"
+            step={0.1}
+            min={-100}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Brightness,
+                Brightness: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.brightness}
+          />
+          <DecimalWithSliderInput2
+            label="Contrast"
+            step={0.1}
+            min={-100}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Contrast,
+                Contrast: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.contrast}
+          />
+          <DecimalWithSliderInput2
+            label="Saturation"
+            step={0.1}
+            min={0}
+            max={200}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask:
+                  LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Saturation,
+                Saturation: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.saturation}
+          />
+
+          <DecimalWithSliderInput2
+            label="Red"
+            step={0.1}
+            min={-100}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Red,
+                Red: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.red}
+          />
+          <DecimalWithSliderInput2
+            label="Green"
+            step={0.1}
+            min={-100}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Green,
+                Green: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.green}
+          />
+          <DecimalWithSliderInput2
+            label="Blue"
+            step={0.1}
+            min={-100}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Blue,
+                Blue: e
+              })
+            }
+            value={this.props.keyer.advancedChroma.properties.blue}
+          />
         </div>
-
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.keyer.properties.fillSource}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              FillSource: e
-            })
-          }
-        />
-
-        <ChromaSample
-          sendCommand={this.props.sendCommand}
-          meIndex={this.props.meIndex}
-          keyerIndex={this.props.keyerIndex}
-          props={this.props.keyer.advancedChroma.sample}
-        />
-
-        <div className="ss-heading">Key Adjustments</div>
-        <DecimalWithSliderInput
-          label="Foreground"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask:
-                LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.ForegroundLevel,
-              ForegroundLevel: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.foregroundLevel}
-        />
-        <DecimalWithSliderInput
-          label="Background"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask:
-                LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.BackgroundLevel,
-              BackgroundLevel: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.backgroundLevel}
-        />
-        <DecimalWithSliderInput
-          label="Key Edge"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
-              KeyEdge: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.keyEdge}
-        />
-
-        <div className="ss-heading">Chroma Correction</div>
-        <DecimalWithSliderInput
-          label="Spill"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask:
-                LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                  .SpillSuppression,
-              SpillSuppression: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.spillSuppression}
-        />
-        <DecimalWithSliderInput
-          label="Flare Suppression"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask:
-                LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
-                  .FlareSuppression,
-              FlareSuppression: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.flareSuppression}
-        />
-
-        <div className="ss-heading">Color Adjustments</div>
-        <DecimalWithSliderInput
-          label="Brightness"
-          step={0.1}
-          min={-100}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Brightness,
-              Brightness: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.brightness}
-        />
-        <DecimalWithSliderInput
-          label="Contrast"
-          step={0.1}
-          min={-100}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Contrast,
-              Contrast: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.contrast}
-        />
-        <DecimalWithSliderInput
-          label="Saturation"
-          step={0.1}
-          min={0}
-          max={200}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Saturation,
-              Saturation: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.saturation}
-        />
-
-        <DecimalWithSliderInput
-          label="Red"
-          step={0.1}
-          min={-100}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Red,
-              Red: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.red}
-        />
-        <DecimalWithSliderInput
-          label="Green"
-          step={0.1}
-          min={-100}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Green,
-              Green: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.green}
-        />
-        <DecimalWithSliderInput
-          label="Blue"
-          step={0.1}
-          min={-100}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Blue,
-              Blue: e
-            })
-          }
-          value={this.props.keyer.advancedChroma.properties.blue}
-        />
 
         <KeyerMaskProperties
           meIndex={this.props.meIndex}
@@ -320,7 +327,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
         />
 
         {this.props.keyer.dve && this.props.keyer.flyProperties ? (
-          <>
+          <div className="atem-form">
             <FlyingKeyerProperties
               sendCommand={this.props.sendCommand}
               meIndex={this.props.meIndex}
@@ -337,11 +344,11 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
               meIndex={this.props.meIndex}
               sendCommand={this.props.sendCommand}
             />
-          </>
+          </div>
         ) : (
           undefined
         )}
-      </div>
+      </>
     )
   }
 }
@@ -378,7 +385,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
     const rgbCol = yuvToRgb([this.props.props.sampledY, this.props.props.sampledCb, this.props.props.sampledCr])
 
     return (
-      <div>
+      <div style={{ gridColumn: 'span 2' }}>
         <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
           <ToggleButton
             label={

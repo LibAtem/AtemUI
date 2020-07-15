@@ -1,8 +1,16 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
-import { ToggleButton, MaskProperties } from '../common'
-import { DecimalInput, SourceSelectInput, DropdownMenu, DropdownMenuItem, SourcesMap } from '../../common'
+import { MaskProperties } from '../common'
+import {
+  DecimalInput,
+  SourceSelectInput2,
+  DropdownMenu,
+  DropdownMenuItem,
+  SourcesMap,
+  ToggleButton2,
+  DecimalInputWithLabel
+} from '../../common'
 import { Layouts } from './layouts'
 
 interface SuperSourcePropertiesSettingsProps {
@@ -15,7 +23,7 @@ export class SuperSourcePropertiesSettings extends React.PureComponent<SuperSour
   render() {
     return (
       <div>
-        <div className="ss-heading">Layout</div>
+        <div className="atem-heading">Layout</div>
 
         <div className="ss-ssrc-layout-grid">
           {Layouts.map((l, i) => (
@@ -40,189 +48,186 @@ interface SuperSourceBoxSettingsProps {
 
 export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
   return (
-    <div>
-      <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
-        <ToggleButton
-          label="Enable box"
-          active={props.boxProps.enabled}
-          onClick={v =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Enabled,
-              Enabled: v
-            })
-          }
+    <>
+      <div className="atem-form">
+        <div style={{ gridColumn: 'span 2', display: 'grid', gridAutoFlow: 'column' }}>
+          <ToggleButton2
+            label="Enable box"
+            active={props.boxProps.enabled}
+            onClick={v =>
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Enabled,
+                Enabled: v
+              })
+            }
+          />
+
+          <DropdownMenu style={{ margin: '10px 10px 0' }} resetAll={true}>
+            <DropdownMenuItem
+              onClick={() => {
+                if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                    SSrcId: props.index,
+                    BoxIndex: props.boxIndex,
+                    Mask:
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
+                    PositionX: 0,
+                    PositionY: 0
+                  })
+                } else if (props.index === 0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                    BoxIndex: props.boxIndex,
+                    Mask:
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
+                    PositionX: 0,
+                    PositionY: 0
+                  })
+                }
+              }}
+            >
+              Reset Pos
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                    SSrcId: props.index,
+                    BoxIndex: props.boxIndex,
+                    Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
+                    Size: 0.5
+                  })
+                } else if (props.index === 0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                    BoxIndex: props.boxIndex,
+                    Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Size,
+                    Size: 0.5
+                  })
+                }
+              }}
+            >
+              Reset Size
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                    SSrcId: props.index,
+                    BoxIndex: props.boxIndex,
+                    Mask:
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
+                    CropTop: 0,
+                    CropBottom: 0,
+                    CropLeft: 0,
+                    CropRight: 0
+                  })
+                } else if (props.index === 0) {
+                  props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                    BoxIndex: props.boxIndex,
+                    Mask:
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropTop |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropBottom |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropLeft |
+                      LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropRight,
+                    CropTop: 0,
+                    CropBottom: 0,
+                    CropLeft: 0,
+                    CropRight: 0
+                  })
+                }
+              }}
+            >
+              Reset Crop
+            </DropdownMenuItem>
+          </DropdownMenu>
+        </div>
+
+        <SourceSelectInput2
+          label="Source"
+          sources={props.sources}
+          sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceBox}
+          value={props.boxProps.source}
+          disabled={!props.boxProps.enabled}
+          onChange={e => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
+                Source: e
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Source,
+                Source: e
+              })
+            }
+          }}
         />
 
-        <DropdownMenu style={{ margin: '10px 10px 0' }} resetAll={true}>
-          <DropdownMenuItem
-            onClick={() => {
-              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                  SSrcId: props.index,
-                  BoxIndex: props.boxIndex,
-                  Mask:
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
-                  PositionX: 0,
-                  PositionY: 0
-                })
-              } else if (props.index === 0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-                  BoxIndex: props.boxIndex,
-                  Mask:
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
-                  PositionX: 0,
-                  PositionY: 0
-                })
-              }
-            }}
-          >
-            Reset Pos
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                  SSrcId: props.index,
-                  BoxIndex: props.boxIndex,
-                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
-                  Size: 0.5
-                })
-              } else if (props.index === 0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-                  BoxIndex: props.boxIndex,
-                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Size,
-                  Size: 0.5
-                })
-              }
-            }}
-          >
-            Reset Size
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                  SSrcId: props.index,
-                  BoxIndex: props.boxIndex,
-                  Mask:
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
-                  CropTop: 0,
-                  CropBottom: 0,
-                  CropLeft: 0,
-                  CropRight: 0
-                })
-              } else if (props.index === 0) {
-                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-                  BoxIndex: props.boxIndex,
-                  Mask:
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropTop |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropBottom |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropLeft |
-                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropRight,
-                  CropTop: 0,
-                  CropBottom: 0,
-                  CropLeft: 0,
-                  CropRight: 0
-                })
-              }
-            }}
-          >
-            Reset Crop
-          </DropdownMenuItem>
-        </DropdownMenu>
-      </div>
-
-      <SourceSelectInput
-        label="Source"
-        sources={props.sources}
-        sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceBox}
-        value={props.boxProps.source}
-        disabled={!props.boxProps.enabled}
-        onChange={e => {
-          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
-              Source: e
-            })
-          } else if (props.index === 0) {
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Source,
-              Source: e
-            })
-          }
-        }}
-      />
-
-      <div className="ss-row xy">
-        <div style={{ minWidth: '50px' }} className={`ss-label ${!props.boxProps.enabled ? 'disabled' : ''}`}>
+        <div style={{ minWidth: '50px' }} className={`atem-label ${!props.boxProps.enabled ? 'disabled' : ''}`}>
           Position:
         </div>
-        <div className={`ss-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>X:</div>
-        <DecimalInput
-          step={0.01}
-          min={-48}
-          max={48}
-          value={props.boxProps.positionX}
-          disabled={!props.boxProps.enabled}
-          onChange={value => {
-            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                SSrcId: props.index,
-                BoxIndex: props.boxIndex,
-                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX,
-                PositionX: value
-              })
-            } else if (props.index === 0) {
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-                BoxIndex: props.boxIndex,
-                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX,
-                PositionX: value
-              })
-            }
-          }}
-        />
-        <div className={`ss-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>Y:</div>
-        <DecimalInput
-          step={0.01}
-          min={-27}
-          max={27}
-          value={props.boxProps.positionY}
-          disabled={!props.boxProps.enabled}
-          onChange={value => {
-            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                SSrcId: props.index,
-                BoxIndex: props.boxIndex,
-                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
-                PositionY: value
-              })
-            } else if (props.index === 0) {
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
-                BoxIndex: props.boxIndex,
-                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
-                PositionY: value
-              })
-            }
-          }}
-        />
-      </div>
-
-      <div className="ss-row xy">
-        <div style={{ minWidth: '50px' }} className={`ss-label ${!props.boxProps.enabled ? 'disabled' : ''}`}>
-          Scale:
+        <div className="content-xy">
+          <div className={`atem-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>X:</div>
+          <DecimalInput
+            step={0.01}
+            min={-48}
+            max={48}
+            value={props.boxProps.positionX}
+            disabled={!props.boxProps.enabled}
+            onChange={value => {
+              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                  SSrcId: props.index,
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX,
+                  PositionX: value
+                })
+              } else if (props.index === 0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX,
+                  PositionX: value
+                })
+              }
+            }}
+          />
+          <div className={`atem-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>Y:</div>
+          <DecimalInput
+            step={0.01}
+            min={-27}
+            max={27}
+            value={props.boxProps.positionY}
+            disabled={!props.boxProps.enabled}
+            onChange={value => {
+              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                  SSrcId: props.index,
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
+                  PositionY: value
+                })
+              } else if (props.index === 0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
+                  PositionY: value
+                })
+              }
+            }}
+          />
         </div>
-        <div className={`ss-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>X:</div>
-        <DecimalInput
+
+        <DecimalInputWithLabel
+          label="Scale"
           step={0.01}
           min={0}
           max={1}
@@ -246,7 +251,6 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           }}
         />
       </div>
-
       <MaskProperties
         type="ssrc-box"
         disabled={!props.boxProps.enabled}
@@ -336,6 +340,6 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           }
         }}
       />
-    </div>
+    </>
   )
 }

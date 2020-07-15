@@ -1,10 +1,9 @@
 import React from 'react'
-import { ToggleButton } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { DVECommonProprties } from './dve'
 import { RateInput } from '../../common'
-import { RunButton } from '../../common/button'
+import { RunButton, ToggleButton2 } from '../../common'
 import { literal } from '../../../util'
 import * as _ from 'underscore'
 import { FlyingPatternInfo, FlyingPatternImage } from './flying-pattern'
@@ -17,8 +16,8 @@ export function FlyingKeyerProperties(props: {
   keyerProps: LibAtemState.MixEffectState_KeyerDVEState
 }) {
   return (
-    <div>
-      <ToggleButton
+    <>
+      <ToggleButton2
         active={props.flyEnabled}
         label="Flying Key"
         onClick={v =>
@@ -38,7 +37,7 @@ export function FlyingKeyerProperties(props: {
         keyerProps={props.keyerProps}
         disabled={!props.flyEnabled}
       />
-    </div>
+    </>
   )
 }
 
@@ -130,100 +129,98 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
         : null
 
     return (
-      <div>
-        <div className="ss-row" style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <div className={this.props.flyEnabled ? 'ss-label' : 'ss-label disabled'}>Rate:</div>
-          <div className="ss-rate">
-            <RateInput
-              disabled={!this.props.flyEnabled}
-              videoMode={this.props.videoMode}
-              value={this.props.keyerProps.rate}
-              maxSeconds={10}
-              callback={(e: number) =>
-                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+      <>
+        <div className={this.props.flyEnabled ? 'atem-label' : 'atem-label disabled'}>Rate:</div>
+        <div className="ss-rate">
+          <RateInput
+            disabled={!this.props.flyEnabled}
+            videoMode={this.props.videoMode}
+            value={this.props.keyerProps.rate}
+            maxSeconds={10}
+            callback={(e: number) =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyDVESetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rate,
+                Rate: e
+              })
+            }
+          />
+        </div>
+
+        <div className={this.props.flyEnabled ? 'atem-label' : 'atem-label disabled'}>KeyFrame:</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '50px 50px 1fr', gridColumnGap: '5px' }}>
+          <RunButton
+            label="Set A"
+            disabled={!this.props.flyEnabled}
+            onClick={() => this.setKeyframe(LibAtemEnums.FlyKeyKeyFrameId.One)}
+          />
+          <RunButton
+            label="Set B"
+            disabled={!this.props.flyEnabled}
+            onClick={() => this.setKeyframe(LibAtemEnums.FlyKeyKeyFrameId.Two)}
+          />
+        </div>
+
+        <div className="fly-run-holder">
+          <div className="ss-dve-style-heading">Run To:</div>
+          <div className="ss-run-holder">
+            <RunButton
+              label="A"
+              disabled={!this.props.flyEnabled || !this.props.flyProps.isASet}
+              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.A}
+              onClick={() =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
                   MixEffectIndex: this.props.meIndex,
                   KeyerIndex: this.props.keyerIndex,
-                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rate,
-                  Rate: e
+                  KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.A,
+                  Mask: 0
+                })
+              }
+            />
+            <RunButton
+              label="B"
+              disabled={!this.props.flyEnabled || !this.props.flyProps.isBSet}
+              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.B}
+              onClick={() =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.B,
+                  Mask: 0
+                })
+              }
+            />
+            <RunButton
+              label="Full"
+              disabled={!this.props.flyEnabled}
+              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.Full}
+              onClick={() =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.Full,
+                  Mask: 0
                 })
               }
             />
           </div>
-        </div>
-
-        <div className="ss-row">
-          <div className={this.props.flyEnabled ? 'ss-label' : 'ss-label disabled'}>KeyFrame:</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '50px 50px 1fr', gridColumnGap: '5px' }}>
-            <RunButton
-              label="Set A"
-              disabled={!this.props.flyEnabled}
-              onClick={() => this.setKeyframe(LibAtemEnums.FlyKeyKeyFrameId.One)}
-            />
-            <RunButton
-              label="Set B"
-              disabled={!this.props.flyEnabled}
-              onClick={() => this.setKeyframe(LibAtemEnums.FlyKeyKeyFrameId.Two)}
-            />
+          <div className="ss-dve-style-heading">Run To Infinite:</div>
+          <div style={{ marginBottom: '20px' }} className="ss-dve-style-holder">
+            {FlyingPatternInfo.map((info, i) => {
+              if (info.icon2 !== undefined) {
+                return (
+                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                    {this.createIcon(currentInfinite, info.icon, 0)}
+                    {this.createIcon(currentInfinite, info.icon2, 1)}
+                  </div>
+                )
+              }
+              return this.createIcon(currentInfinite, info.icon, i)
+            })}
           </div>
         </div>
-
-        <div className="ss-dve-style-heading">Run To:</div>
-        <div className="ss-run-holder">
-          <RunButton
-            label="A"
-            disabled={!this.props.flyEnabled || !this.props.flyProps.isASet}
-            active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.A}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.A,
-                Mask: 0
-              })
-            }
-          />
-          <RunButton
-            label="B"
-            disabled={!this.props.flyEnabled || !this.props.flyProps.isBSet}
-            active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.B}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.B,
-                Mask: 0
-              })
-            }
-          />
-          <RunButton
-            label="Full"
-            disabled={!this.props.flyEnabled}
-            active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.Full}
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
-                MixEffectIndex: this.props.meIndex,
-                KeyerIndex: this.props.keyerIndex,
-                KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.Full,
-                Mask: 0
-              })
-            }
-          />
-        </div>
-        <div className="ss-dve-style-heading">Run To Infinite:</div>
-        <div style={{ marginBottom: '20px' }} className="ss-dve-style-holder">
-          {FlyingPatternInfo.map((info, i) => {
-            if (info.icon2 !== undefined) {
-              return (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                  {this.createIcon(currentInfinite, info.icon, 0)}
-                  {this.createIcon(currentInfinite, info.icon2, 1)}
-                </div>
-              )
-            }
-            return this.createIcon(currentInfinite, info.icon, i)
-          })}
-        </div>
-      </div>
+      </>
     )
   }
 }

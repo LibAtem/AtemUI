@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput, SourcesMap } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput2, SourceSelectInput2, SourcesMap } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'
@@ -68,8 +68,8 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           })}
         </div>
 
-        <div className="ss-row" style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <div className="ss-label">Rate:</div>
+        <div className="atem-form no-border">
+          <div className="atem-label">Rate:</div>
           <div className="ss-rate">
             <RateInput
               videoMode={this.props.videoMode}
@@ -91,49 +91,47 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               }}
             />
           </div>
-        </div>
 
-        <div className="ss-row" style={{ gridTemplateColumns: '1fr 1fr 1.5fr' }}>
-          <div className={isGraphicsSpin ? 'ss-label disabled' : 'ss-label'}>Direction:</div>
-          <AtemButtonBar
-            innerStyle={{ lineHeight: '25px' }}
-            disabled={isGraphicsSpin}
-            options={[
-              {
-                label: <FontAwesomeIcon icon={faAngleRight} />,
-                value: false
-              },
-              {
-                label: <FontAwesomeIcon icon={faAngleLeft} />,
-                value: true
+          <div className={isGraphicsSpin ? 'atem-label disabled' : 'atem-label'}>Direction:</div>
+          <div className="content-split">
+            <AtemButtonBar
+              innerStyle={{ lineHeight: '25px', fontSize: '16px' }}
+              disabled={isGraphicsSpin}
+              options={[
+                {
+                  label: <FontAwesomeIcon icon={faAngleRight} style={{ width: '20px' }} />,
+                  value: false
+                },
+                {
+                  label: <FontAwesomeIcon icon={faAngleLeft} />,
+                  value: true
+                }
+              ]}
+              selected={this.props.dve.reverse}
+              onChange={v => {
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                  Index: this.props.meIndex,
+                  Reverse: v,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Reverse
+                })
+              }}
+            />
+
+            <CheckboxInput2
+              label="Flip Flop"
+              value={this.props.dve.flipFlop}
+              disabled={isGraphicsSpin}
+              onChange={v =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                  Index: this.props.meIndex,
+                  FlipFlop: v,
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop
+                })
               }
-            ]}
-            selected={this.props.dve.reverse}
-            onChange={v => {
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.meIndex,
-                Reverse: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Reverse
-              })
-            }}
-          />
+            />
+          </div>
 
-          <CheckboxInput
-            label="Flip Flop"
-            value={this.props.dve.flipFlop}
-            disabled={isGraphicsSpin}
-            onChange={v =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-                Index: this.props.meIndex,
-                FlipFlop: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop
-              })
-            }
-          />
-        </div>
-
-        <div className="ss-row" style={{ gridTemplateColumns: '1fr 100px 1fr' }}>
-          <div className="ss-label">Effects: </div>
+          <div className="atem-label">Effects: </div>
           <AtemButtonBar
             innerStyle={{ lineHeight: '25px' }}
             options={[
@@ -162,52 +160,53 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               })
             }}
           />
+
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.dve.fillSource}
+            disabled={!isGraphics}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FillSource,
+                FillSource: e
+              })
+            }
+          />
+
+          <CheckboxInput2
+            label="Enable Key"
+            value={this.props.dve.enableKey}
+            disabled={!isGraphics}
+            style={{ gridColumn: 'span 2' }}
+            onChange={v =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: this.props.meIndex,
+                EnableKey: v,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey
+              })
+            }
+          />
+
+          <SourceSelectInput2
+            label="Key Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
+            meAvailability={this.props.meIndex}
+            value={this.props.dve.keySource}
+            disabled={!isGraphics || !this.props.dve.enableKey}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
+                Index: this.props.meIndex,
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.KeySource,
+                KeySource: e
+              })
+            }
+          />
         </div>
-
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.dve.fillSource}
-          disabled={!isGraphics}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FillSource,
-              FillSource: e
-            })
-          }
-        />
-
-        <CheckboxInput
-          label="Enable Key"
-          value={this.props.dve.enableKey}
-          disabled={!isGraphics}
-          onChange={v =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-              Index: this.props.meIndex,
-              EnableKey: v,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey
-            })
-          }
-        />
-
-        <SourceSelectInput
-          label="Key Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-          meAvailability={this.props.meIndex}
-          value={this.props.dve.keySource}
-          disabled={!isGraphics || !this.props.dve.enableKey}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
-              Index: this.props.meIndex,
-              Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.KeySource,
-              KeySource: e
-            })
-          }
-        />
 
         <PreMultipliedKeyProperties
           disabled={!isGraphics || !this.props.dve.enableKey}

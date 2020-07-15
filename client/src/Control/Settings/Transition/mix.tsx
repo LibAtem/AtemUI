@@ -14,8 +14,8 @@ interface MixTransitionSettingsProps {
 export function MixTransitionSettings(props: MixTransitionSettingsProps) {
   return (
     <React.Fragment>
-      <div className="ss-row">
-        <div className="ss-label">Rate:</div>{' '}
+      <div className="atem-form">
+        <div className="atem-label">Rate:</div>
         <div className="ss-rate">
           <RateInput
             value={props.mix.rate}

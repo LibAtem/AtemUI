@@ -29,3 +29,24 @@
 .programPreview {
   text-align: center;
 }
+
+.settings-page {
+  background: #2e2e2e;
+  color: #858585;
+}
+
+.settings-content {
+  padding-top: 2rem;
+
+  .atem-heading {
+    font-size: 1.1rem;
+    margin: 10px 10px 0;
+  }
+
+  .atem-note {
+    color: #858585;
+    margin: -10px 20px 0;
+    font-size: 13px;
+    grid-column: span 2;
+  }
+}

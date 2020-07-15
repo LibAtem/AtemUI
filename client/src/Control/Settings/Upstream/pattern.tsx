@@ -3,10 +3,10 @@ import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import {
-  CheckboxInput,
+  CheckboxInput2,
   DropdownMenu,
-  SourceSelectInput,
-  DecimalWithSliderInput,
+  SourceSelectInput2,
+  DecimalWithSliderInput2,
   DecimalInput,
   Patterns,
   PatternInfo,
@@ -56,130 +56,132 @@ export class Pattern extends React.Component<PatternProps> {
     const currentPatternInfo: PatternInfo | undefined = Patterns[currentPattern]
 
     return (
-      <div>
-        <div className="ss-heading">
-          Settings
-          <DropdownMenu resetAll={true}>
-            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-          </DropdownMenu>
-        </div>
+      <>
+        <div className="atem-form">
+          <div className="atem-heading">
+            Settings
+            <DropdownMenu resetAll={true}>
+              {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+              {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            </DropdownMenu>
+          </div>
 
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.keyer.properties.fillSource}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              FillSource: e
-            })
-          }
-        />
-
-        <div className="ss-wipe-pattern-holder">
-          {Object.keys(Patterns).map(v => this.renderPattern(currentPattern, Number(v)))}
-        </div>
-
-        <CheckboxInput
-          label="Invert Pattern"
-          value={this.props.keyer.pattern.inverse}
-          onChange={v =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Inverse,
-              Inverse: v
-            })
-          }
-        />
-
-        <DecimalWithSliderInput
-          label="Size"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Size,
-              Size: e
-            })
-          }
-          value={this.props.keyer.pattern.size}
-        />
-
-        <DecimalWithSliderInput
-          label="Symmetry"
-          disabled={!currentPatternInfo?.symmetry}
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Symmetry,
-              Symmetry: e
-            })
-          }
-          value={this.props.keyer.pattern.symmetry}
-        />
-
-        <DecimalWithSliderInput
-          label="Softness"
-          step={0.1}
-          min={0}
-          max={100}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Softness,
-              Softness: e
-            })
-          }
-          value={this.props.keyer.pattern.softness}
-        />
-
-        <div className="ss-row xy">
-          <div className="ss-label">Position:</div>
-          <div className={currentPatternInfo?.x ? 'ss-label right' : 'ss-label disabled right'}>X:</div>
-          <DecimalInput
-            step={0.0001}
-            min={0}
-            max={1}
-            disabled={!currentPatternInfo?.x}
-            value={this.props.keyer.pattern.xPosition}
-            onChange={value =>
-              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.keyer.properties.fillSource}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.XPosition,
-                XPosition: value
+                FillSource: e
               })
             }
           />
-          <div className={currentPatternInfo?.y ? 'ss-label right' : 'ss-label disabled right'}>Y:</div>
-          <DecimalInput
-            step={0.0001}
-            min={0}
-            max={1}
-            disabled={!currentPatternInfo?.y}
-            value={this.props.keyer.pattern.yPosition}
-            onChange={value =>
+
+          <div className="ss-wipe-pattern-holder" style={{ gridColumn: 'span 2' }}>
+            {Object.keys(Patterns).map(v => this.renderPattern(currentPattern, Number(v)))}
+          </div>
+
+          <CheckboxInput2
+            label="Invert Pattern"
+            value={this.props.keyer.pattern.inverse}
+            onChange={v =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
-                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.YPosition,
-                YPosition: value
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Inverse,
+                Inverse: v
               })
             }
           />
+
+          <DecimalWithSliderInput2
+            label="Size"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Size,
+                Size: e
+              })
+            }
+            value={this.props.keyer.pattern.size}
+          />
+
+          <DecimalWithSliderInput2
+            label="Symmetry"
+            disabled={!currentPatternInfo?.symmetry}
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Symmetry,
+                Symmetry: e
+              })
+            }
+            value={this.props.keyer.pattern.symmetry}
+          />
+
+          <DecimalWithSliderInput2
+            label="Softness"
+            step={0.1}
+            min={0}
+            max={100}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.Softness,
+                Softness: e
+              })
+            }
+            value={this.props.keyer.pattern.softness}
+          />
+
+          <div className="atem-label">Position:</div>
+          <div className="content-xy">
+            <div className={currentPatternInfo?.x ? 'atem-label right' : 'atem-label disabled right'}>X:</div>
+            <DecimalInput
+              step={0.0001}
+              min={0}
+              max={1}
+              disabled={!currentPatternInfo?.x}
+              value={this.props.keyer.pattern.xPosition}
+              onChange={value =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.XPosition,
+                  XPosition: value
+                })
+              }
+            />
+            <div className={currentPatternInfo?.y ? 'atem-label right' : 'atem-label disabled right'}>Y:</div>
+            <DecimalInput
+              step={0.0001}
+              min={0}
+              max={1}
+              disabled={!currentPatternInfo?.y}
+              value={this.props.keyer.pattern.yPosition}
+              onChange={value =>
+                this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyPatternSetCommand', {
+                  MixEffectIndex: this.props.meIndex,
+                  KeyerIndex: this.props.keyerIndex,
+                  Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyPatternSetCommand_MaskFlags.YPosition,
+                  YPosition: value
+                })
+              }
+            />
+          </div>
         </div>
 
         <KeyerMaskProperties
@@ -190,7 +192,7 @@ export class Pattern extends React.Component<PatternProps> {
         />
 
         {this.props.keyer.dve && this.props.keyer.flyProperties ? (
-          <>
+          <div className="atem-form">
             <FlyingKeyerProperties
               sendCommand={this.props.sendCommand}
               meIndex={this.props.meIndex}
@@ -207,11 +209,11 @@ export class Pattern extends React.Component<PatternProps> {
               meIndex={this.props.meIndex}
               sendCommand={this.props.sendCommand}
             />
-          </>
+          </div>
         ) : (
           undefined
         )}
-      </div>
+      </>
     )
   }
 }

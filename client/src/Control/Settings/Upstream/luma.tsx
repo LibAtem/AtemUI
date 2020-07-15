@@ -4,7 +4,7 @@ import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
-import { DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
+import { DropdownMenu, SourceSelectInput2, SourcesMap } from '../../common'
 import { ResetDVE } from './dve'
 
 interface LumaKeyerSettingsProps {
@@ -23,43 +23,45 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
     }
 
     return (
-      <div>
-        <div className="ss-heading">
-          Settings
-          <DropdownMenu resetAll={true}>
-            {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-            {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
-          </DropdownMenu>
-        </div>
+      <>
+        <div className="atem-form">
+          <div className="atem-heading">
+            Settings
+            <DropdownMenu resetAll={true}>
+              {ResetKeyerMask(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+              {ResetDVE(this.props.sendCommand, this.props.meIndex, this.props.keyerIndex)}
+            </DropdownMenu>
+          </div>
 
-        <SourceSelectInput
-          label="Fill Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex}
-          value={this.props.keyer.properties.fillSource}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              FillSource: e
-            })
-          }
-        />
-        <SourceSelectInput
-          label="Key Source"
-          sources={this.props.sources}
-          sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-          meAvailability={this.props.meIndex}
-          value={this.props.keyer.properties.cutSource}
-          onChange={e =>
-            this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
-              MixEffectIndex: this.props.meIndex,
-              KeyerIndex: this.props.keyerIndex,
-              CutSource: e
-            })
-          }
-        />
+          <SourceSelectInput2
+            label="Fill Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.None}
+            meAvailability={this.props.meIndex}
+            value={this.props.keyer.properties.fillSource}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                FillSource: e
+              })
+            }
+          />
+          <SourceSelectInput2
+            label="Key Source"
+            sources={this.props.sources}
+            sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
+            meAvailability={this.props.meIndex}
+            value={this.props.keyer.properties.cutSource}
+            onChange={e =>
+              this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {
+                MixEffectIndex: this.props.meIndex,
+                KeyerIndex: this.props.keyerIndex,
+                CutSource: e
+              })
+            }
+          />
+        </div>
 
         <KeyerMaskProperties
           meIndex={this.props.meIndex}
@@ -108,7 +110,7 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
         />
 
         {this.props.keyer.dve && this.props.keyer.flyProperties ? (
-          <>
+          <div className="atem-form">
             <FlyingKeyerProperties
               sendCommand={this.props.sendCommand}
               meIndex={this.props.meIndex}
@@ -125,11 +127,11 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
               meIndex={this.props.meIndex}
               sendCommand={this.props.sendCommand}
             />
-          </>
+          </div>
         ) : (
           undefined
         )}
-      </div>
+      </>
     )
   }
 }
