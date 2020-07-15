@@ -4,15 +4,15 @@ import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
-import { DropdownMenu, SourceSelectInput } from '../../common'
+import { DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
 import { ResetDVE } from './dve'
 
 interface LumaKeyerSettingsProps {
   sendCommand: SendCommandStrict
   meIndex: number
   keyerIndex: number
-  keyer: LibAtemState.MixEffectState_KeyerState // & Required<Pick<LibAtemState.MixEffectState_KeyerState, 'luma'>>
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  keyer: LibAtemState.MixEffectState_KeyerState
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -36,7 +36,7 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.keyer.properties.fillSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
@@ -50,7 +50,7 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
           label="Key Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.keyer.properties.cutSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyCutSourceSetCommand', {

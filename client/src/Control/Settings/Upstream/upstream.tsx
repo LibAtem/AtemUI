@@ -7,6 +7,7 @@ import { TabPanelTab, TabPanel } from '../common'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { ChromaKeyerAdvancedProperties } from './chroma-advanced'
+import { SourcesMap } from '../../common'
 
 interface UpstreamKeyState {
   open: boolean
@@ -17,7 +18,7 @@ interface SubMenuProps {
   meIndex: number
   keyerIndex: number
   keyer: LibAtemState.MixEffectState_KeyerState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 

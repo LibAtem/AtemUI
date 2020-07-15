@@ -9,7 +9,8 @@ import {
   DecimalWithSliderInput,
   DecimalInput,
   Patterns,
-  PatternInfo
+  PatternInfo,
+  SourcesMap
 } from '../../common'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 import { ResetDVE } from './dve'
@@ -19,7 +20,7 @@ interface PatternProps {
   meIndex: number
   keyerIndex: number
   keyer: LibAtemState.MixEffectState_KeyerState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -68,7 +69,7 @@ export class Pattern extends React.Component<PatternProps> {
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.keyer.properties.fillSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {

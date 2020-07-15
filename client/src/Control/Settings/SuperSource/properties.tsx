@@ -2,7 +2,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { ToggleButton, MaskProperties } from '../common'
-import { DecimalInput, SourceSelectInput, DropdownMenu, DropdownMenuItem } from '../../common'
+import { DecimalInput, SourceSelectInput, DropdownMenu, DropdownMenuItem, SourcesMap } from '../../common'
 import { Layouts } from './layouts'
 
 interface SuperSourcePropertiesSettingsProps {
@@ -34,7 +34,7 @@ interface SuperSourceBoxSettingsProps {
   index: number
   boxIndex: number
   boxProps: LibAtemState.SuperSourceState_BoxState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   version: LibAtemEnums.ProtocolVersion | undefined
 }
 

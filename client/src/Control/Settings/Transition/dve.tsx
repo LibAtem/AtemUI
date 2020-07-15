@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput, SourcesMap } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'
@@ -11,7 +11,7 @@ interface DVETransitionSettingsProps {
   sendCommand: SendCommandStrict
   meIndex: number
   dve: LibAtemState.MixEffectState_TransitionDVEState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -168,7 +168,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.dve.fillSource}
           disabled={!isGraphics}
           onChange={e =>
@@ -197,7 +197,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           label="Key Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.dve.keySource}
           disabled={!isGraphics || !this.props.dve.enableKey}
           onChange={e =>

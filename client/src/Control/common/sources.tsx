@@ -1,18 +1,26 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums } from '../../generated'
 
-function getSourceOptions(
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>,
+export type SourcesMap = ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+
+export function isSourceAvailable(
+  src: LibAtemState.InputState_PropertiesState,
   sourceAvailability: LibAtemEnums.SourceAvailability,
-  meAvailability: LibAtemEnums.MeAvailability = LibAtemEnums.MeAvailability.None
+  meAvailability: number | null
+): boolean {
+  return (
+    (sourceAvailability === LibAtemEnums.SourceAvailability.None ||
+      (src.sourceAvailability & sourceAvailability) === sourceAvailability) &&
+    (meAvailability === null || (src.meAvailability & (1 << meAvailability)) === 1 << meAvailability)
+  )
+}
+function getSourceOptions(
+  sources: SourcesMap,
+  sourceAvailability: LibAtemEnums.SourceAvailability,
+  meAvailability: number | null
 ) {
   return Array.from(sources.entries())
-    .filter(
-      ([i, v]) =>
-        (sourceAvailability === LibAtemEnums.SourceAvailability.None ||
-          (v.sourceAvailability & sourceAvailability) === sourceAvailability) &&
-        (meAvailability === LibAtemEnums.MeAvailability.None || (v.meAvailability & meAvailability) === meAvailability)
-    )
+    .filter(([i, v]) => isSourceAvailable(v, sourceAvailability, meAvailability))
     .sort((a, b) => a[0] - b[0])
     .map(([i, v]) => (
       <option key={i} value={i}>
@@ -24,9 +32,9 @@ function getSourceOptions(
 interface SourceSelectInputProps {
   disabled?: boolean
   label: string
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   sourceAvailability: LibAtemEnums.SourceAvailability
-  meAvailability?: LibAtemEnums.MeAvailability
+  meAvailability?: number | null
   value: LibAtemEnums.VideoSource
   onChange: (val: LibAtemEnums.VideoSource) => void
 }

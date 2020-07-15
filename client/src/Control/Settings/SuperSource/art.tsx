@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../../generated'
-import { SelectInput, SourceSelectInput } from '../../common'
+import { SelectInput, SourceSelectInput, SourcesMap } from '../../common'
 import { PreMultipliedKeyProperties } from '../common'
 import { BorderProperties, ShadowProperties } from '../border'
 
@@ -21,7 +21,7 @@ interface SuperSourceArtSettingsProps {
   index: number
   ssrcProps: LibAtemState.SuperSourceState_PropertiesState
   borderProps: LibAtemState.SuperSourceState_BorderState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   version: LibAtemEnums.ProtocolVersion | undefined
 }
 

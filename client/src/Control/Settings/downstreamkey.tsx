@@ -3,13 +3,13 @@ import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
-import { SourceSelectInput } from '../common/sources'
+import { SourceSelectInput, SourcesMap } from '../common/sources'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
 
   keyers: LibAtemState.DownstreamKeyerState[]
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 interface DownstreamKeyerSettingsState {
@@ -74,7 +74,7 @@ export class DownstreamKeyerSettings extends React.Component<
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={LibAtemEnums.MeAvailability.Me1}
+          meAvailability={0}
           value={this.props.keyers[index].sources.fillSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
@@ -87,7 +87,7 @@ export class DownstreamKeyerSettings extends React.Component<
           label="Key Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-          meAvailability={LibAtemEnums.MeAvailability.Me1}
+          meAvailability={0}
           value={this.props.keyers[index].sources.cutSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {

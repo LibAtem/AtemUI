@@ -5,7 +5,14 @@ import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 import { ToggleButton } from '../common'
 import Slider from 'react-rangeslider'
-import { DropdownMenu, RunButton, DecimalWithSliderInput, SourceSelectInput, DropdownMenuItem } from '../../common'
+import {
+  DropdownMenu,
+  RunButton,
+  DecimalWithSliderInput,
+  SourceSelectInput,
+  DropdownMenuItem,
+  SourcesMap
+} from '../../common'
 import { ResetDVE } from './dve'
 const yuv = require('color-space/yuv')
 
@@ -14,7 +21,7 @@ interface ChromaKeyerAdvancedPropertiesProps {
   meIndex: number
   keyerIndex: number
   keyer: LibAtemState.MixEffectState_KeyerState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -109,7 +116,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.keyer.properties.fillSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {

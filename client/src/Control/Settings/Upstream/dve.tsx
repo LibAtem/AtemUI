@@ -1,7 +1,7 @@
 import React from 'react'
 import { ToggleButton, MaskProperties } from '../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DecimalInput, DropdownMenuItem, DropdownMenu, SourceSelectInput } from '../../common'
+import { DecimalInput, DropdownMenuItem, DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { FlyingKeyFrameProperties } from './flying'
 import { BorderProperties, ShadowProperties } from '../border'
@@ -19,7 +19,7 @@ interface DveKeyerPropertiesProps {
   meIndex: number
   keyerIndex: number
   keyer: LibAtemState.MixEffectState_KeyerState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -43,7 +43,7 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.keyer.properties.fillSource}
           onChange={e =>
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {

@@ -7,6 +7,7 @@ import { StingerTransitionSettings } from './stinger'
 import { TabPanel, TabPanelTab } from '../common'
 import { MixTransitionSettings } from './mix'
 import { SendCommandStrict } from '../../../device-page-wrapper'
+import { SourcesMap } from '../../common'
 
 interface TransitionSettingsState {
   open: boolean
@@ -18,7 +19,7 @@ interface TransitionSettingsProps {
   transition: LibAtemState.MixEffectState_TransitionState
   profile: LibAtemProfile.DeviceProfile
   meIndex: number
-  inputProperties: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -75,7 +76,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sendCommand={this.props.sendCommand}
                 meIndex={this.props.meIndex}
                 dip={this.props.transition.dip}
-                sources={this.props.inputProperties}
+                sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
             ) : (
@@ -89,7 +90,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sendCommand={this.props.sendCommand}
                 meIndex={this.props.meIndex}
                 wipe={this.props.transition.wipe}
-                sources={this.props.inputProperties}
+                sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
             ) : (
@@ -107,7 +108,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sendCommand={this.props.sendCommand}
                 meIndex={this.props.meIndex}
                 stinger={this.props.transition.stinger}
-                sources={this.props.inputProperties}
+                sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
             ) : (
@@ -121,7 +122,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sendCommand={this.props.sendCommand}
                 meIndex={this.props.meIndex}
                 dve={this.props.transition.dve}
-                sources={this.props.inputProperties}
+                sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
             ) : (

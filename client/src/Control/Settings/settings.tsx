@@ -3,18 +3,18 @@ import './settings.scss'
 import { TransitionSettings } from './Transition/transition'
 import { DownstreamKeyerSettings } from './downstreamkey'
 import { UpstreamKey } from './Upstream/upstream'
-import { LibAtemState, LibAtemEnums, LibAtemProfile } from '../../generated'
-import { AtemButtonBar } from '../common'
+import { LibAtemState, LibAtemProfile } from '../../generated'
+import { AtemButtonBar, SourcesMap } from '../common'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
-import { videoIds } from '../../ControlSettings/ids'
 import { SuperSourceSettings } from './SuperSource/supersource'
 
 interface SwitcherSettingsProps {
   sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
+  sources: SourcesMap
   full: boolean
   meIndex: number
 }
@@ -54,15 +54,6 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
   render() {
     if (!this.props.currentState || !this.props.profile) {
       return <div style={this.props.full ? { height: '100%' } : { overflowY: 'auto' }} className="ss"></div>
-    }
-
-    const inputProperties = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
-    // TODO - memo this?
-    for (const [k, v] of Object.entries(this.props.currentState.settings.inputs)) {
-      const id = videoIds[k]
-      if (id !== undefined) {
-        inputProperties.set(id, v.properties)
-      }
     }
 
     const meProps = this.props.currentState.mixEffects[this.props.meIndex] as LibAtemState.MixEffectState | undefined
@@ -106,7 +97,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           sendCommand={this.props.sendCommand}
           transition={meProps.transition}
           profile={this.props.profile}
-          inputProperties={inputProperties}
+          sources={this.props.sources}
           videoMode={this.props.currentState.settings.videoMode}
         />
 
@@ -117,7 +108,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
             index={i}
             hasMultiple={(this.props.currentState?.superSources.length ?? 0) > 1}
             ssrcProps={ssrc}
-            sources={inputProperties}
+            sources={this.props.sources}
             version={this.props.currentState?.info.version}
           />
         ))}
@@ -129,7 +120,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
             keyer={key}
             meIndex={this.props.meIndex}
             keyerIndex={i}
-            sources={inputProperties}
+            sources={this.props.sources}
             videoMode={videoMode}
           />
         ))}
@@ -137,7 +128,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
         <DownstreamKeyerSettings
           sendCommand={this.props.sendCommand}
           videoMode={this.props.currentState.settings.videoMode}
-          sources={inputProperties}
+          sources={this.props.sources}
           keyers={this.props.currentState.downstreamKeyers}
         />
 

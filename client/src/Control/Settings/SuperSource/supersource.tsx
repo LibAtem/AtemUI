@@ -4,13 +4,14 @@ import { LibAtemState, LibAtemEnums } from '../../../generated'
 import { TabPanelTab, TabPanel } from '../common'
 import { SuperSourceArtSettings } from './art'
 import { SuperSourcePropertiesSettings, SuperSourceBoxSettings } from './properties'
+import { SourcesMap } from '../../common'
 
 interface SuperSourceSettingsProps {
   sendCommand: SendCommandStrict
   index: number
   hasMultiple: boolean
   ssrcProps: LibAtemState.SuperSourceState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   version: LibAtemEnums.ProtocolVersion | undefined
 }
 

@@ -1,18 +1,25 @@
 import React from 'react'
-import { AtemButtonBar, RateInput, CheckboxInput, SourceSelectInput } from '../../common'
+import {
+  AtemButtonBar,
+  RateInput,
+  CheckboxInput,
+  SourceSelectInput,
+  SourcesMap,
+  DecimalWithSliderInput,
+  DecimalInput
+} from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
 import { Patterns, PatternInfo } from '../../common/patterns'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DecimalWithSliderInput, DecimalInput } from '../../common/decimal'
 
 interface WipeProps {
   sendCommand: SendCommandStrict
 
   meIndex: number
   wipe: LibAtemState.MixEffectState_TransitionWipeState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -184,7 +191,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
           label="Fill Source"
           sources={this.props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.None}
-          meAvailability={this.props.meIndex + 1}
+          meAvailability={this.props.meIndex}
           value={this.props.wipe.borderInput}
           disabled={this.props.wipe.borderWidth === 0}
           onChange={e =>

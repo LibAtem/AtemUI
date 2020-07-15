@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SourceSelectInput } from '../../common'
+import { RateInput, SourceSelectInput, SourcesMap } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface DipTransitionSettingsProps {
@@ -8,7 +8,7 @@ interface DipTransitionSettingsProps {
 
   meIndex: LibAtemEnums.MixEffectBlockId
   dip: LibAtemState.MixEffectState_TransitionDipState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 
@@ -36,7 +36,7 @@ export function DipTransitionSettings(props: DipTransitionSettingsProps) {
         label="Dip Source"
         sources={props.sources}
         sourceAvailability={LibAtemEnums.SourceAvailability.None}
-        meAvailability={props.meIndex + 1}
+        meAvailability={props.meIndex}
         value={props.dip.input}
         onChange={e =>
           props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {

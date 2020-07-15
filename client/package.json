@@ -40,6 +40,7 @@
     "react-scripts": "^3.4.1",
     "react-select": "^3.0.8",
     "react-simple-tree-menu": "^1.1.7",
+    "shallow-equal": "^1.2.1",
     "typescript": "^3.8.3",
     "underscore": "^1.10.2"
   },

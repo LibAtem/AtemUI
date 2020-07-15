@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SelectInput } from '../../common'
+import { RateInput, SelectInput, SourcesMap } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { PreMultipliedKeyProperties } from '../common'
 
@@ -9,7 +9,7 @@ interface StingerTransitionSettingsProps {
 
   meIndex: LibAtemEnums.MixEffectBlockId
   stinger: LibAtemState.MixEffectState_TransitionStingerState
-  sources: Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
+  sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
 }
 

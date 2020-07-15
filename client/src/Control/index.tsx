@@ -8,11 +8,12 @@ import { DSKPanel } from './dsk'
 import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
-import { BankPanel, InputProps } from './bank'
+import { BankPanel } from './bank'
 import { DevicePageWrapper, sendCommandStrict, SendCommandStrict } from '../device-page-wrapper'
-import { LibAtemState, LibAtemProfile } from '../generated'
-import { AtemButtonBar } from './common'
+import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
+import { AtemButtonBar, SourcesMap } from './common'
 import { CommandTypes } from '../generated/commands'
+import { shallowEqualObjects } from 'shallow-equal'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -114,7 +115,32 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
     )
   }
 
+  private lastSourcesMap: ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState> = new Map()
+  private lastSourcesInput: { [key: string]: LibAtemState.InputState } = {}
+  private getSourcesMap(): SourcesMap {
+    const newInputs = this.props.currentState?.settings?.inputs
+
+    if (!shallowEqualObjects(newInputs ?? {}, this.lastSourcesInput)) {
+      const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
+      if (newInputs) {
+        for (const [k, v] of Object.entries(newInputs)) {
+          const id = videoIds[k]
+          if (id !== undefined) {
+            sources.set(id, v.properties)
+          }
+        }
+      }
+
+      this.lastSourcesInput = { ...newInputs }
+      this.lastSourcesMap = sources
+    }
+
+    return this.lastSourcesMap
+  }
+
   render() {
+    const sources = this.getSourcesMap()
+
     return (
       <MediaQuery minWidth="950px">
         {matches =>
@@ -130,6 +156,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   profile={this.props.profile}
                   device={this.props.device}
                   currentState={this.props.currentState}
+                  sources={sources}
                   meIndex={this.state.meIndex}
                   sendCommand={this.sendCommand}
                 />
@@ -143,6 +170,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   currentState={this.props.currentState}
                   meIndex={this.state.meIndex}
                   profile={this.props.profile}
+                  sources={sources}
                   sendCommand={this.sendCommand}
                 />
               ) : (
@@ -175,6 +203,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   currentState={this.props.currentState}
                   meIndex={this.state.meIndex}
                   profile={this.props.profile}
+                  sources={sources}
                   sendCommand={this.sendCommand}
                 />
               ) : (
@@ -182,6 +211,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   profile={this.props.profile}
                   device={this.props.device}
                   currentState={this.props.currentState}
+                  sources={sources}
                   meIndex={this.state.meIndex}
                   open={this.state.open}
                   sendCommand={this.sendCommand}
@@ -200,15 +230,12 @@ interface MixEffectPanelProps {
   device: AtemDeviceInfo
   currentState: LibAtemState.AtemState | null
   profile: LibAtemProfile.DeviceProfile | null
+  sources: SourcesMap
   open: boolean
   meIndex: number
 }
 interface MixEffectPanelState {
   hasConnected: boolean
-}
-
-function compact<T>(raw: Array<T | undefined>): T[] {
-  return raw.filter(v => v !== undefined) as T[]
 }
 
 class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanelState> {
@@ -248,22 +275,6 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
       return <p>Bad ME</p>
     }
 
-    const sources = compact(
-      Object.entries(currentState.settings.inputs).map(([id, src]) => {
-        const val = videoIds[id as any]
-        if (val !== undefined && src) {
-          const r: InputProps = {
-            index: val,
-            name: src.properties.shortName,
-            type: src.properties.internalPortType
-          }
-          return r
-        } else {
-          return undefined
-        }
-      })
-    )
-
     return (
       <div className={this.props.open ? 'page-wrapper-control open' : 'page-wrapper-control'}>
         <BankPanel
@@ -271,7 +282,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           inTransition={false}
           isProgram={true}
           currentSource={currentME.sources.program}
-          sources={sources}
+          sources={this.props.sources}
           sendCommand={this.props.sendCommand}
         />
         <TransitionStylePanel
@@ -287,7 +298,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
           inTransition={currentME.transition.position.inTransition}
           isProgram={false}
           currentSource={currentME.sources.preview}
-          sources={sources}
+          sources={this.props.sources}
           sendCommand={this.props.sendCommand}
         />
         <NextPanel

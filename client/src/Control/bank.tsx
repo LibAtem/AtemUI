@@ -1,65 +1,68 @@
-import { AtemButtonGeneric } from './common'
+import { AtemButtonGeneric, SourcesMap } from './common'
 import React from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { SendCommandStrict } from '../device-page-wrapper'
+import { LibAtemState, LibAtemEnums } from '../generated'
+import { isSourceAvailable } from './common/sources'
+import * as _ from 'underscore'
 
-export interface InputProps {
-  index: number
-  name: string
-  type: unknown
-}
-
-interface BankProps {
+interface BankPanelProps {
   sendCommand: SendCommandStrict
   meIndex: number
   inTransition: boolean
   isProgram: boolean
   currentSource: number
-  sources: InputProps[]
+  sources: SourcesMap
 }
 
-export function BankPanel(props: BankProps) {
+function createButton(
+  props: BankPanelProps,
+  id: LibAtemEnums.VideoSource,
+  info: LibAtemState.InputState_PropertiesState
+) {
   const buttonColor = props.isProgram || props.inTransition ? 'red' : 'green'
-  const title = props.isProgram ? 'Program' : 'Preview'
-
-  const createButton = (info: InputProps) => (
+  return (
     <AtemButtonGeneric
-      key={info.index}
+      key={id}
       color={buttonColor}
-      name={info.name}
+      name={info.shortName}
       callback={() => {
         if (props.isProgram) {
           props.sendCommand('LibAtem.Commands.MixEffects.ProgramInputSetCommand', {
             Index: props.meIndex,
-            Source: info.index
+            Source: id
           })
         } else {
           props.sendCommand('LibAtem.Commands.MixEffects.PreviewInputSetCommand', {
             Index: props.meIndex,
-            Source: info.index
+            Source: id
           })
         }
       }}
-      active={props.currentSource === info.index}
+      active={props.currentSource === id}
     />
   )
+}
 
-  const tryCreateButton = (index: number) => {
-    const info = props.sources.find(src => src.index === index)
-    if (info) {
-      return createButton(info)
-    } else {
-      return <div key={index}></div>
-    }
+export function BankPanel(props: BankPanelProps) {
+  const title = props.isProgram ? 'Program' : 'Preview'
+
+  const availableSources = Array.from(props.sources.entries()).filter(([i, v]) =>
+    isSourceAvailable(v, LibAtemEnums.SourceAvailability.None, props.meIndex)
+  )
+
+  const groupedSources = _.groupBy(availableSources, ([i, src]) => src.internalPortType)
+  const createOfType = (type: LibAtemEnums.InternalPortType) => {
+    return (groupedSources[type] ?? []).map(([i, src]) => createButton(props, i, src))
   }
 
-  const inputButtons = props.sources.filter(src => src.index < 50 && src.index > 0).map(createButton)
-
-  const blk = tryCreateButton(0)
-  const bars = tryCreateButton(1000)
-  const col1 = tryCreateButton(2001)
-  const mp1 = tryCreateButton(3010)
-  const mp2 = tryCreateButton(3020)
+  const inputButtons = createOfType(LibAtemEnums.InternalPortType.External)
+  const colorButtons = createOfType(LibAtemEnums.InternalPortType.ColorGenerator)
+  const barsButtons = createOfType(LibAtemEnums.InternalPortType.ColorBars)
+  const ssrcButtons = createOfType(LibAtemEnums.InternalPortType.SuperSource)
+  const blackButtons = createOfType(LibAtemEnums.InternalPortType.Black)
+  const mediaPlayerButtons = createOfType(LibAtemEnums.InternalPortType.MediaPlayerFill)
+  const meButtons = createOfType(LibAtemEnums.InternalPortType.MEOutput)
 
   const isPhone = useMediaQuery({ query: '(min-width: 600px)' })
 
@@ -70,11 +73,12 @@ export function BankPanel(props: BankProps) {
         <div className="box-inner-mobile">
           <div className="box-inner-inputs">{inputButtons}</div>
           <div className="box-program-row">
-            {blk}
-            {bars}
-            {col1}
-            {mp1}
-            {mp2}
+            {blackButtons}
+            {ssrcButtons}
+            {barsButtons}
+            {colorButtons}
+            {mediaPlayerButtons}
+            {meButtons}
           </div>
         </div>
       </div>
@@ -86,14 +90,15 @@ export function BankPanel(props: BankProps) {
         <div className="box-inner">
           <div className="box-inner-inputs">{inputButtons}</div>
           <div className="box-inner-mid">
-            {blk}
-            {bars}
+            {blackButtons}
+            {ssrcButtons}
+            {barsButtons}
           </div>
           <div className="box-inner-rest">
-            {col1}
+            {colorButtons}
             <div></div>
-            {mp1}
-            {mp2}
+            {mediaPlayerButtons}
+            {meButtons}
           </div>
         </div>
       </div>
