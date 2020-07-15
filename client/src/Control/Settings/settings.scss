@@ -853,3 +853,54 @@ input[type='number'] {
   }
 
 }
+
+.ss-mediaplayer-panel-holder {
+  display: grid;
+  grid-auto-flow: row;
+
+  .ss-mediaplayer-panel {
+    &:not(:last-child) {
+      border-bottom: 1px solid #000000;
+    }
+
+    margin: 20px;
+
+    .ss-label {
+      text-align: right;
+    }
+
+    .buttons {
+      display: grid;
+      // grid-auto-flow: column;
+      grid-template-columns: auto 30px 30px 30px 30px 30px;
+      column-gap: 10px;
+
+      .ss-label {
+        font-size: 15px;
+        text-align: right;
+        font-weight: bold;
+        color: #b1b1b1;
+      }
+
+      .media-button {
+        @extend .ss-run-button;
+
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+
+        border-radius: 50%;
+
+        &.active {
+          @extend .ss-run-button.active;
+        }
+      }
+    }
+
+    .ss-dropdown {
+      width: 100%;
+      text-overflow: ellipsis;
+    }
+
+  }
+}

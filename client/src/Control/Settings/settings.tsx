@@ -9,6 +9,8 @@ import { SendCommandStrict } from '../../device-page-wrapper'
 import { ColorGeneratorSettings } from './color'
 import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 import { SuperSourceSettings } from './SuperSource/supersource'
+import { MediaPlayerSettings } from './mediaplayers'
+import { HyperdeckSettings } from './hyperdeck'
 
 interface SwitcherSettingsProps {
   sendCommand: SendCommandStrict
@@ -74,8 +76,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
             },
             {
               label: 'Media Players',
-              value: 1,
-              disabled: true
+              value: 1
             },
             {
               label: 'Output',
@@ -83,62 +84,82 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
               disabled: true
             }
           ]}
-          selected={0}
-          onChange={() => {}}
+          selected={this.state.page}
+          onChange={newPage => this.setState({ page: newPage })}
         />
 
-        <ColorGeneratorSettings
-          sendCommand={this.props.sendCommand}
-          colorGenerators={this.props.currentState.colorGenerators}
-        />
+        {this.state.page === 0 ? (
+          <>
+            <ColorGeneratorSettings
+              sendCommand={this.props.sendCommand}
+              colorGenerators={this.props.currentState.colorGenerators}
+            />
 
-        <TransitionSettings
-          meIndex={this.props.meIndex}
-          sendCommand={this.props.sendCommand}
-          transition={meProps.transition}
-          profile={this.props.profile}
-          sources={this.props.sources}
-          videoMode={this.props.currentState.settings.videoMode}
-        />
+            <TransitionSettings
+              meIndex={this.props.meIndex}
+              sendCommand={this.props.sendCommand}
+              transition={meProps.transition}
+              profile={this.props.profile}
+              sources={this.props.sources}
+              videoMode={this.props.currentState.settings.videoMode}
+            />
 
-        {this.props.currentState.superSources.map((ssrc, i) => (
-          <SuperSourceSettings
-            key={`ssrc${i}`}
-            sendCommand={this.props.sendCommand}
-            index={i}
-            hasMultiple={(this.props.currentState?.superSources.length ?? 0) > 1}
-            ssrcProps={ssrc}
-            sources={this.props.sources}
-            version={this.props.currentState?.info.version}
-          />
-        ))}
+            {this.props.currentState.superSources.map((ssrc, i) => (
+              <SuperSourceSettings
+                key={`ssrc${i}`}
+                sendCommand={this.props.sendCommand}
+                index={i}
+                hasMultiple={(this.props.currentState?.superSources.length ?? 0) > 1}
+                ssrcProps={ssrc}
+                sources={this.props.sources}
+                version={this.props.currentState?.info.version}
+              />
+            ))}
 
-        {meProps.keyers.map((key, i) => (
-          <UpstreamKey
-            key={'usk' + i}
-            sendCommand={this.props.sendCommand}
-            keyer={key}
-            meIndex={this.props.meIndex}
-            keyerIndex={i}
-            sources={this.props.sources}
-            videoMode={videoMode}
-          />
-        ))}
+            {meProps.keyers.map((key, i) => (
+              <UpstreamKey
+                key={'usk' + i}
+                sendCommand={this.props.sendCommand}
+                keyer={key}
+                meIndex={this.props.meIndex}
+                keyerIndex={i}
+                sources={this.props.sources}
+                videoMode={videoMode}
+              />
+            ))}
 
-        <DownstreamKeyerSettings
-          sendCommand={this.props.sendCommand}
-          videoMode={this.props.currentState.settings.videoMode}
-          sources={this.props.sources}
-          keyers={this.props.currentState.downstreamKeyers}
-        />
+            <DownstreamKeyerSettings
+              sendCommand={this.props.sendCommand}
+              videoMode={this.props.currentState.settings.videoMode}
+              sources={this.props.sources}
+              keyers={this.props.currentState.downstreamKeyers}
+            />
 
-        <FadeToBlackSettings
-          sendCommand={this.props.sendCommand}
-          meIndex={this.props.meIndex}
-          ftb={meProps.fadeToBlack}
-          videoMode={this.props.currentState.settings.videoMode}
-          {...this.getFtbAudioProps(this.props.currentState)}
-        />
+            <FadeToBlackSettings
+              sendCommand={this.props.sendCommand}
+              meIndex={this.props.meIndex}
+              ftb={meProps.fadeToBlack}
+              videoMode={this.props.currentState.settings.videoMode}
+              {...this.getFtbAudioProps(this.props.currentState)}
+            />
+          </>
+        ) : (
+          undefined
+        )}
+
+        {this.state.page === 1 ? (
+          <>
+            <MediaPlayerSettings
+              sendCommand={this.props.sendCommand}
+              mediaPlayers={this.props.currentState.mediaPlayers}
+              mediaPool={this.props.currentState.mediaPool}
+            />
+
+            <HyperdeckSettings sendCommand={this.props.sendCommand} />
+          </>
+        ) : (
+          undefined
+        )}
       </div>
     )
   }

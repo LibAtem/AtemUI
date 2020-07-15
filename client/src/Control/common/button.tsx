@@ -80,7 +80,9 @@ export class AtemButtonBar<T> extends React.Component<AtemButtonBarProps<T>> {
               className={classes}
               style={this.props.innerStyle}
               onClick={() => {
-                this.props.onChange(opt.value)
+                if (!this.props.disabled && !opt.disabled) {
+                  this.props.onChange(opt.value)
+                }
               }}
               title={opt.tooltip}
             >
