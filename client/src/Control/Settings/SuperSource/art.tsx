@@ -28,21 +28,26 @@ interface SuperSourceArtSettingsProps {
 export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
   const artKeyEnabled = props.ssrcProps.artOption === LibAtemEnums.SuperSourceArtOption.Foreground
 
-  // TODO - protcol version support
-
   return (
     <div>
       <SelectInput
         label="Place In"
         value={props.ssrcProps.artOption}
         options={ArtOptions}
-        onChange={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtOption,
-            ArtOption: v
-          })
-        }
+        onChange={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtOption,
+              ArtOption: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtOption,
+              ArtOption: v
+            })
+          }
+        }}
       />
 
       <SourceSelectInput
@@ -50,13 +55,20 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         sources={props.sources}
         sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt}
         value={props.ssrcProps.artFillSource}
-        onChange={e =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
-            ArtFillSource: e
-          })
-        }
+        onChange={e => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtFillSource,
+              ArtFillSource: e
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtFillSource,
+              ArtFillSource: e
+            })
+          }
+        }}
       />
 
       <SourceSelectInput
@@ -65,13 +77,20 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt | LibAtemEnums.SourceAvailability.KeySource}
         value={props.ssrcProps.artCutSource}
         disabled={!artKeyEnabled}
-        onChange={e =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
-            ArtCutSource: e
-          })
-        }
+        onChange={e => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtCutSource,
+              ArtCutSource: e
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtCutSource,
+              ArtCutSource: e
+            })
+          }
+        }}
       />
 
       <PreMultipliedKeyProperties
@@ -80,34 +99,62 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         clip={props.ssrcProps.artClip}
         gain={props.ssrcProps.artGain}
         invert={props.ssrcProps.artInvertKey}
-        setEnabled={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtPreMultiplied,
-            ArtPreMultiplied: v
-          })
-        }
-        setClip={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtClip,
-            ArtClip: v
-          })
-        }
-        setGain={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtGain,
-            ArtGain: v
-          })
-        }
-        setInvert={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtInvertKey,
-            ArtInvertKey: v
-          })
-        }
+        setEnabled={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtPreMultiplied,
+              ArtPreMultiplied: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtPreMultiplied,
+              ArtPreMultiplied: v
+            })
+          }
+        }}
+        setClip={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtClip,
+              ArtClip: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtClip,
+              ArtClip: v
+            })
+          }
+        }}
+        setGain={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtGain,
+              ArtGain: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtGain,
+              ArtGain: v
+            })
+          }
+        }}
+        setInvert={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags.ArtInvertKey,
+              ArtInvertKey: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.ArtInvertKey,
+              ArtInvertKey: v
+            })
+          }
+        }}
       />
 
       <BorderProperties
@@ -122,75 +169,143 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         opacity={0}
         bevelPosition={props.borderProps.bevelPosition}
         bevelSoftness={props.borderProps.bevelSoftness}
-        setEnabled={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Enabled,
-            Enabled: v
-          })
-        }
-        setColor={color =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Hue: color.h,
-            Saturation: color.s,
-            Luma: color.l,
-            Mask:
-              LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Hue |
-              LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Saturation |
-              LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Luma
-          })
-        }
-        setBevel={e =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Bevel,
-            Bevel: e
-          })
-        }
-        setOuterWidth={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.OuterWidth,
-            OuterWidth: v
-          })
-        }
-        setInnerWidth={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.InnerWidth,
-            InnerWidth: v
-          })
-        }
-        setOuterSoftness={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.OuterSoftness,
-            OuterSoftness: v
-          })
-        }
-        setInnerSoftness={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.InnerSoftness,
-            InnerSoftness: v
-          })
-        }
+        setEnabled={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Enabled,
+              Enabled: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderEnabled,
+              BorderEnabled: v
+            })
+          }
+        }}
+        setColor={color => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Hue: color.h,
+              Saturation: color.s,
+              Luma: color.l,
+              Mask:
+                LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Hue |
+                LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Saturation |
+                LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Luma
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              BorderHue: color.h,
+              BorderSaturation: color.s,
+              BorderLuma: color.l,
+              Mask:
+                LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderHue |
+                LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderSaturation |
+                LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLuma
+            })
+          }
+        }}
+        setBevel={e => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.Bevel,
+              Bevel: e
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderBevel,
+              BorderBevel: e
+            })
+          }
+        }}
+        setOuterWidth={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.OuterWidth,
+              OuterWidth: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderOuterWidth,
+              BorderOuterWidth: v
+            })
+          }
+        }}
+        setInnerWidth={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.InnerWidth,
+              InnerWidth: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderInnerWidth,
+              BorderInnerWidth: v
+            })
+          }
+        }}
+        setOuterSoftness={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.OuterSoftness,
+              OuterSoftness: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderOuterSoftness,
+              BorderOuterSoftness: v
+            })
+          }
+        }}
+        setInnerSoftness={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.InnerSoftness,
+              InnerSoftness: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderInnerSoftness,
+              BorderInnerSoftness: v
+            })
+          }
+        }}
         setOpacity={() => null}
-        setBevelPosition={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.BevelPosition,
-            BevelPosition: v
-          })
-        }
-        setBevelSoftness={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.BevelSoftness,
-            BevelSoftness: v
-          })
-        }
+        setBevelPosition={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.BevelPosition,
+              BevelPosition: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderBevelPosition,
+              BorderBevelPosition: v
+            })
+          }
+        }}
+        setBevelSoftness={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.BevelSoftness,
+              BevelSoftness: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderBevelSoftness,
+              BorderBevelSoftness: v
+            })
+          }
+        }}
       />
 
       <ShadowProperties
@@ -199,20 +314,34 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
         }
         altitude={props.borderProps.lightSourceAltitude}
         direction={props.borderProps.lightSourceDirection}
-        setAltitude={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceAltitude,
-            LightSourceAltitude: v
-          })
-        }
-        setDirection={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
-            SSrcId: props.index,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceDirection,
-            LightSourceDirection: v
-          })
-        }
+        setAltitude={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceAltitude,
+              LightSourceAltitude: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceAltitude,
+              BorderLightSourceAltitude: v
+            })
+          }
+        }}
+        setDirection={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand', {
+              SSrcId: props.index,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBorderSetCommand_MaskFlags.LightSourceDirection,
+              LightSourceDirection: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand', {
+              Mask: LibAtemCommands.SuperSource_SuperSourcePropertiesSetCommand_MaskFlags.BorderLightSourceDirection,
+              BorderLightSourceDirection: v
+            })
+          }
+        }}
       />
     </div>
   )

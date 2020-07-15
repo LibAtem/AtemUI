@@ -39,8 +39,6 @@ interface SuperSourceBoxSettingsProps {
 }
 
 export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
-  // TODO - protcol version support
-
   return (
     <div>
       <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
@@ -59,48 +57,82 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
 
         <DropdownMenu style={{ margin: '10px 10px 0' }} resetAll={true}>
           <DropdownMenuItem
-            onClick={() =>
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                SSrcId: props.index,
-                BoxIndex: props.boxIndex,
-                Mask:
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX |
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
-                PositionX: 0,
-                PositionY: 0
-              })
-            }
+            onClick={() => {
+              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                  SSrcId: props.index,
+                  BoxIndex: props.boxIndex,
+                  Mask:
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
+                  PositionX: 0,
+                  PositionY: 0
+                })
+              } else if (props.index === 0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                  BoxIndex: props.boxIndex,
+                  Mask:
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
+                  PositionX: 0,
+                  PositionY: 0
+                })
+              }
+            }}
           >
             Reset Pos
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                SSrcId: props.index,
-                BoxIndex: props.boxIndex,
-                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
-                Size: 0.5
-              })
-            }
+            onClick={() => {
+              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                  SSrcId: props.index,
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
+                  Size: 0.5
+                })
+              } else if (props.index === 0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                  BoxIndex: props.boxIndex,
+                  Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Size,
+                  Size: 0.5
+                })
+              }
+            }}
           >
             Reset Size
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() =>
-              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-                SSrcId: props.index,
-                BoxIndex: props.boxIndex,
-                Mask:
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop |
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom |
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft |
-                  LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
-                CropTop: 0,
-                CropBottom: 0,
-                CropLeft: 0,
-                CropRight: 0
-              })
-            }
+            onClick={() => {
+              if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                  SSrcId: props.index,
+                  BoxIndex: props.boxIndex,
+                  Mask:
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
+                  CropTop: 0,
+                  CropBottom: 0,
+                  CropLeft: 0,
+                  CropRight: 0
+                })
+              } else if (props.index === 0) {
+                props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                  BoxIndex: props.boxIndex,
+                  Mask:
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropTop |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropBottom |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropLeft |
+                    LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropRight,
+                  CropTop: 0,
+                  CropBottom: 0,
+                  CropLeft: 0,
+                  CropRight: 0
+                })
+              }
+            }}
           >
             Reset Crop
           </DropdownMenuItem>
@@ -113,14 +145,22 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
         sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceBox}
         value={props.boxProps.source}
         disabled={!props.boxProps.enabled}
-        onChange={e =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
-            Source: e
-          })
-        }
+        onChange={e => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Source,
+              Source: e
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Source,
+              Source: e
+            })
+          }
+        }}
       />
 
       <div className="ss-row xy">
@@ -134,14 +174,22 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           max={48}
           value={props.boxProps.positionX}
           disabled={!props.boxProps.enabled}
-          onChange={value =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX,
-              PositionX: value
-            })
-          }
+          onChange={value => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionX,
+                PositionX: value
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionX,
+                PositionX: value
+              })
+            }
+          }}
         />
         <div className={`ss-label right ${!props.boxProps.enabled ? 'disabled' : ''}`}>Y:</div>
         <DecimalInput
@@ -150,14 +198,22 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           max={27}
           value={props.boxProps.positionY}
           disabled={!props.boxProps.enabled}
-          onChange={value =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
-              PositionY: value
-            })
-          }
+          onChange={value => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.PositionY,
+                PositionY: value
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.PositionY,
+                PositionY: value
+              })
+            }
+          }}
         />
       </div>
 
@@ -172,14 +228,22 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           max={1}
           value={props.boxProps.size}
           disabled={!props.boxProps.enabled}
-          onChange={value =>
-            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-              SSrcId: props.index,
-              BoxIndex: props.boxIndex,
-              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
-              Size: value
-            })
-          }
+          onChange={value => {
+            if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+                SSrcId: props.index,
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Size,
+                Size: value
+              })
+            } else if (props.index === 0) {
+              props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+                BoxIndex: props.boxIndex,
+                Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Size,
+                Size: value
+              })
+            }
+          }}
         />
       </div>
 
@@ -191,46 +255,86 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
         maskBottom={props.boxProps.cropBottom}
         maskLeft={props.boxProps.cropLeft}
         maskRight={props.boxProps.cropRight}
-        setMaskEnabled={value =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Cropped,
-            Cropped: value
-          })
-        }
-        setMaskTop={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop,
-            CropTop: v
-          })
-        }
-        setMaskBottom={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom,
-            CropBottom: v
-          })
-        }
-        setMaskLeft={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft,
-            CropLeft: v
-          })
-        }
-        setMaskRight={v =>
-          props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
-            SSrcId: props.index,
-            BoxIndex: props.boxIndex,
-            Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
-            CropRight: v
-          })
-        }
+        setMaskEnabled={value => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.Cropped,
+              Cropped: value
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.Cropped,
+              Cropped: value
+            })
+          }
+        }}
+        setMaskTop={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropTop,
+              CropTop: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropTop,
+              CropTop: v
+            })
+          }
+        }}
+        setMaskBottom={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropBottom,
+              CropBottom: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropBottom,
+              CropBottom: v
+            })
+          }
+        }}
+        setMaskLeft={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropLeft,
+              CropLeft: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropLeft,
+              CropLeft: v
+            })
+          }
+        }}
+        setMaskRight={v => {
+          if (!props.version || props.version >= LibAtemEnums.ProtocolVersion.V8_0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetV8Command', {
+              SSrcId: props.index,
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetV8Command_MaskFlags.CropRight,
+              CropRight: v
+            })
+          } else if (props.index === 0) {
+            props.sendCommand('LibAtem.Commands.SuperSource.SuperSourceBoxSetCommand', {
+              BoxIndex: props.boxIndex,
+              Mask: LibAtemCommands.SuperSource_SuperSourceBoxSetCommand_MaskFlags.CropRight,
+              CropRight: v
+            })
+          }
+        }}
       />
     </div>
   )
