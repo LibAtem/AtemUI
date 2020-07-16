@@ -335,26 +335,26 @@ class NavBar extends React.PureComponent<{
             <IndexLinkContainer to="/">
               <Nav.Link>Home</Nav.Link>
             </IndexLinkContainer>
-            <LinkContainer to="/commands">
-              <Nav.Link>Manual Commands</Nav.Link>
-            </LinkContainer>
             <LinkContainer to="/control">
               <Nav.Link>Control</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/settings">
               <Nav.Link>Settings</Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/state">
-              <Nav.Link>State</Nav.Link>
-            </LinkContainer>
-            <LinkContainer to="/profile">
-              <Nav.Link>Profile</Nav.Link>
-            </LinkContainer>
             <LinkContainer to="/media">
               <Nav.Link>Media</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/audio">
               <Nav.Link>Audio</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/commands">
+              <Nav.Link>Manual Commands</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/state">
+              <Nav.Link>State</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/profile">
+              <Nav.Link>Profile</Nav.Link>
             </LinkContainer>
           </Nav>
           <Nav className="justify-content-end">
