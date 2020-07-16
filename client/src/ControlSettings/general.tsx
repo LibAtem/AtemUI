@@ -1,11 +1,7 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../Devices/types'
-import { GetDeviceId } from '../DeviceManager'
-import { Container, Form, Row, Col } from 'react-bootstrap'
-import Slider from 'react-rangeslider'
-import { prettyDecimal } from '../util'
+import { Container } from 'react-bootstrap'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { RunButton, SelectInput } from '../components'
+import { RunButton, SelectInput, DecimalWithSliderInput } from '../components'
 import { LibAtemState, LibAtemEnums, VideoModeInfoSet } from '../generated'
 
 const SDI3GLevelOptions = [
@@ -21,49 +17,10 @@ const SDI3GLevelOptions = [
 
 interface GeneralSettingsProps {
   sendCommand: SendCommandStrict
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
+  currentState: LibAtemState.AtemState
 }
-interface GeneralSettingsState {
-  clip1Length: number
-  clip2Length: number
-}
-export class GeneralSettings extends React.Component<GeneralSettingsProps, GeneralSettingsState> {
-  constructor(props: GeneralSettingsProps) {
-    super(props)
-    this.state = {
-      clip1Length: props.currentState.mediaPool.clips[0].maxFrames,
-      clip2Length: props.currentState.mediaPool.clips[1].maxFrames
-    }
-  }
-
-  private sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
+export class GeneralSettings extends React.Component<GeneralSettingsProps> {
   render() {
-    const { currentState, currentProfile } = this.props
-
-    var maxFrames = 0
-    for (var i = 0; i < currentState.mediaPool.clips.length; i++) {
-      maxFrames += currentState.mediaPool.clips[i].maxFrames
-    }
     return (
       <Container className="maxW">
         <div className="atem-form center">
@@ -75,100 +32,20 @@ export class GeneralSettings extends React.Component<GeneralSettingsProps, Gener
 
           <hr />
 
-          <MediaPoolSettings sendCommand={this.props.sendCommand} clips={this.props.currentState.mediaPool.clips} />
+          <MediaPoolSettings
+            sendCommand={this.props.sendCommand}
+            clips={this.props.currentState.mediaPool.clips}
+            unassignedFrames={this.props.currentState.mediaPool.unassignedFrames}
+            key={countMaxFrames(
+              this.props.currentState.mediaPool.clips,
+              this.props.currentState.mediaPool.unassignedFrames
+            )}
+          />
 
           <hr />
 
           <CameraControlSettings sendCommand={this.props.sendCommand} />
         </div>
-
-        <h3>Media Pool</h3>
-        <small id="emailHelp" className="form-text text-muted">
-          There are {maxFrames} frames to share between the clips
-        </small>
-
-        <Form.Group as={Row}>
-          <Form.Label column sm="4">
-            Clip 1 Length:
-          </Form.Label>
-          <Col sm="6">
-            <Slider
-              key={0}
-              min={0}
-              max={maxFrames}
-              step={1}
-              // labels={"horizontalLabels"}
-              onChange={v => {
-                this.setState({
-                  clip1Length: v,
-                  clip2Length: maxFrames - v
-                })
-              }}
-              value={this.state.clip1Length}
-              // defaultValue={0}
-              format={prettyDecimal}
-            />
-            <br key={1} />
-          </Col>
-          <Col sm="2">
-            <Form.Control
-              key={2}
-              type="number"
-              placeholder={''}
-              min={0}
-              max={maxFrames}
-              value={prettyDecimal(this.state.clip1Length)}
-              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-                if (e.currentTarget.value) {
-                  this.setState({
-                    clip1Length: parseInt(e.currentTarget.value),
-                    clip2Length: maxFrames - parseInt(e.currentTarget.value)
-                  })
-                }
-              }}
-            />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row}>
-          <Form.Label column sm="4">
-            Clip 2 Length:
-          </Form.Label>
-          <Col sm="6">
-            <Slider
-              key={0}
-              min={0}
-              max={maxFrames}
-              step={1}
-              onChange={v => {
-                this.setState({
-                  clip2Length: v,
-                  clip1Length: maxFrames - v
-                })
-              }}
-              value={this.state.clip2Length}
-              format={prettyDecimal}
-            />
-            <br key={1} />
-          </Col>
-          <Col sm="2">
-            <Form.Control
-              key={2}
-              type="number"
-              placeholder={''}
-              min={0}
-              max={maxFrames}
-              value={prettyDecimal(this.state.clip2Length)}
-              onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-                if (e.currentTarget.value) {
-                  this.setState({
-                    clip2Length: parseInt(e.currentTarget.value),
-                    clip1Length: maxFrames - parseInt(e.currentTarget.value)
-                  })
-                }
-              }}
-            />
-          </Col>
-        </Form.Group>
       </Container>
     )
   }
@@ -311,32 +188,83 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
   }
 }
 
+function countMaxFrames(clips: LibAtemState.MediaPoolState_ClipState[], unassigned: number) {
+  let maxFrames = unassigned
+  for (const clip of clips) {
+    maxFrames += clip.maxFrames
+  }
+  return maxFrames
+}
+
 interface MediaPoolSettingsProps {
   sendCommand: SendCommandStrict
   clips: LibAtemState.MediaPoolState_ClipState[]
-  // state: LibAtemState.SettingsState
-  // info: LibAtemState.InfoState
+  unassignedFrames: number
 }
-class MediaPoolSettings extends React.Component<MediaPoolSettingsProps> {
-  render() {
-    let maxFrames = 0
-    for (const clip of this.props.clips) {
-      maxFrames += clip.maxFrames
+interface MediaPoolSettingsState {
+  frames: number[] | null
+}
+class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoolSettingsState> {
+  constructor(props: MediaPoolSettingsProps) {
+    super(props)
+
+    this.state = {
+      frames: null
     }
+  }
+  render() {
+    const maxFrames = countMaxFrames(this.props.clips, this.props.unassignedFrames)
 
     return (
       <>
         <div className="atem-heading">Media Pool</div>
         <div className="atem-note">There are {maxFrames} frames to share between the clips</div>
 
-        {this.props.clips.map((clip, i) => (
-          <>
-            <div key={`label${i}`} className="atem-label">
-              Clip {i + 1} length:
-            </div>
-            <div key={`slider${i}`}>TODO</div>
-          </>
+        {this.props.clips.map((clip, id) => (
+          <DecimalWithSliderInput
+            label={`Clip ${id + 1} length`}
+            step={1}
+            min={0}
+            max={maxFrames}
+            value={this.state.frames ? this.state.frames[id] : clip.maxFrames}
+            onChange={newValue => {
+              if (this.props.clips.length === 2) {
+                // As there is only 2, changing one will change the other
+                const clampedValue = Math.max(Math.min(newValue, maxFrames), 0)
+                const newFrames =
+                  id === 0 ? [clampedValue, maxFrames - clampedValue] : [maxFrames - clampedValue, clampedValue]
+                this.setState({ frames: newFrames })
+              } else if (this.props.clips.length > 2) {
+                // Here we have a pool of unassignedFrames, and changing one does not affect the others
+                const newFrames = this.state.frames ? [...this.state.frames] : this.props.clips.map(cl => cl.maxFrames)
+
+                const otherInUse = newFrames.filter((v, i) => i !== id).reduce((a, b) => a + b, 0)
+                const clampedValue = Math.max(Math.min(newValue, maxFrames - otherInUse), 0)
+
+                newFrames[id] = clampedValue
+                this.setState({ frames: newFrames })
+              }
+            }}
+          />
         ))}
+
+        <div></div>
+        <div>
+          <RunButton
+            disabled={!this.state.frames}
+            label="Set"
+            onClick={() => {
+              if (this.state.frames !== null) {
+                this.props.sendCommand('LibAtem.Commands.Media.MediaPoolSettingsSetCommand', {
+                  MaxFrames: this.state.frames
+                })
+              }
+
+              this.setState({ frames: null })
+            }}
+          />
+          <RunButton disabled={!this.state.frames} label="Discard" onClick={() => this.setState({ frames: null })} />
+        </div>
       </>
     )
   }

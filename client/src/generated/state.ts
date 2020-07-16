@@ -73,6 +73,7 @@ export interface MacroState {
 export interface MediaPoolState {
   stills: MediaPoolState_StillState[]
   clips: MediaPoolState_ClipState[]
+  unassignedFrames: number
 }
 
 export interface SettingsState {

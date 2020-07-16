@@ -151,13 +151,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
         {this.state.page === 0 ? (
           <ErrorBoundary key={0}>
-            <GeneralSettings
-              sendCommand={this.sendCommand}
-              device={device}
-              currentState={currentState}
-              signalR={this.props.signalR}
-              currentProfile={this.props.currentProfile}
-            />
+            <GeneralSettings sendCommand={this.sendCommand} currentState={currentState} />
           </ErrorBoundary>
         ) : (
           undefined

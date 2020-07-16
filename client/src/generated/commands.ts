@@ -989,6 +989,7 @@ export interface Media_MediaPoolSetClipCommand {
 
 export interface Media_MediaPoolSettingsGetCommand {
   MaxFrames: number[]
+  UnassignedFrames: number
 }
 
 export interface Media_MediaPoolSettingsSetCommand {
