@@ -9,10 +9,11 @@ import multiview3 from './assets/multiview3.svg'
 import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
 import { LibAtemState, LibAtemProfile } from '../generated'
-import { sendCommand, sendCommandStrict } from '../device-page-wrapper'
+import { sendCommandStrict } from '../device-page-wrapper'
 import { AtemButtonBar } from '../Control/common'
 import { GeneralSettings } from './general'
 import { CommandTypes } from '../generated/commands'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -25,17 +26,19 @@ export class ControlSettingsPage extends React.Component {
     return (
       <div className="settings-page">
         <Container>
-          {device && this.context.signalR ? (
-            <ControlSettingsPageInner
-              key={this.context.activeDeviceId || ''}
-              device={device}
-              currentState={this.context.currentState}
-              currentProfile={this.context.currentProfile}
-              signalR={this.context.signalR}
-            />
-          ) : (
-            <p>No device selected</p>
-          )}
+          <ErrorBoundary key={this.context.activeDeviceId || ''}>
+            {device && this.context.signalR ? (
+              <ControlSettingsPageInner
+                key={this.context.activeDeviceId || ''}
+                device={device}
+                currentState={this.context.currentState}
+                currentProfile={this.context.currentProfile}
+                signalR={this.context.signalR}
+              />
+            ) : (
+              <p>No device selected</p>
+            )}
+          </ErrorBoundary>
         </Container>
       </div>
     )
@@ -147,13 +150,15 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
         />
 
         {this.state.page === 0 ? (
-          <GeneralSettings
-            sendCommand={this.sendCommand}
-            device={device}
-            currentState={currentState}
-            signalR={this.props.signalR}
-            currentProfile={this.props.currentProfile}
-          />
+          <ErrorBoundary key={0}>
+            <GeneralSettings
+              sendCommand={this.sendCommand}
+              device={device}
+              currentState={currentState}
+              signalR={this.props.signalR}
+              currentProfile={this.props.currentProfile}
+            />
+          </ErrorBoundary>
         ) : (
           undefined
         )}
@@ -161,25 +166,29 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
         {/* TODO Audio */}
 
         {this.state.page === 2 ? (
-          <MultiViewSettings
-            device={device}
-            currentState={currentState}
-            signalR={this.props.signalR}
-            currentProfile={this.props.currentProfile}
-          />
+          <ErrorBoundary key={2}>
+            <MultiViewSettings
+              device={device}
+              currentState={currentState}
+              signalR={this.props.signalR}
+              currentProfile={this.props.currentProfile}
+            />
+          </ErrorBoundary>
         ) : (
           undefined
         )}
 
         {this.state.page === 3 ? (
-          <LabelSettings
-            device={device}
-            currentState={currentState}
-            signalR={this.props.signalR}
-            currentProfile={this.props.currentProfile}
-            sendCommand={this.sendCommand}
-            updateLabel={this.updateLabel}
-          />
+          <ErrorBoundary key={3}>
+            <LabelSettings
+              device={device}
+              currentState={currentState}
+              signalR={this.props.signalR}
+              currentProfile={this.props.currentProfile}
+              sendCommand={this.sendCommand}
+              updateLabel={this.updateLabel}
+            />
+          </ErrorBoundary>
         ) : (
           undefined
         )}

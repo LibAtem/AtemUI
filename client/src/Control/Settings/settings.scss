@@ -302,6 +302,10 @@
     &.disabled {
       color: #646464;
     }
+
+    .ss-color-picker {
+      margin-left: 1rem;
+    }
   }
 }
 
@@ -576,7 +580,7 @@ input[type='number'] {
   -moz-appearance: textfield;
 }
 
-.sss .rangeslider.rangeslider-vertical {
+.rangeslider.rangeslider-vertical {
   width: 3px;
   border-radius: 10px;
   background: #161616;
@@ -593,27 +597,22 @@ input[type='number'] {
   }
 }
 
-.sss.disabled .rangeslider__handle {
+.disabled .rangeslider__handle {
   pointer-events: none;
   display: none;
 }
 
-.sss .rangeslider__fill {
+.rangeslider__fill {
   background-color: grey;
   display: none;
 }
 
-.sss .rangeslider__handle::after {
+.rangeslider__handle::after {
   display: none;
 }
 
-.sss .rangeslider__labels {
+.rangeslider__labels {
   display: none;
-}
-
-
-.ss-pmk {
-  outline: 1px solid #1a1a1a;
 }
 
 .ss-submenu-submenu {

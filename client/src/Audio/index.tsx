@@ -4,6 +4,7 @@ import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import Slider from 'react-rangeslider'
 import { LibAtemEnums } from '../generated'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class AudioPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -14,17 +15,19 @@ export class AudioPage extends React.Component {
     const device = GetActiveDevice(this.context)
     return (
       <div className="page-audio">
-        <div></div>
-        {device ? (
-          <AudioPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            currentState={this.context.currentState}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
+        <ErrorBoundary key={this.context.activeDeviceId || ''}>
+          <div></div>
+          {device ? (
+            <AudioPageInner
+              key={this.context.activeDeviceId || ''}
+              device={device}
+              currentState={this.context.currentState}
+              signalR={this.context.signalR}
+            />
+          ) : (
+            <p>No device selected</p>
+          )}
+        </ErrorBoundary>
       </div>
     )
   }
@@ -113,10 +116,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
   }
 
   render() {
-    if (
-      this.props.currentState == null ||
-      this.props.currentState.audio.inputs == undefined
-    ) {
+    if (this.props.currentState == null || this.props.currentState.audio.inputs == undefined) {
       return <p>Waiting for Profile</p>
     }
 

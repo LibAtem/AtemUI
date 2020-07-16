@@ -43,10 +43,27 @@
     margin: 10px 10px 0;
   }
 
-  .atem-note {
-    color: #858585;
-    margin: -10px 20px 0;
-    font-size: 13px;
-    grid-column: span 2;
+}
+
+.error-boundary {
+  .atem-heading {
+    font-size: 1.5rem;
+    margin: 10px 10px 0;
   }
+
+  .atem-note {
+    font-size: 1.1rem;
+    margin-top: -5px;
+  }
+
+  .atem-button {
+    margin: 5px 40px;
+  }
+}
+
+.atem-note {
+  color: #858585;
+  margin: -10px 20px 0;
+  font-size: 13px;
+  grid-column: span 2;
 }

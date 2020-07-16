@@ -8,6 +8,7 @@ import update from 'immutability-helper'
 import ToggleSwitch from 'bootstrap-switch-button-react'
 import Slider from 'react-rangeslider'
 import { prettyDecimal } from '../util'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class ManualCommandsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -19,15 +20,17 @@ export class ManualCommandsPage extends React.Component {
       <Container>
         <h2>Manual Commands</h2>
 
-        {device ? (
-          <ManualCommandsPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
+        <ErrorBoundary key={this.context.activeDeviceId || ''}>
+          {device ? (
+            <ManualCommandsPageInner
+              key={this.context.activeDeviceId || ''}
+              device={device}
+              signalR={this.context.signalR}
+            />
+          ) : (
+            <p>No device selected</p>
+          )}
+        </ErrorBoundary>
       </Container>
     )
   }

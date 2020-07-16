@@ -425,7 +425,6 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
         </div>
         {this.props.props.enableCursor ? (
           <div
-            className="sss"
             style={{
               gridAutoFlow: 'column',
               display: 'grid',

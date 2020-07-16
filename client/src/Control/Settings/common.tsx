@@ -1,5 +1,6 @@
 import React from 'react'
 import { CheckboxInput, ToggleHeading, DecimalWithSliderInput, DecimalInputWithLabel } from '../common'
+import { ErrorBoundary } from '../../errorBoundary'
 
 interface MaskPropertiesProps {
   type: 'key' | 'dve' | 'ssrc-box'
@@ -178,6 +179,6 @@ export class TabPanel extends React.Component<TabPanelProps> {
 
 export class TabPanelTab extends React.Component<{ id: number; label: string; disabled?: boolean }> {
   render() {
-    return <React.Fragment>{this.props.children}</React.Fragment>
+    return <ErrorBoundary key={this.props.id}>{this.props.children}</ErrorBoundary>
   }
 }

@@ -5,6 +5,7 @@ import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceMan
 import remove from './assets/remove.svg'
 import './media.css'
 import { LibAtemState } from '../generated'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -17,16 +18,18 @@ export class UploadMediaPage extends React.Component {
 
     return (
       <div>
-        {device ? (
-          <MediaPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            currentState={this.context.currentState}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
+        <ErrorBoundary key={this.context.activeDeviceId || ''}>
+          {device ? (
+            <MediaPageInner
+              key={this.context.activeDeviceId || ''}
+              device={device}
+              currentState={this.context.currentState}
+              signalR={this.context.signalR}
+            />
+          ) : (
+            <p>No device selected</p>
+          )}
+        </ErrorBoundary>
       </div>
     )
   }

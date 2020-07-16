@@ -14,16 +14,19 @@ import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
 import { AtemButtonBar, SourcesMap } from './common'
 import { CommandTypes } from '../generated/commands'
 import { shallowEqualObjects } from 'shallow-equal'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
-      <ControlPageInnerInner
-        device={device}
-        currentState={this.context.currentState}
-        signalR={signalR}
-        profile={this.context.currentProfile}
-      />
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        <ControlPageInnerInner
+          device={device}
+          currentState={this.context.currentState}
+          signalR={signalR}
+          profile={this.context.currentProfile}
+        />
+      </ErrorBoundary>
     )
   }
 }

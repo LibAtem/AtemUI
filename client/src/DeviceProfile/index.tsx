@@ -6,6 +6,7 @@ import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-
 import { literal } from '../util'
 import { isObject } from 'util'
 import { LibAtemProfile } from '../generated'
+import { ErrorBoundary } from '../errorBoundary'
 
 export class DeviceProfileViewerPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -17,16 +18,18 @@ export class DeviceProfileViewerPage extends React.Component {
       <Container>
         <h2>Device DeviceProfile</h2>
 
-        {device ? (
-          <DeviceProfileViewerPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            currentDeviceProfile={this.context.currentProfile}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
+        <ErrorBoundary key={this.context.activeDeviceId || ''}>
+          {device ? (
+            <DeviceProfileViewerPageInner
+              key={this.context.activeDeviceId || ''}
+              device={device}
+              currentDeviceProfile={this.context.currentProfile}
+              signalR={this.context.signalR}
+            />
+          ) : (
+            <p>No device selected</p>
+          )}
+        </ErrorBoundary>
       </Container>
     )
   }
@@ -49,7 +52,7 @@ class DeviceProfileViewerPageInner extends React.Component<
     super(props)
 
     this.state = {
-      hasConnected: props.device.connected,
+      hasConnected: props.device.connected
     }
   }
 
