@@ -149,7 +149,7 @@ export class TabPanel extends React.Component<TabPanelProps> {
         <div className="ss-submenu-submenu">
           {children.length <= 1 && this.props.hideSingle
             ? undefined
-            : children.map(ch => {
+            : children.map((ch, i) => {
                 let classes = 'ss-submenu-submenu-item'
                 if (ch.props.disabled) {
                   classes += ' disabled'
@@ -158,6 +158,7 @@ export class TabPanel extends React.Component<TabPanelProps> {
                 }
                 return (
                   <div
+                    key={i}
                     onClick={() => {
                       if (!ch.props.disabled) {
                         this.props.onChange(ch.props.id)

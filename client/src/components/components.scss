@@ -347,7 +347,10 @@
     font-size: 14px;
     line-height: 25px;
 
-    &.disabled {
+    margin: 0 5px;
+    padding: 0 10px;
+
+    &:disabled {
         background: #333333;
         color: #646464;
         border: 1px solid #252525;

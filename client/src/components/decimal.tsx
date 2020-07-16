@@ -1,5 +1,6 @@
 import React from 'react'
 import Slider from 'react-rangeslider'
+import { prettyDecimal } from '../util'
 
 interface DecimalInputProps {
   onChange: (value: number) => void
@@ -38,7 +39,7 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
 
   render() {
     const step = this.props.step || 0.01
-    const roundedValue = Math.round(this.props.value / step) * step
+    const prettyValue = prettyDecimal(Math.round(this.props.value / step) * step)
 
     return (
       <input
@@ -49,9 +50,9 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
           this.setState({ focus: false })
           this.finishValue(e.currentTarget.value)
         }}
-        onFocus={e => this.setState({ focus: true, tempValue: `${roundedValue}` })}
+        onFocus={e => this.setState({ focus: true, tempValue: prettyValue })}
         onChange={e => this.setState({ tempValue: e.currentTarget.value })}
-        value={this.state.focus ? this.state.tempValue : roundedValue}
+        value={this.state.focus ? this.state.tempValue : prettyValue}
         onKeyPress={e => {
           if (e.key === 'Enter') {
             this.finishValue(e.currentTarget.value)
