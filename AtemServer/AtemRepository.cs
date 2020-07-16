@@ -64,7 +64,7 @@ namespace AtemServer
                 SendState(null);
             };
 
-            Client.OnReceive += async (sender, commands) =>
+            Client.OnReceive += (sender, commands) =>
             {
                 var changedPaths = new HashSet<string>();
                 var errors = new List<string>();
@@ -473,6 +473,7 @@ namespace AtemServer
                     device.Enabled = false;
                     SetupConnection(device);
                     
+                    // TODO - don't delete it, unless it has not been seen in a while
                     dbDevices.Delete(id);
                     changed = devices.Remove(id);
                 }

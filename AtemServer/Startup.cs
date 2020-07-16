@@ -26,10 +26,6 @@ namespace AtemServer
             {
                 //
             });
-              /*  .AddJsonProtocol(options =>
-            {
-                options.PayloadSerializerOptions.WriteIndented = false;
-            })*/
             
             services.AddSingleton<AtemRepository>();
 

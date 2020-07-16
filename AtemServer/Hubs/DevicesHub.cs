@@ -13,17 +13,17 @@ namespace AtemServer.Hubs
 {
     public class DevicesHub : Hub
     {
-        private readonly AtemRepository repo_;
+        private readonly AtemRepository _repo;
 
         public DevicesHub(AtemRepository repo)
         {
-            repo_ = repo;
+            _repo = repo;
         }
         
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             //await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
-            repo_.DisconnectClient(Context.ConnectionId);
+            _repo.DisconnectClient(Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -40,7 +40,7 @@ namespace AtemServer.Hubs
 
         public Task DeviceList()
         {
-            return SendDevices(repo_.ListDevices());
+            return SendDevices(_repo.ListDevices());
         }
 
         private async Task SendMutateResponse(Tuple<bool, IReadOnlyList<AtemDevice>> res, string msg)
@@ -57,25 +57,25 @@ namespace AtemServer.Hubs
 
         public Task DeviceAdd(string address, int port)
         {
-            return SendMutateResponse(repo_.AddDevice(address, port), "Add");
+            return SendMutateResponse(_repo.AddDevice(address, port), "Add");
         }
 
         public Task DeviceForget(string address, int port)
         {
-            return SendMutateResponse(repo_.ForgetDevice(address, port), "Forget");
+            return SendMutateResponse(_repo.ForgetDevice(address, port), "Forget");
         }
 
         public Task DeviceEnabled(string address, int port, bool enabled)
         {
-            return SendMutateResponse(repo_.SetDeviceEnabled(address, port, enabled), "Enabled");
+            return SendMutateResponse(_repo.SetDeviceEnabled(address, port, enabled), "Enabled");
         }
         #endregion Devices
 
-        private static IReadOnlyDictionary<string, Type> commandTypesMap;
+        private static IReadOnlyDictionary<string, Type> _commandTypesMap;
 
         private static Type TranslateToType(string fullName)
         {
-            if (commandTypesMap == null)
+            if (_commandTypesMap == null)
             {
                 var newTypesMap = new Dictionary<string, Type>();
                 foreach (var commandSet in CommandManager.GetAllTypes())
@@ -86,13 +86,13 @@ namespace AtemServer.Hubs
                     }
                 }
 
-                commandTypesMap = newTypesMap;
+                _commandTypesMap = newTypesMap;
             }
 
-            return commandTypesMap.TryGetValue(fullName, out Type value) ? value : null;
+            return _commandTypesMap.TryGetValue(fullName, out Type value) ? value : null;
         }
 
-        public async Task CommandSend(string deviceId, string commandName, string propertiesStr)
+        public void CommandSend(string deviceId, string commandName, string propertiesStr)
         {
 
             Console.WriteLine("Attempting to send {0} to {1} ({2})", commandName, deviceId, propertiesStr);
@@ -108,7 +108,7 @@ namespace AtemServer.Hubs
             Console.WriteLine("Got obj {0}", cmd);
 
             // Now try to send this command
-            var client = repo_.GetConnection(deviceId);
+            var client = _repo.GetConnection(deviceId);
             if (client == null)
             {
                 throw new Exception("Bad deviceId");
@@ -120,7 +120,7 @@ namespace AtemServer.Hubs
 
         public void updateLabel(string deviceId, string name, uint id)
         {
-            var client = repo_.GetConnection(deviceId);
+            var client = _repo.GetConnection(deviceId);
             if (client == null)
             {
                 throw new Exception("Bad deviceId");
@@ -137,25 +137,25 @@ namespace AtemServer.Hubs
             Console.WriteLine("Sucess? {0}", result);
         }
 
-        public async Task<AtemState> SubscribeState(string deviceId)
+        public AtemState SubscribeState(string deviceId)
         {
-            return repo_.SubscribeClient(Context.ConnectionId, deviceId);
+            return _repo.SubscribeClient(Context.ConnectionId, deviceId);
         }
         
-        public async void UnsubscribeState(string deviceId)
+        public void UnsubscribeState(string deviceId)
         {
-            repo_.UnsubscribeClient(Context.ConnectionId, deviceId);
+            _repo.UnsubscribeClient(Context.ConnectionId, deviceId);
         }
 
-        public Task<DeviceProfile> SendProfile(string deviceId)
+        public DeviceProfile SendProfile(string deviceId)
         {
-            var client = repo_.GetConnection(deviceId);
+            var client = _repo.GetConnection(deviceId);
             if (client == null)
             {
                 throw new Exception("Bad deviceId");
             }
 
-            return Task.FromResult(client.GetProfile());
+            return client.GetProfile();
         }
 
     }

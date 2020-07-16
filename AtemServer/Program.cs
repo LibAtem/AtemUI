@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Reflection;
+using ElectronNET.API;
 using log4net;
 using log4net.Config;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace AtemServer
 {
@@ -29,6 +24,7 @@ namespace AtemServer
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseElectron(args)
                 .UseStartup<Startup>();
     }
 }
