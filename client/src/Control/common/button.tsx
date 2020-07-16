@@ -104,25 +104,6 @@ interface CheckboxInputProps {
 }
 export function CheckboxInput(props: CheckboxInputProps) {
   return (
-    <label className={props.disabled ? 'ss-checkbox-container disabled' : 'ss-checkbox-container'} style={props.style}>
-      {props.label}
-      <input
-        type="checkbox"
-        disabled={props.disabled}
-        checked={props.value}
-        onChange={e => {
-          if (!props.disabled) {
-            props.onChange(e.currentTarget.checked)
-          }
-        }}
-      />
-      <span className={props.disabled ? 'checkmark disabled' : 'checkmark'}></span>
-    </label>
-  )
-}
-
-export function CheckboxInput2(props: CheckboxInputProps) {
-  return (
     <label
       className={props.disabled ? 'atem-checkbox-container disabled' : 'atem-checkbox-container'}
       style={props.style}
@@ -168,7 +149,7 @@ export function RunButton(props: RunButtonProps) {
   )
 }
 
-export function ToggleButton2(props: {
+export function ToggleHeading(props: {
   label: string | JSX.Element
   active: boolean
   onClick: (val: boolean) => void

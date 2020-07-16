@@ -13,7 +13,6 @@ interface DecimalInputState {
   focus: boolean
   tempValue: string
 }
-
 export class DecimalInput extends React.Component<DecimalInputProps, DecimalInputState> {
   constructor(props: DecimalInputProps) {
     super(props)
@@ -23,7 +22,7 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
     }
   }
 
-  private finishValue(val: string, unfocus?: boolean) {
+  private finishValue(val: string) {
     let valNum = Number(val)
     if (val !== '' && !isNaN(valNum)) {
       if (this.props.max !== undefined) {
@@ -33,10 +32,6 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
         valNum = Math.max(this.props.min, valNum)
       }
 
-      // this.setState({
-      //   tempValue: `${valNum}`,
-      //   focus: unfocus ? false : this.state.focus
-      // })
       this.props.onChange(valNum)
     }
   }
@@ -52,7 +47,7 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
         disabled={this.props.disabled}
         onBlur={e => {
           this.setState({ focus: false })
-          this.finishValue(e.currentTarget.value, true)
+          this.finishValue(e.currentTarget.value)
         }}
         onFocus={e => this.setState({ focus: true, tempValue: `${roundedValue}` })}
         onChange={e => this.setState({ tempValue: e.currentTarget.value })}
@@ -68,18 +63,6 @@ export class DecimalInput extends React.Component<DecimalInputProps, DecimalInpu
   }
 }
 
-export function DecimalWithSliderInput(props: DecimalInputProps & { label: string }) {
-  return (
-    <div className="ss-slider-holder">
-      <div className={props.disabled ? 'sss ss-slider-outer disabled' : 'sss ss-slider-outer'}>
-        <Slider tooltip={false} {...props} />
-        <div className={props.disabled ? 'ss-slider-label disabled' : 'ss-slider-label'}>{props.label}:</div>
-      </div>
-      <DecimalInput {...props} />
-    </div>
-  )
-}
-
 export function DecimalInputWithLabel(props: DecimalInputProps & { label: string }) {
   return (
     <React.Fragment>
@@ -92,7 +75,7 @@ export function DecimalInputWithLabel(props: DecimalInputProps & { label: string
   )
 }
 
-export function DecimalWithSliderInput2(props: DecimalInputProps & { label: string }) {
+export function DecimalWithSliderInput(props: DecimalInputProps & { label: string }) {
   return (
     <div className="atem-slider-holder">
       <div className={`atem-slider-holder-inner ${props.disabled ? 'disabled' : ''}`}>

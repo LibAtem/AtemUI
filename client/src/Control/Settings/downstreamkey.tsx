@@ -3,7 +3,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
-import { SourcesMap, SourceSelectInput2 } from '../common/sources'
+import { SourcesMap, SourceSelectInput } from '../common/sources'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
@@ -141,7 +141,7 @@ export class DownstreamKeyerSettings extends React.Component<
                   </DropdownMenu>
                 </div>
 
-                <SourceSelectInput2
+                <SourceSelectInput
                   label="Fill Source"
                   sources={this.props.sources}
                   sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -154,7 +154,7 @@ export class DownstreamKeyerSettings extends React.Component<
                     })
                   }
                 />
-                <SourceSelectInput2
+                <SourceSelectInput
                   label="Key Source"
                   sources={this.props.sources}
                   sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}

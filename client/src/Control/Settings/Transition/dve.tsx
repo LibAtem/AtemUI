@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar, CheckboxInput2, SourceSelectInput2, SourcesMap } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput, SourcesMap } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'
@@ -117,8 +117,9 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               }}
             />
 
-            <CheckboxInput2
+            <CheckboxInput
               label="Flip Flop"
+              style={{ gridColumn: 'span 1' }}
               value={this.props.dve.flipFlop}
               disabled={isGraphicsSpin}
               onChange={v =>
@@ -161,7 +162,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }}
           />
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -177,7 +178,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }
           />
 
-          <CheckboxInput2
+          <CheckboxInput
             label="Enable Key"
             value={this.props.dve.enableKey}
             disabled={!isGraphics}
@@ -191,7 +192,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             }
           />
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Key Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}

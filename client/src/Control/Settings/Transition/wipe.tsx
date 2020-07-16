@@ -5,8 +5,8 @@ import {
   CheckboxInput,
   SourcesMap,
   DecimalInput,
-  DecimalWithSliderInput2,
-  SourceSelectInput2
+  DecimalWithSliderInput,
+  SourceSelectInput
 } from '../../common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
@@ -68,7 +68,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
             />
           </div>
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label={'Symmetry'}
             disabled={!currentPatternInfo?.symmetry}
             value={this.props.wipe.symmetry}
@@ -144,6 +144,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
 
             <CheckboxInput
               label="Flip Flop"
+              style={{ gridColumn: 'span 1' }}
               value={this.props.wipe.flipFlop}
               onChange={v =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
@@ -156,7 +157,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
           </div>
 
           <div className="atem-heading">Border</div>
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Softness"
             step={0.1}
             min={0}
@@ -171,7 +172,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
             value={this.props.wipe.borderSoftness}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Width"
             step={0.1}
             min={0}
@@ -186,7 +187,7 @@ export class WipeTransitionSettings extends React.Component<WipeProps> {
             value={this.props.wipe.borderWidth}
           />
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}

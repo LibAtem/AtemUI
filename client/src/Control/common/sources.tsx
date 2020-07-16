@@ -38,27 +38,7 @@ interface SourceSelectInputProps {
   value: LibAtemEnums.VideoSource
   onChange: (val: LibAtemEnums.VideoSource) => void
 }
-// export function SourceSelectInput(props: SourceSelectInputProps) {
-//   return (
-//     <div className="ss-row">
-//       <div className={`ss-label ${props.disabled ? 'disabled' : ''}`}>{props.label}:</div>
-//       <select
-//         disabled={props.disabled}
-//         onChange={e => props.onChange(Number(e.currentTarget.value))}
-//         value={props.value}
-//         className="atem-dropdown"
-//       >
-//         {getSourceOptions(
-//           props.sources,
-//           props.sourceAvailability,
-//           props.meAvailability ?? LibAtemEnums.MeAvailability.None
-//         )}
-//       </select>
-//     </div>
-//   )
-// }
-
-export function SourceSelectInput2(props: SourceSelectInputProps) {
+export function SourceSelectInput(props: SourceSelectInputProps) {
   return (
     <>
       <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>{props.label}:</div>

@@ -65,6 +65,7 @@ export class FadeToBlackSettings extends React.Component<FadeToBlackSettingsProp
                   label="Audio Follow Video"
                   value={this.props.followFadeToBlack}
                   disabled={this.props.meIndex !== 0 || this.props.ftbMode === null}
+                  style={{ gridColumn: 'span 1' }}
                   onChange={v => {
                     switch (this.props.ftbMode) {
                       case 'classic':

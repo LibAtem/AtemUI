@@ -5,7 +5,7 @@ import { Container, Form, Row, Col } from 'react-bootstrap'
 import Slider from 'react-rangeslider'
 import { prettyDecimal } from '../util'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { SelectInput2 } from '../Control/common/select'
+import { SelectInput } from '../Control/common/select'
 import { RunButton } from '../Control/common'
 import { LibAtemState, LibAtemEnums, VideoModeInfoSet } from '../generated'
 
@@ -224,7 +224,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
       <>
         <div className="atem-heading">Video</div>
 
-        <SelectInput2
+        <SelectInput
           label="Set video standard to"
           value={currentVideoMode}
           options={videoModes}
@@ -232,7 +232,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
         />
 
         {/* TODO - is this correct and the lib has it named wrong? */}
-        <SelectInput2
+        <SelectInput
           label="Set multi view video standard to"
           disabled={!multiviewerModes || multiviewerModes.length <= 1}
           value={this.state.multiViewMode ?? this.props.state.downConvertVideoMode}
@@ -241,7 +241,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
         />
 
         {/* TODO - this bit doesnt make sense... */}
-        <SelectInput2
+        <SelectInput
           label="Down convert as"
           disabled={!downConvertModes || downConvertModes.length <= 1}
           value={this.state.downConvertMode ?? this.props.state.downConvertMode}
@@ -250,7 +250,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
         />
 
         {/* TODO - this should be disabled for most modes... */}
-        <SelectInput2
+        <SelectInput
           label="Set 3G SDI output to"
           value={this.state.sdi3GLevel ?? this.props.state.sDI3GLevel}
           options={SDI3GLevelOptions}

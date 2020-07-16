@@ -3,15 +3,15 @@ import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
-import { ToggleButton } from '../common'
 import Slider from 'react-rangeslider'
 import {
   DropdownMenu,
   RunButton,
-  DecimalWithSliderInput2,
-  SourceSelectInput2,
+  DecimalWithSliderInput,
+  SourceSelectInput,
   DropdownMenuItem,
-  SourcesMap
+  SourcesMap,
+  ToggleHeading
 } from '../../common'
 import { ResetDVE } from './dve'
 const yuv = require('color-space/yuv')
@@ -114,7 +114,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             </DropdownMenu>
           </div>
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -137,7 +137,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
           />
 
           <div className="atem-heading">Key Adjustments</div>
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Foreground"
             step={0.1}
             min={0}
@@ -154,7 +154,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.foregroundLevel}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Background"
             step={0.1}
             min={0}
@@ -171,7 +171,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.backgroundLevel}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Key Edge"
             step={0.1}
             min={0}
@@ -188,7 +188,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
           />
 
           <div className="atem-heading">Chroma Correction</div>
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Spill"
             step={0.1}
             min={0}
@@ -205,7 +205,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.spillSuppression}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Flare Suppression"
             step={0.1}
             min={0}
@@ -224,7 +224,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
           />
 
           <div className="atem-heading">Color Adjustments</div>
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Brightness"
             step={0.1}
             min={-100}
@@ -240,7 +240,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.brightness}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Contrast"
             step={0.1}
             min={-100}
@@ -255,7 +255,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.contrast}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Saturation"
             step={0.1}
             min={0}
@@ -272,7 +272,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             value={this.props.keyer.advancedChroma.properties.saturation}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Red"
             step={0.1}
             min={-100}
@@ -287,7 +287,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.red}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Green"
             step={0.1}
             min={-100}
@@ -302,7 +302,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             }
             value={this.props.keyer.advancedChroma.properties.green}
           />
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Blue"
             step={0.1}
             min={-100}
@@ -387,7 +387,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
     return (
       <div style={{ gridColumn: 'span 2' }}>
         <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
-          <ToggleButton
+          <ToggleHeading
             label={
               <div style={{ gridAutoFlow: 'column', display: 'grid' }}>
                 Chroma Sample

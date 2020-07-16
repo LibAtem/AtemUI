@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../../generated'
-import { SelectInput2, SourceSelectInput2, SourcesMap } from '../../common'
+import { SelectInput, SourceSelectInput, SourcesMap } from '../../common'
 import { PreMultipliedKeyProperties } from '../common'
 import { BorderProperties, ShadowProperties } from '../border'
 
@@ -31,7 +31,7 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
   return (
     <>
       <div className="atem-form">
-        <SelectInput2
+        <SelectInput
           label="Place In"
           value={props.ssrcProps.artOption}
           options={ArtOptions}
@@ -51,7 +51,7 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
           }}
         />
 
-        <SourceSelectInput2
+        <SourceSelectInput
           label="Fill Source"
           sources={props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceArt}
@@ -72,7 +72,7 @@ export function SuperSourceArtSettings(props: SuperSourceArtSettingsProps) {
           }}
         />
 
-        <SourceSelectInput2
+        <SourceSelectInput
           label="Key Source"
           sources={props.sources}
           sourceAvailability={

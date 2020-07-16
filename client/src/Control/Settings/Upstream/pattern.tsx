@@ -3,10 +3,10 @@ import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import {
-  CheckboxInput2,
+  CheckboxInput,
   DropdownMenu,
-  SourceSelectInput2,
-  DecimalWithSliderInput2,
+  SourceSelectInput,
+  DecimalWithSliderInput,
   DecimalInput,
   Patterns,
   PatternInfo,
@@ -66,7 +66,7 @@ export class Pattern extends React.Component<PatternProps> {
             </DropdownMenu>
           </div>
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -85,7 +85,7 @@ export class Pattern extends React.Component<PatternProps> {
             {Object.keys(Patterns).map(v => this.renderPattern(currentPattern, Number(v)))}
           </div>
 
-          <CheckboxInput2
+          <CheckboxInput
             label="Invert Pattern"
             value={this.props.keyer.pattern.inverse}
             onChange={v =>
@@ -98,7 +98,7 @@ export class Pattern extends React.Component<PatternProps> {
             }
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Size"
             step={0.1}
             min={0}
@@ -114,7 +114,7 @@ export class Pattern extends React.Component<PatternProps> {
             value={this.props.keyer.pattern.size}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Symmetry"
             disabled={!currentPatternInfo?.symmetry}
             step={0.1}
@@ -131,7 +131,7 @@ export class Pattern extends React.Component<PatternProps> {
             value={this.props.keyer.pattern.symmetry}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Softness"
             step={0.1}
             min={0}

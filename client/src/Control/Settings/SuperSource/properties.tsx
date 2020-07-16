@@ -4,11 +4,11 @@ import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
 import { MaskProperties } from '../common'
 import {
   DecimalInput,
-  SourceSelectInput2,
+  SourceSelectInput,
   DropdownMenu,
   DropdownMenuItem,
   SourcesMap,
-  ToggleButton2,
+  ToggleHeading,
   DecimalInputWithLabel
 } from '../../common'
 import { Layouts } from './layouts'
@@ -23,7 +23,7 @@ export class SuperSourcePropertiesSettings extends React.PureComponent<SuperSour
   render() {
     return (
       <div>
-        <div className="atem-heading">Layout</div>
+        <div className="ss-heading">Layout</div>
 
         <div className="ss-ssrc-layout-grid">
           {Layouts.map((l, i) => (
@@ -51,7 +51,7 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
     <>
       <div className="atem-form">
         <div style={{ gridColumn: 'span 2', display: 'grid', gridAutoFlow: 'column' }}>
-          <ToggleButton2
+          <ToggleHeading
             label="Enable box"
             active={props.boxProps.enabled}
             onClick={v =>
@@ -148,7 +148,7 @@ export function SuperSourceBoxSettings(props: SuperSourceBoxSettingsProps) {
           </DropdownMenu>
         </div>
 
-        <SourceSelectInput2
+        <SourceSelectInput
           label="Source"
           sources={props.sources}
           sourceAvailability={LibAtemEnums.SourceAvailability.SuperSourceBox}

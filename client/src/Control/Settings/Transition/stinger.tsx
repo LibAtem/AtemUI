@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SelectInput, SourcesMap, SelectInput2 } from '../../common'
+import { RateInput, SourcesMap, SelectInput } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { PreMultipliedKeyProperties } from '../common'
 
@@ -23,7 +23,7 @@ export function StingerTransitionSettings(props: StingerTransitionSettingsProps)
   return (
     <>
       <div className="atem-form">
-        <SelectInput2
+        <SelectInput
           label="Source"
           value={props.stinger.source}
           options={getMediaPlayerOptions(props)}

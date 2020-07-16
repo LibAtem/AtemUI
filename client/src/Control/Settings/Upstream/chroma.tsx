@@ -2,14 +2,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
-import {
-  CheckboxInput,
-  DropdownMenu,
-  DecimalWithSliderInput2,
-  SourceSelectInput2,
-  SourcesMap,
-  CheckboxInput2
-} from '../../common'
+import { DropdownMenu, DecimalWithSliderInput, SourceSelectInput, SourcesMap, CheckboxInput } from '../../common'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 import { ResetDVE } from './dve'
 
@@ -39,7 +32,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             </DropdownMenu>
           </div>
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -54,7 +47,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             }
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Hue"
             step={0.1}
             min={0}
@@ -70,7 +63,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             value={this.props.keyer.chroma.hue}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Gain"
             step={0.1}
             min={0}
@@ -86,7 +79,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             value={this.props.keyer.chroma.gain}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Y Suppress"
             step={0.1}
             min={0}
@@ -102,7 +95,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             value={this.props.keyer.chroma.ySuppress}
           />
 
-          <DecimalWithSliderInput2
+          <DecimalWithSliderInput
             label="Lift"
             step={0.1}
             min={0}
@@ -118,7 +111,7 @@ export class ChromaKeyerClassicProperties extends React.Component<ChromaKeyerCla
             value={this.props.keyer.chroma.lift}
           />
 
-          <CheckboxInput2
+          <CheckboxInput
             label="Narrow Chroma Key Range"
             value={this.props.keyer.chroma.narrow}
             onChange={v =>

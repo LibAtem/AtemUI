@@ -4,7 +4,7 @@ import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
-import { DropdownMenu, SourceSelectInput2, SourcesMap } from '../../common'
+import { DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
 import { ResetDVE } from './dve'
 
 interface LumaKeyerSettingsProps {
@@ -33,7 +33,7 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
             </DropdownMenu>
           </div>
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -47,7 +47,7 @@ export class LumaKeyerSettings extends React.Component<LumaKeyerSettingsProps> {
               })
             }
           />
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Key Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}

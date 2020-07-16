@@ -5,9 +5,9 @@ import {
   DecimalInput,
   DropdownMenuItem,
   DropdownMenu,
-  SourceSelectInput2,
+  SourceSelectInput,
   SourcesMap,
-  ToggleButton2
+  ToggleHeading
 } from '../../common'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { FlyingKeyFrameProperties } from './flying'
@@ -47,7 +47,7 @@ export class DveKeyerProperties extends React.Component<DveKeyerPropertiesProps>
             </DropdownMenu>
           </div>
 
-          <SourceSelectInput2
+          <SourceSelectInput
             label="Fill Source"
             sources={this.props.sources}
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
@@ -348,7 +348,7 @@ function DVEMaskProperties(props: DveSubPanelProps) {
 function Shadow(props: DveSubPanelProps) {
   return (
     <div className="atem-form">
-      <ToggleButton2
+      <ToggleHeading
         active={props.keyerProps.borderShadowEnabled}
         label={'Shadow'}
         onClick={v =>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SourceSelectInput2, SourcesMap } from '../../common'
+import { RateInput, SourceSelectInput, SourcesMap } from '../../common'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface DipTransitionSettingsProps {
@@ -30,7 +30,7 @@ export function DipTransitionSettings(props: DipTransitionSettingsProps) {
         />
       </div>
 
-      <SourceSelectInput2
+      <SourceSelectInput
         label="Dip Source"
         sources={props.sources}
         sourceAvailability={LibAtemEnums.SourceAvailability.None}

@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  CheckboxInput2,
-  ToggleButton2,
-  DecimalWithSliderInput2,
-  DecimalWithSliderInput,
-  DecimalInputWithLabel
-} from '../common'
+import { CheckboxInput, ToggleHeading, DecimalWithSliderInput, DecimalInputWithLabel } from '../common'
 
 interface MaskPropertiesProps {
   type: 'key' | 'dve' | 'ssrc-box'
@@ -33,7 +27,7 @@ export function MaskProperties(props: MaskPropertiesProps) {
 
   return (
     <div className="atem-form">
-      <ToggleButton2
+      <ToggleHeading
         label={props.type === 'ssrc-box' ? 'Crop' : 'Mask'}
         active={props.maskEnabled}
         disabled={props.disabled}
@@ -101,14 +95,14 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
 
   return (
     <div className="atem-form">
-      <ToggleButton2
+      <ToggleHeading
         disabled={props.disabled}
         active={props.enabled}
         label={'Pre Multiplied Key'}
         onClick={() => props.setEnabled(!props.enabled)}
       />
 
-      <DecimalWithSliderInput2
+      <DecimalWithSliderInput
         disabled={disableControls}
         label="Clip"
         value={props.clip}
@@ -118,7 +112,7 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
         onChange={e => props.setClip(e)}
       />
 
-      <DecimalWithSliderInput2
+      <DecimalWithSliderInput
         disabled={disableControls}
         label="Gain"
         value={props.gain}
@@ -128,30 +122,13 @@ export function PreMultipliedKeyProperties(props: PreMultipliedKeyPropertiesProp
         onChange={e => props.setGain(e)}
       />
 
-      <CheckboxInput2
+      <CheckboxInput
         label="Invert"
         disabled={disableControls}
         style={{ gridColumn: 'span 2' }}
         value={props.invert}
         onChange={e => props.setInvert(e)}
       />
-    </div>
-  )
-}
-
-export function ToggleButton(props: {
-  label: string | JSX.Element
-  active: boolean
-  onClick: (val: boolean) => void
-  disabled?: boolean
-}) {
-  return (
-    <div
-      className="ss-circle-button-holder"
-      onClick={() => (!props.disabled ? props.onClick(!props.active) : undefined)}
-    >
-      <div className="ss-circle-button">{props.active ? <div className="ss-circle-button-inner"></div> : ''}</div>
-      <div className={`ss-heading ${props.disabled ? 'disabled' : ''}`}>{props.label}</div>
     </div>
   )
 }

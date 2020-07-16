@@ -156,32 +156,34 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                         }
                       />
                     </div>
-                    <SelectInput
-                      label="Media"
-                      value={isClip ? mp.source.sourceIndex + clipOffset : mp.source.sourceIndex}
-                      options={mediaOptions}
-                      onChange={v => {
-                        if (v >= clipOffset) {
-                          this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
-                            Mask:
-                              LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.SourceType |
-                              LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.ClipIndex,
-                            Index: id,
-                            SourceType: LibAtemEnums.MediaPlayerSource.Clip,
-                            ClipIndex: v % clipOffset
-                          })
-                        } else {
-                          this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
-                            Mask:
-                              LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.SourceType |
-                              LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.StillIndex,
-                            Index: id,
-                            SourceType: LibAtemEnums.MediaPlayerSource.Still,
-                            StillIndex: v
-                          })
-                        }
-                      }}
-                    />
+                    <div className="atem-form no-border">
+                      <SelectInput
+                        label="Media"
+                        value={isClip ? mp.source.sourceIndex + clipOffset : mp.source.sourceIndex}
+                        options={mediaOptions}
+                        onChange={v => {
+                          if (v >= clipOffset) {
+                            this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
+                              Mask:
+                                LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.SourceType |
+                                LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.ClipIndex,
+                              Index: id,
+                              SourceType: LibAtemEnums.MediaPlayerSource.Clip,
+                              ClipIndex: v % clipOffset
+                            })
+                          } else {
+                            this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
+                              Mask:
+                                LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.SourceType |
+                                LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.StillIndex,
+                              Index: id,
+                              SourceType: LibAtemEnums.MediaPlayerSource.Still,
+                              StillIndex: v
+                            })
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                 )
               })}

@@ -3,7 +3,7 @@ import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { DVECommonProprties } from './dve'
 import { RateInput } from '../../common'
-import { RunButton, ToggleButton2 } from '../../common'
+import { RunButton, ToggleHeading } from '../../common'
 import { literal } from '../../../util'
 import * as _ from 'underscore'
 import { FlyingPatternInfo, FlyingPatternImage } from './flying-pattern'
@@ -17,7 +17,7 @@ export function FlyingKeyerProperties(props: {
 }) {
   return (
     <>
-      <ToggleButton2
+      <ToggleHeading
         active={props.flyEnabled}
         label="Flying Key"
         onClick={v =>
