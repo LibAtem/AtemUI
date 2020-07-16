@@ -1,5 +1,5 @@
 import React from 'react'
-import { CheckboxInput, ToggleHeading, DecimalWithSliderInput, DecimalInputWithLabel } from '../common'
+import { CheckboxInput, ToggleHeading, DecimalWithSliderInput, DecimalInputWithLabel } from '../../components'
 import { ErrorBoundary } from '../../errorBoundary'
 
 interface MaskPropertiesProps {

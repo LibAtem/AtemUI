@@ -7,7 +7,7 @@ import { StingerTransitionSettings } from './stinger'
 import { TabPanel, TabPanelTab } from '../common'
 import { MixTransitionSettings } from './mix'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { SourcesMap } from '../../common'
+import { SourcesMap } from '../../../components'
 
 interface TransitionSettingsState {
   open: boolean

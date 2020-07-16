@@ -5,8 +5,7 @@ import { Container, Form, Row, Col } from 'react-bootstrap'
 import Slider from 'react-rangeslider'
 import { prettyDecimal } from '../util'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { SelectInput } from '../Control/common/select'
-import { RunButton } from '../Control/common'
+import { RunButton, SelectInput } from '../components'
 import { LibAtemState, LibAtemEnums, VideoModeInfoSet } from '../generated'
 
 const SDI3GLevelOptions = [

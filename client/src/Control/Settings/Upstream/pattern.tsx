@@ -11,7 +11,7 @@ import {
   Patterns,
   PatternInfo,
   SourcesMap
-} from '../../common'
+} from '../../../components'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 import { ResetDVE } from './dve'
 

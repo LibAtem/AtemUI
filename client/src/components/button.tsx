@@ -132,21 +132,33 @@ interface RunButtonProps {
   style?: React.CSSProperties
 }
 export function RunButton(props: RunButtonProps) {
-  let classes = 'ss-run-button'
+  let classes = 'atem-button'
   if (props.disabled) {
-    classes += ' disabled'
+    // classes += ' disabled'
   } else if (props.active) {
     classes += ' active'
   }
+
   return (
-    <div
-      style={props.style ?? { width: '50px' }}
-      onClick={() => (!props.disabled ? props.onClick() : undefined)}
+    <button
+      style={props.style}
       className={classes}
+      disabled={props.disabled}
+      onClick={() => (!props.disabled ? props.onClick() : undefined)}
     >
       {props.label}
-    </div>
+    </button>
   )
+
+  // return (
+  //   <div
+  //     style={props.style ?? { width: '50px' }}
+  //     onClick={() => (!props.disabled ? props.onClick() : undefined)}
+  //     className={classes}
+  //   >
+  //     {props.label}
+  //   </div>
+  // )
 }
 
 export function ToggleHeading(props: {

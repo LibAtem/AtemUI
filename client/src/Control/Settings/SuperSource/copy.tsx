@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemEnums } from '../../../generated'
-import { CheckboxInput, RunButton } from '../../common'
+import { CheckboxInput, RunButton } from '../../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { literal } from '../../../util'
@@ -61,7 +61,7 @@ export class SuperSourceBoxCopySettings extends React.Component<
     return (
       <div className="ss-ssrc-copy-boxes">
         <div>
-          <div className="ss-heading">From:</div>
+          <div className="atem-heading">From:</div>
 
           <div className="ss-boxes-option-group">
             {this.props.boxProps.map((box, i) => (
@@ -81,7 +81,7 @@ export class SuperSourceBoxCopySettings extends React.Component<
           <FontAwesomeIcon icon={faChevronRight} />
         </div>
         <div>
-          <div className="ss-heading">To:</div>
+          <div className="atem-heading">To:</div>
 
           <div className="ss-boxes-option-group">
             {this.props.boxProps.map((box, i) => {

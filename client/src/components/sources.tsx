@@ -1,5 +1,5 @@
 import React from 'react'
-import { LibAtemState, LibAtemEnums } from '../../generated'
+import { LibAtemState, LibAtemEnums } from '../generated'
 
 export type SourcesMap = ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>
 

@@ -1,7 +1,6 @@
 import React from 'react'
-import { AtemButtonGeneric } from './common'
+import { AtemButtonGeneric, RateInput } from '../components'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { RateInput } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands, LibAtemProfile } from '../generated'
 
 interface StyleProps {

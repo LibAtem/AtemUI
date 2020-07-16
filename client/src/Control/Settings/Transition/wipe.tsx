@@ -6,12 +6,13 @@ import {
   SourcesMap,
   DecimalInput,
   DecimalWithSliderInput,
-  SourceSelectInput
-} from '../../common'
+  SourceSelectInput,
+  PatternInfo,
+  Patterns
+} from '../../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
-import { Patterns, PatternInfo } from '../../common/patterns'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface WipeProps {

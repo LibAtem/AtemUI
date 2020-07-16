@@ -1,9 +1,8 @@
-import { AtemButtonGeneric, SourcesMap } from './common'
+import { AtemButtonGeneric, SourcesMap, isSourceAvailable } from '../components'
 import React from 'react'
 import { useMediaQuery } from 'react-responsive'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemEnums } from '../generated'
-import { isSourceAvailable } from './common/sources'
 import * as _ from 'underscore'
 
 interface BankPanelProps {

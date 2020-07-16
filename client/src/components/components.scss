@@ -1,0 +1,408 @@
+.atem-form {
+    display: grid;
+    // grid-auto-flow: column;
+    grid-template-columns: auto auto;
+    margin: 10px;
+    column-gap: 10px;
+    row-gap: 10px;
+    white-space: nowrap;
+
+    &:not(:first-child):not(.no-border) {
+        border-top: solid 1px #1a1a1a;
+    }
+
+    &.center {
+        grid-template-columns: 1fr 1fr;
+
+        .atem-label {
+            text-align: right;
+        }
+    }
+
+    hr {
+        grid-column: span 2;
+        width: 100%;
+        margin: 0.5rem 0 0;
+        border-color: #858585;
+    }
+
+    .content-split {
+        display: grid;
+        grid-template-columns: auto auto;
+        column-gap: 10px;
+    }
+
+    .content-xy {
+        display: grid;
+        grid-template-columns: 0fr 1fr 0fr 1fr;
+        column-gap: 10px;
+    }
+
+    .atem-heading {
+        grid-column: span 2;
+        margin: 5px 0;
+
+        .ss-color-picker {
+            margin-left: 1rem;
+        }
+    }
+}
+
+
+.atem-heading {
+    color: #bfbfbf;
+    margin: 10px;
+    font-size: 14px;
+
+    &.disabled {
+        color: #646464;
+    }
+}
+
+.atem-label {
+    position: relative;
+    font-size: 13px;
+    color: #858585;
+    line-height: 25px;
+    // vertical-align: middle;
+
+    &.right {
+        text-align: right;
+    }
+
+    &.disabled {
+        color: #505050;
+    }
+}
+
+.atem-dropdown {
+    background: #282828;
+    border: 1px solid #1a1a1a;
+    border-radius: 5px;
+    color: #9c9c9c;
+    font-size: 14px;
+    padding-left: 5px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    text-overflow: ellipsis;
+
+    &:disabled {
+        color: #6d6d6d;
+        background: #3d3d3d;
+        border: 1px solid #2b2b2b;
+    }
+
+    * {
+        border-radius: 2px;
+        border: none;
+    }
+
+    option {
+        border: none;
+    }
+
+    button {
+        display: none;
+    }
+}
+
+.atem-toggle-heading-holder {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 30px 1fr;
+
+    grid-column: span 2;
+
+    .atem-toggle-circle-button {
+        position: relative;
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background: #282828;
+        border: solid 1px #1c1c1c;
+        margin: 15px 10px;
+    }
+
+    .atem-toggle-circle-button-inner {
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        height: 6px;
+        width: 6px;
+        border-radius: 50%;
+        background: #ff9900;
+        /* border:solid 1px #111111; */
+    }
+
+    .atem-heading {
+        width: fit-content;
+        margin-left: 5px;
+        align-self: center;
+    }
+}
+
+.atem-slider-holder {
+    grid-column: span 2;
+
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    column-gap: 15px;
+    margin: 10px 0 0;
+
+    .atem-slider-holder-inner {
+        position: relative;
+    }
+
+    .atem-slider-label {
+        position: absolute;
+        font-size: 12px;
+        top: -15px;
+        color: #858585;
+
+        &.disabled {
+            color: #505050;
+        }
+    }
+
+
+    .rangeslider.rangeslider-horizontal {
+        height: 3px;
+        border-radius: 10px;
+        background: #161616;
+        margin: 11px 0;
+
+        .rangeslider__handle {
+            width: 14px;
+            height: 14px;
+            border-radius: 14px;
+            top: 50%;
+            transform: translate3d(-50%, -50%, 0);
+            background: #8f8f8f;
+            /* border: 1px solid #505050; */
+        }
+    }
+
+    .disabled .rangeslider.rangeslider-horizontal {
+        pointer-events: none;
+        background: #303030;
+    }
+
+    .disabled .rangeslider__handle {
+        pointer-events: none;
+        display: none;
+    }
+
+    .rangeslider__fill {
+        background-color: grey;
+        display: none;
+    }
+
+    .rangeslider__handle::after {
+        display: none;
+    }
+
+    .rangeslider__labels {
+        display: none;
+    }
+}
+
+.rangeslider.rangeslider-vertical {
+    width: 3px;
+    border-radius: 10px;
+    background: #161616;
+    margin: 0 11px;
+
+    .rangeslider__handle {
+        width: 14px;
+        height: 14px;
+        border-radius: 14px;
+        left: 50%;
+        transform: translate3d(-50%, 0, 0);
+        background: #8f8f8f;
+        /* border: 1px solid #505050; */
+    }
+}
+
+.disabled .rangeslider__handle {
+    pointer-events: none;
+    display: none;
+}
+
+.rangeslider__fill {
+    background-color: grey;
+    display: none;
+}
+
+.rangeslider__handle::after {
+    display: none;
+}
+
+.rangeslider__labels {
+    display: none;
+}
+
+.atem-checkbox-container {
+    grid-column: span 2;
+
+    /* display: block; */
+    position: relative;
+    align-self: center;
+    padding-left: 20px;
+    /* margin-bottom: 12px; */
+    // margin-left: 15px;
+    // margin-top: 3px;
+    margin: 0;
+    font-size: 13px;
+    color: #858585;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    &.disabled {
+        color: #505050;
+        cursor: default;
+    }
+
+    /* On mouse-over, add a grey background color */
+    &:hover input~.checkmark {
+        background-color: rgb(29, 29, 29);
+    }
+
+
+    /* Create a custom checkbox */
+    .checkmark {
+        position: absolute;
+        top: 2px;
+        cursor: pointer;
+        left: 0;
+        height: 15px;
+        width: 15px;
+        border-radius: 3px;
+        background-color: rgb(41, 41, 41);
+
+        &.disabled {
+            cursor: default;
+            color: #777676;
+
+            &:after {
+                border: solid rgb(85, 85, 85);
+                border-width: 0 3px 3px 0;
+            }
+        }
+
+        /* Create the checkmark/indicator (hidden when not checked) */
+        &:after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid rgb(216, 216, 216);
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+    }
+
+    /* Hide the browser's default checkbox */
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+
+        /* When the checkbox is checked, change the background */
+        &:checked~.checkmark {
+            background-color: rgb(41, 41, 41);
+        }
+
+
+        /* Show the checkmark when checked */
+        &:checked~.checkmark:after {
+            display: block;
+        }
+
+        /* Show the checkmark when checked */
+        &:disabled~.checkmark:after {
+            border-color: rgb(120, 120, 120);
+        }
+    }
+
+}
+
+.atem-button {
+    background: #2c2c2c;
+    background: linear-gradient(0deg, rgba(35, 35, 35, 1) 0%, rgba(44, 44, 44, 1) 60%, rgb(46, 46, 46) 93%);
+    color: #858585;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #1a1a1a;
+    font-size: 14px;
+    line-height: 25px;
+
+    &.disabled {
+        background: #333333;
+        color: #646464;
+        border: 1px solid #252525;
+
+        &:active {
+            box-shadow: none;
+        }
+    }
+
+    &:active {
+        background: linear-gradient(0deg, rgb(27, 27, 27) 0%, rgb(32, 32, 32) 60%, rgb(34, 34, 34) 93%);
+        box-shadow: inset 0px 0px 5px #00000054;
+    }
+
+    &.active {
+        background: linear-gradient(0deg, rgb(27, 27, 27) 0%, rgb(32, 32, 32) 60%, rgb(34, 34, 34) 93%);
+        color: orange;
+    }
+}
+
+
+/* Dropdown: for reset options */
+.dropdown-toggle.btn.btn-reset {
+    color: #9c9c9c;
+    padding: 0;
+}
+
+.dropdown.right {
+    float: right;
+    text-align: right;
+
+    .dropdown-menu {
+        padding: 0;
+        background-color: #2e2e2e;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        min-width: 100px;
+
+        hr {
+            margin: 0;
+            border-color: #000;
+        }
+
+        a {
+            color: #9c9c9c;
+            font-size: 13px;
+            padding: .25rem 1.2rem;
+
+            &:hover {
+                background-color: #111111;
+                color: #9c9c9c;
+
+            }
+        }
+    }
+}
+
+/* End dropdown */

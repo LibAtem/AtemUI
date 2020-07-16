@@ -2,7 +2,7 @@ import React from 'react'
 import { MaskProperties } from '../common'
 import { LibAtemState, LibAtemCommands } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DropdownMenuItem } from '../../common/dropdown-menu'
+import { DropdownMenuItem } from '../../../components'
 
 export function ResetKeyerMask(sendCommand: SendCommandStrict, meIndex: number, keyerIndex: number) {
   return (

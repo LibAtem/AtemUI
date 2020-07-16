@@ -1,5 +1,5 @@
 import React from 'react'
-import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput, SourcesMap } from '../../common'
+import { RateInput, AtemButtonBar, CheckboxInput, SourceSelectInput, SourcesMap } from '../../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { PreMultipliedKeyProperties } from '../common'

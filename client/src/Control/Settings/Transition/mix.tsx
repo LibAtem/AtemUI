@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums } from '../../../generated'
-import { RateInput } from '../../common'
+import { RateInput } from '../../../components'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface MixTransitionSettingsProps {

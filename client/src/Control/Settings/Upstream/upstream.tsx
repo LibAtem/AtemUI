@@ -7,7 +7,7 @@ import { TabPanelTab, TabPanel } from '../common'
 import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { ChromaKeyerAdvancedProperties } from './chroma-advanced'
-import { SourcesMap } from '../../common'
+import { SourcesMap } from '../../../components'
 
 interface UpstreamKeyState {
   open: boolean

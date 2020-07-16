@@ -1,3 +1,5 @@
+import './components.scss'
+
 export { AtemButtonBar, AtemButtonGeneric, CheckboxInput, RunButton, ToggleHeading } from './button'
 export { DecimalInput, DecimalInputWithLabel, DecimalWithSliderInput } from './decimal'
 export { DropdownMenu, DropdownMenuItem } from './dropdown-menu'
@@ -5,5 +7,5 @@ export { Patterns } from './patterns'
 export type { PatternInfo } from './patterns'
 export { RateInput } from './rate'
 export { SelectInput } from './select'
-export { SourceSelectInput } from './sources'
+export { SourceSelectInput, isSourceAvailable } from './sources'
 export type { SourcesMap } from './sources'

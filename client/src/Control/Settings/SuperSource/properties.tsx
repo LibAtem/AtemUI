@@ -10,7 +10,7 @@ import {
   SourcesMap,
   ToggleHeading,
   DecimalInputWithLabel
-} from '../../common'
+} from '../../../components'
 import { Layouts } from './layouts'
 
 interface SuperSourcePropertiesSettingsProps {
@@ -23,7 +23,7 @@ export class SuperSourcePropertiesSettings extends React.PureComponent<SuperSour
   render() {
     return (
       <div>
-        <div className="ss-heading">Layout</div>
+        <div className="atem-heading">Layout</div>
 
         <div className="ss-ssrc-layout-grid">
           {Layouts.map((l, i) => (

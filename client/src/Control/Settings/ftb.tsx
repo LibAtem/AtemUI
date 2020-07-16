@@ -1,6 +1,6 @@
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
-import { RateInput, CheckboxInput } from '../common'
+import { RateInput, CheckboxInput } from '../../components'
 import { MagicLabel } from './settings'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
 

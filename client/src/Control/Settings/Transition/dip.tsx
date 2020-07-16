@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SourceSelectInput, SourcesMap } from '../../common'
+import { RateInput, SourceSelectInput, SourcesMap } from '../../../components'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 
 interface DipTransitionSettingsProps {

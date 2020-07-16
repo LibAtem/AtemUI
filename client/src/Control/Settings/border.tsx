@@ -1,7 +1,7 @@
 import React from 'react'
 import { LibAtemEnums } from '../../generated'
 import { ChromePicker } from 'react-color'
-import { ToggleHeading, SelectInput, DecimalWithSliderInput, DecimalInput } from '../common'
+import { ToggleHeading, SelectInput, DecimalWithSliderInput, DecimalInput } from '../../components'
 
 const BorderBevelOptions: Array<{ id: LibAtemEnums.BorderBevel; label: string }> = [
   {

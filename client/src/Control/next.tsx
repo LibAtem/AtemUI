@@ -1,5 +1,5 @@
 import React from 'react'
-import { AtemButtonGeneric } from './common'
+import { AtemButtonGeneric } from '../components'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemCommands, LibAtemState } from '../generated'
 

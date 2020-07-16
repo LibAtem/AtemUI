@@ -1,9 +1,8 @@
-import { RateInput, DropdownMenu, DropdownMenuItem } from '../common'
+import { RateInput, DropdownMenu, DropdownMenuItem, SourcesMap, SourceSelectInput } from '../../components'
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
-import { SourcesMap, SourceSelectInput } from '../common/sources'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
@@ -28,75 +27,6 @@ export class DownstreamKeyerSettings extends React.Component<
       page: 0
     }
   }
-
-  // private getTopBox(index: number) {
-  //   return (
-  //     <div className="atem-form">
-  //       <div className="atem-label">Rate:</div>
-  //       <div style={{ display: 'grid', gridAutoFlow: 'column' }}>
-  //         <div className="ss-rate">
-  //           <RateInput
-  //             value={this.props.keyers[index].properties.rate}
-  //             videoMode={this.props.videoMode}
-  //             callback={e => {
-  //               this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', {
-  //                 Index: index,
-  //                 Rate: e
-  //               })
-  //             }}
-  //           />
-  //         </div>
-
-  //         <DropdownMenu>
-  //           <DropdownMenuItem
-  //             onClick={() => {
-  //               this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
-  //                 Index: index,
-  //                 Mask:
-  //                   LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskTop |
-  //                   LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskBottom |
-  //                   LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskLeft |
-  //                   LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskRight,
-  //                 MaskTop: 9,
-  //                 MaskBottom: -9,
-  //                 MaskLeft: -16,
-  //                 MaskRight: 16
-  //               })
-  //             }}
-  //           >
-  //             Reset Mask
-  //           </DropdownMenuItem>
-  //         </DropdownMenu>
-  //       </div>
-  //       <SourceSelectInput
-  //         label="Fill Source"
-  //         sources={this.props.sources}
-  //         sourceAvailability={LibAtemEnums.SourceAvailability.None}
-  //         meAvailability={0}
-  //         value={this.props.keyers[index].sources.fillSource}
-  //         onChange={e =>
-  //           this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
-  //             Index: index,
-  //             FillSource: e
-  //           })
-  //         }
-  //       />
-  //       <SourceSelectInput
-  //         label="Key Source"
-  //         sources={this.props.sources}
-  //         sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
-  //         meAvailability={0}
-  //         value={this.props.keyers[index].sources.cutSource}
-  //         onChange={e =>
-  //           this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {
-  //             Index: index,
-  //             CutSource: e
-  //           })
-  //         }
-  //       />
-  //     </div>
-  //   )
-  // }
 
   render() {
     const panels = this.state.open

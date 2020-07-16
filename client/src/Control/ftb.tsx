@@ -1,6 +1,6 @@
 import React from 'react'
 import { SendCommandStrict } from '../device-page-wrapper'
-import { AtemButtonGeneric, RateInput } from './common'
+import { AtemButtonGeneric, RateInput } from '../components'
 import { LibAtemState, LibAtemEnums } from '../generated'
 
 interface FTBProps {

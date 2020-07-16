@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../generated'
-import { SelectInput } from '../common'
+import { SelectInput } from '../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faPlay, faChevronRight, faRedo } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
@@ -25,7 +25,7 @@ function MediaButton(props: {
   icons: IconProp[]
   onClick: () => void
 }) {
-  let classes = 'media-button'
+  let classes = 'atem-button media-button'
   if (props.disabled) {
     classes += ' disabled'
   } else if (props.active) {
@@ -33,11 +33,11 @@ function MediaButton(props: {
   }
 
   return (
-    <div className={classes} title={props.title} onClick={() => (!props.disabled ? props.onClick() : null)}>
+    <button className={classes} title={props.title} onClick={() => (!props.disabled ? props.onClick() : null)}>
       {props.icons.map((ic, i) => (
         <FontAwesomeIcon key={i} icon={ic} />
       ))}
-    </div>
+    </button>
   )
 }
 

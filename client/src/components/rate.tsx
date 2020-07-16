@@ -1,13 +1,12 @@
 import React from 'react'
-import { VideoModeInfoSet } from '../../generated'
-import { VideoMode } from '../../generated/common-enums'
+import { VideoModeInfoSet, LibAtemEnums } from '../generated'
 import * as _ from 'underscore'
 
 interface RateInputProps {
   callback: (frames: number) => void
   value: number
   disabled?: boolean
-  videoMode: VideoMode
+  videoMode: LibAtemEnums.VideoMode
   className?: string
   maxSeconds?: number
 }

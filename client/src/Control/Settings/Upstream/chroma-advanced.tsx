@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   SourcesMap,
   ToggleHeading
-} from '../../common'
+} from '../../../components'
 import { ResetDVE } from './dve'
 const yuv = require('color-space/yuv')
 

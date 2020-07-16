@@ -2,7 +2,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { LibAtemEnums, LibAtemState, LibAtemCommands } from '../../../generated'
-import { DropdownMenu, DecimalWithSliderInput, SourceSelectInput, SourcesMap, CheckboxInput } from '../../common'
+import { DropdownMenu, DecimalWithSliderInput, SourceSelectInput, SourcesMap, CheckboxInput } from '../../../components'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
 import { ResetDVE } from './dve'
 

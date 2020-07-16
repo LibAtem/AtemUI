@@ -1,6 +1,6 @@
 import React from 'react'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../../generated'
-import { RateInput, SourcesMap, SelectInput } from '../../common'
+import { RateInput, SourcesMap, SelectInput } from '../../../components'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { PreMultipliedKeyProperties } from '../common'
 

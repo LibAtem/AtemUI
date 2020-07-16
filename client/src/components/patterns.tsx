@@ -1,5 +1,5 @@
 import React from 'react'
-import { LibAtemEnums } from '../../generated'
+import { LibAtemEnums } from '../generated'
 
 export interface PatternInfo {
   createSvg: (isCurrent: boolean) => JSX.Element

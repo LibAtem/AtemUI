@@ -4,7 +4,7 @@ import { LibAtemState, LibAtemEnums } from '../../../generated'
 import { TabPanelTab, TabPanel } from '../common'
 import { SuperSourceArtSettings } from './art'
 import { SuperSourcePropertiesSettings, SuperSourceBoxSettings } from './properties'
-import { SourcesMap } from '../../common'
+import { SourcesMap } from '../../../components'
 import { SuperSourceBoxCopySettings } from './copy'
 
 interface SuperSourceSettingsProps {
@@ -52,7 +52,7 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
                 index={this.props.index}
                 version={this.props.version}
               />
-              <div className="ss-heading">Box Control</div>
+              <div className="atem-heading">Box Control</div>
               <TabPanel page={this.state.box} onChange={newBox => this.setState({ box: newBox })}>
                 {this.props.ssrcProps.boxes.map((box, i) => (
                   <TabPanelTab key={i} id={i} label={`Box ${i + 1}`}>

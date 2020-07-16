@@ -4,7 +4,7 @@ import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { KeyerMaskProperties, ResetKeyerMask } from './mask'
 import { FlyingKeyerProperties, FlyingKeyFrameProperties } from './flying'
-import { DropdownMenu, SourceSelectInput, SourcesMap } from '../../common'
+import { DropdownMenu, SourceSelectInput, SourcesMap } from '../../../components'
 import { ResetDVE } from './dve'
 
 interface LumaKeyerSettingsProps {

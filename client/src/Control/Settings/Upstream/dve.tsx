@@ -8,7 +8,7 @@ import {
   SourceSelectInput,
   SourcesMap,
   ToggleHeading
-} from '../../common'
+} from '../../../components'
 import { LibAtemCommands, LibAtemState, LibAtemEnums } from '../../../generated'
 import { FlyingKeyFrameProperties } from './flying'
 import { BorderProperties, ShadowProperties } from '../border'

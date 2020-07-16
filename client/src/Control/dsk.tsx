@@ -1,4 +1,4 @@
-import { AtemButtonGeneric, RateInput } from './common'
+import { AtemButtonGeneric, RateInput } from '../components'
 import React from 'react'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'

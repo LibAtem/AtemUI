@@ -1,7 +1,7 @@
 import React from 'react'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { LibAtemState, LibAtemCommands, LibAtemEnums } from '../../../generated'
-import { SelectInput, SourceSelectInput, SourcesMap } from '../../common'
+import { SelectInput, SourceSelectInput, SourcesMap } from '../../../components'
 import { PreMultipliedKeyProperties } from '../common'
 import { BorderProperties, ShadowProperties } from '../border'
 
