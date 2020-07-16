@@ -4,6 +4,7 @@ using LibAtem.Common;
 using LibAtem.DeviceProfile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Newtonsoft.Json;
 
 namespace AtemServer.Controllers

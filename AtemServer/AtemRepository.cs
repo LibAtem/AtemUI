@@ -230,6 +230,7 @@ namespace AtemServer
         public AtemDevice(AtemDeviceInfo info)
         {
             Info = info;
+            Subscriptions = new HashSet<string>();
         }
         private AtemDevice()
         {
@@ -256,7 +257,7 @@ namespace AtemServer
         private static readonly ILog Log = LogManager.GetLogger(typeof(AtemClient));
 
         private readonly LiteDatabase db;
-        private readonly LiteCollection<AtemDevice> dbDevices;
+        private readonly ILiteCollection<AtemDevice> dbDevices;
         private readonly Dictionary<string, AtemDevice> devices;
 
         private readonly AtemDiscoveryService discovery;
@@ -422,7 +423,7 @@ namespace AtemServer
         {
             lock (devices)
             {
-                return devices[id]?.Client;
+                return devices.TryGetValue(id, out AtemDevice device) ? device.Client : null;
             }
         }
 
