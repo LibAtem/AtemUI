@@ -26,7 +26,7 @@ export interface DeviceProfile {
 
 export interface DevicePort {
   id: Enums.VideoSource
-  port?: Enums.ExternalPortType[]
+  port?: Enums.VideoPortType[]
 }
 
 export interface MultiView {

@@ -6,11 +6,15 @@ export interface AtemState {
   mediaPlayers: MediaPlayerState[]
   mixEffects: MixEffectState[]
   superSources: SuperSourceState[]
+  hyperdecks: HyperdeckState[]
   audio?: AudioState
   fairlight?: FairlightAudioState
+  cameraControl: CameraControlState
   macros: MacroState
   mediaPool: MediaPoolState
   settings: SettingsState
+  streaming?: StreamingState
+  recording?: RecordingState
   info: InfoState
   power: boolean[]
 }
@@ -49,6 +53,13 @@ export interface SuperSourceState {
   border: SuperSourceState_BorderState
 }
 
+export interface HyperdeckState {
+  storage: HyperdeckState_StorageState
+  settings: HyperdeckState_SettingsState
+  player: HyperdeckState_PlayerState
+  clips: HyperdeckState_ClipState[]
+}
+
 export interface AudioState {
   programOut: AudioState_ProgramOutState
   inputs: Record<number, AudioState_InputState>
@@ -62,6 +73,11 @@ export interface FairlightAudioState {
   inputs: Record<number, FairlightAudioState_InputState>
   monitors: FairlightAudioState_MonitorOutputState[]
   tally?: unknown
+}
+
+export interface CameraControlState {
+  periodicFlushInterval: number
+  cameras: Record<number, CameraControlState_CameraState>
 }
 
 export interface MacroState {
@@ -79,15 +95,26 @@ export interface MediaPoolState {
 export interface SettingsState {
   multiViewers: MultiViewerState[]
   inputs: Record<Enums.VideoSource, InputState>
-  hyperdecks: SettingsState_HyperdeckState[]
   talkback?: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
   mixMinusOutputs: SettingsState_MixMinusOutputState[]
+  autoVideoMode: boolean
+  detectedVideoMode: boolean
   videoMode: Enums.VideoMode
   downConvertMode: Enums.DownConvertMode
-  downConvertVideoMode: Enums.VideoMode
+  downConvertVideoModes: Record<Enums.VideoMode, Enums.VideoMode>
+  multiviewVideoModes: Record<Enums.VideoMode, Enums.VideoMode>
   serialMode: Enums.SerialMode
   sDI3GLevel: Enums.SDI3GOutputLevel
   superSourceCascade: boolean
+}
+
+export interface StreamingState {
+  status: StreamingState_StatusState
+  settings: StreamingState_SettingsState
+}
+
+export interface RecordingState {
+  disks: RecordingDiskState[]
 }
 
 export interface InfoState {
@@ -98,6 +125,11 @@ export interface InfoState {
   productName: string
   supportedVideoModes: VideoModeInfo[]
   supportsAutoVideoMode: boolean
+  advancedChromaKeyers: boolean
+  onlyConfigurableOutputs: boolean
+  hasCameraControl: boolean
+  dve?: InfoState_DveInfoState
+  multiViewers?: InfoState_MultiViewInfoState
 }
 
 export interface DownstreamKeyerState_SourcesState {
@@ -210,10 +242,48 @@ export interface SuperSourceState_BorderState {
   lightSourceAltitude: number
 }
 
+export interface HyperdeckState_StorageState {
+  activeStorageMedia: number
+  currentClipId: number
+  activeStorageStatus: Enums.HyperDeckStorageStatus
+  frameRate: number
+  timeScale: number
+  isInterlaced: boolean
+  isDropFrameTimecode: boolean
+  remainingRecordTime?: Enums.HyperDeckTime
+}
+
+export interface HyperdeckState_SettingsState {
+  networkAddress: string
+  input: Enums.VideoSource
+  autoRoll: boolean
+  autoRollFrameDelay: number
+  status: Enums.HyperDeckConnectionStatus
+  isRemoteEnabled: boolean
+  storageMediaCount: number
+}
+
+export interface HyperdeckState_PlayerState {
+  state: Enums.HyperDeckPlayerState
+  loop: boolean
+  singleClip: boolean
+  playbackSpeed: number
+  clipTime?: Enums.HyperDeckTime
+  timelineTime?: Enums.HyperDeckTime
+}
+
+export interface HyperdeckState_ClipState {
+  name: string
+  duration?: Enums.HyperDeckTime
+  timelineStart?: Enums.HyperDeckTime
+  timelineEnd?: Enums.HyperDeckTime
+}
+
 export interface AudioState_ProgramOutState {
   gain: number
   balance: number
   followFadeToBlack: boolean
+  audioFollowVideoCrossfadeTransitionEnabled: boolean
   levels?: AudioState_LevelsState
 }
 
@@ -253,7 +323,7 @@ export interface FairlightAudioState_ProgramOutState {
 export interface FairlightAudioState_InputState {
   inputType: Enums.FairlightInputType
   supportedConfigurations: Enums.FairlightInputConfiguration
-  externalPortType: Enums.ExternalPortType
+  externalPortType: Enums.AudioPortType
   activeConfiguration: Enums.FairlightInputConfiguration
   analog?: FairlightAudioState_AnalogState
   sources: FairlightAudioState_InputSourceState[]
@@ -264,6 +334,13 @@ export interface FairlightAudioState_MonitorOutputState {
   inputMasterGain: number
   inputTalkbackGain: number
   inputSidetoneGain: number
+}
+
+export interface CameraControlState_CameraState {
+  camera: CameraControlState_CameraSettingsState
+  chip: CameraControlState_ChipSettingsState
+  lens: CameraControlState_LensSettingsState
+  colorBars: boolean
 }
 
 export interface MacroState_ItemState {
@@ -293,15 +370,13 @@ export interface MediaPoolState_StillState {
 export interface MediaPoolState_ClipState {
   isUsed: boolean
   name: string
+  frameCount: number
   maxFrames: number
   frames: MediaPoolState_FrameState[]
+  audio: MediaPoolState_ClipState_AudioState
 }
 
 export interface MultiViewerState {
-  supportsVuMeters: boolean
-  supportsProgramPreviewSwapped: boolean
-  supportsQuadrantLayout: boolean
-  supportsToggleSafeArea: boolean
   vuMeterOpacity: number
   properties: MultiViewerState_PropertiesState
   windows: MultiViewerState_WindowState[]
@@ -312,22 +387,39 @@ export interface InputState {
   tally: InputState_TallyState
 }
 
-export interface SettingsState_HyperdeckState {
-  networkAddress: string
-  input: Enums.VideoSource
-  autoRoll: boolean
-  autoRollFrameDelay: number
-}
-
 export interface SettingsState_TalkbackState {
   muteSDI: boolean
   inputs: SettingsState_TalkbackInputState[]
 }
 
 export interface SettingsState_MixMinusOutputState {
+  hasAudioInputId: boolean
   audioInputId: Enums.AudioSource
   supportedModes: Enums.MixMinusMode
   mode: Enums.MixMinusMode
+}
+
+export interface StreamingState_StatusState {
+  isStreaming: boolean
+  cacheUsed: number
+  encodingBitrate: number
+  duration?: Timecode
+  state: unknown
+  error: number
+}
+
+export interface StreamingState_SettingsState {
+  serviceName: string
+  url: string
+  key: string
+  lowBitrate: number
+  highBitrate: number
+}
+
+export interface RecordingDiskState {
+  diskId: number
+  volumeName: string
+  recordingTimeAvailable: number
 }
 
 export interface Timecode {
@@ -343,6 +435,20 @@ export interface VideoModeInfo {
   requiresReconfig: boolean
   multiviewModes: Enums.VideoMode[]
   downConvertModes: Enums.VideoMode[]
+}
+
+export interface InfoState_DveInfoState {
+  canRotate: boolean
+  canScaleUp: boolean
+  supportedTransitions: Enums.DVEEffect[]
+}
+
+export interface InfoState_MultiViewInfoState {
+  canRouteInputs: boolean
+  supportsVuMeters: boolean
+  supportsProgramPreviewSwapped: boolean
+  supportsQuadrantLayout: boolean
+  supportsToggleSafeArea: boolean
 }
 
 export interface MixEffectState_KeyerLumaState {
@@ -438,14 +544,14 @@ export interface MixEffectState_KeyerPropertiesState {
   maskBottom: number
   maskLeft: number
   maskRight: number
+  canFlyKey: boolean
 }
 
 export interface MixEffectState_KeyerFlyProperties {
   isASet: boolean
   isBSet: boolean
-  isAtKeyFrame: number
-  runToInfinite: number
-  activeKeyFrame: number
+  runningToKeyFrame: Enums.FlyKeyKeyFrameType
+  runningToInfinite: Enums.FlyKeyLocation
 }
 
 export interface MixEffectState_TransitionPropertiesState {
@@ -453,8 +559,7 @@ export interface MixEffectState_TransitionPropertiesState {
   nextStyle: Enums.TransitionStyle
   selection: Enums.TransitionLayer
   nextSelection: Enums.TransitionLayer
-  preview: boolean
-  isInPreview: boolean
+  previewTransition: boolean
 }
 
 export interface MixEffectState_TransitionPositionState {
@@ -586,12 +691,55 @@ export interface FairlightAudioState_InputSourceState {
   levels?: FairlightAudioState_LevelsState
 }
 
+export interface CameraControlState_CameraSettingsState {
+  detail: Enums.CameraDetail
+  detailPeriodicFlushEnabled: boolean
+  gain: number
+  gainPeriodicFlushEnabled: boolean
+  positiveGain: number
+  positiveGainPeriodicFlushEnabled: boolean
+  shutter: number
+  shutterPeriodicFlushEnabled: boolean
+  whiteBalance: number
+  whiteBalancePeriodicFlushEnabled: boolean
+}
+
+export interface CameraControlState_ChipSettingsState {
+  lift: CameraControlState_RGBYState
+  gamma: CameraControlState_RGBYState
+  gain: CameraControlState_RGBYState
+  contrast: number
+  contrastPeriodicFlushEnabled: boolean
+  hue: number
+  saturation: number
+  hueSaturationPeriodicFlushEnabled: boolean
+  lumMix: number
+  lumMixPeriodicFlushEnabled: boolean
+  aperture: number
+  aperturePeriodicFlushEnabled: boolean
+}
+
+export interface CameraControlState_LensSettingsState {
+  zoomSpeed: number
+  zoomSpeedPeriodicFlushEnabled: boolean
+  focus: number
+  focusPeriodicFlushEnabled: boolean
+  iris: number
+  irisPeriodicFlushEnabled: boolean
+}
+
 export interface MacroState_MacroRunStatus {
 }
 
 export interface MediaPoolState_FrameState {
   isUsed: boolean
-  filename?: number[]
+  hash: number[]
+}
+
+export interface MediaPoolState_ClipState_AudioState {
+  isUsed: boolean
+  name: string
+  hash?: number[]
 }
 
 export interface MultiViewerState_PropertiesState {
@@ -600,20 +748,22 @@ export interface MultiViewerState_PropertiesState {
 }
 
 export interface MultiViewerState_WindowState {
-  vuMeter: boolean
-  supportsVuMeter: boolean
   source: Enums.VideoSource
+  supportsVuMeter: boolean
+  vuMeterEnabled: boolean
+  supportsSafeArea: boolean
   safeAreaEnabled: boolean
 }
 
 export interface InputState_PropertiesState {
   shortName: string
   longName: string
+  areNamesDefault: boolean
   internalPortType: Enums.InternalPortType
   sourceAvailability: Enums.SourceAvailability
   meAvailability: Enums.MeAvailability
-  availableExternalPortTypes: Enums.ExternalPortTypeFlags
-  currentExternalPortType: Enums.ExternalPortTypeFlags
+  availableExternalPortTypes?: Enums.VideoPortType[]
+  currentExternalPortType: Enums.VideoPortType
 }
 
 export interface InputState_TallyState {
@@ -686,5 +836,13 @@ export interface FairlightAudioState_EqualizerBandState {
   frequency: number
   gain: number
   qFactor: number
+}
+
+export interface CameraControlState_RGBYState {
+  r: number
+  g: number
+  b: number
+  y: number
+  periodicFlushEnabled: boolean
 }
 

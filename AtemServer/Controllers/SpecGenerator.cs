@@ -162,7 +162,7 @@ namespace AtemServer.Controllers
                             else if (prop.GetCustomAttribute<ByteArrayAttribute>() != null)
                             {
                                 resProp.Type = CommandPropertyType.ByteArray;
-                                resProp.Max = (int) prop.GetCustomAttribute<ByteArrayAttribute>().Length;
+                                resProp.Max = (int) prop.GetCustomAttribute<ByteArrayAttribute>().Size;
                             }
                             else if (prop.GetCustomAttribute<UInt16ListAttribute>() != null)
                             {

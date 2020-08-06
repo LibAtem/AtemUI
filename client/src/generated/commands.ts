@@ -101,7 +101,7 @@ export interface SuperSource_SuperSourceBorderSetCommand {
 }
 
 export interface SuperSource_SuperSourceBoxGetCommand {
-  Index: Enums.SuperSourceBoxId
+  BoxIndex: Enums.SuperSourceBoxId
   Enabled: boolean
   InputSource: Enums.VideoSource
   PositionX: number
@@ -234,9 +234,43 @@ export interface SuperSource_SuperSourcePropertiesSetV8Command {
   ArtInvertKey?: boolean
 }
 
-export interface Settings_DownConvertAvailableModesCommand {
-  CoreVideoMode: Enums.VideoMode
-  DownConvertedMode: Enums.VideoMode
+export interface Streaming_StreamingActiveSetCommand {
+  IsStreaming: boolean
+}
+
+export interface Streaming_StreamingStateCommand {
+  StreamingStatus: unknown
+}
+
+export interface Streaming_SRSSCommand {
+}
+
+export interface Streaming_StreamingServiceGetCommand {
+  ServiceName: string
+  Url: string
+  Key: string
+  Bitrates: number
+}
+
+export interface Streaming_StreamingServiceSetCommand {
+  Mask: Streaming_StreamingServiceSetCommand_MaskFlags
+  ServiceName?: string
+  Url?: string
+  Key?: string
+  Bitrates?: number
+}
+
+export interface Streaming_StreamingTimecodeCommand {
+  Hour: number
+  Minute: number
+  Second: number
+  Frame: number
+  IsDropFrame: boolean
+}
+
+export interface Settings_AutoVideoModeCommand {
+  Enabled: boolean
+  Detected: boolean
 }
 
 export interface Settings_DownConvertModeGetCommand {
@@ -247,8 +281,30 @@ export interface Settings_DownConvertModeSetCommand {
   DownConvertMode: Enums.DownConvertMode
 }
 
+export interface Settings_DownConvertVideoModeGetCommand {
+  CoreVideoMode: Enums.VideoMode
+  DownConvertedMode: Enums.VideoMode
+}
+
+export interface Settings_DownConvertVideoModeSetCommand {
+  CoreVideoMode: Enums.VideoMode
+  DownConvertedMode: Enums.VideoMode
+}
+
+export interface Settings_InputNameResetCommand {
+  Id: Enums.VideoSource
+}
+
 export interface Settings_InputPropertiesGetCommand {
-  unimplemented: never
+  Id: Enums.VideoSource
+  LongName: string
+  ShortName: string
+  AreNamesDefault: boolean
+  AvailableExternalPorts: Enums.VideoPortType
+  ExternalPortType: Enums.VideoPortType
+  InternalPortType: Enums.InternalPortType
+  SourceAvailability: Enums.SourceAvailability
+  MeAvailability: Enums.MeAvailability
 }
 
 export interface Settings_InputPropertiesSetCommand {
@@ -256,13 +312,14 @@ export interface Settings_InputPropertiesSetCommand {
   Id: Enums.VideoSource
   LongName?: string
   ShortName?: string
-  ExternalPortType?: Enums.ExternalPortTypeFlags
+  ExternalPortType?: Enums.VideoPortType
 }
 
 export interface Settings_MixMinusOutputGetCommand {
   Id: number
   Mode: Enums.MixMinusMode
   SupportedModes: Enums.MixMinusMode
+  HasAudioInputId: boolean
   AudioInputId: Enums.AudioSource
 }
 
@@ -290,11 +347,6 @@ export interface Settings_VideoModeGetCommand {
 
 export interface Settings_VideoModeSetCommand {
   VideoMode: Enums.VideoMode
-}
-
-export interface Settings_Multiview_MultiviewerAvailableModesCommand {
-  CoreVideoMode: Enums.VideoMode
-  MultiviewMode: Enums.VideoMode
 }
 
 export interface Settings_Multiview_MultiviewPropertiesGetCommand {
@@ -325,6 +377,16 @@ export interface Settings_Multiview_MultiviewPropertiesSetV8Command {
   ProgramPreviewSwapped?: boolean
 }
 
+export interface Settings_Multiview_MultiviewVideoModeGetCommand {
+  CoreVideoMode: Enums.VideoMode
+  MultiviewMode: Enums.VideoMode
+}
+
+export interface Settings_Multiview_MultiviewVideoModeSetCommand {
+  CoreVideoMode: Enums.VideoMode
+  MultiviewMode: Enums.VideoMode
+}
+
 export interface Settings_Multiview_MultiviewVuOpacityCommand {
   MultiviewIndex: number
   Opacity: number
@@ -334,6 +396,8 @@ export interface Settings_Multiview_MultiviewWindowInputGetCommand {
   MultiviewIndex: number
   WindowIndex: number
   Source: Enums.VideoSource
+  SupportVuMeter: boolean
+  SupportsSafeArea: boolean
 }
 
 export interface Settings_Multiview_MultiviewWindowInputSetCommand {
@@ -360,34 +424,82 @@ export interface Settings_Multiview_MultiviewWindowVuMeterSetCommand {
   VuEnabled: boolean
 }
 
-export interface Settings_HyperDeck_HyperDeckRXCCCommand {
-  unimplemented: never
+export interface Settings_HyperDeck_HyperDeckClipCountCommand {
+  Id: number
+  ClipCount: number
 }
 
-export interface Settings_HyperDeck_HyperDeckRXCPCommand {
-  unimplemented: never
+export interface Settings_HyperDeck_HyperDeckClipInfoCommand {
+  HyperdeckId: number
+  ClipId: number
+  Name: string
+  TimelineStart: number
+  TimelineEnd: number
+  Duration: number
 }
 
-export interface Settings_HyperDeck_HyperDeckRXSSCommand {
-  unimplemented: never
+export interface Settings_HyperDeck_HyperDeckPlayerGetCommand {
+  Id: number
+  State: Enums.HyperDeckPlayerState
+  SingleClip: boolean
+  Loop: boolean
+  PlaybackSpeed: number
+  TimelineTime: number
+  ClipTime: number
+}
+
+export interface Settings_HyperDeck_HyperDeckPlayerSetCommand {
+  Mask: Settings_HyperDeck_HyperDeckPlayerSetCommand_MaskFlags
+  Id: number
+  State?: Enums.HyperDeckPlayerState
+  SingleClip?: boolean
+  Loop?: boolean
+  PlaybackSpeed?: number
+  ClipTime?: number
+  Jog?: number
 }
 
 export interface Settings_HyperDeck_HyperDeckSettingsGetCommand {
   Id: number
   NetworkAddress: number
-  NetworkAddressBytes: number[]
   Input: Enums.VideoSource
   AutoRoll: boolean
   AutoRollFrameDelay: number
+  Status: Enums.HyperDeckConnectionStatus
+  StorageMediaCount: number
+  IsRemoteEnabled: boolean
 }
 
 export interface Settings_HyperDeck_HyperDeckSettingsSetCommand {
   Mask: Settings_HyperDeck_HyperDeckSettingsSetCommand_MaskFlags
   Id: number
-  NetworkAddressStr?: number
-  Source?: Enums.VideoSource
+  NetworkAddress?: number
+  Input?: Enums.VideoSource
   AutoRoll?: boolean
   AutoRollFrameDelay?: number
+}
+
+export interface Settings_HyperDeck_HyperDeckStorageGetCommand {
+  Id: number
+  ActiveStorageStatus: Enums.HyperDeckStorageStatus
+  ActiveStorageMedia: number
+  CurrentClipId: number
+  RemainingRecordTime: number
+  FrameRate: number
+  TimeScale: number
+  IsInterlaced: boolean
+  IsDropFrameTimecode: boolean
+}
+
+export interface Settings_HyperDeck_HyperDeckStorageSetCommand {
+  Mask: Settings_HyperDeck_HyperDeckStorageSetCommand_MaskFlags
+  Id: number
+  ActiveStorageMedia?: number
+  CurrentClipId?: number
+}
+
+export interface Recording_RecordingRMSuCommand {
+  Filename: string
 }
 
 export interface MixEffects_FadeToBlackAutoCommand {
@@ -812,16 +924,26 @@ export interface MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand {
   MaskRight?: number
 }
 
+export interface MixEffects_Key_MixEffectKeyFlyKeyframeStoreCommand {
+  MixEffectIndex: Enums.MixEffectBlockId
+  KeyerIndex: Enums.UpstreamKeyId
+  KeyFrame: Enums.FlyKeyKeyFrameId
+}
+
 export interface MixEffects_Key_MixEffectKeyFlyPropertiesGetCommand {
-  unimplemented: never
+  MixEffectIndex: Enums.MixEffectBlockId
+  KeyerIndex: Enums.UpstreamKeyId
+  IsASet: boolean
+  IsBSet: boolean
+  RunningToKeyFrame: Enums.FlyKeyKeyFrameType
+  RunningToInfinite: Enums.FlyKeyLocation
 }
 
 export interface MixEffects_Key_MixEffectKeyFlyRunSetCommand {
-  Mask: MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
-  KeyFrame?: Enums.FlyKeyKeyFrameType
-  RunToInfinite?: Enums.FlyKeyLocation
+  KeyFrame: Enums.FlyKeyKeyFrameType
+  RunToInfinite: Enums.FlyKeyLocation
 }
 
 export interface MixEffects_Key_MixEffectKeyLumaGetCommand {
@@ -895,6 +1017,7 @@ export interface MixEffects_Key_MixEffectKeyPropertiesGetCommand {
   MixEffectIndex: Enums.MixEffectBlockId
   KeyerIndex: Enums.UpstreamKeyId
   KeyType: Enums.MixEffectKeyType
+  CanFlyKey: boolean
   FlyEnabled: boolean
   FillSource: Enums.VideoSource
   CutSource: Enums.VideoSource
@@ -952,6 +1075,9 @@ export interface Media_MediaPoolAudioDescriptionCommand {
 }
 
 export interface Media_MediaPoolCaptureStillCommand {
+}
+
+export interface Media_MediaPoolClearAllCommand {
 }
 
 export interface Media_MediaPoolClearAudioCommand {
@@ -1177,10 +1303,19 @@ export interface DeviceProfile_MultiviewerConfigCommand {
   CanToggleSafeArea: boolean
 }
 
+export interface DeviceProfile_MultiviewerConfigV811Command {
+  WindowCount: number
+  CanRouteInputs: boolean
+  SupportsVuMeters: boolean
+  CanToggleSafeArea: boolean
+  CanSwapPreviewProgram: boolean
+  SupportsQuadrants: boolean
+}
+
 export interface DeviceProfile_MultiviewerConfigV8Command {
   Count: number
   WindowCount: number
-  CanRouteWindows: boolean
+  CanRouteInputs: boolean
   SupportsVuMeters: boolean
   CanToggleSafeArea: boolean
   CanSwapPreviewProgram: boolean
@@ -1220,6 +1355,24 @@ export interface DeviceProfile_TopologyCommand {
   SuperSource: number
 }
 
+export interface DeviceProfile_TopologyV811Command {
+  MixEffectBlocks: number
+  VideoSources: number
+  DownstreamKeyers: number
+  Auxiliaries: number
+  MixMinusOutputs: number
+  MediaPlayers: number
+  Multiviewers: number
+  SerialPort: number
+  HyperDecks: number
+  DVE: number
+  Stingers: number
+  SuperSource: number
+  CameraControl: boolean
+  AdvancedChromaKeyers: boolean
+  OnlyConfigurableOutputs: boolean
+}
+
 export interface DeviceProfile_TopologyV8Command {
   MixEffectBlocks: number
   VideoSources: number
@@ -1232,20 +1385,9 @@ export interface DeviceProfile_TopologyV8Command {
   DVE: number
   Stingers: number
   SuperSource: number
-}
-
-export interface DeviceProfile_TopologyV811Command {
-  MixEffectBlocks: number
-  VideoSources: number
-  DownstreamKeyers: number
-  Auxiliaries: number
-  MixMinusOutputs: number
-  MediaPlayers: number
-  SerialPort: number
-  HyperDecks: number
-  DVE: number
-  Stingers: number
-  SuperSource: number
+  CameraControl: boolean
+  AdvancedChromaKeyers: boolean
+  OnlyConfigurableOutputs: boolean
 }
 
 export interface DeviceProfile_VersionCommand {
@@ -1258,6 +1400,10 @@ export interface DeviceProfile_VideoMixerConfigCommand {
 
 export interface DeviceProfile_TimecodeLockedCommand {
   Locked: boolean
+}
+
+export interface DataTransfer_DataTransferAbortCommand {
+  TransferId: number
 }
 
 export interface DataTransfer_DataTransferAckCommand {
@@ -1321,8 +1467,28 @@ export interface DataTransfer_LockStateSetCommand {
   Locked: boolean
 }
 
-export interface CameraControl_CCstCommand {
+export interface CameraControl_CameraControlDeviceOptionsSetCommand {
+  Mask: CameraControl_CameraControlDeviceOptionsSetCommand_MaskFlags
+  Input: Enums.VideoSource
+  Category: number
+  Parameter: number
+  PeriodicFlushEnabled?: boolean
+}
+
+export interface CameraControl_CameraControlGetCommand {
   unimplemented: never
+}
+
+export interface CameraControl_CameraControlSetCommand {
+  unimplemented: never
+}
+
+export interface CameraControl_CameraControlSettingsGetCommand {
+  Interval: number
+}
+
+export interface CameraControl_CameraControlSettingsSetCommand {
+  Interval?: number
 }
 
 export interface Audio_AudioMixerHeadphoneGetCommand {
@@ -1467,7 +1633,7 @@ export interface Audio_Fairlight_FairlightMixerAnalogAudioSetCommand {
 export interface Audio_Fairlight_FairlightMixerInputGetCommand {
   Index: Enums.AudioSource
   InputType: Enums.FairlightInputType
-  ExternalPortType: Enums.ExternalPortType
+  ExternalPortType: Enums.AudioPortType
   SupportsRcaToXlr: boolean
   RcaToXlrEnabled: boolean
   SupportedConfigurations: Enums.FairlightInputConfiguration
@@ -1477,7 +1643,7 @@ export interface Audio_Fairlight_FairlightMixerInputGetCommand {
 export interface Audio_Fairlight_FairlightMixerInputGetV811Command {
   Index: Enums.AudioSource
   InputType: Enums.FairlightInputType
-  ExternalPortType: Enums.ExternalPortType
+  ExternalPortType: Enums.AudioPortType
   SupportedConfigurations: Enums.FairlightInputConfiguration
   ActiveConfiguration: Enums.FairlightInputConfiguration
   SupportedInputLevels: Enums.FairlightAnalogInputLevel
@@ -1898,6 +2064,13 @@ export enum SuperSource_SuperSourcePropertiesSetV8Command_MaskFlags {
   ArtInvertKey = 64,
 }
 
+export enum Streaming_StreamingServiceSetCommand_MaskFlags {
+  ServiceName = 1,
+  Url = 2,
+  Key = 4,
+  Bitrates = 8,
+}
+
 export enum Settings_InputPropertiesSetCommand_MaskFlags {
   LongName = 1,
   ShortName = 2,
@@ -1919,11 +2092,25 @@ export enum Settings_Multiview_MultiviewPropertiesSetV8Command_MaskFlags {
   ProgramPreviewSwapped = 2,
 }
 
+export enum Settings_HyperDeck_HyperDeckPlayerSetCommand_MaskFlags {
+  State = 1,
+  SingleClip = 2,
+  Loop = 4,
+  PlaybackSpeed = 8,
+  ClipTime = 16,
+  Jog = 32,
+}
+
 export enum Settings_HyperDeck_HyperDeckSettingsSetCommand_MaskFlags {
   NetworkAddress = 1,
-  Source = 2,
+  Input = 2,
   AutoRoll = 4,
   AutoRollFrameDelay = 8,
+}
+
+export enum Settings_HyperDeck_HyperDeckStorageSetCommand_MaskFlags {
+  ActiveStorageMedia = 1,
+  CurrentClipId = 2,
 }
 
 export enum MixEffects_Transition_TransitionDipSetCommand_MaskFlags {
@@ -2063,11 +2250,6 @@ export enum MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand_MaskFlags {
   MaskRight = 1048576,
 }
 
-export enum MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags {
-  OnOff = 1,
-  RunToInfinite = 2,
-}
-
 export enum MixEffects_Key_MixEffectKeyLumaSetCommand_MaskFlags {
   PreMultiplied = 1,
   Clip = 2,
@@ -2137,6 +2319,10 @@ export enum DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags {
   MaskBottom = 4,
   MaskLeft = 8,
   MaskRight = 16,
+}
+
+export enum CameraControl_CameraControlDeviceOptionsSetCommand_MaskFlags {
+  PeriodicFlushEnabled = 1,
 }
 
 export enum Audio_AudioMixerHeadphoneSetCommand_MaskFlags {
@@ -2318,9 +2504,18 @@ export type CommandTypes =
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesGetV8Command", SuperSource_SuperSourcePropertiesGetV8Command] |
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand", SuperSource_SuperSourcePropertiesSetCommand] |
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command", SuperSource_SuperSourcePropertiesSetV8Command] |
-  ["LibAtem.Commands.Settings.DownConvertAvailableModesCommand", Settings_DownConvertAvailableModesCommand] |
+  ["LibAtem.Commands.Streaming.StreamingActiveSetCommand", Streaming_StreamingActiveSetCommand] |
+  ["LibAtem.Commands.Streaming.StreamingStateCommand", Streaming_StreamingStateCommand] |
+  ["LibAtem.Commands.Streaming.SRSSCommand", Streaming_SRSSCommand] |
+  ["LibAtem.Commands.Streaming.StreamingServiceGetCommand", Streaming_StreamingServiceGetCommand] |
+  ["LibAtem.Commands.Streaming.StreamingServiceSetCommand", Streaming_StreamingServiceSetCommand] |
+  ["LibAtem.Commands.Streaming.StreamingTimecodeCommand", Streaming_StreamingTimecodeCommand] |
+  ["LibAtem.Commands.Settings.AutoVideoModeCommand", Settings_AutoVideoModeCommand] |
   ["LibAtem.Commands.Settings.DownConvertModeGetCommand", Settings_DownConvertModeGetCommand] |
   ["LibAtem.Commands.Settings.DownConvertModeSetCommand", Settings_DownConvertModeSetCommand] |
+  ["LibAtem.Commands.Settings.DownConvertVideoModeGetCommand", Settings_DownConvertVideoModeGetCommand] |
+  ["LibAtem.Commands.Settings.DownConvertVideoModeSetCommand", Settings_DownConvertVideoModeSetCommand] |
+  ["LibAtem.Commands.Settings.InputNameResetCommand", Settings_InputNameResetCommand] |
   ["LibAtem.Commands.Settings.InputPropertiesGetCommand", Settings_InputPropertiesGetCommand] |
   ["LibAtem.Commands.Settings.InputPropertiesSetCommand", Settings_InputPropertiesSetCommand] |
   ["LibAtem.Commands.Settings.MixMinusOutputGetCommand", Settings_MixMinusOutputGetCommand] |
@@ -2330,22 +2525,27 @@ export type CommandTypes =
   ["LibAtem.Commands.Settings.SerialPortModeCommand", Settings_SerialPortModeCommand] |
   ["LibAtem.Commands.Settings.VideoModeGetCommand", Settings_VideoModeGetCommand] |
   ["LibAtem.Commands.Settings.VideoModeSetCommand", Settings_VideoModeSetCommand] |
-  ["LibAtem.Commands.Settings.Multiview.MultiviewerAvailableModesCommand", Settings_Multiview_MultiviewerAvailableModesCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewPropertiesGetCommand", Settings_Multiview_MultiviewPropertiesGetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewPropertiesGetV8Command", Settings_Multiview_MultiviewPropertiesGetV8Command] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetCommand", Settings_Multiview_MultiviewPropertiesSetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetV8Command", Settings_Multiview_MultiviewPropertiesSetV8Command] |
+  ["LibAtem.Commands.Settings.Multiview.MultiviewVideoModeGetCommand", Settings_Multiview_MultiviewVideoModeGetCommand] |
+  ["LibAtem.Commands.Settings.Multiview.MultiviewVideoModeSetCommand", Settings_Multiview_MultiviewVideoModeSetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewVuOpacityCommand", Settings_Multiview_MultiviewVuOpacityCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewWindowInputGetCommand", Settings_Multiview_MultiviewWindowInputGetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", Settings_Multiview_MultiviewWindowInputSetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewWindowSafeAreaCommand", Settings_Multiview_MultiviewWindowSafeAreaCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewWindowVuMeterGetCommand", Settings_Multiview_MultiviewWindowVuMeterGetCommand] |
   ["LibAtem.Commands.Settings.Multiview.MultiviewWindowVuMeterSetCommand", Settings_Multiview_MultiviewWindowVuMeterSetCommand] |
-  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckRXCCCommand", Settings_HyperDeck_HyperDeckRXCCCommand] |
-  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckRXCPCommand", Settings_HyperDeck_HyperDeckRXCPCommand] |
-  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckRXSSCommand", Settings_HyperDeck_HyperDeckRXSSCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckClipCountCommand", Settings_HyperDeck_HyperDeckClipCountCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckClipInfoCommand", Settings_HyperDeck_HyperDeckClipInfoCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckPlayerGetCommand", Settings_HyperDeck_HyperDeckPlayerGetCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckPlayerSetCommand", Settings_HyperDeck_HyperDeckPlayerSetCommand] |
   ["LibAtem.Commands.Settings.HyperDeck.HyperDeckSettingsGetCommand", Settings_HyperDeck_HyperDeckSettingsGetCommand] |
   ["LibAtem.Commands.Settings.HyperDeck.HyperDeckSettingsSetCommand", Settings_HyperDeck_HyperDeckSettingsSetCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckStorageGetCommand", Settings_HyperDeck_HyperDeckStorageGetCommand] |
+  ["LibAtem.Commands.Settings.HyperDeck.HyperDeckStorageSetCommand", Settings_HyperDeck_HyperDeckStorageSetCommand] |
+  ["LibAtem.Commands.Recording.RecordingRMSuCommand", Recording_RecordingRMSuCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", MixEffects_FadeToBlackAutoCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackCutCommand", MixEffects_FadeToBlackCutCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackPropertiesGetCommand", MixEffects_FadeToBlackPropertiesGetCommand] |
@@ -2386,6 +2586,7 @@ export type CommandTypes =
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand", MixEffects_Key_MixEffectKeyFillSourceSetCommand] |
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyKeyframeGetCommand", MixEffects_Key_MixEffectKeyFlyKeyframeGetCommand] |
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyKeyframeSetCommand", MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand] |
+  ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyKeyframeStoreCommand", MixEffects_Key_MixEffectKeyFlyKeyframeStoreCommand] |
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyPropertiesGetCommand", MixEffects_Key_MixEffectKeyFlyPropertiesGetCommand] |
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand", MixEffects_Key_MixEffectKeyFlyRunSetCommand] |
   ["LibAtem.Commands.MixEffects.Key.MixEffectKeyLumaGetCommand", MixEffects_Key_MixEffectKeyLumaGetCommand] |
@@ -2403,6 +2604,7 @@ export type CommandTypes =
   ["LibAtem.Commands.Media.MediaPlayerSourceSetCommand", Media_MediaPlayerSourceSetCommand] |
   ["LibAtem.Commands.Media.MediaPoolAudioDescriptionCommand", Media_MediaPoolAudioDescriptionCommand] |
   ["LibAtem.Commands.Media.MediaPoolCaptureStillCommand", Media_MediaPoolCaptureStillCommand] |
+  ["LibAtem.Commands.Media.MediaPoolClearAllCommand", Media_MediaPoolClearAllCommand] |
   ["LibAtem.Commands.Media.MediaPoolClearAudioCommand", Media_MediaPoolClearAudioCommand] |
   ["LibAtem.Commands.Media.MediaPoolClearClipCommand", Media_MediaPoolClearClipCommand] |
   ["LibAtem.Commands.Media.MediaPoolClearStillCommand", Media_MediaPoolClearStillCommand] |
@@ -2440,17 +2642,19 @@ export type CommandTypes =
   ["LibAtem.Commands.DeviceProfile.MediaPoolConfigCommand", DeviceProfile_MediaPoolConfigCommand] |
   ["LibAtem.Commands.DeviceProfile.MixEffectBlockConfigCommand", DeviceProfile_MixEffectBlockConfigCommand] |
   ["LibAtem.Commands.DeviceProfile.MultiviewerConfigCommand", DeviceProfile_MultiviewerConfigCommand] |
+  ["LibAtem.Commands.DeviceProfile.MultiviewerConfigV811Command", DeviceProfile_MultiviewerConfigV811Command] |
   ["LibAtem.Commands.DeviceProfile.MultiviewerConfigV8Command", DeviceProfile_MultiviewerConfigV8Command] |
   ["LibAtem.Commands.DeviceProfile.PowerStatusCommand", DeviceProfile_PowerStatusCommand] |
   ["LibAtem.Commands.DeviceProfile.ProductIdentifierCommand", DeviceProfile_ProductIdentifierCommand] |
   ["LibAtem.Commands.DeviceProfile.SuperSourceConfigCommand", DeviceProfile_SuperSourceConfigCommand] |
   ["LibAtem.Commands.DeviceProfile.SuperSourceConfigV8Command", DeviceProfile_SuperSourceConfigV8Command] |
   ["LibAtem.Commands.DeviceProfile.TopologyCommand", DeviceProfile_TopologyCommand] |
-  ["LibAtem.Commands.DeviceProfile.TopologyV8Command", DeviceProfile_TopologyV8Command] |
   ["LibAtem.Commands.DeviceProfile.TopologyV811Command", DeviceProfile_TopologyV811Command] |
+  ["LibAtem.Commands.DeviceProfile.TopologyV8Command", DeviceProfile_TopologyV8Command] |
   ["LibAtem.Commands.DeviceProfile.VersionCommand", DeviceProfile_VersionCommand] |
   ["LibAtem.Commands.DeviceProfile.VideoMixerConfigCommand", DeviceProfile_VideoMixerConfigCommand] |
   ["LibAtem.Commands.DeviceProfile.TimecodeLockedCommand", DeviceProfile_TimecodeLockedCommand] |
+  ["LibAtem.Commands.DataTransfer.DataTransferAbortCommand", DataTransfer_DataTransferAbortCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferAckCommand", DataTransfer_DataTransferAckCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferCompleteCommand", DataTransfer_DataTransferCompleteCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferDataCommand", DataTransfer_DataTransferDataCommand] |
@@ -2462,7 +2666,11 @@ export type CommandTypes =
   ["LibAtem.Commands.DataTransfer.LockObtainedCommand", DataTransfer_LockObtainedCommand] |
   ["LibAtem.Commands.DataTransfer.LockStateChangedCommand", DataTransfer_LockStateChangedCommand] |
   ["LibAtem.Commands.DataTransfer.LockStateSetCommand", DataTransfer_LockStateSetCommand] |
-  ["LibAtem.Commands.CameraControl.CCstCommand", CameraControl_CCstCommand] |
+  ["LibAtem.Commands.CameraControl.CameraControlDeviceOptionsSetCommand", CameraControl_CameraControlDeviceOptionsSetCommand] |
+  ["LibAtem.Commands.CameraControl.CameraControlGetCommand", CameraControl_CameraControlGetCommand] |
+  ["LibAtem.Commands.CameraControl.CameraControlSetCommand", CameraControl_CameraControlSetCommand] |
+  ["LibAtem.Commands.CameraControl.CameraControlSettingsGetCommand", CameraControl_CameraControlSettingsGetCommand] |
+  ["LibAtem.Commands.CameraControl.CameraControlSettingsSetCommand", CameraControl_CameraControlSettingsSetCommand] |
   ["LibAtem.Commands.Audio.AudioMixerHeadphoneGetCommand", Audio_AudioMixerHeadphoneGetCommand] |
   ["LibAtem.Commands.Audio.AudioMixerHeadphoneSetCommand", Audio_AudioMixerHeadphoneSetCommand] |
   ["LibAtem.Commands.Audio.AudioMixerInputGetCommand", Audio_AudioMixerInputGetCommand] |

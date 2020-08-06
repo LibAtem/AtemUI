@@ -96,6 +96,45 @@ export enum AudioSourceType {
   ExternalAudio = 2,
 }
 
+export enum AdjustmentDomain {
+  Lens = 0,
+  Camera = 1,
+  ColourBars = 4,
+  Chip = 8,
+}
+
+export enum CameraFeature {
+  PositiveGain = 1,
+  WhiteBalance = 2,
+  Shutter = 5,
+  Detail = 8,
+  Gain = 13,
+}
+
+export enum LensFeature {
+  Focus = 0,
+  AutoFocus = 1,
+  Iris = 2,
+  Zoom = 9,
+}
+
+export enum ChipFeature {
+  Lift = 0,
+  Gamma = 1,
+  Gain = 2,
+  Aperture = 3,
+  Contrast = 4,
+  Lum = 5,
+  HueSaturation = 6,
+}
+
+export enum CameraDetail {
+  Off = 0,
+  Default = 1,
+  Medium = 2,
+  High = 3,
+}
+
 export enum DownConvertMode {
   CentreCut = 0,
   Letterbox = 1,
@@ -140,6 +179,25 @@ export enum DVEEffect {
   GraphicLogoWipe = 34,
 }
 
+export enum HyperDeckStorageStatus {
+  Unavailable = 0,
+  Ready = 1,
+}
+
+export enum HyperDeckConnectionStatus {
+  NotConnected = 0,
+  Connecting = 1,
+  Connected = 2,
+  Incompatible = 3,
+}
+
+export enum HyperDeckPlayerState {
+  Playing = 0,
+  Idle = 1,
+  Shuttle = 2,
+  Recording = 4,
+}
+
 export enum ModelId {
   Unknown = 0,
   TVStudio = 1,
@@ -150,7 +208,13 @@ export enum ModelId {
   TwoMe4K = 6,
   TwoMEBS4K = 7,
   TVStudioHD = 8,
-  Constellation8K = 11,
+  TVStudioProHD = 9,
+  TVStudioPro4K = 10,
+  Constellation = 11,
+  Constellation8K = 12,
+  Mini = 13,
+  MiniPro = 14,
+  MiniProISO = 15,
 }
 
 export enum MixEffectBlockId {
@@ -212,7 +276,16 @@ export enum FlyKeyKeyFrameId {
   Two = 2,
 }
 
+export enum FlyKeyAtKeyFrame {
+  None = 0,
+  A = 1,
+  B = 2,
+  Full = 4,
+  Infinite = 8,
+}
+
 export enum FlyKeyKeyFrameType {
+  None = 0,
   A = 1,
   B = 2,
   Full = 3,
@@ -567,9 +640,9 @@ export enum MeAvailability {
   None = 0,
   Me1 = 1,
   Me2 = 2,
-  Me3 = 3,
-  Me4 = 4,
-  All = 7,
+  Me3 = 4,
+  Me4 = 8,
+  All = 15,
 }
 
 export enum MediaPlayerSource {
@@ -581,6 +654,8 @@ export enum MediaPoolFileType {
   Still = 0,
   Clip1 = 1,
   Clip2 = 2,
+  Clip3 = 3,
+  Clip4 = 4,
 }
 
 export enum MixEffectKeyType {
@@ -642,35 +717,6 @@ export enum BorderBevel {
   Out = 3,
 }
 
-export enum ExternalPortType {
-  Internal = 0,
-  SDI = 1,
-  HDMI = 2,
-  Composite = 3,
-  Component = 4,
-  SVideo = 5,
-  XLR = 32,
-  AESEBU = 64,
-  RCA = 128,
-  TSJack = 512,
-  MADI = 1024,
-  TRS = 2048,
-}
-
-export enum ExternalPortTypeFlags {
-  Unknown = 0,
-  SDI = 1,
-  HDMI = 2,
-  Component = 4,
-  Composite = 8,
-  SVideo = 16,
-  Internal = 32,
-  XLR = 64,
-  AESEBU = 128,
-  RCA = 256,
-  TSJack = 512,
-}
-
 export enum InternalPortType {
   External = 0,
   Black = 1,
@@ -679,9 +725,21 @@ export enum InternalPortType {
   MediaPlayerFill = 4,
   MediaPlayerKey = 5,
   SuperSource = 6,
+  ExternalDirect = 7,
   MEOutput = 128,
   Auxiliary = 129,
   Mask = 130,
+  MultiViewer = 131,
+}
+
+export enum VideoPortType {
+  None = 0,
+  SDI = 1,
+  HDMI = 2,
+  Component = 4,
+  Composite = 8,
+  SVideo = 16,
+  Internal = 256,
 }
 
 export enum AudioPortType {
@@ -692,7 +750,9 @@ export enum AudioPortType {
   AESEBU = 64,
   RCA = 128,
   Internal = 256,
-  Headset = 512,
+  TSJack = 512,
+  MADI = 1024,
+  TRSJack = 2048,
 }
 
 export enum MacroPortType {
@@ -859,8 +919,22 @@ export enum VideoSource {
   Key2Mask = 4020,
   Key3Mask = 4030,
   Key4Mask = 4040,
+  Key5Mask = 4050,
+  Key6Mask = 4060,
+  Key7Mask = 4070,
+  Key8Mask = 4080,
+  Key9Mask = 4090,
+  Key10Mask = 4100,
+  Key11Mask = 4110,
+  Key12Mask = 4120,
+  Key13Mask = 4130,
+  Key14Mask = 4140,
+  Key15Mask = 4150,
+  Key16Mask = 4160,
   DSK1Mask = 5010,
   DSK2Mask = 5020,
+  DSK3Mask = 5030,
+  DSK4Mask = 5040,
   SuperSource = 6000,
   SuperSource2 = 6001,
   CleanFeed1 = 7001,
