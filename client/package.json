@@ -54,7 +54,9 @@
     "build": "craco build",
     "test": "craco test",
     "lint": "eslint . --ext .ts --ignore-pattern build",
-    "generate-types": "cd ../TypesGenerator/; dotnet run"
+    "generate-types": "cd ../TypesGenerator/; dotnet run",
+    "check-types": "tsc --noEmit -p tsconfig.json",
+    "watch-types": "npm run check-types -- --watch"
   },
   "eslintConfig": {
     "extends": "react-app"

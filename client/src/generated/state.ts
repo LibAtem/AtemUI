@@ -20,6 +20,13 @@ export interface AtemState {
   power: boolean[]
 }
 
+export interface LibAtem_Common_HyperDeckTime {
+  hour: number
+  minute: number
+  second: number
+  frame: number
+}
+
 export interface AuxState {
   source: Enums.VideoSource
 }
@@ -251,7 +258,7 @@ export interface HyperdeckState_StorageState {
   timeScale: number
   isInterlaced: boolean
   isDropFrameTimecode: boolean
-  remainingRecordTime?: Enums.HyperDeckTime
+  remainingRecordTime?: LibAtem_Common_HyperDeckTime
 }
 
 export interface HyperdeckState_SettingsState {
@@ -269,15 +276,15 @@ export interface HyperdeckState_PlayerState {
   loop: boolean
   singleClip: boolean
   playbackSpeed: number
-  clipTime?: Enums.HyperDeckTime
-  timelineTime?: Enums.HyperDeckTime
+  clipTime?: LibAtem_Common_HyperDeckTime
+  timelineTime?: LibAtem_Common_HyperDeckTime
 }
 
 export interface HyperdeckState_ClipState {
   name: string
-  duration?: Enums.HyperDeckTime
-  timelineStart?: Enums.HyperDeckTime
-  timelineEnd?: Enums.HyperDeckTime
+  duration?: LibAtem_Common_HyperDeckTime
+  timelineStart?: LibAtem_Common_HyperDeckTime
+  timelineEnd?: LibAtem_Common_HyperDeckTime
 }
 
 export interface AudioState_ProgramOutState {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using LibAtem.Common;
 using LibAtem.DeviceProfile;
 using LibAtem.State;
 
@@ -21,7 +22,8 @@ namespace TypesGenerator
             }
             using (var stateFile = new StreamWriter("../client/src/generated/state.ts"))
             {
-                new ClassSpecGenerator(stateFile, "LibAtem.State.", typeof(AtemState)).RunIt("LibAtem.State.AtemState");
+                new ClassSpecGenerator(stateFile, "LibAtem.State.", typeof(AtemState)).RunIt("LibAtem.State.AtemState",
+                    typeof(HyperDeckTime));
             }
             using (var profileFile = new StreamWriter("../client/src/generated/profile.ts"))
             {

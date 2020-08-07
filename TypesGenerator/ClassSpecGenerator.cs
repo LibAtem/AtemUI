@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using LibAtem;
+using LibAtem.Common;
 
 namespace TypesGenerator
 {
@@ -32,12 +33,15 @@ namespace TypesGenerator
             return rawName.Replace(".", "_").Replace("+", "_");
         }
         
-        public void RunIt(string entry)
+        public void RunIt(string entry, params Type[] additionalTypes)
         {
             _file.WriteLine("/* eslint-disable*/");
             _file.WriteLine($"import * as Enums from './common-enums'");
 
             _pendingClasses.Add(entry);
+            _pendingClasses.AddRange(additionalTypes.Select(t => t.FullName));
+
+            var additionalTypesSet = new HashSet<Type>(additionalTypes);
 
             while (_pendingClasses.Count > 0)
             {
@@ -45,12 +49,12 @@ namespace TypesGenerator
                 _pendingClasses.RemoveAt(0);
                 if (_generatedClasses.Add(t))
                 {
-                    RunForClass(t);
+                    RunForClass(t, additionalTypesSet);
                 }
             }
         }
 
-        private string translateType(Type t)
+        private string translateType(Type t, HashSet<Type> additionalTypesSet)
         {
             string commonPrefix = "LibAtem.Common.";
 
@@ -59,24 +63,28 @@ namespace TypesGenerator
 
             if (isList)
             {
-                return translateType(t.GetGenericArguments().Single()) + "[]";
+                return translateType(t.GetGenericArguments().Single(), additionalTypesSet) + "[]";
             }
 
             if (isDictionary)
             {
                 var types = t.GetGenericArguments();
-                if (translateType(types[0]) != "unknown")
+                if (translateType(types[0], additionalTypesSet) != "unknown")
                 {
-                    return $"Record<{translateType(types[0])}, {translateType(types[1])}>"; // | undefined>"; // TODO - this is safer, but is it a good idea?   
+                    return $"Record<{translateType(types[0], additionalTypesSet)}, {translateType(types[1], additionalTypesSet)}>"; // | undefined>"; // TODO - this is safer, but is it a good idea?   
                 }
             }
             if (t.IsArray)
             {
-                return translateType(t.GetElementType()) + "[]";
+                return translateType(t.GetElementType(), additionalTypesSet) + "[]";
             }
             if (t == typeof(ProtocolVersion))
             {
                 return "Enums.ProtocolVersion";
+            }
+            if (additionalTypesSet.Contains(t))
+            {
+                return SafeName(t.FullName);
             }
             if (t.FullName.StartsWith(commonPrefix))
             {
@@ -108,7 +116,7 @@ namespace TypesGenerator
             return "unknown";
         }
 
-        private void RunForClass(string fullname)
+        private void RunForClass(string fullname, HashSet<Type> additionalTypesSet)
         {
             var coreAssembly = typeof(ProtocolVersion).GetTypeInfo().Assembly;
             var refAssembly = _reference.GetTypeInfo().Assembly;
@@ -129,7 +137,7 @@ namespace TypesGenerator
                                      (prop.GetSetMethod(true)?.IsPublic).GetValueOrDefault(false) &&
                                      prop.GetValue(sampleClass) == null && prop.PropertyType != typeof(string);
                     var optionalStr = isOptional ? "?" : "";
-                    _file.WriteLine($"  {name}{optionalStr}: {translateType(prop.PropertyType)}");
+                    _file.WriteLine($"  {name}{optionalStr}: {translateType(prop.PropertyType, additionalTypesSet)}");
                 }
 
                 _file.WriteLine($"}}\n");

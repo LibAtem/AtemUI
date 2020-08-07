@@ -19,12 +19,12 @@ export function FlyingKeyerProperties(props: {
       <ToggleHeading
         active={props.flyEnabled}
         label="Flying Key"
-        onClick={v =>
+        onClick={(v) =>
           props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
             MixEffectIndex: props.meIndex,
             KeyerIndex: props.keyerIndex,
             Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags.FlyEnabled,
-            FlyEnabled: v
+            FlyEnabled: v,
           })
         }
       />
@@ -63,8 +63,8 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
         MixEffectIndex: this.props.meIndex,
         KeyerIndex: this.props.keyerIndex,
         KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.RunToInfinite,
-        Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags.RunToInfinite,
-        RunToInfinite: target
+        // Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyFlyRunSetCommand_MaskFlags.RunToInfinite,
+        RunToInfinite: target,
       })
     }
   }
@@ -86,7 +86,7 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
 
   private setKeyframe(keyframe: LibAtemEnums.FlyKeyKeyFrameId) {
     const maskVals = Object.values(LibAtemCommands.MixEffects_Key_MixEffectKeyFlyKeyframeSetCommand_MaskFlags).filter(
-      v => typeof v === 'number'
+      (v) => typeof v === 'number'
     ) as number[]
 
     this.props.sendCommand(
@@ -116,15 +116,15 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
         MaskBottom: this.props.keyerProps.maskBottom,
         MaskLeft: this.props.keyerProps.maskLeft,
         MaskRight: this.props.keyerProps.maskRight,
-        Mask: (_.max(maskVals) << 1) - 1
+        Mask: (_.max(maskVals) << 1) - 1,
       })
     )
   }
 
   render() {
     const currentInfinite =
-      this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.RunToInfinite
-        ? this.props.flyProps.runToInfinite
+      this.props.flyProps.runningToKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.RunToInfinite
+        ? this.props.flyProps.runningToInfinite
         : null
 
     return (
@@ -141,7 +141,7 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyDVESetCommand_MaskFlags.Rate,
-                Rate: e
+                Rate: e,
               })
             }
           />
@@ -167,39 +167,42 @@ export class FlyingKeyFrameProperties extends React.Component<FlyingKeyFrameProp
             <RunButton
               label="A"
               disabled={!this.props.flyEnabled || !this.props.flyProps.isASet}
-              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.A}
+              active={this.props.flyProps.runningToKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.A}
               onClick={() =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
                   MixEffectIndex: this.props.meIndex,
                   KeyerIndex: this.props.keyerIndex,
                   KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.A,
-                  Mask: 0
+                  RunToInfinite: 0,
+                  // Mask: 0,
                 })
               }
             />
             <RunButton
               label="B"
               disabled={!this.props.flyEnabled || !this.props.flyProps.isBSet}
-              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.B}
+              active={this.props.flyProps.runningToKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.B}
               onClick={() =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
                   MixEffectIndex: this.props.meIndex,
                   KeyerIndex: this.props.keyerIndex,
                   KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.B,
-                  Mask: 0
+                  RunToInfinite: 0,
+                  // Mask: 0,
                 })
               }
             />
             <RunButton
               label="Full"
               disabled={!this.props.flyEnabled}
-              active={this.props.flyProps.activeKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.Full}
+              active={this.props.flyProps.runningToKeyFrame === LibAtemEnums.FlyKeyKeyFrameType.Full}
               onClick={() =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFlyRunSetCommand', {
                   MixEffectIndex: this.props.meIndex,
                   KeyerIndex: this.props.keyerIndex,
                   KeyFrame: LibAtemEnums.FlyKeyKeyFrameType.Full,
-                  Mask: 0
+                  RunToInfinite: 0,
+                  // Mask: 0,
                 })
               }
             />

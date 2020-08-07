@@ -7,12 +7,12 @@ import { LibAtemState, LibAtemEnums, VideoModeInfoSet } from '../generated'
 const SDI3GLevelOptions = [
   {
     id: LibAtemEnums.SDI3GOutputLevel.LevelA,
-    label: 'Level A'
+    label: 'Level A',
   },
   {
     id: LibAtemEnums.SDI3GOutputLevel.LevelB,
-    label: 'Level B (Normal)'
-  }
+    label: 'Level B (Normal)',
+  },
 ]
 
 interface GeneralSettingsProps {
@@ -70,7 +70,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
       videoMode: null,
       multiViewMode: null,
       downConvertMode: null,
-      sdi3GLevel: null
+      sdi3GLevel: null,
     }
   }
   render() {
@@ -83,17 +83,17 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
     const currentVideoMode = this.state.videoMode ?? this.props.state.videoMode
     const videoModes = this.props.info.supportedVideoModes.map((mode, i) => ({
       id: mode.mode,
-      label: VideoModeInfoSet[mode.mode]?.name ?? mode.mode
+      label: VideoModeInfoSet[mode.mode]?.name ?? mode.mode,
     }))
 
-    const videoModeInfo = this.props.info.supportedVideoModes.find(mode => mode.mode === currentVideoMode)
-    const multiviewerModes = videoModeInfo?.multiviewModes?.map(mode => ({
+    const videoModeInfo = this.props.info.supportedVideoModes.find((mode) => mode.mode === currentVideoMode)
+    const multiviewerModes = videoModeInfo?.multiviewModes?.map((mode) => ({
       id: mode,
-      label: VideoModeInfoSet[mode]?.name ?? mode
+      label: VideoModeInfoSet[mode]?.name ?? mode,
     }))
-    const downConvertModes = videoModeInfo?.downConvertModes?.map(mode => ({
+    const downConvertModes = videoModeInfo?.downConvertModes?.map((mode) => ({
       id: (mode as any) as LibAtemEnums.DownConvertMode, // TODO - this is wrong..
-      label: mode + ''
+      label: mode + '',
     }))
 
     return (
@@ -104,16 +104,20 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           label="Set video standard to"
           value={currentVideoMode}
           options={videoModes}
-          onChange={v => this.setState({ videoMode: v, multiViewMode: null, downConvertMode: null })}
+          onChange={(v) => this.setState({ videoMode: v, multiViewMode: null, downConvertMode: null })}
         />
 
         {/* TODO - is this correct and the lib has it named wrong? */}
         <SelectInput
           label="Set multi view video standard to"
           disabled={!multiviewerModes || multiviewerModes.length <= 1}
-          value={this.state.multiViewMode ?? this.props.state.downConvertVideoMode}
+          value={this.state.multiViewMode ?? ''}
           options={multiviewerModes ?? []}
-          onChange={v => this.setState({ multiViewMode: v })}
+          onChange={(v) => {
+            if (v != '') {
+              this.setState({ multiViewMode: v })
+            }
+          }}
         />
 
         {/* TODO - this bit doesnt make sense... */}
@@ -122,7 +126,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           disabled={!downConvertModes || downConvertModes.length <= 1}
           value={this.state.downConvertMode ?? this.props.state.downConvertMode}
           options={downConvertModes ?? []}
-          onChange={v => this.setState({ downConvertMode: v })}
+          onChange={(v) => this.setState({ downConvertMode: v })}
         />
 
         {/* TODO - this should be disabled for most modes... */}
@@ -130,7 +134,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           label="Set 3G SDI output to"
           value={this.state.sdi3GLevel ?? this.props.state.sDI3GLevel}
           options={SDI3GLevelOptions}
-          onChange={v => this.setState({ sdi3GLevel: v })}
+          onChange={(v) => this.setState({ sdi3GLevel: v })}
         />
 
         <div></div>
@@ -142,7 +146,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
               // TODO - sendCommand
               if (this.state.videoMode !== null) {
                 this.props.sendCommand('LibAtem.Commands.Settings.VideoModeSetCommand', {
-                  VideoMode: this.state.videoMode
+                  VideoMode: this.state.videoMode,
                 })
               }
               if (this.state.multiViewMode !== null) {
@@ -153,12 +157,12 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
               }
               if (this.state.downConvertMode !== null) {
                 this.props.sendCommand('LibAtem.Commands.Settings.DownConvertModeSetCommand', {
-                  DownConvertMode: this.state.downConvertMode
+                  DownConvertMode: this.state.downConvertMode,
                 })
               }
               if (this.state.sdi3GLevel !== null) {
                 this.props.sendCommand('LibAtem.Commands.Settings.SDI3GLevelOutputSetCommand', {
-                  SDI3GOutputLevel: this.state.sdi3GLevel
+                  SDI3GOutputLevel: this.state.sdi3GLevel,
                 })
               }
 
@@ -166,7 +170,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
                 videoMode: null,
                 multiViewMode: null,
                 downConvertMode: null,
-                sdi3GLevel: null
+                sdi3GLevel: null,
               })
             }}
           />
@@ -178,7 +182,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
                 videoMode: null,
                 multiViewMode: null,
                 downConvertMode: null,
-                sdi3GLevel: null
+                sdi3GLevel: null,
               })
             }
           />
@@ -209,7 +213,7 @@ class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoo
     super(props)
 
     this.state = {
-      frames: null
+      frames: null,
     }
   }
   render() {
@@ -227,7 +231,7 @@ class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoo
             min={0}
             max={maxFrames}
             value={this.state.frames ? this.state.frames[id] : clip.maxFrames}
-            onChange={newValue => {
+            onChange={(newValue) => {
               if (this.props.clips.length === 2) {
                 // As there is only 2, changing one will change the other
                 const clampedValue = Math.max(Math.min(newValue, maxFrames), 0)
@@ -236,7 +240,9 @@ class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoo
                 this.setState({ frames: newFrames })
               } else if (this.props.clips.length > 2) {
                 // Here we have a pool of unassignedFrames, and changing one does not affect the others
-                const newFrames = this.state.frames ? [...this.state.frames] : this.props.clips.map(cl => cl.maxFrames)
+                const newFrames = this.state.frames
+                  ? [...this.state.frames]
+                  : this.props.clips.map((cl) => cl.maxFrames)
 
                 const otherInUse = newFrames.filter((v, i) => i !== id).reduce((a, b) => a + b, 0)
                 const clampedValue = Math.max(Math.min(newValue, maxFrames - otherInUse), 0)
@@ -256,7 +262,7 @@ class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoo
             onClick={() => {
               if (this.state.frames !== null) {
                 this.props.sendCommand('LibAtem.Commands.Media.MediaPoolSettingsSetCommand', {
-                  MaxFrames: this.state.frames
+                  MaxFrames: this.state.frames,
                 })
               }
 

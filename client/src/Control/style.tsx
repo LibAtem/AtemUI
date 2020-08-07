@@ -23,10 +23,10 @@ const styles: TransStyleProps[] = [
     sendRate: (props: StyleProps, val: number) => {
       props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionMixSetCommand', {
         Index: props.meIndex,
-        Rate: val
+        Rate: val,
       })
     },
-    disabled: () => false
+    disabled: () => false,
   },
   {
     name: 'DIP',
@@ -34,10 +34,10 @@ const styles: TransStyleProps[] = [
       props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDipSetCommand', {
         Index: props.meIndex,
         Mask: LibAtemCommands.MixEffects_Transition_TransitionDipSetCommand_MaskFlags.Rate,
-        Rate: val
+        Rate: val,
       })
     },
-    disabled: () => false
+    disabled: () => false,
   },
   {
     name: 'WIPE',
@@ -45,10 +45,10 @@ const styles: TransStyleProps[] = [
       props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionWipeSetCommand', {
         Index: props.meIndex,
         Mask: LibAtemCommands.MixEffects_Transition_TransitionWipeSetCommand_MaskFlags.Rate,
-        Rate: val
+        Rate: val,
       })
     },
-    disabled: () => false
+    disabled: () => false,
   },
   {
     name: 'DVE',
@@ -56,16 +56,16 @@ const styles: TransStyleProps[] = [
       props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
         Index: props.meIndex,
         Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Rate,
-        Rate: val
+        Rate: val,
       })
     },
-    disabled: p => p.dve === 0
+    disabled: (p) => p.dve === 0,
   },
   {
     name: 'STING',
     sendRate: null,
-    disabled: p => p.mediaPoolClips === 0
-  }
+    disabled: (p) => p.mediaPoolClips === 0,
+  },
 ]
 
 export function TransitionStylePanel(props: StyleProps) {
@@ -98,7 +98,7 @@ export function TransitionStylePanel(props: StyleProps) {
               props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPropertiesSetCommand', {
                 Index: props.meIndex,
                 Mask: 1,
-                NextStyle: index
+                NextStyle: index,
               })
             }
             active={checkStyle(index)}
@@ -113,10 +113,10 @@ export function TransitionStylePanel(props: StyleProps) {
           callback={() =>
             props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionPreviewSetCommand', {
               Index: props.meIndex,
-              PreviewTransition: !props.properties.preview
+              PreviewTransition: !props.properties.previewTransition,
             })
           }
-          active={props.properties.preview}
+          active={props.properties.previewTransition}
           name={'PREV TRANS'}
         />
 
@@ -145,7 +145,7 @@ export function TransitionStylePanel(props: StyleProps) {
           <RateInput
             disabled={!currentStyle?.sendRate}
             className={'rate-input'}
-            callback={e => {
+            callback={(e) => {
               if (currentStyle?.sendRate) {
                 currentStyle.sendRate(props, e)
               }
