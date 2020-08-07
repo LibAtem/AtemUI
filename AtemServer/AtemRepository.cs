@@ -42,6 +42,10 @@ namespace AtemServer
         private readonly AtemState _state;
         private readonly IHubContext<DevicesHub> context_;
         private readonly HashSet<string> _subscriptions;
+        
+        public delegate void DeviceChange(object sender);
+
+        public event DeviceChange OnChange;
 
         public AtemClientExt(string deviceId, AtemClient client, IHubContext<DevicesHub> _context, HashSet<string> subscriptions)
         {
@@ -56,11 +60,13 @@ namespace AtemServer
             Client.OnConnection += sender =>
             {
                 Connected = true;
+                OnChange?.Invoke(this);
                 SendState(GetState());
             };
             Client.OnDisconnect += sender =>
             {
                 Connected = false;
+                OnChange?.Invoke(this);
                 SendState(null);
             };
 
@@ -163,7 +169,7 @@ namespace AtemServer
             }
         }
 
-        private void SendState(AtemState state)
+        public void SendState(AtemState state)
         {
             context_.Clients.Clients(GetClientIds()).SendAsync("state", new AtemStateWrapped{
                 State = state,
@@ -212,6 +218,12 @@ namespace AtemServer
     {
         public AtemDeviceInfo Info { get; set; }
         
+        /*
+        [BsonIgnore]
+        [JsonIgnore]
+        public DateTime LastDiscovered { get; set; }
+        */
+        
         public bool Enabled { get; set; }
         
         public bool Remember { get; set; }
@@ -256,12 +268,12 @@ namespace AtemServer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(AtemClient));
 
-        private readonly LiteDatabase db;
-        private readonly ILiteCollection<AtemDevice> dbDevices;
-        private readonly Dictionary<string, AtemDevice> devices;
+        private readonly LiteDatabase _db;
+        private readonly ILiteCollection<AtemDevice> _dbDevices;
+        private readonly Dictionary<string, AtemDevice> _devices;
 
-        private readonly AtemDiscoveryService discovery;
-        private readonly IHubContext<DevicesHub> context_;
+        private readonly AtemDiscoveryService _discovery;
+        private readonly IHubContext<DevicesHub> _context;
 
         static AtemRepository()
         {
@@ -275,31 +287,31 @@ namespace AtemServer
 
         public AtemRepository(IHubContext<DevicesHub> context)
         {
-            db = new LiteDatabase(@"MyData.db");
-            dbDevices = db.GetCollection<AtemDevice>("devices");
-            devices = new Dictionary<string, AtemDevice>();
+            _db = new LiteDatabase(@"MyData.db");
+            _dbDevices = _db.GetCollection<AtemDevice>("devices");
+            _devices = new Dictionary<string, AtemDevice>();
 
-            context_ = context;
+            _context = context;
 
             // Load up old devices
-            foreach (AtemDevice device in dbDevices.FindAll())
+            foreach (AtemDevice device in _dbDevices.FindAll())
             {
                 device.Subscriptions = new HashSet<string>();
                 SetupConnection(device);
-                devices[device.Info.Id()] = device;
+                _devices[device.Info.Id()] = device;
             }
             
-            discovery = new AtemDiscoveryService();
-            discovery.OnDeviceSeen += OnDeviceSeen;
-            discovery.OnDeviceLost += OnDeviceLost;
+            _discovery = new AtemDiscoveryService(5000);
+            _discovery.OnDeviceSeen += OnDeviceSeen;
+            _discovery.OnDeviceLost += OnDeviceLost;
         }
 
         public AtemState SubscribeClient(string connectionId, string deviceId)
         {
             AtemDevice device;
-            lock (devices)
+            lock (_devices)
             {
-                device = devices[deviceId];
+                device = _devices[deviceId];
             }
 
             if (device == null)
@@ -319,9 +331,9 @@ namespace AtemServer
         public void UnsubscribeClient(string connectionId, string deviceId)
         {
             AtemDevice device;
-            lock (devices)
+            lock (_devices)
             {
-                device = devices[deviceId];
+                device = _devices[deviceId];
             }
 
             if (device == null)
@@ -337,9 +349,9 @@ namespace AtemServer
 
         public void DisconnectClient(string connectionId)
         {
-            lock (devices)
+            lock (_devices)
             {
-                foreach (var device in devices)
+                foreach (var device in _devices)
                 {
                     lock (device.Value.Subscriptions)
                     {
@@ -353,77 +365,84 @@ namespace AtemServer
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClientExt(device.Info.Id(), new AtemClient(device.Info.Address, false), context_, device.Subscriptions);
-                // TODO setup listeners for stuff
+                device.Client = new AtemClientExt(device.Info.Id(), new AtemClient(device.Info.Address, false), _context, device.Subscriptions);
+                device.Client.OnChange += sender =>
+                {
+                    if (sender is AtemClientExt client)
+                    {
+                        _context.Clients.All.SendAsync("devices", ListDevices());
+                        Console.WriteLine($"Device state change {device?.Info?.Name ?? "-"} = {client.Connected}");
+                    }
+                };
                 
                 device.Client.Client.Connect();
             } else if (!device.Enabled && device.Client != null) {
                 device.Client.Client.Dispose();
+                device.Client.SendState(null);
                 device.Client = null;
-                // TODO - send 'empty' state
             }
         }
 
         private void OnDeviceSeen(object sender, AtemDeviceInfo info)
         {
             var id = info.Id();
-            lock (devices)
+            lock (_devices)
             {
-                if (devices.TryGetValue(id, out AtemDevice device))
+                if (_devices.TryGetValue(id, out AtemDevice device))
                 {
                     device.Info = info;
 
                     // If remembered, sync changes to the db
                     if (device.Remember)
-                        dbDevices.Update(id, device);
+                        _dbDevices.Update(id, device);
                 }
                 else
                 {
-                    devices[id] = new AtemDevice(info);
+                    _devices[id] = new AtemDevice(info);
                     Log.InfoFormat("Discovered device: {0}", info.ToString());
                 }
 
-                context_.Clients.All.SendAsync("devices", ListDevices());
+                _context.Clients.All.SendAsync("devices", ListDevices());
             }
         }
         private void OnDeviceLost(object sender, AtemDeviceInfo info)
         {
             var id = info.Id();
 
-            lock (devices)
+            lock (_devices)
             {
-                if (devices.TryGetValue(id, out AtemDevice device))
+                if (_devices.TryGetValue(id, out AtemDevice device))
                 {
                     Log.InfoFormat("Lost device: {0}", info.ToString());
 
                     if (!device.Remember)
                     {
-                        devices.Remove(id);
+                        _devices.Remove(id);
                         
-                        dbDevices.Delete(id); // Ensure its not in the db (it shouldnt be)
+                        _dbDevices.Delete(id); // Ensure its not in the db (it shouldnt be)
                     }
                     
                     // Ensure device is in expected state
                     SetupConnection(device);
                     
-                    context_.Clients.All.SendAsync("devices", ListDevices());
+                    _context.Clients.All.SendAsync("devices", ListDevices());
                 }
             }
         }
 
         public IReadOnlyList<AtemDevice> ListDevices()
         {
-            lock (devices)
+            lock (_devices)
             {
-                return devices.Select(d => d.Value).ToList();
+                return _devices.Select(d => d.Value).ToList();
             }
         }
         
         public AtemClientExt GetConnection(string id)
         {
-            lock (devices)
+            lock (_devices)
             {
-                return devices.TryGetValue(id, out AtemDevice device) ? device.Client : null;
+                return _devices.TryGetValue(id, out AtemDevice device) ? device.Client : null;
             }
         }
 
@@ -431,26 +450,26 @@ namespace AtemServer
         {
             var id = AtemDeviceExt.Id(address, port);
 
-            lock (devices)
+            lock (_devices)
             {
-                if (devices.TryGetValue(id, out AtemDevice device))
+                if (_devices.TryGetValue(id, out AtemDevice device))
                 {
                     device.Remember = true;
                     device.Enabled = true;
 
 
-                    dbDevices.Upsert(id, device);
+                    _dbDevices.Upsert(id, device);
                     
                     // startup connection
                     SetupConnection(device);
                 } else {
-                    var doc = devices[id] = new AtemDevice(new AtemDeviceInfo(id, "", DateTime.MinValue, address, port, new List<string>()))
+                    var doc = _devices[id] = new AtemDevice(new AtemDeviceInfo(id, "", DateTime.MinValue, address, port, new List<string>()))
                     {
                         Remember = true, // Remember anything created manually
                         Enabled = true, // Enable for connections 
                     };
 
-                    dbDevices.Upsert(id, doc);
+                    _dbDevices.Upsert(id, doc);
                     
                     // startup connection
                     SetupConnection(doc);
@@ -464,18 +483,18 @@ namespace AtemServer
         {
             var id = AtemDeviceExt.Id(address, port);
 
-            lock (devices)
+            lock (_devices)
             {
                 var changed = false;
-                if (devices.TryGetValue(id, out AtemDevice device))
+                if (_devices.TryGetValue(id, out AtemDevice device))
                 {
                     // shutdown the connection
                     device.Enabled = false;
                     SetupConnection(device);
                     
                     // TODO - don't delete it, unless it has not been seen in a while
-                    dbDevices.Delete(id);
-                    changed = devices.Remove(id);
+                    _dbDevices.Delete(id);
+                    changed = _devices.Remove(id);
                 }
                 
                 return Tuple.Create(changed, ListDevices());
@@ -487,10 +506,10 @@ namespace AtemServer
         {
             var id = AtemDeviceExt.Id(address, port);
 
-            lock (devices)
+            lock (_devices)
             {
                 var changed = false;
-                if (devices.TryGetValue(id, out AtemDevice device))
+                if (_devices.TryGetValue(id, out AtemDevice device))
                 {
                     // Set state
                     device.Enabled = enabled;
@@ -498,7 +517,7 @@ namespace AtemServer
                     device.Remember = true;
 
                     // Persist to db
-                    dbDevices.Upsert(id, device);
+                    _dbDevices.Upsert(id, device);
 
                     // Ensure connection state
                     SetupConnection(device);
