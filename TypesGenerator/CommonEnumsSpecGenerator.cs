@@ -44,6 +44,7 @@ namespace TypesGenerator
         
         private void RunIt()
         {
+            _file.WriteLine("/* eslint-disable*/");
             ProcessEnum(typeof(ProtocolVersion));
                 
             var assembly = typeof(ProtocolVersion).GetTypeInfo().Assembly;

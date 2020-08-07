@@ -1,3 +1,4 @@
+/* eslint-disable*/
 export enum ProtocolVersion {
   V7_2 = 131094,
   V7_X = 131097,

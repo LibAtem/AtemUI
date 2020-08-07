@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import * as Enums from './common-enums'
 import * as Types from './manual-types'
 export const VideoModeInfoSet: Types.IVideoModeInfoSet = {

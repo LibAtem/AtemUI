@@ -45,6 +45,7 @@ namespace TypesGenerator
             var funcs = new List<string>();
             var enumsSb = new StringBuilder();
             
+            _file.WriteLine("/* eslint-disable*/");
             _file.WriteLine($"import * as Enums from './common-enums'");
             
             foreach (var cmdSet in CommandManager.GetAllTypes())

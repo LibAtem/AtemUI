@@ -1,3 +1,4 @@
+/* eslint-disable*/
 import * as Enums from './common-enums'
 export interface AuxSourceGetCommand {
   Id: Enums.AuxiliaryId

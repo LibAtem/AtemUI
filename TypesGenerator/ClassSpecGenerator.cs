@@ -34,6 +34,7 @@ namespace TypesGenerator
         
         public void RunIt(string entry)
         {
+            _file.WriteLine("/* eslint-disable*/");
             _file.WriteLine($"import * as Enums from './common-enums'");
 
             _pendingClasses.Add(entry);

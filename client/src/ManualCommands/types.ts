@@ -10,7 +10,7 @@ export enum CommandPropertyType {
   Enum = 'Enum',
   Flags = 'Flags',
   String = 'String',
-  ByteArray = 'ByteArray'
+  ByteArray = 'ByteArray',
 }
 
 export interface CommandProperty {

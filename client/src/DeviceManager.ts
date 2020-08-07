@@ -15,16 +15,16 @@ export const DeviceManagerContext = React.createContext<DeviceContext>({
   devices: [],
   activeDeviceId: null,
   currentState: null,
-  currentProfile: null
+  currentProfile: null,
 })
 
-export function GetDeviceId(dev: AtemDeviceInfo) {
+export function GetDeviceId(dev: AtemDeviceInfo): string {
   return `${dev.info.address}:${dev.info.port}`
 }
 
-export function GetActiveDevice(context: DeviceContext) {
+export function GetActiveDevice(context: DeviceContext): AtemDeviceInfo | undefined {
   if (context.activeDeviceId) {
-    return context.devices.find(dev => GetDeviceId(dev) === context.activeDeviceId)
+    return context.devices.find((dev) => GetDeviceId(dev) === context.activeDeviceId)
   } else {
     return undefined
   }
