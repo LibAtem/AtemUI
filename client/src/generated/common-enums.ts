@@ -258,15 +258,6 @@ export enum SuperSourceBoxId {
   Four = 3,
 }
 
-export enum AuxiliaryId {
-  One = 0,
-  Two = 1,
-  Three = 2,
-  Four = 3,
-  Five = 4,
-  Six = 5,
-}
-
 export enum ColorGeneratorId {
   One = 0,
   Two = 1,
@@ -275,14 +266,6 @@ export enum ColorGeneratorId {
 export enum FlyKeyKeyFrameId {
   One = 1,
   Two = 2,
-}
-
-export enum FlyKeyAtKeyFrame {
-  None = 0,
-  A = 1,
-  B = 2,
-  Full = 4,
-  Infinite = 8,
 }
 
 export enum FlyKeyKeyFrameType {
@@ -762,6 +745,29 @@ export enum MacroPortType {
   Component = 2,
 }
 
+export enum RecordingError {
+  None = 0,
+  NoMedia = 1,
+  MediaFull = 2,
+  MediaError = 3,
+  MediaUnformatted = 4,
+  DroppingFrames = 5,
+  Unknown = 6,
+}
+
+export enum RecordingState {
+  Idle = 0,
+  Recording = 1,
+  Stopping = 2,
+}
+
+export enum RecordingDiskStatus {
+  Idle = 0,
+  Unformatted = 1,
+  Active = 2,
+  Recording = 3,
+}
+
 export enum SDI3GOutputLevel {
   LevelB = 0,
   LevelA = 1,
@@ -791,9 +797,27 @@ export enum StingerSource {
   MediaPlayer4 = 4,
 }
 
+export enum StreamingError {
+  None = 0,
+  InvalidState = 1,
+  Unknown = 2,
+}
+
+export enum StreamingStatus {
+  Idle = 1,
+  Connecting = 2,
+  Streaming = 4,
+  Stopping = 8,
+}
+
 export enum SuperSourceArtOption {
   Background = 0,
   Foreground = 1,
+}
+
+export enum TimeCodeMode {
+  FreeRun = 0,
+  TimeOfDay = 1,
 }
 
 export enum TransitionLayer {

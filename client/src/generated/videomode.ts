@@ -159,13 +159,13 @@ export const VideoModeInfoSet: Types.IVideoModeInfoSet = {
     framerate: 59.94,
   },
   [Enums.VideoMode.N1080p30]: {
-    name: "1080p2997",
+    name: "1080p30",
     width: 1920,
     height: 1080,
     framerate: 30,
   },
   [Enums.VideoMode.N1080p60]: {
-    name: "1080p5994",
+    name: "1080p60",
     width: 1920,
     height: 1080,
     framerate: 60,

@@ -103,7 +103,7 @@ export interface MediaPoolState {
 export interface SettingsState {
   multiViewers: MultiViewerState[]
   inputs: Record<Enums.VideoSource, InputState>
-  talkback?: Record<Enums.TalkbackChannel, SettingsState_TalkbackState>
+  talkback: SettingsState_TalkbackState[]
   mixMinusOutputs: SettingsState_MixMinusOutputState[]
   autoVideoMode: boolean
   detectedVideoMode: boolean
@@ -114,6 +114,7 @@ export interface SettingsState {
   serialMode: Enums.SerialMode
   sDI3GLevel: Enums.SDI3GOutputLevel
   superSourceCascade: boolean
+  timeCodeMode: Enums.TimeCodeMode
 }
 
 export interface StreamingState {
@@ -397,7 +398,7 @@ export interface InputState {
 
 export interface SettingsState_TalkbackState {
   muteSDI: boolean
-  inputs: SettingsState_TalkbackInputState[]
+  inputs: Record<Enums.VideoSource, SettingsState_TalkbackInputState>
 }
 
 export interface SettingsState_MixMinusOutputState {
@@ -412,7 +413,7 @@ export interface StreamingState_StatusState {
   cacheUsed: number
   encodingBitrate: number
   duration?: Timecode
-  state: unknown
+  state: Enums.StreamingStatus
   error: number
 }
 
@@ -457,6 +458,8 @@ export interface InfoState_MultiViewInfoState {
   supportsProgramPreviewSwapped: boolean
   supportsQuadrantLayout: boolean
   supportsToggleSafeArea: boolean
+  canChangeLayout: boolean
+  canChangeVuMeterOpacity: boolean
 }
 
 export interface MixEffectState_KeyerLumaState {
@@ -780,6 +783,9 @@ export interface InputState_TallyState {
 }
 
 export interface SettingsState_TalkbackInputState {
+  muteSDI: boolean
+  inputCanMuteSDI: boolean
+  currentInputSupportsMuteSDI: boolean
 }
 
 export interface MixEffectState_KeyerAdvancedChromaSampleState {

@@ -1,12 +1,12 @@
 /* eslint-disable*/
 import * as Enums from './common-enums'
 export interface AuxSourceGetCommand {
-  Id: Enums.AuxiliaryId
+  Id: number
   Source: Enums.VideoSource
 }
 
 export interface AuxSourceSetCommand {
-  Id: Enums.AuxiliaryId
+  Id: number
   Source?: Enums.VideoSource
 }
 
@@ -64,6 +64,32 @@ export interface TimeCodeRequestCommand {
 
 export interface WarningCommand {
   Text: string
+}
+
+export interface Talkback_TalkbackMixerInputPropertiesGetCommand {
+  Channel: Enums.TalkbackChannel
+  Index: Enums.VideoSource
+  InputCanMuteSDI: boolean
+  CurrentInputSupportsMuteSDI: boolean
+  MuteSDI: boolean
+}
+
+export interface Talkback_TalkbackMixerInputPropertiesSetCommand {
+  Mask: Talkback_TalkbackMixerInputPropertiesSetCommand_MaskFlags
+  Channel: Enums.TalkbackChannel
+  Index: Enums.VideoSource
+  MuteSDI?: boolean
+}
+
+export interface Talkback_TalkbackMixerPropertiesGetCommand {
+  Channel: Enums.TalkbackChannel
+  MuteSDI: boolean
+}
+
+export interface Talkback_TalkbackMixerPropertiesSetCommand {
+  Mask: Talkback_TalkbackMixerPropertiesSetCommand_MaskFlags
+  Channel: Enums.TalkbackChannel
+  MuteSDI?: boolean
 }
 
 export interface SuperSource_SuperSourceBorderGetCommand {
@@ -240,7 +266,7 @@ export interface Streaming_StreamingActiveSetCommand {
 }
 
 export interface Streaming_StreamingStateCommand {
-  StreamingStatus: unknown
+  StreamingStatus: Enums.StreamingStatus
 }
 
 export interface Streaming_SRSSCommand {
@@ -1306,6 +1332,7 @@ export interface DeviceProfile_MultiviewerConfigCommand {
 
 export interface DeviceProfile_MultiviewerConfigV811Command {
   WindowCount: number
+  CanChangeLayout: boolean
   CanRouteInputs: boolean
   SupportsVuMeters: boolean
   CanToggleSafeArea: boolean
@@ -1369,6 +1396,7 @@ export interface DeviceProfile_TopologyV811Command {
   DVE: number
   Stingers: number
   SuperSource: number
+  TalkbackChannels: number
   CameraControl: boolean
   AdvancedChromaKeyers: boolean
   OnlyConfigurableOutputs: boolean
@@ -1386,6 +1414,7 @@ export interface DeviceProfile_TopologyV8Command {
   DVE: number
   Stingers: number
   SuperSource: number
+  TalkbackChannels: number
   CameraControl: boolean
   AdvancedChromaKeyers: boolean
   OnlyConfigurableOutputs: boolean
@@ -1399,7 +1428,15 @@ export interface DeviceProfile_VideoMixerConfigCommand {
   unimplemented: never
 }
 
-export interface DeviceProfile_TimecodeLockedCommand {
+export interface DeviceProfile_TimeCodeConfigGetCommand {
+  Mode: Enums.TimeCodeMode
+}
+
+export interface DeviceProfile_TimeCodeConfigSetCommand {
+  Mode: Enums.TimeCodeMode
+}
+
+export interface DeviceProfile_TimeCodeLockedCommand {
   Locked: boolean
 }
 
@@ -1594,30 +1631,8 @@ export interface Audio_AudioMixerSendLevelsCommand {
   SendLevels: boolean
 }
 
-export interface Audio_AudioMixerTalkbackPropertiesGetCommand {
-  MuteSDI: boolean
-}
-
-export interface Audio_AudioMixerTalkbackPropertiesSetCommand {
-  Mask: Audio_AudioMixerTalkbackPropertiesSetCommand_MaskFlags
-  MuteSDI?: boolean
-}
-
 export interface Audio_AudioMixerTallyCommand {
   unimplemented: never
-}
-
-export interface Audio_TalkbackMixerInputPropertiesGetCommand {
-  Channel: Enums.TalkbackChannel
-  Index: Enums.VideoSource
-  MuteSDI: boolean
-}
-
-export interface Audio_TalkbackMixerInputPropertiesSetCommand {
-  Mask: Audio_TalkbackMixerInputPropertiesSetCommand_MaskFlags
-  Channel: Enums.TalkbackChannel
-  Index: Enums.VideoSource
-  MuteSDI?: boolean
 }
 
 export interface Audio_Fairlight_FairlightMixerAnalogAudioGetCommand {
@@ -1694,7 +1709,9 @@ export interface Audio_Fairlight_FairlightMixerMasterDynamicsResetCommand {
 export interface Audio_Fairlight_FairlightMixerMasterEqualizerBandGetCommand {
   Band: number
   BandEnabled: boolean
+  SupportedShapes: Enums.FairlightEqualizerBandShape
   Shape: Enums.FairlightEqualizerBandShape
+  SupportedFrequencyRanges: Enums.FairlightEqualizerFrequencyRange
   FrequencyRange: Enums.FairlightEqualizerFrequencyRange
   Frequency: number
   Gain: number
@@ -1713,10 +1730,12 @@ export interface Audio_Fairlight_FairlightMixerMasterEqualizerBandSetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterEqualizerResetCommand {
-  Equalizer: boolean
+  Mask: Audio_Fairlight_FairlightMixerMasterEqualizerResetCommand_MaskFlags
+  Band?: number
 }
 
 export interface Audio_Fairlight_FairlightMixerMasterGetCommand {
+  EqualizerBands: number
   EqualizerEnabled: boolean
   EqualizerGain: number
   MakeUpGain: number
@@ -1865,9 +1884,10 @@ export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceEqualizerResetCommand {
+  Mask: Audio_Fairlight_FairlightMixerSourceEqualizerResetCommand_MaskFlags
   Index: Enums.AudioSource
   SourceId: number
-  Equalizer: boolean
+  Band?: number
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceExpanderGetCommand {
@@ -1988,6 +2008,14 @@ export enum ColorGeneratorSetCommand_MaskFlags {
   Hue = 1,
   Saturation = 2,
   Luma = 4,
+}
+
+export enum Talkback_TalkbackMixerInputPropertiesSetCommand_MaskFlags {
+  MuteSDI = 1,
+}
+
+export enum Talkback_TalkbackMixerPropertiesSetCommand_MaskFlags {
+  MuteSDI = 1,
 }
 
 export enum SuperSource_SuperSourceBorderSetCommand_MaskFlags {
@@ -2367,14 +2395,6 @@ export enum Audio_AudioMixerResetPeaksCommand_MaskFlags {
   Monitor = 8,
 }
 
-export enum Audio_AudioMixerTalkbackPropertiesSetCommand_MaskFlags {
-  MuteSDI = 1,
-}
-
-export enum Audio_TalkbackMixerInputPropertiesSetCommand_MaskFlags {
-  MuteSDI = 1,
-}
-
 export enum Audio_Fairlight_FairlightMixerInputSetCommand_MaskFlags {
   RcaToXlrEnabled = 1,
   ActiveConfiguration = 2,
@@ -2401,6 +2421,11 @@ export enum Audio_Fairlight_FairlightMixerMasterEqualizerBandSetCommand_MaskFlag
   Frequency = 8,
   Gain = 16,
   QFactor = 32,
+}
+
+export enum Audio_Fairlight_FairlightMixerMasterEqualizerResetCommand_MaskFlags {
+  Equalizer = 1,
+  Band = 2,
 }
 
 export enum Audio_Fairlight_FairlightMixerMasterLimiterSetCommand_MaskFlags {
@@ -2446,6 +2471,11 @@ export enum Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand_MaskFlag
   Frequency = 8,
   Gain = 16,
   QFactor = 32,
+}
+
+export enum Audio_Fairlight_FairlightMixerSourceEqualizerResetCommand_MaskFlags {
+  Equalizer = 1,
+  Band = 2,
 }
 
 export enum Audio_Fairlight_FairlightMixerSourceExpanderSetCommand_MaskFlags {
@@ -2494,6 +2524,10 @@ export type CommandTypes =
   ["LibAtem.Commands.TimeCodeCommand", TimeCodeCommand] |
   ["LibAtem.Commands.TimeCodeRequestCommand", TimeCodeRequestCommand] |
   ["LibAtem.Commands.WarningCommand", WarningCommand] |
+  ["LibAtem.Commands.Talkback.TalkbackMixerInputPropertiesGetCommand", Talkback_TalkbackMixerInputPropertiesGetCommand] |
+  ["LibAtem.Commands.Talkback.TalkbackMixerInputPropertiesSetCommand", Talkback_TalkbackMixerInputPropertiesSetCommand] |
+  ["LibAtem.Commands.Talkback.TalkbackMixerPropertiesGetCommand", Talkback_TalkbackMixerPropertiesGetCommand] |
+  ["LibAtem.Commands.Talkback.TalkbackMixerPropertiesSetCommand", Talkback_TalkbackMixerPropertiesSetCommand] |
   ["LibAtem.Commands.SuperSource.SuperSourceBorderGetCommand", SuperSource_SuperSourceBorderGetCommand] |
   ["LibAtem.Commands.SuperSource.SuperSourceBorderSetCommand", SuperSource_SuperSourceBorderSetCommand] |
   ["LibAtem.Commands.SuperSource.SuperSourceBoxGetCommand", SuperSource_SuperSourceBoxGetCommand] |
@@ -2654,7 +2688,9 @@ export type CommandTypes =
   ["LibAtem.Commands.DeviceProfile.TopologyV8Command", DeviceProfile_TopologyV8Command] |
   ["LibAtem.Commands.DeviceProfile.VersionCommand", DeviceProfile_VersionCommand] |
   ["LibAtem.Commands.DeviceProfile.VideoMixerConfigCommand", DeviceProfile_VideoMixerConfigCommand] |
-  ["LibAtem.Commands.DeviceProfile.TimecodeLockedCommand", DeviceProfile_TimecodeLockedCommand] |
+  ["LibAtem.Commands.DeviceProfile.TimeCodeConfigGetCommand", DeviceProfile_TimeCodeConfigGetCommand] |
+  ["LibAtem.Commands.DeviceProfile.TimeCodeConfigSetCommand", DeviceProfile_TimeCodeConfigSetCommand] |
+  ["LibAtem.Commands.DeviceProfile.TimeCodeLockedCommand", DeviceProfile_TimeCodeLockedCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferAbortCommand", DataTransfer_DataTransferAbortCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferAckCommand", DataTransfer_DataTransferAckCommand] |
   ["LibAtem.Commands.DataTransfer.DataTransferCompleteCommand", DataTransfer_DataTransferCompleteCommand] |
@@ -2686,11 +2722,7 @@ export type CommandTypes =
   ["LibAtem.Commands.Audio.AudioMixerPropertiesSetCommand", Audio_AudioMixerPropertiesSetCommand] |
   ["LibAtem.Commands.Audio.AudioMixerResetPeaksCommand", Audio_AudioMixerResetPeaksCommand] |
   ["LibAtem.Commands.Audio.AudioMixerSendLevelsCommand", Audio_AudioMixerSendLevelsCommand] |
-  ["LibAtem.Commands.Audio.AudioMixerTalkbackPropertiesGetCommand", Audio_AudioMixerTalkbackPropertiesGetCommand] |
-  ["LibAtem.Commands.Audio.AudioMixerTalkbackPropertiesSetCommand", Audio_AudioMixerTalkbackPropertiesSetCommand] |
   ["LibAtem.Commands.Audio.AudioMixerTallyCommand", Audio_AudioMixerTallyCommand] |
-  ["LibAtem.Commands.Audio.TalkbackMixerInputPropertiesGetCommand", Audio_TalkbackMixerInputPropertiesGetCommand] |
-  ["LibAtem.Commands.Audio.TalkbackMixerInputPropertiesSetCommand", Audio_TalkbackMixerInputPropertiesSetCommand] |
   ["LibAtem.Commands.Audio.Fairlight.FairlightMixerAnalogAudioGetCommand", Audio_Fairlight_FairlightMixerAnalogAudioGetCommand] |
   ["LibAtem.Commands.Audio.Fairlight.FairlightMixerAnalogAudioSetCommand", Audio_Fairlight_FairlightMixerAnalogAudioSetCommand] |
   ["LibAtem.Commands.Audio.Fairlight.FairlightMixerInputGetCommand", Audio_Fairlight_FairlightMixerInputGetCommand] |
