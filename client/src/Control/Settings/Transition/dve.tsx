@@ -5,11 +5,13 @@ import { faAngleRight, faAngleLeft, faUndoAlt, faRedoAlt, faArrowRight } from '@
 import { PreMultipliedKeyProperties } from '../common'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
-import { DveImagePage, DveImagePages } from './dve-images'
+import { DveImagePage, DveImagePages, IDveImagePage } from './dve-images'
+import { AtemButtonBarProps } from '../../../components/button'
 
 interface DVETransitionSettingsProps {
   sendCommand: SendCommandStrict
   meIndex: number
+  info: LibAtemState.InfoState_DveInfoState | undefined
   dve: LibAtemState.MixEffectState_TransitionDVEState
   sources: SourcesMap
   videoMode: LibAtemEnums.VideoMode
@@ -23,19 +25,28 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
   constructor(props: DVETransitionSettingsProps) {
     super(props)
 
-    const initialPage = DveImagePages.findIndex(pg => pg.images.find(img => img === this.props.dve.style))
+    const initialPage = this.getValidPages().findIndex((pg) => pg.images.find((img) => img === this.props.dve.style))
     this.state = {
-      stylePage: initialPage === -1 ? 0 : initialPage
+      stylePage: initialPage === -1 ? 0 : initialPage,
     }
 
     this.changeStyle = this.changeStyle.bind(this)
+  }
+
+  private getValidPages(): IDveImagePage[] {
+    if (this.props.info) {
+      const supported = new Set(this.props.info.supportedTransitions)
+      return DveImagePages.filter((pg) => pg.images.find((im) => im != null && supported.has(im)) !== undefined)
+    } else {
+      return DveImagePages
+    }
   }
 
   private changeStyle(style: LibAtemEnums.DVEEffect) {
     this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
       Index: this.props.meIndex,
       Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Style,
-      Style: style
+      Style: style,
     })
   }
 
@@ -46,6 +57,8 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
     const isGraphicsLogo = this.props.dve.style === LibAtemEnums.DVEEffect.GraphicLogoWipe
     const isGraphics = isGraphicsSpin || isGraphicsLogo
 
+    const supportedEffects = new Set(this.props.info?.supportedTransitions)
+
     return (
       <div>
         <DveImagePage
@@ -55,8 +68,7 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
         />
 
         <div className="ss-dve-style-page-button-holder">
-          {/* TODO - not every model supports every style */}
-          {DveImagePages.map((pg, i) => {
+          {this.getValidPages().map((pg, i) => {
             let classes = 'ss-dve-style-page-button'
             if (this.state.stylePage === i) {
               classes += ' currentPage'
@@ -79,13 +91,13 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
                   this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                     Index: this.props.meIndex,
                     Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.LogoRate,
-                    LogoRate: e
+                    LogoRate: e,
                   })
                 } else {
                   this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                     Index: this.props.meIndex,
                     Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Rate,
-                    Rate: e
+                    Rate: e,
                   })
                 }
               }}
@@ -100,19 +112,19 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               options={[
                 {
                   label: <FontAwesomeIcon icon={faAngleRight} style={{ width: '20px' }} />,
-                  value: false
+                  value: false,
                 },
                 {
                   label: <FontAwesomeIcon icon={faAngleLeft} />,
-                  value: true
-                }
+                  value: true,
+                },
               ]}
               selected={this.props.dve.reverse}
-              onChange={v => {
+              onChange={(v) => {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                   Index: this.props.meIndex,
                   Reverse: v,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Reverse
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Reverse,
                 })
               }}
             />
@@ -122,11 +134,11 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               style={{ gridColumn: 'span 1' }}
               value={this.props.dve.flipFlop}
               disabled={isGraphicsSpin}
-              onChange={v =>
+              onChange={(v) =>
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                   Index: this.props.meIndex,
                   FlipFlop: v,
-                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop
+                  Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FlipFlop,
                 })
               }
             />
@@ -139,25 +151,28 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
               {
                 label: <FontAwesomeIcon icon={faUndoAlt} />,
                 value: LibAtemEnums.DVEEffect.GraphicCCWSpin,
-                tooltip: 'Graphic CCW Spin'
+                tooltip: 'Graphic CCW Spin',
+                disabled: !supportedEffects.has(LibAtemEnums.DVEEffect.GraphicCCWSpin),
               },
               {
                 label: <FontAwesomeIcon icon={faRedoAlt} />,
                 value: LibAtemEnums.DVEEffect.GraphicCWSpin,
-                tooltip: 'Graphic CW Spin'
+                tooltip: 'Graphic CW Spin',
+                disabled: !supportedEffects.has(LibAtemEnums.DVEEffect.GraphicCWSpin),
               },
               {
                 label: <FontAwesomeIcon icon={faArrowRight} />,
                 value: LibAtemEnums.DVEEffect.GraphicLogoWipe,
-                tooltip: 'Graphic Logo Wipe'
-              }
+                tooltip: 'Graphic Logo Wipe',
+                disabled: !supportedEffects.has(LibAtemEnums.DVEEffect.GraphicLogoWipe),
+              },
             ]}
             selected={this.props.dve.style}
-            onChange={v => {
+            onChange={(v) => {
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.meIndex,
                 Style: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Style
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Style,
               })
             }}
           />
@@ -169,11 +184,11 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             meAvailability={this.props.meIndex}
             value={this.props.dve.fillSource}
             disabled={!isGraphics}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.meIndex,
                 Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.FillSource,
-                FillSource: e
+                FillSource: e,
               })
             }
           />
@@ -183,11 +198,11 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             value={this.props.dve.enableKey}
             disabled={!isGraphics}
             style={{ gridColumn: 'span 2' }}
-            onChange={v =>
+            onChange={(v) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.meIndex,
                 EnableKey: v,
-                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey
+                Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.EnableKey,
               })
             }
           />
@@ -199,11 +214,11 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
             meAvailability={this.props.meIndex}
             value={this.props.dve.keySource}
             disabled={!isGraphics || !this.props.dve.enableKey}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
                 Index: this.props.meIndex,
                 Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.KeySource,
-                KeySource: e
+                KeySource: e,
               })
             }
           />
@@ -215,32 +230,32 @@ export class DVETransitionSettings extends React.Component<DVETransitionSettings
           clip={this.props.dve.clip}
           gain={this.props.dve.gain}
           invert={this.props.dve.invertKey}
-          setEnabled={v => {
+          setEnabled={(v) => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
               Index: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.PreMultiplied,
-              PreMultiplied: v
+              PreMultiplied: v,
             })
           }}
-          setClip={v => {
+          setClip={(v) => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
               Index: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Clip,
-              Clip: v
+              Clip: v,
             })
           }}
-          setGain={v => {
+          setGain={(v) => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
               Index: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.Gain,
-              Gain: v
+              Gain: v,
             })
           }}
-          setInvert={v => {
+          setInvert={(v) => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Transition.TransitionDVESetCommand', {
               Index: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Transition_TransitionDVESetCommand_MaskFlags.InvertKey,
-              InvertKey: v
+              InvertKey: v,
             })
           }}
         />

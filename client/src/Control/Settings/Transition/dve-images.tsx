@@ -43,7 +43,7 @@ export class DveImagePage extends React.PureComponent<DveImagePageProps> {
     )
   }
 }
-interface IDveImagePage {
+export interface IDveImagePage {
   name: string
   images: Array<LibAtemEnums.DVEEffect | null>
 }
@@ -59,8 +59,8 @@ export const DveImagePages: Array<IDveImagePage> = [
       LibAtemEnums.DVEEffect.PushRight,
       LibAtemEnums.DVEEffect.PushBottomLeft,
       LibAtemEnums.DVEEffect.PushBottom,
-      LibAtemEnums.DVEEffect.PushBottomRight
-    ]
+      LibAtemEnums.DVEEffect.PushBottomRight,
+    ],
   },
   {
     name: 'Squeeze',
@@ -73,8 +73,8 @@ export const DveImagePages: Array<IDveImagePage> = [
       LibAtemEnums.DVEEffect.SqueezeRight,
       LibAtemEnums.DVEEffect.SqueezeBottomLeft,
       LibAtemEnums.DVEEffect.SqueezeBottom,
-      LibAtemEnums.DVEEffect.SqueezeBottomRight
-    ]
+      LibAtemEnums.DVEEffect.SqueezeBottomRight,
+    ],
   },
   {
     name: 'Spin',
@@ -87,8 +87,8 @@ export const DveImagePages: Array<IDveImagePage> = [
       LibAtemEnums.DVEEffect.SpinCWTopRight,
       LibAtemEnums.DVEEffect.SpinCCWTopLeft,
       LibAtemEnums.DVEEffect.SpinCWBottomRight,
-      LibAtemEnums.DVEEffect.SpinCCWBottomLeft
-    ]
+      LibAtemEnums.DVEEffect.SpinCCWBottomLeft,
+    ],
   },
   {
     name: 'Swoosh',
@@ -101,9 +101,9 @@ export const DveImagePages: Array<IDveImagePage> = [
       LibAtemEnums.DVEEffect.SwooshRight,
       LibAtemEnums.DVEEffect.SwooshBottomLeft,
       LibAtemEnums.DVEEffect.SwooshBottom,
-      LibAtemEnums.DVEEffect.SwooshBottomRight
-    ]
-  }
+      LibAtemEnums.DVEEffect.SwooshBottomRight,
+    ],
+  },
 ]
 
 export class DveImage extends React.PureComponent<{ style: LibAtemEnums.DVEEffect; isCurrent: boolean }> {
@@ -118,7 +118,7 @@ export class DveImage extends React.PureComponent<{ style: LibAtemEnums.DVEEffec
 }
 
 export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean) => JSX.Element) | null } = {
-  [LibAtemEnums.DVEEffect.SwooshTopLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshTopLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -133,7 +133,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshTop]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshTop]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -147,7 +147,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshTopRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshTopRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -162,7 +162,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -177,7 +177,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -192,7 +192,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshBottomLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshBottomLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -207,7 +207,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshBottom]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshBottom]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -222,7 +222,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SwooshBottomRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SwooshBottomRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -237,7 +237,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCWTopLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCWTopLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -263,7 +263,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCWTopRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCWTopRight]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask2">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -289,7 +289,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCWBottomLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCWBottomLeft]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(-1, 1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask2">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -315,7 +315,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCWBottomRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCWBottomRight]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(-1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -341,7 +341,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCCWTopLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCCWTopLeft]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(-1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask2">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -367,7 +367,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCCWTopRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCCWTopRight]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(-1, 1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -393,7 +393,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCCWBottomLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCCWBottomLeft]: (isCurrent) => (
     <svg width="100%" height="100%" transform="scale(1, -1)" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -419,7 +419,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SpinCCWBottomRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SpinCCWBottomRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <mask id="myMask2">
         <rect fill="white" x="0" y="0" height="100" width="150"></rect>
@@ -445,7 +445,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeTopLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeTopLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -483,7 +483,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeTop]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeTop]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -522,7 +522,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeTopRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeTopRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -558,7 +558,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -597,7 +597,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -636,7 +636,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeBottomLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeBottomLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -672,7 +672,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeBottom]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeBottom]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -711,7 +711,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.SqueezeBottomRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.SqueezeBottomRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -747,7 +747,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushTopLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushTopLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -775,7 +775,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushTop]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushTop]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -803,7 +803,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushTopRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushTopRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -831,7 +831,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -859,7 +859,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -887,7 +887,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushBottomLeft]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushBottomLeft]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -915,7 +915,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushBottom]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushBottom]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -943,7 +943,7 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
       </g>
     </svg>
   ),
-  [LibAtemEnums.DVEEffect.PushBottomRight]: isCurrent => (
+  [LibAtemEnums.DVEEffect.PushBottomRight]: (isCurrent) => (
     <svg width="100%" height="100%" viewBox="0 0 150 100" xmlns="http://www.w3.org/2000/svg">
       <g>
         <polygon
@@ -973,5 +973,5 @@ export const DveImages: { [key in LibAtemEnums.DVEEffect]: ((isCurrent: boolean)
   ),
   [LibAtemEnums.DVEEffect.GraphicCWSpin]: null,
   [LibAtemEnums.DVEEffect.GraphicCCWSpin]: null,
-  [LibAtemEnums.DVEEffect.GraphicLogoWipe]: null
+  [LibAtemEnums.DVEEffect.GraphicLogoWipe]: null,
 }

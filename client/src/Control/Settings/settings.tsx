@@ -102,6 +102,7 @@ export class SwitcherSettings extends StickyPanelBase<SwitcherSettingsProps, Swi
             <TransitionSettings
               meIndex={this.props.meIndex}
               sendCommand={this.props.sendCommand}
+              dveInfo={this.props.currentState.info.dve}
               transition={meProps.transition}
               profile={this.props.profile}
               sources={this.props.sources}

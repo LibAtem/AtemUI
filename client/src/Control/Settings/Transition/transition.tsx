@@ -17,6 +17,7 @@ interface TransitionSettingsState {
 
 interface TransitionSettingsProps {
   sendCommand: SendCommandStrict
+  dveInfo: LibAtemState.InfoState_DveInfoState | undefined
   transition: LibAtemState.MixEffectState_TransitionState
   profile: LibAtemProfile.DeviceProfile
   meIndex: number
@@ -117,6 +118,7 @@ export class TransitionSettings extends StickyPanelBase<TransitionSettingsProps,
               <DVETransitionSettings
                 sendCommand={this.props.sendCommand}
                 meIndex={this.props.meIndex}
+                info={this.props.dveInfo}
                 dve={this.props.transition.dve}
                 sources={this.props.sources}
                 videoMode={this.props.videoMode}

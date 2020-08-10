@@ -48,7 +48,7 @@ export class AtemButtonGeneric extends React.Component<AtemButtonGenericProps> {
   }
 }
 
-interface AtemButtonBarProps<T> {
+export interface AtemButtonBarProps<T> {
   style?: React.CSSProperties
   innerStyle?: React.CSSProperties
   selected: T
@@ -113,7 +113,7 @@ export function CheckboxInput(props: CheckboxInputProps) {
         type="checkbox"
         disabled={props.disabled}
         checked={props.value}
-        onChange={e => {
+        onChange={(e) => {
           if (!props.disabled) {
             props.onChange(e.currentTarget.checked)
           }
