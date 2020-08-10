@@ -57,7 +57,7 @@ interface VideoSettingsProps {
   info: LibAtemState.InfoState
 }
 interface VideoSettingsState {
-  videoMode: LibAtemEnums.VideoMode | null
+  videoMode: LibAtemEnums.VideoMode | -1 | null
   multiViewMode: LibAtemEnums.VideoMode | null
   downConvertMode: LibAtemEnums.DownConvertMode | null
   sdi3GLevel: LibAtemEnums.SDI3GOutputLevel | null
@@ -80,11 +80,23 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
       this.state.downConvertMode !== null ||
       this.state.sdi3GLevel !== null
 
-    const currentVideoMode = this.state.videoMode ?? this.props.state.videoMode
-    const videoModes = this.props.info.supportedVideoModes.map((mode, i) => ({
+    const currentVideoMode = this.state.videoMode ?? (this.props.state.autoVideoMode ? -1 : this.props.state.videoMode)
+    const videoModes: Array<{
+      id: LibAtemEnums.VideoMode | -1
+      label: string
+    }> = this.props.info.supportedVideoModes.map((mode, i) => ({
       id: mode.mode,
       label: VideoModeInfoSet[mode.mode]?.name ?? mode.mode,
     }))
+
+    if (this.props.info.supportsAutoVideoMode) {
+      const detectedMode = this.props.state.videoMode
+      const detectedModeName = VideoModeInfoSet[detectedMode]?.name ?? detectedMode
+      videoModes.unshift({
+        id: -1,
+        label: this.props.state.autoVideoMode ? `Auto Mode (${detectedModeName})` : 'Auto Mode',
+      })
+    }
 
     const videoModeInfo = this.props.info.supportedVideoModes.find((mode) => mode.mode === currentVideoMode)
     const multiviewerModes = videoModeInfo?.multiviewModes?.map((mode) => ({
@@ -144,7 +156,19 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
             label="Set"
             onClick={() => {
               // TODO - sendCommand
-              if (this.state.videoMode !== null) {
+              console.log(this.state.videoMode)
+              if (this.state.videoMode === -1) {
+                this.props.sendCommand('LibAtem.Commands.Settings.AutoVideoModeCommand', {
+                  Enabled: true,
+                  Detected: false,
+                })
+              } else if (this.state.videoMode !== null) {
+                if (this.props.info.supportsAutoVideoMode) {
+                  this.props.sendCommand('LibAtem.Commands.Settings.AutoVideoModeCommand', {
+                    Enabled: false,
+                    Detected: false,
+                  })
+                }
                 this.props.sendCommand('LibAtem.Commands.Settings.VideoModeSetCommand', {
                   VideoMode: this.state.videoMode,
                 })
@@ -219,18 +243,35 @@ class MediaPoolSettings extends React.Component<MediaPoolSettingsProps, MediaPoo
   render() {
     const maxFrames = countMaxFrames(this.props.clips, this.props.unassignedFrames)
 
+    const clips: Array<Pick<LibAtemState.MediaPoolState_ClipState, 'maxFrames'>> =
+      this.props.clips.length > 0
+        ? this.props.clips
+        : [
+            {
+              maxFrames: 0,
+            },
+            {
+              maxFrames: 0,
+            },
+          ]
+
     return (
       <>
         <div className="atem-heading">Media Pool</div>
-        <div className="atem-note">There are {maxFrames} frames to share between the clips</div>
+        {this.props.clips.length > 2 ? (
+          <div className="atem-note">There are {maxFrames} frames to share between the clips</div>
+        ) : (
+          ''
+        )}
 
-        {this.props.clips.map((clip, id) => (
+        {clips.map((clip, id) => (
           <DecimalWithSliderInput
             label={`Clip ${id + 1} length`}
             step={1}
             min={0}
             max={maxFrames}
             value={this.state.frames ? this.state.frames[id] : clip.maxFrames}
+            disabled={this.props.clips.length === 0}
             onChange={(newValue) => {
               if (this.props.clips.length === 2) {
                 // As there is only 2, changing one will change the other
@@ -287,7 +328,9 @@ class CameraControlSettings extends React.Component<CameraControlSettingsProps> 
       <>
         <div className="atem-heading">Camera Control</div>
 
-        <div className="atem-note">TODO</div>
+        <div className="atem-note">TODO. This is a client side setting</div>
+
+        {/* <SelectInput label="Camera control monitoring" value={0}  /> */}
       </>
     )
   }

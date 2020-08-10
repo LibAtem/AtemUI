@@ -31,7 +31,7 @@ function getSourceOptions(
 
 interface SourceSelectInputProps {
   disabled?: boolean
-  label: string
+  label: string | null
   sources: SourcesMap
   sourceAvailability: LibAtemEnums.SourceAvailability
   meAvailability?: number | null
@@ -41,18 +41,18 @@ interface SourceSelectInputProps {
 export function SourceSelectInput(props: SourceSelectInputProps) {
   return (
     <>
-      <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>{props.label}:</div>
+      {props.label !== null ? (
+        <div className={`atem-label ${props.disabled ? 'disabled' : ''}`}>{props.label}:</div>
+      ) : (
+        ''
+      )}
       <select
         disabled={props.disabled}
-        onChange={e => props.onChange(Number(e.currentTarget.value))}
+        onChange={(e) => props.onChange(Number(e.currentTarget.value))}
         value={props.value}
         className="atem-dropdown"
       >
-        {getSourceOptions(
-          props.sources,
-          props.sourceAvailability,
-          props.meAvailability ?? LibAtemEnums.MeAvailability.None
-        )}
+        {getSourceOptions(props.sources, props.sourceAvailability, props.meAvailability ?? null)}
       </select>
     </>
   )

@@ -3,17 +3,15 @@ import './settings.scss'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { Container, ButtonGroup, Button, Form, Row, Col } from 'react-bootstrap'
-import multiview1 from './assets/multiview1.svg'
-import multiview2 from './assets/multiview2.svg'
-import multiview3 from './assets/multiview3.svg'
-import multiview4 from './assets/multiview4.svg'
 import { videoIds } from './ids'
-import { LibAtemState, LibAtemProfile } from '../generated'
+import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
 import { sendCommandStrict } from '../device-page-wrapper'
-import { AtemButtonBar } from '../components'
+import { AtemButtonBar, SourcesMap } from '../components'
 import { GeneralSettings } from './general'
 import { CommandTypes } from '../generated/commands'
 import { ErrorBoundary } from '../errorBoundary'
+import { MultiViewSettings } from './multiview'
+import { shallowEqualObjects } from 'shallow-equal'
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -45,33 +43,6 @@ export class ControlSettingsPage extends React.Component {
   }
 }
 
-const NavOptions = [
-  {
-    value: 0,
-    label: 'General'
-  },
-  {
-    value: 1,
-    label: 'Audio'
-  },
-  {
-    value: 2,
-    label: 'Multi View'
-  },
-  {
-    value: 3,
-    label: 'Labels'
-  },
-  {
-    value: 4,
-    label: 'HyperDeck'
-  },
-  {
-    value: 5,
-    label: 'Remote'
-  }
-]
-
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
@@ -90,7 +61,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
     this.state = {
       hasConnected: this.props.device.connected,
-      page: 0
+      page: 2,
     }
 
     this.sendCommand = this.sendCommand.bind(this)
@@ -100,6 +71,29 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     sendCommandStrict(this.props, ...args)
   }
 
+  private lastSourcesMap: ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState> = new Map()
+  private lastSourcesInput: { [key: string]: LibAtemState.InputState } = {}
+  private getSourcesMap(): SourcesMap {
+    const newInputs = this.props.currentState?.settings?.inputs
+
+    if (!shallowEqualObjects(newInputs ?? {}, this.lastSourcesInput)) {
+      const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
+      if (newInputs) {
+        for (const [k, v] of Object.entries(newInputs)) {
+          const id = videoIds[k]
+          if (id !== undefined) {
+            sources.set(id, v.properties)
+          }
+        }
+      }
+
+      this.lastSourcesInput = { ...newInputs }
+      this.lastSourcesMap = sources
+    }
+
+    return this.lastSourcesMap
+  }
+
   public updateLabel(name: string, id: number) {
     const { device, signalR } = this.props
     if (device.connected && signalR) {
@@ -107,12 +101,12 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
       signalR
         .invoke('updateLabel', devId, name, id)
-        .then(res => {
+        .then((res) => {
           // console.log(value)
           console.log('ManualCommands: sent')
           // console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -126,7 +120,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true
+        hasConnected: true,
       })
     }
   }
@@ -141,36 +135,60 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
       return <p className="mt-5">Loading state...</p>
     }
 
+    const sources = this.getSourcesMap()
+
     return (
       <div className="settings-content">
         <AtemButtonBar
           selected={this.state.page}
-          options={NavOptions}
-          onChange={newPage => this.setState({ page: newPage })}
+          options={[
+            {
+              value: 0,
+              label: 'General',
+            },
+            {
+              value: 1,
+              label: 'Audio',
+            },
+            {
+              value: 2,
+              label: 'Multi View',
+              disabled: !this.props.currentState?.info.multiViewers,
+            },
+            {
+              value: 3,
+              label: 'Labels',
+            },
+            {
+              value: 4,
+              label: 'HyperDeck',
+            },
+            {
+              value: 5,
+              label: 'Remote',
+            },
+          ]}
+          onChange={(newPage) => this.setState({ page: newPage })}
         />
 
         {this.state.page === 0 ? (
           <ErrorBoundary key={0}>
             <GeneralSettings sendCommand={this.sendCommand} currentState={currentState} />
           </ErrorBoundary>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         {/* TODO Audio */}
 
         {this.state.page === 2 ? (
           <ErrorBoundary key={2}>
             <MultiViewSettings
-              device={device}
-              currentState={currentState}
-              signalR={this.props.signalR}
-              currentProfile={this.props.currentProfile}
+              sendCommand={this.sendCommand}
+              sources={sources}
+              info={currentState.info.multiViewers}
+              multiViewers={currentState.settings.multiViewers}
             />
           </ErrorBoundary>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         {this.state.page === 3 ? (
           <ErrorBoundary key={3}>
@@ -183,9 +201,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
               updateLabel={this.updateLabel}
             />
           </ErrorBoundary>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         {/* TODO HyperDeck */}
 
@@ -209,7 +225,7 @@ interface LabelSettingsState {
 
 class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsState> {
   state = {
-    page: 0
+    page: 0,
   }
 
   signalR = this.props.signalR
@@ -223,12 +239,12 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
 
       signalR
         .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
+        .then((res) => {
           console.log(value)
           console.log('ManualCommands: sent')
           console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -243,12 +259,12 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
 
       signalR
         .invoke('updateLabel', devId, name, id)
-        .then(res => {
+        .then((res) => {
           // console.log(value)
           console.log('ManualCommands: sent')
           // console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -317,11 +333,11 @@ class LabelSettings extends React.Component<LabelSettingsProps, LabelSettingsSta
 
 class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettingsState> {
   state = {
-    page: 0
+    page: 0,
   }
 
   set() {
-    var outputs = Object.keys(this.props.currentState.settings.inputs).filter(x => x.includes('input'))
+    var outputs = Object.keys(this.props.currentState.settings.inputs).filter((x) => x.includes('input'))
     for (var i in outputs) {
       // console.log(Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString()))
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
@@ -344,7 +360,7 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Mask: 7,
           LongName: long.value,
           ShortName: short.value,
-          ExternalPortType: parseInt(port.value)
+          ExternalPortType: parseInt(port.value),
         })
       } else if (
         long.value != this.props.currentState.settings.inputs['input' + index].properties.longName &&
@@ -355,7 +371,7 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Id: index,
           Mask: 3,
           LongName: long.value,
-          ShortName: short.value
+          ShortName: short.value,
         })
       } else if (
         long.value != this.props.currentState.settings.inputs['input' + index].properties.longName &&
@@ -367,7 +383,7 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Id: index,
           Mask: 5,
           LongName: long.value,
-          ExternalPortType: parseInt(port.value)
+          ExternalPortType: parseInt(port.value),
         })
       } else if (
         short.value != this.props.currentState.settings.inputs['input' + index].properties.shortValue &&
@@ -378,20 +394,20 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Id: index,
           Mask: 6,
           ShortName: short.value,
-          ExternalPortType: parseInt(port.value)
+          ExternalPortType: parseInt(port.value),
         })
       } else if (long.value != this.props.currentState.settings.inputs['input' + index].properties.longName) {
         this.props.updateLabel(long.value, id)
         this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
           Id: index,
           Mask: 1,
-          LongName: long.value
+          LongName: long.value,
         })
       } else if (short.value != this.props.currentState.settings.inputs['input' + index].properties.shortName) {
         this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
           Id: index,
           Mask: 2,
-          ShortName: short.value
+          ShortName: short.value,
         })
       } else if (
         port.value !=
@@ -400,7 +416,7 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
         this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
           Id: index,
           Mask: 4,
-          ExternalPortType: parseInt(port.value)
+          ExternalPortType: parseInt(port.value),
         })
       }
     }
@@ -479,14 +495,14 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
     this.state = {
       // hasConnected: this.props.device.connected,
       // currentState: this.props.currentState,
-      page: 0
+      page: 0,
     }
   }
 
   set() {
     // var = ids[]
     var outputs = Object.keys(this.props.currentState.settings.inputs).filter(
-      x => !x.includes('input') && !x.includes('mediaPlayer')
+      (x) => !x.includes('input') && !x.includes('mediaPlayer')
     )
     for (var i in outputs) {
       console.log(Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString()))
@@ -505,20 +521,20 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
             Id: id,
             Mask: 3,
             LongName: long.value,
-            ShortName: short.value
+            ShortName: short.value,
           })
         } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
           this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
             Id: id,
             Mask: 1,
-            LongName: long.value
+            LongName: long.value,
           })
           this.props.updateLabel(long.value, id)
         } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
           this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
             Id: id,
             Mask: 2,
-            ShortName: short.value
+            ShortName: short.value,
           })
         }
       }
@@ -528,7 +544,7 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
   render() {
     var rows = []
     var outputs = Object.keys(this.props.currentState.settings.inputs).filter(
-      x => !x.includes('input') && !x.includes('mediaPlayer')
+      (x) => !x.includes('input') && !x.includes('mediaPlayer')
     )
     for (var j in outputs) {
       rows.push(
@@ -575,13 +591,13 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
   constructor(props: LabelSettingsProps) {
     super(props)
     this.state = {
-      page: 0
+      page: 0,
     }
   }
 
   set() {
     // var = ids[]
-    var outputs = Object.keys(this.props.currentState.settings.inputs).filter(x => x.includes('mediaPlayer'))
+    var outputs = Object.keys(this.props.currentState.settings.inputs).filter((x) => x.includes('mediaPlayer'))
     for (var i in outputs) {
       console.log(Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString()))
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
@@ -598,7 +614,7 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Id: id,
           Mask: 3,
           LongName: long.value,
-          ShortName: short.value
+          ShortName: short.value,
         })
         this.props.updateLabel(long.value, id)
       } else if (long.value != this.props.currentState.settings.inputs[outputs[i]].properties.longName) {
@@ -606,13 +622,13 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
         this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
           Id: id,
           Mask: 1,
-          LongName: long.value
+          LongName: long.value,
         })
       } else if (short.value != this.props.currentState.settings.inputs[outputs[i]].properties.shortName) {
         this.props.sendCommand('LibAtem.Commands.Settings.InputPropertiesSetCommand', {
           Id: id,
           Mask: 2,
-          ShortName: short.value
+          ShortName: short.value,
         })
       }
     }
@@ -620,7 +636,7 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
 
   render() {
     var rows = []
-    var outputs = Object.keys(this.props.currentState.settings.inputs).filter(x => x.includes('mediaPlayer'))
+    var outputs = Object.keys(this.props.currentState.settings.inputs).filter((x) => x.includes('mediaPlayer'))
     for (var j in outputs) {
       rows.push(
         <Form.Group as={Row}>
@@ -658,243 +674,6 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
           Set
         </Button>
       </Form>
-    )
-  }
-}
-
-interface MultiViewSettingsProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: any
-  currentProfile: any
-}
-interface MultiViewSettingsState {
-  // page: number
-}
-
-class MultiViewSettings extends React.Component<MultiViewSettingsProps, MultiViewSettingsState> {
-  state = {
-    // page: 0
-  }
-
-  public sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch(e => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
-  }
-
-  render() {
-    var layout = [] as number[][]
-    if (this.props.currentState.settings.multiViewers[0].properties.layout == 3) {
-      layout = [[2, 3, 6, 7], [4, 5, 8, 9], [0], [1]]
-    } else if (this.props.currentState.settings.multiViewers[0].properties.layout == 5) {
-      layout = [[2, 3, 4, 5], [0], [6, 7, 8, 9], [1]]
-    } else if (this.props.currentState.settings.multiViewers[0].properties.layout == 10) {
-      layout = [[0], [2, 3, 4, 5], [1], [6, 7, 8, 9]]
-    } else if (this.props.currentState.settings.multiViewers[0].properties.layout == 12) {
-      layout = [[0], [1], [2, 3, 6, 7], [4, 5, 8, 9]]
-    }
-    var options = []
-    var inputs = Object.keys(this.props.currentState.settings.inputs)
-    for (var i = 0; i < inputs.length; i++) {
-      console.log(videoIds[inputs[i]])
-      options.push(
-        <option value={videoIds[inputs[i]]}>
-          {this.props.currentState.settings.inputs[inputs[i]].properties.longName}
-        </option>
-      )
-    }
-    var content = []
-    for (i = 0; i < layout.length; i++) {
-      if (layout[i].length == 1) {
-        if (layout[i][0] == 0) {
-          content.push(<div className="mutliViewItem programPreview">Preview</div>)
-        } else {
-          content.push(<div className="mutliViewItem programPreview">Program</div>)
-        }
-      } else {
-        var inner = []
-        for (var j in layout[i]) {
-          const x = layout[i][j]
-          inner.push(
-            <div className="mutliViewItem">
-              <Form.Group controlId="exampleForm.ControlSelect1">
-                <Form.Control
-                  onChange={e =>
-                    this.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand', {
-                      MultiviewIndex: 0,
-                      WindowIndex: x,
-                      Source: e.currentTarget.value
-                    })
-                  }
-                  value={this.props.currentState.settings.multiViewers[0].windows[layout[i][j]].source}
-                  as="select"
-                >
-                  {options}
-                </Form.Control>
-              </Form.Group>
-            </div>
-          )
-        }
-        content.push(<div className="multiViewSubGrid">{inner}</div>)
-      }
-    }
-    // var topLeft = []
-    // if (this.props.currentState.settings.multiViewers[0].properties.layout == 12 || this.props.currentState.settings.multiViewers[0].properties.layout == 10) {
-    //   topLeft.push(<div className="mutliViewItem">Preview</div>)
-    // } else {
-    //   topLeft.push(<div className="multiViewSubGrid">
-    //     <div className="mutliViewItem">
-    //       <Form.Group controlId="exampleForm.ControlSelect1">
-    //         <Form.Control onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[0], Source: e.currentTarget.value })} value={this.props.currentState.settings.multiViewers[0].windows[layout[0]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group controlId="exampleForm.ControlSelect1">
-    //         <Form.Control  onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[1], Source: e.currentTarget.value })} value={this.props.currentState.settings.multiViewers[0].windows[layout[1]].source} as="select">
-    //        {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group  controlId="exampleForm.ControlSelect1">
-    //         <Form.Control  onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[2], Source: e.currentTarget.value })}
-    //         value={this.props.currentState.settings.multiViewers[0].windows[layout[2]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group  controlId="exampleForm.ControlSelect1">
-    //         <Form.Control onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[3], Source: e.currentTarget.value })}
-    //          value={this.props.currentState.settings.multiViewers[0].windows[layout[3]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //   </div>)
-    // }
-
-    // var bottomLeft = []
-    // if (this.props.currentState.settings.multiViewers[0].properties.layout == 10 ) {
-    //   bottomLeft.push(<div className="mutliViewItem">Program</div>)
-    // } else if(this.props.currentState.settings.multiViewers[0].properties.layout == 3){
-    //   bottomLeft.push(<div className="mutliViewItem">Preview</div>)
-    // }
-    // else {
-    //   bottomLeft.push(<div className="multiViewSubGrid">
-    //     <div className="mutliViewItem">
-    //       <Form.Group controlId="exampleForm.ControlSelect1">
-    //         <Form.Control onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[0], Source: e.currentTarget.value })} value={this.props.currentState.settings.multiViewers[0].windows[layout[0]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group controlId="exampleForm.ControlSelect1">
-    //         <Form.Control  onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[1], Source: e.currentTarget.value })} value={this.props.currentState.settings.multiViewers[0].windows[layout[1]].source} as="select">
-    //        {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group  controlId="exampleForm.ControlSelect1">
-    //         <Form.Control  onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[2], Source: e.currentTarget.value })}
-    //         value={this.props.currentState.settings.multiViewers[0].windows[layout[2]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //     <div className="mutliViewItem">
-    //       <Form.Group  controlId="exampleForm.ControlSelect1">
-    //         <Form.Control onChange={(e)=>this.sendCommand("LibAtem.Commands.Settings.Multiview.MultiviewWindowInputSetCommand", { MultiviewIndex: 0, WindowIndex: layout[3], Source: e.currentTarget.value })}
-    //          value={this.props.currentState.settings.multiViewers[0].windows[layout[3]].source} as="select">
-    //         {options}
-    //         </Form.Control>
-    //       </Form.Group>
-    //     </div>
-    //   </div>
-    // )
-    //}
-
-    return (
-      <Container className="maxW">
-        <Row className="justify-content-md-center p-5">
-          <ButtonGroup aria-label="Basic example">
-            <Button
-              variant={
-                this.props.currentState.settings.multiViewers[0].properties.layout == 12 ? 'primary' : 'secondary'
-              }
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetV8Command', {
-                  MultiviewIndex: 0,
-                  Mask: 1,
-                  Layout: 12
-                })
-              }
-            >
-              <img src={multiview1} alt="1" />
-            </Button>
-            <Button
-              variant={
-                this.props.currentState.settings.multiViewers[0].properties.layout == 3 ? 'primary' : 'secondary'
-              }
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetV8Command', {
-                  MultiviewIndex: 0,
-                  Mask: 1,
-                  Layout: 3
-                })
-              }
-            >
-              <img src={multiview2} alt="2" />
-            </Button>
-            <Button
-              variant={
-                this.props.currentState.settings.multiViewers[0].properties.layout == 10 ? 'primary' : 'secondary'
-              }
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetV8Command', {
-                  MultiviewIndex: 0,
-                  Mask: 1,
-                  Layout: 10
-                })
-              }
-            >
-              <img src={multiview3} alt="3" />
-            </Button>
-            <Button
-              variant={
-                this.props.currentState.settings.multiViewers[0].properties.layout == 5 ? 'primary' : 'secondary'
-              }
-              onClick={() =>
-                this.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewPropertiesSetV8Command', {
-                  MultiviewIndex: 0,
-                  Mask: 1,
-                  Layout: 5
-                })
-              }
-            >
-              <img src={multiview4} alt="4" />
-            </Button>
-          </ButtonGroup>
-        </Row>
-        <div className="multiViewGrid">{content}</div>
-      </Container>
     )
   }
 }
