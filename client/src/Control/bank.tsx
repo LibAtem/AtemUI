@@ -29,12 +29,12 @@ function createButton(
         if (props.isProgram) {
           props.sendCommand('LibAtem.Commands.MixEffects.ProgramInputSetCommand', {
             Index: props.meIndex,
-            Source: id
+            Source: id,
           })
         } else {
           props.sendCommand('LibAtem.Commands.MixEffects.PreviewInputSetCommand', {
             Index: props.meIndex,
-            Source: id
+            Source: id,
           })
         }
       }}
@@ -69,9 +69,9 @@ export function BankPanel(props: BankPanelProps) {
     return (
       <div className="box pp" id={title}>
         <div className="box-title">{title}</div>
-        <div className="box-inner-mobile">
-          <div className="box-inner-inputs">{inputButtons}</div>
-          <div className="box-program-row">
+        <div className="box-inner mobile">
+          <div className="bank-button-grid">{inputButtons}</div>
+          <div className="bank-button-grid">
             {blackButtons}
             {ssrcButtons}
             {barsButtons}
@@ -86,16 +86,16 @@ export function BankPanel(props: BankPanelProps) {
     return (
       <div className="box pp" id={title}>
         <div className="box-title">{title}</div>
-        <div className="box-inner">
-          <div className="box-inner-inputs">{inputButtons}</div>
-          <div className="box-inner-mid">
+        <div className="box-inner desktop">
+          <div className="bank-button-grid">{inputButtons}</div>
+          <div className="bank-button-grid">
             {blackButtons}
             {ssrcButtons}
             {barsButtons}
           </div>
-          <div className="box-inner-rest">
+          <div className="bank-button-grid">
             {colorButtons}
-            <div></div>
+            {mediaPlayerButtons.length <= 1 ? <div></div> : ''}
             {mediaPlayerButtons}
             {meButtons}
           </div>
