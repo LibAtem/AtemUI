@@ -5,6 +5,7 @@ import { SelectInput } from '../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faPlay, faChevronRight, faRedo } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
+import { StickyPanelBase } from './base'
 
 interface MediaPlayerSettingsProps {
   sendCommand: SendCommandStrict
@@ -41,11 +42,14 @@ function MediaButton(props: {
   )
 }
 
-export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProps, MediaPlayerSettingsState> {
+export class MediaPlayerSettings extends StickyPanelBase<MediaPlayerSettingsProps, MediaPlayerSettingsState> {
   constructor(props: MediaPlayerSettingsProps) {
-    super(props)
+    super(props, `control.media.players`)
+
+    this.trackSessionValues('open')
+
     this.state = {
-      open: false
+      open: this.getSessionValue('open') == 1,
     }
   }
 
@@ -58,13 +62,13 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
     this.props.mediaPool.clips.forEach((clip, i) => {
       mediaOptions.push({
         id: i + clipOffset,
-        label: `Clip ${i + 1}` + (clip.name ? `: ${clip.name}` : '')
+        label: `Clip ${i + 1}` + (clip.name ? `: ${clip.name}` : ''),
       })
     })
     this.props.mediaPool.stills.forEach((still, i) => {
       mediaOptions.push({
         id: i,
-        label: `Still ${i + 1}` + (still.filename ? `: ${still.filename}` : '')
+        label: `Still ${i + 1}` + (still.filename ? `: ${still.filename}` : ''),
       })
     })
 
@@ -72,7 +76,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
@@ -97,7 +101,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                           this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerClipStatusSetCommand', {
                             Mask: LibAtemCommands.Media_MediaPlayerClipStatusSetCommand_MaskFlags.ClipFrame,
                             Index: id,
-                            ClipFrame: 0
+                            ClipFrame: 0,
                           })
                         }
                       />
@@ -110,7 +114,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                           this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerClipStatusSetCommand', {
                             Mask: LibAtemCommands.Media_MediaPlayerClipStatusSetCommand_MaskFlags.Playing,
                             Index: id,
-                            Playing: !mp.clipStatus?.playing
+                            Playing: !mp.clipStatus?.playing,
                           })
                         }
                       />
@@ -124,7 +128,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                           this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerClipStatusSetCommand', {
                             Mask: LibAtemCommands.Media_MediaPlayerClipStatusSetCommand_MaskFlags.ClipFrame,
                             Index: id,
-                            ClipFrame: Math.max(0, (mp.clipStatus?.clipFrame ?? 1) - 1)
+                            ClipFrame: Math.max(0, (mp.clipStatus?.clipFrame ?? 1) - 1),
                           })
                         }
                       />
@@ -137,7 +141,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                           this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerClipStatusSetCommand', {
                             Mask: LibAtemCommands.Media_MediaPlayerClipStatusSetCommand_MaskFlags.ClipFrame,
                             Index: id,
-                            ClipFrame: (mp.clipStatus?.clipFrame ?? 0) + 1
+                            ClipFrame: (mp.clipStatus?.clipFrame ?? 0) + 1,
                           })
                         }
                       />
@@ -151,7 +155,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                           this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerClipStatusSetCommand', {
                             Mask: LibAtemCommands.Media_MediaPlayerClipStatusSetCommand_MaskFlags.Loop,
                             Index: id,
-                            Loop: !mp.clipStatus?.loop
+                            Loop: !mp.clipStatus?.loop,
                           })
                         }
                       />
@@ -161,7 +165,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                         label="Media"
                         value={isClip ? mp.source.sourceIndex + clipOffset : mp.source.sourceIndex}
                         options={mediaOptions}
-                        onChange={v => {
+                        onChange={(v) => {
                           if (v >= clipOffset) {
                             this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
                               Mask:
@@ -169,7 +173,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                                 LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.ClipIndex,
                               Index: id,
                               SourceType: LibAtemEnums.MediaPlayerSource.Clip,
-                              ClipIndex: v % clipOffset
+                              ClipIndex: v % clipOffset,
                             })
                           } else {
                             this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
@@ -178,7 +182,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                                 LibAtemCommands.Media_MediaPlayerSourceSetCommand_MaskFlags.StillIndex,
                               Index: id,
                               SourceType: LibAtemEnums.MediaPlayerSource.Still,
-                              StillIndex: v
+                              StillIndex: v,
                             })
                           }
                         }}
@@ -188,9 +192,7 @@ export class MediaPlayerSettings extends React.Component<MediaPlayerSettingsProp
                 )
               })}
             </div>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </div>
       </div>
     )

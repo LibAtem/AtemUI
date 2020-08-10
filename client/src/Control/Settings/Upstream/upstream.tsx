@@ -8,6 +8,7 @@ import { LibAtemEnums, LibAtemCommands, LibAtemState } from '../../../generated'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { ChromaKeyerAdvancedProperties } from './chroma-advanced'
 import { SourcesMap } from '../../../components'
+import { StickyPanelBase } from '../base'
 
 interface UpstreamKeyState {
   open: boolean
@@ -22,11 +23,14 @@ interface SubMenuProps {
   videoMode: LibAtemEnums.VideoMode
 }
 
-export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState> {
+export class UpstreamKey extends StickyPanelBase<SubMenuProps, UpstreamKeyState> {
   constructor(props: SubMenuProps) {
-    super(props)
+    super(props, `control.settings.usk.${props.keyerIndex}`)
+
+    this.trackSessionValues('open')
+
     this.state = {
-      open: false
+      open: this.getSessionValue('open') == 1,
     }
   }
 
@@ -40,7 +44,7 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         <div className="ss-submenu">
           <div
             className="ss-submenu-title"
-            onClick={e => {
+            onClick={(e) => {
               this.setState({ open: !this.state.open })
             }}
           >
@@ -55,7 +59,7 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
@@ -63,12 +67,12 @@ export class UpstreamKey extends React.Component<SubMenuProps, UpstreamKeyState>
         </div>
         <TabPanel
           page={this.props.keyer.properties.keyType}
-          onChange={newPage => {
+          onChange={(newPage) => {
             this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyTypeSetCommand', {
               KeyerIndex: this.props.keyerIndex,
               MixEffectIndex: this.props.meIndex,
               Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyTypeSetCommand_MaskFlags.KeyType,
-              KeyType: newPage
+              KeyType: newPage,
             })
           }}
         >

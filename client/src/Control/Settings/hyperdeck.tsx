@@ -1,21 +1,23 @@
 import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
+import { StickyPanelBase } from './base'
 
 interface HyperdeckSettingsProps {
   sendCommand: SendCommandStrict
-  //   mediaPlayers: LibAtemState.MediaPlayerState[]
-  //   mediaPool: LibAtemState.MediaPoolState
 }
 
 interface HyperdeckSettingsState {
   open: boolean
 }
 
-export class HyperdeckSettings extends React.Component<HyperdeckSettingsProps, HyperdeckSettingsState> {
+export class HyperdeckSettings extends StickyPanelBase<HyperdeckSettingsProps, HyperdeckSettingsState> {
   constructor(props: HyperdeckSettingsProps) {
-    super(props)
+    super(props, `control.media.hyperdeck`)
+
+    this.trackSessionValues('open')
+
     this.state = {
-      open: false
+      open: this.getSessionValue('open') == 1,
     }
   }
 
@@ -24,7 +26,7 @@ export class HyperdeckSettings extends React.Component<HyperdeckSettingsProps, H
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
@@ -35,9 +37,7 @@ export class HyperdeckSettings extends React.Component<HyperdeckSettingsProps, H
             <div className="ss-mediaplayer-panel-holder">
               <div className="atem-label">Not implemented</div>
             </div>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </div>
       </div>
     )

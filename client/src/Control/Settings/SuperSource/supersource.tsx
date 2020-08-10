@@ -6,6 +6,7 @@ import { SuperSourceArtSettings } from './art'
 import { SuperSourcePropertiesSettings, SuperSourceBoxSettings } from './properties'
 import { SourcesMap } from '../../../components'
 import { SuperSourceBoxCopySettings } from './copy'
+import { StickyPanelBase } from '../base'
 
 interface SuperSourceSettingsProps {
   sendCommand: SendCommandStrict
@@ -22,13 +23,16 @@ interface SuperSourceSettingsState {
   box: number
 }
 
-export class SuperSourceSettings extends React.Component<SuperSourceSettingsProps, SuperSourceSettingsState> {
+export class SuperSourceSettings extends StickyPanelBase<SuperSourceSettingsProps, SuperSourceSettingsState> {
   constructor(props: SuperSourceSettingsProps) {
-    super(props)
+    super(props, `control.settings.supersource.${props.index}`)
+
+    this.trackSessionValues('open', 'page', 'box')
+
     this.state = {
-      open: false,
-      page: 0,
-      box: 0
+      open: this.getSessionValue('open') == 1,
+      page: this.getSessionValue('page') ?? 0,
+      box: this.getSessionValue('box') ?? 0,
     }
   }
 
@@ -37,7 +41,7 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
@@ -45,7 +49,7 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
         </div>
 
         {this.state.open ? (
-          <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+          <TabPanel page={this.state.page} onChange={(newPage) => this.setState({ page: newPage })}>
             <TabPanelTab id={0} label={'Presets'}>
               <SuperSourcePropertiesSettings
                 sendCommand={this.props.sendCommand}
@@ -53,7 +57,7 @@ export class SuperSourceSettings extends React.Component<SuperSourceSettingsProp
                 version={this.props.version}
               />
               <div className="atem-heading">Box Control</div>
-              <TabPanel page={this.state.box} onChange={newBox => this.setState({ box: newBox })}>
+              <TabPanel page={this.state.box} onChange={(newBox) => this.setState({ box: newBox })}>
                 {this.props.ssrcProps.boxes.map((box, i) => (
                   <TabPanelTab key={i} id={i} label={`Box ${i + 1}`}>
                     <SuperSourceBoxSettings

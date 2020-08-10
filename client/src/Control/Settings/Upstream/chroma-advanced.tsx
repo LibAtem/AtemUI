@@ -11,9 +11,10 @@ import {
   SourceSelectInput,
   DropdownMenuItem,
   SourcesMap,
-  ToggleHeading
+  ToggleHeading,
 } from '../../../components'
 import { ResetDVE } from './dve'
+import { StickyPanelBase } from '../base'
 const yuv = require('color-space/yuv')
 
 interface ChromaKeyerAdvancedPropertiesProps {
@@ -52,7 +53,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
                         LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
                       ForegroundLevel: 0,
                       BackgroundLevel: 0,
-                      KeyEdge: 50
+                      KeyEdge: 50,
                     }
                   )
                 }
@@ -72,7 +73,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
                         LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
                           .FlareSuppression,
                       SpillSuppression: 0,
-                      FlareSuppression: 0
+                      FlareSuppression: 0,
                     }
                   )
                 }
@@ -101,7 +102,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
                       Saturation: 100,
                       Red: 0,
                       Green: 0,
-                      Blue: 0
+                      Blue: 0,
                     }
                   )
                 }
@@ -120,11 +121,11 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             sourceAvailability={LibAtemEnums.SourceAvailability.None}
             meAvailability={this.props.meIndex}
             value={this.props.keyer.properties.fillSource}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyFillSourceSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
-                FillSource: e
+                FillSource: e,
               })
             }
           />
@@ -142,14 +143,14 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
                     .ForegroundLevel,
-                ForegroundLevel: e
+                ForegroundLevel: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.foregroundLevel}
@@ -159,14 +160,14 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
                     .BackgroundLevel,
-                BackgroundLevel: e
+                BackgroundLevel: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.backgroundLevel}
@@ -176,12 +177,12 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.KeyEdge,
-                KeyEdge: e
+                KeyEdge: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.keyEdge}
@@ -193,14 +194,14 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
                     .SpillSuppression,
-                SpillSuppression: e
+                SpillSuppression: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.spillSuppression}
@@ -210,14 +211,14 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags
                     .FlareSuppression,
-                FlareSuppression: e
+                FlareSuppression: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.flareSuppression}
@@ -229,13 +230,13 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={-100}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Brightness,
-                Brightness: e
+                Brightness: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.brightness}
@@ -245,12 +246,12 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={-100}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Contrast,
-                Contrast: e
+                Contrast: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.contrast}
@@ -260,13 +261,13 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={0}
             max={200}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask:
                   LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Saturation,
-                Saturation: e
+                Saturation: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.saturation}
@@ -277,12 +278,12 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={-100}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Red,
-                Red: e
+                Red: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.red}
@@ -292,12 +293,12 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={-100}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Green,
-                Green: e
+                Green: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.green}
@@ -307,12 +308,12 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
             step={0.1}
             min={-100}
             max={100}
-            onChange={e =>
+            onChange={(e) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaPropertiesSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaPropertiesSetCommand_MaskFlags.Blue,
-                Blue: e
+                Blue: e,
               })
             }
             value={this.props.keyer.advancedChroma.properties.blue}
@@ -345,9 +346,7 @@ export class ChromaKeyerAdvancedProperties extends React.Component<ChromaKeyerAd
               sendCommand={this.props.sendCommand}
             />
           </div>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </>
     )
   }
@@ -372,12 +371,14 @@ interface ChromaSampleProps {
   keyerIndex: number
   props: LibAtemState.MixEffectState_KeyerAdvancedChromaSampleState
 }
-class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }> {
+class ChromaSample extends StickyPanelBase<ChromaSampleProps, { open: boolean }> {
   constructor(props: ChromaSampleProps) {
-    super(props)
+    super(props, `control.settings.usk.${props.keyerIndex}.chroma.sample`)
+
+    this.getSessionValue('open')
 
     this.state = {
-      open: false
+      open: this.getSessionValue('open') == 1,
     }
   }
 
@@ -394,18 +395,18 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
                 <div
                   className="ss-color-picker"
                   style={{
-                    background: `rgb(${rgbCol[0]}, ${rgbCol[1]}, ${rgbCol[2]})`
+                    background: `rgb(${rgbCol[0]}, ${rgbCol[1]}, ${rgbCol[2]})`,
                   }}
                 ></div>
               </div>
             }
             active={this.props.props.enableCursor}
-            onClick={v =>
+            onClick={(v) =>
               this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaSampleSetCommand', {
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags.EnableCursor,
-                EnableCursor: v
+                EnableCursor: v,
               })
             }
           />
@@ -418,7 +419,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
                 MixEffectIndex: this.props.meIndex,
                 KeyerIndex: this.props.keyerIndex,
                 Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags.Preview,
-                Preview: !this.props.props.preview
+                Preview: !this.props.props.preview,
               })
             }}
           />
@@ -428,7 +429,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
             style={{
               gridAutoFlow: 'column',
               display: 'grid',
-              gridTemplateColumns: '10px 1fr 25px'
+              gridTemplateColumns: '10px 1fr 25px',
             }}
           >
             <div></div>
@@ -444,7 +445,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
                     LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags.CursorX |
                     LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags.CursorY,
                   CursorX: x,
-                  CursorY: y
+                  CursorY: y,
                 })
               }
             />
@@ -453,12 +454,12 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
               tooltip={false}
               orientation={'vertical'}
               value={this.props.props.cursorSize}
-              onChange={v => {
+              onChange={(v) => {
                 this.props.sendCommand('LibAtem.Commands.MixEffects.Key.MixEffectKeyAdvancedChromaSampleSetCommand', {
                   MixEffectIndex: this.props.meIndex,
                   KeyerIndex: this.props.keyerIndex,
                   Mask: LibAtemCommands.MixEffects_Key_MixEffectKeyAdvancedChromaSampleSetCommand_MaskFlags.CursorSize,
-                  CursorSize: v
+                  CursorSize: v,
                 })
               }}
               step={0.01}
@@ -466,9 +467,7 @@ class ChromaSample extends React.Component<ChromaSampleProps, { open: boolean }>
               max={99.25}
             />
           </div>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     )
   }
@@ -538,7 +537,7 @@ class ChromaSamplePicker extends React.Component<ChromaSamplePickerProps, Chroma
               left: `${(this.props.cursorX / (videoWidth * 2) + 0.5) * 100}%`,
               top: `${(this.props.cursorY / (videoHeight * 2) - 0.5) * -100}%`,
               width: `calc(${this.props.cursorSize}% * 0.5625)`,
-              height: `${this.props.cursorSize}%`
+              height: `${this.props.cursorSize}%`,
             }}
           >
             <div></div>
@@ -546,21 +545,21 @@ class ChromaSamplePicker extends React.Component<ChromaSamplePickerProps, Chroma
 
           <div
             className="input"
-            onMouseDown={e => {
+            onMouseDown={(e) => {
               e.preventDefault()
               this.sendMouseUpdate(e, true)
               this.setState({ focus: true })
             }}
-            onMouseUp={e => {
+            onMouseUp={(e) => {
               e.preventDefault()
               this.setState({ focus: false })
             }}
-            onTouchStart={e => {
+            onTouchStart={(e) => {
               e.preventDefault()
               this.sendTouchUpdate(e, true)
               this.setState({ focus: true })
             }}
-            onTouchEnd={e => {
+            onTouchEnd={(e) => {
               e.preventDefault()
               this.setState({ focus: false })
             }}

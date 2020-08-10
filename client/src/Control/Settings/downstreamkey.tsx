@@ -3,6 +3,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { MaskProperties, TabPanel, TabPanelTab, PreMultipliedKeyProperties } from './common'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../../generated'
+import { StickyPanelBase } from './base'
 
 interface DownstreamKeyerSettingsProps {
   sendCommand: SendCommandStrict
@@ -16,15 +17,18 @@ interface DownstreamKeyerSettingsState {
   page: number
 }
 
-export class DownstreamKeyerSettings extends React.Component<
+export class DownstreamKeyerSettings extends StickyPanelBase<
   DownstreamKeyerSettingsProps,
   DownstreamKeyerSettingsState
 > {
   constructor(props: DownstreamKeyerSettingsProps) {
-    super(props)
+    super(props, `control.settings.dsk`)
+
+    this.trackSessionValues('open', 'page')
+
     this.state = {
-      open: false,
-      page: 0
+      open: this.getSessionValue('open') == 1,
+      page: this.getSessionValue('page') ?? 0,
     }
   }
 
@@ -40,10 +44,10 @@ export class DownstreamKeyerSettings extends React.Component<
                     <RateInput
                       value={dsk.properties.rate}
                       videoMode={this.props.videoMode}
-                      callback={e => {
+                      callback={(e) => {
                         this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyRateSetCommand', {
                           Index: i,
-                          Rate: e
+                          Rate: e,
                         })
                       }}
                     />
@@ -62,7 +66,7 @@ export class DownstreamKeyerSettings extends React.Component<
                           MaskTop: 9,
                           MaskBottom: -9,
                           MaskLeft: -16,
-                          MaskRight: 16
+                          MaskRight: 16,
                         })
                       }}
                     >
@@ -77,10 +81,10 @@ export class DownstreamKeyerSettings extends React.Component<
                   sourceAvailability={LibAtemEnums.SourceAvailability.None}
                   meAvailability={0}
                   value={dsk.sources.fillSource}
-                  onChange={e =>
+                  onChange={(e) =>
                     this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyFillSourceSetCommand', {
                       Index: i,
-                      FillSource: e
+                      FillSource: e,
                     })
                   }
                 />
@@ -90,10 +94,10 @@ export class DownstreamKeyerSettings extends React.Component<
                   sourceAvailability={LibAtemEnums.SourceAvailability.KeySource}
                   meAvailability={0}
                   value={dsk.sources.cutSource}
-                  onChange={e =>
+                  onChange={(e) =>
                     this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyCutSourceSetCommand', {
                       Index: i,
-                      CutSource: e
+                      CutSource: e,
                     })
                   }
                 />
@@ -106,39 +110,39 @@ export class DownstreamKeyerSettings extends React.Component<
                 maskLeft={dsk.properties?.maskLeft ?? 0}
                 maskRight={dsk.properties?.maskRight ?? 0}
                 maskBottom={dsk.properties?.maskBottom ?? 0}
-                setMaskEnabled={v => {
+                setMaskEnabled={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskEnabled,
-                    MaskEnabled: v
+                    MaskEnabled: v,
                   })
                 }}
-                setMaskTop={v => {
+                setMaskTop={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskTop,
-                    MaskTop: v
+                    MaskTop: v,
                   })
                 }}
-                setMaskLeft={v => {
+                setMaskLeft={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskLeft,
-                    MaskLeft: v
+                    MaskLeft: v,
                   })
                 }}
-                setMaskRight={v => {
+                setMaskRight={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskRight,
-                    MaskRight: v
+                    MaskRight: v,
                   })
                 }}
-                setMaskBottom={v => {
+                setMaskBottom={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyMaskSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyMaskSetCommand_MaskFlags.MaskBottom,
-                    MaskBottom: v
+                    MaskBottom: v,
                   })
                 }}
               />
@@ -148,32 +152,32 @@ export class DownstreamKeyerSettings extends React.Component<
                 clip={dsk.properties?.clip}
                 gain={dsk.properties?.gain}
                 invert={dsk.properties?.invert}
-                setEnabled={v => {
+                setEnabled={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.PreMultipliedKey,
-                    PreMultipliedKey: v
+                    PreMultipliedKey: v,
                   })
                 }}
-                setClip={v => {
+                setClip={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Clip,
-                    Clip: v
+                    Clip: v,
                   })
                 }}
-                setGain={v => {
+                setGain={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Gain,
-                    Gain: v
+                    Gain: v,
                   })
                 }}
-                setInvert={v => {
+                setInvert={(v) => {
                   this.props.sendCommand('LibAtem.Commands.DownstreamKey.DownstreamKeyGeneralSetCommand', {
                     Index: i,
                     Mask: LibAtemCommands.DownstreamKey_DownstreamKeyGeneralSetCommand_MaskFlags.Invert,
-                    Invert: v
+                    Invert: v,
                   })
                 }}
               />
@@ -186,13 +190,13 @@ export class DownstreamKeyerSettings extends React.Component<
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
           Downstream Keys
         </div>
-        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })} hideSingle={true}>
+        <TabPanel page={this.state.page} onChange={(newPage) => this.setState({ page: newPage })} hideSingle={true}>
           {panels}
         </TabPanel>
       </div>

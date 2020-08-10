@@ -8,6 +8,7 @@ import { TabPanel, TabPanelTab } from '../common'
 import { MixTransitionSettings } from './mix'
 import { SendCommandStrict } from '../../../device-page-wrapper'
 import { SourcesMap } from '../../../components'
+import { StickyPanelBase } from '../base'
 
 interface TransitionSettingsState {
   open: boolean
@@ -23,19 +24,22 @@ interface TransitionSettingsProps {
   videoMode: LibAtemEnums.VideoMode
 }
 
-export class TransitionSettings extends React.Component<TransitionSettingsProps, TransitionSettingsState> {
+export class TransitionSettings extends StickyPanelBase<TransitionSettingsProps, TransitionSettingsState> {
   constructor(props: TransitionSettingsProps) {
-    super(props)
+    super(props, 'control.settings.transition')
+
+    this.trackSessionValues('open', 'page')
+
     this.state = {
-      open: false,
-      page: 0
+      open: this.getSessionValue('open') == 1,
+      page: this.getSessionValue('page') ?? 0,
     }
   }
 
   private toggleOpen() {
     this.setState({
       open: !this.state.open,
-      page: this.props.transition.properties.style
+      page: this.props.transition.properties.style,
     })
   }
 
@@ -56,7 +60,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
         <div className="ss-submenu-title" onClick={() => this.toggleOpen()}>
           Transition
         </div>
-        <TabPanel page={this.state.page} onChange={newPage => this.setState({ page: newPage })}>
+        <TabPanel page={this.state.page} onChange={(newPage) => this.setState({ page: newPage })}>
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Mix} label={'Mix'}>
             {this.props.transition.mix ? (
               <MixTransitionSettings
@@ -65,9 +69,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 mix={this.props.transition.mix}
                 videoMode={this.props.videoMode}
               />
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Dip} label={'Dip'}>
@@ -79,9 +81,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.TransitionStyle.Wipe} label={'Wipe'}>
@@ -93,9 +93,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </TabPanelTab>
 
           <TabPanelTab
@@ -111,9 +109,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </TabPanelTab>
 
           <TabPanelTab id={LibAtemEnums.TransitionStyle.DVE} label={'DVE'} disabled={this.props.profile.dve === 0}>
@@ -125,9 +121,7 @@ export class TransitionSettings extends React.Component<TransitionSettingsProps,
                 sources={this.props.sources}
                 videoMode={this.props.videoMode}
               />
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </TabPanelTab>
         </TabPanel>
       </div>

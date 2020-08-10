@@ -2,6 +2,7 @@ import React from 'react'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import { ChromePicker } from 'react-color'
 import { LibAtemState, LibAtemCommands } from '../../generated'
+import { StickyPanelBase } from './base'
 
 interface ColorGeneratorSettingsProps {
   sendCommand: SendCommandStrict
@@ -13,12 +14,15 @@ interface ColorGeneratorSettingsState {
   displayPicker: number | null
 }
 
-export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettingsProps, ColorGeneratorSettingsState> {
+export class ColorGeneratorSettings extends StickyPanelBase<ColorGeneratorSettingsProps, ColorGeneratorSettingsState> {
   constructor(props: ColorGeneratorSettingsProps) {
-    super(props)
+    super(props, 'control.settings.color')
+
+    this.trackSessionValues('open')
+
     this.state = {
-      open: false,
-      displayPicker: null
+      open: this.getSessionValue('open') == 1,
+      displayPicker: null,
     }
   }
 
@@ -30,7 +34,7 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
         <div className="color-picker-popover">
           <div className="color-picker-cover" onClick={() => this.setState({ displayPicker: null })} />
           <ChromePicker
-            onChange={color => {
+            onChange={(color) => {
               this.props.sendCommand('LibAtem.Commands.ColorGeneratorSetCommand', {
                 Index: colorId,
                 Hue: color.hsl.h,
@@ -39,14 +43,14 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
                 Mask:
                   LibAtemCommands.ColorGeneratorSetCommand_MaskFlags.Hue |
                   LibAtemCommands.ColorGeneratorSetCommand_MaskFlags.Saturation |
-                  LibAtemCommands.ColorGeneratorSetCommand_MaskFlags.Luma
+                  LibAtemCommands.ColorGeneratorSetCommand_MaskFlags.Luma,
               })
             }}
             disableAlpha={true}
             color={{
               h: colorProps?.hue ?? 0,
               s: colorProps?.saturation ?? 0,
-              l: colorProps?.luma ?? 0
+              l: colorProps?.luma ?? 0,
             }}
           />
         </div>
@@ -61,7 +65,7 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
       <div className="ss-submenu">
         <div
           className="ss-submenu-title"
-          onClick={e => {
+          onClick={(e) => {
             this.setState({ open: !this.state.open })
           }}
         >
@@ -78,7 +82,7 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
                       className="ss-color-picker"
                       onClick={() => this.setState({ displayPicker: this.state.displayPicker === id ? null : id })}
                       style={{
-                        background: `hsl(${col.hue}, ${col.saturation}%, ${col.luma}%)`
+                        background: `hsl(${col.hue}, ${col.saturation}%, ${col.luma}%)`,
                       }}
                     ></div>
                   </div>
@@ -86,9 +90,7 @@ export class ColorGeneratorSettings extends React.Component<ColorGeneratorSettin
               })}
               {this.renderActivePicker()}
             </div>
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </div>
       </div>
     )

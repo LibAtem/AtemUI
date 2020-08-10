@@ -11,6 +11,7 @@ import { FadeToBlackSettings, FadeToBlackSettingsProps } from './ftb'
 import { SuperSourceSettings } from './SuperSource/supersource'
 import { MediaPlayerSettings } from './mediaplayers'
 import { HyperdeckSettings } from './hyperdeck'
+import { StickyPanelBase } from './base'
 
 interface SwitcherSettingsProps {
   sendCommand: SendCommandStrict
@@ -24,11 +25,14 @@ interface SwitcherSettingsState {
   page: number
 }
 
-export class SwitcherSettings extends React.Component<SwitcherSettingsProps, SwitcherSettingsState> {
+export class SwitcherSettings extends StickyPanelBase<SwitcherSettingsProps, SwitcherSettingsState> {
   constructor(props: SwitcherSettingsProps) {
-    super(props)
+    super(props, 'control.settings.page')
+
+    this.trackSessionValues('page')
+
     this.state = {
-      page: 0
+      page: this.getSessionValue('page') ?? 0,
     }
   }
 
@@ -38,17 +42,17 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
     if (state.audio) {
       return {
         ftbMode: 'classic',
-        followFadeToBlack: state.audio.programOut.followFadeToBlack
+        followFadeToBlack: state.audio.programOut.followFadeToBlack,
       }
     } else if (state.fairlight) {
       return {
         ftbMode: 'fairlight',
-        followFadeToBlack: state.fairlight.programOut.followFadeToBlack
+        followFadeToBlack: state.fairlight.programOut.followFadeToBlack,
       }
     } else {
       return {
         ftbMode: null,
-        followFadeToBlack: false
+        followFadeToBlack: false,
       }
     }
   }
@@ -72,20 +76,20 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
           options={[
             {
               label: 'Palettes',
-              value: 0
+              value: 0,
             },
             {
               label: 'Media Players',
-              value: 1
+              value: 1,
             },
             {
               label: 'Output',
               value: 2,
-              disabled: true
-            }
+              disabled: true,
+            },
           ]}
           selected={this.state.page}
-          onChange={newPage => this.setState({ page: newPage })}
+          onChange={(newPage) => this.setState({ page: newPage })}
         />
 
         {this.state.page === 0 ? (
@@ -143,9 +147,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
               {...this.getFtbAudioProps(this.props.currentState)}
             />
           </>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         {this.state.page === 1 ? (
           <>
@@ -157,9 +159,7 @@ export class SwitcherSettings extends React.Component<SwitcherSettingsProps, Swi
 
             <HyperdeckSettings sendCommand={this.props.sendCommand} />
           </>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
       </div>
     )
   }
@@ -188,7 +188,7 @@ export class MagicLabel extends React.Component<MagicLabelProps, MagicLabelState
       tempValue: this.props.value,
       disabled: this.props.disabled || true,
       xCoord: 0,
-      yCoord: 0
+      yCoord: 0,
     }
   }
 
@@ -196,12 +196,12 @@ export class MagicLabel extends React.Component<MagicLabelProps, MagicLabelState
     return (
       <div
         style={{ overscrollBehavior: 'contain', touchAction: 'none' }}
-        onTouchMove={e => {
+        onTouchMove={(e) => {
           console.log(this.state.yCoord - e.touches.item(0).clientY)
           this.props.callback(this.props.value + (this.state.yCoord - e.touches.item(0).clientY))
           this.setState({ xCoord: e.touches.item(0).clientX, yCoord: e.touches.item(0).clientY })
         }}
-        onTouchStart={e => this.setState({ xCoord: e.touches.item(0).clientX, yCoord: e.touches.item(0).clientY })}
+        onTouchStart={(e) => this.setState({ xCoord: e.touches.item(0).clientX, yCoord: e.touches.item(0).clientY })}
         className="atem-label"
       >
         {this.props.label}
