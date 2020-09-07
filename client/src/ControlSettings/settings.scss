@@ -2,13 +2,36 @@
   max-width: 800px;
 }
 
+.multiViewProperties {
+  display: grid;
+  padding: 1rem 0;
+
+  display: grid;
+  column-gap: 0.5rem;
+  grid-template-columns: auto 1fr;
+
+
+  .layout {
+    display: inline-block;
+
+    .layout-bar {
+      display: grid;
+      column-gap: 0.5rem;
+      grid-template-columns: 50px 50px 50px 50px;
+      justify-items: center;
+    }
+  }
+}
+
 .multiViewGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 300px 300px;
   column-gap: 5px;
   row-gap: 5px;
-  /* background:red; */
+
+  position: relative;
+  /* Needed to let the swap-preview-program float*/
 }
 
 .multiViewSubGrid {
@@ -19,11 +42,99 @@
   row-gap: 5px;
 }
 
+.multiViewLayoutButton {
+  width: 50px;
+  height: 35px;
+  padding: 0;
+
+  border: none;
+  background-color: transparent;
+  border-radius: .25rem;
+
+  // &.multiViewLayoutButton-secondary {
+  //   background-color: #363636;
+
+  //   &:active {
+  //     background-color: #202020;
+  //   }
+  // }
+
+  &.multiViewLayoutButton-primary {
+    background-color: #0f0f0f;
+  }
+}
+
+
+.multiViewLayoutButton:focus,
+.multiViewButton:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 0.2rem rgba(#404040, .5);
+}
+
+.multiViewButton {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  // padding: 5px 8px;
+
+  border: 1px solid #000;
+  border-radius: .25rem;
+
+  color: #aaa;
+
+  &.multiViewButton-secondary {
+    background-color: #363636;
+
+    &:active {
+      background-color: #202020;
+    }
+
+    &:hover {
+      background-color: #303030;
+    }
+  }
+
+  &.multiViewButton-primary {
+    color: #ddd;
+    background-color: #0f0f0f;
+
+    &:active {
+      background-color: #202020;
+    }
+  }
+}
+
+.swap-preview-program {
+  position: absolute;
+  float: left;
+  top: 100px;
+
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .mutliViewItem {
-  background: #202020;
+  background: #262626;
   border-radius: 5px;
-  padding: 10%;
+  border: 1px solid #222222;
+  padding: 15px;
   // padding-top: 30%;
+
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-rows: 1fr 40px;
+
+  .name-row {
+    padding: 10% 0;
+  }
+
+  .button-row {
+    text-align: left;
+  }
 }
 
 .programPreview {
@@ -31,7 +142,7 @@
 }
 
 .settings-page {
-  background: #2e2e2e;
+  background: #2d2d2d;
   color: #858585;
 }
 
