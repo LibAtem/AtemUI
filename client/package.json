@@ -19,8 +19,8 @@
     "@types/react-router-dom": "^5.1.2",
     "@types/react-select": "^3.0.8",
     "@types/underscore": "^1.10.6",
-    "@typescript-eslint/eslint-plugin": "^3.8.0",
-    "@typescript-eslint/parser": "^3.8.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.1.0",
     "bootstrap": "^4.3.1",
     "bootstrap-switch-button-react": "^1.1.0",
     "camelcase": "^6.0.0",
@@ -48,7 +48,7 @@
     "react-select": "^3.0.8",
     "react-simple-tree-menu": "^1.1.7",
     "shallow-equal": "^1.2.1",
-    "typescript": "^3.8.3",
+    "typescript": "^4.0.2",
     "underscore": "^1.10.2"
   },
   "scripts": {

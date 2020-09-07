@@ -27,7 +27,7 @@ const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 enum ConnectionStatus {
   Disconnected,
   Connected,
-  Reconnecting
+  Reconnecting,
 }
 
 interface AppState extends DeviceContext {
@@ -58,18 +58,18 @@ export default class App extends React.Component<{}, AppState> {
     activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
     currentState: null,
     currentProfile: null,
-    connected: ConnectionStatus.Disconnected
+    connected: ConnectionStatus.Disconnected,
     // hasConnected: false
   }
   updateProfile() {
     if (this.state.signalR && this.state.activeDeviceId) {
       this.state.signalR
         .invoke<LibAtemProfile.DeviceProfile>('SendProfile', this.state.activeDeviceId)
-        .then(profile => {
+        .then((profile) => {
           console.log('ProfileUpdate: Got profile', profile)
           this.setState({ currentProfile: profile })
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('ProfileUpdate: Failed to load profile:', err)
 
           this.setState({ currentProfile: null })
@@ -87,7 +87,7 @@ export default class App extends React.Component<{}, AppState> {
 
       connection.on('devices', (devices: AtemDeviceInfo[]) => {
         console.log('Devices update:', devices)
-        const currentDevice = devices.find(dev => GetDeviceId(dev) === this.state.activeDeviceId)
+        const currentDevice = devices.find((dev) => GetDeviceId(dev) === this.state.activeDeviceId)
         if (currentDevice && !isDeviceAvailable(currentDevice)) {
           console.log('Forget activeDevice')
           // Selected device is now invalid
@@ -124,7 +124,7 @@ export default class App extends React.Component<{}, AppState> {
               } else {
                 return {
                   ...input,
-                  [i]: child
+                  [i]: child,
                 }
               }
             }
@@ -132,7 +132,7 @@ export default class App extends React.Component<{}, AppState> {
 
           let newState = this.state.currentState
           for (const path of state.paths as string[]) {
-            const path2 = path.split('.').map(p => camelcase(p))
+            const path2 = path.split('.').map((p) => camelcase(p))
             const newObj = objectPath.get(state.state, path2.join('.'))
 
             newState = updatePath(newState, path2, newObj)
@@ -141,46 +141,45 @@ export default class App extends React.Component<{}, AppState> {
         }
       })
 
-      connection.onreconnecting(err => {
+      connection.onreconnecting((err) => {
         if (err) {
           console.log('SignalR connection error:', err)
         }
 
         this.setState({
-          connected: ConnectionStatus.Reconnecting
+          connected: ConnectionStatus.Reconnecting,
         })
       })
       connection.onreconnected(() => {
         this.setState({
-          connected: ConnectionStatus.Connected
+          connected: ConnectionStatus.Connected,
         })
       })
-      connection.onclose(err => {
+      connection.onclose((err) => {
         if (err) {
           console.log('SignalR connection error:', err)
         }
 
         this.setState({
-          connected: ConnectionStatus.Disconnected
+          connected: ConnectionStatus.Disconnected,
         })
       })
       this.setState({
-        signalR: connection
+        signalR: connection,
       })
-      ;(window as any).conn2 = connection
 
       connection
         .start()
         .then(() => {
           console.log('SignalR connected')
           this.setState({
-            connected: ConnectionStatus.Connected
+            connected: ConnectionStatus.Connected,
             // hasConnected: true
           })
           this.updateProfile()
           this.setDeivce(this.state.activeDeviceId || undefined)
         })
-        .catch(err => console.error('Connection failed', err))
+        .catch((err) => console.error('Connection failed', err))
     }
   }
 
@@ -190,36 +189,36 @@ export default class App extends React.Component<{}, AppState> {
     if (oldDeviceId !== id && oldDeviceId) {
       this.state.signalR
         .invoke<any>('UnsubscribeState', oldDeviceId)
-        .then(state => {})
-        .catch(err => {
+        .then((state) => {})
+        .catch((err) => {
           console.error('StateViewer: Failed to subscribe state:', err)
         })
     }
 
     this.setState({
       activeDeviceId: id || null,
-      currentState: null
+      currentState: null,
     })
     if (id) {
       console.log('here', id)
       if (this.state.signalR) {
         this.state.signalR
           .invoke<LibAtemProfile.DeviceProfile>('SendProfile', id)
-          .then(profile => {
+          .then((profile) => {
             console.log('ProfileUpdate: Got profile', profile)
             this.setState({ currentProfile: profile })
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('ProfileUpdate: Failed to load profile:', err)
             this.setState({ currentProfile: null })
           })
 
         this.state.signalR
           .invoke<any>('SubscribeState', id)
-          .then(state => {
+          .then((state) => {
             this.setState({ currentState: state })
           })
-          .catch(err => {
+          .catch((err) => {
             console.error('StateViewer: Failed to subscribe state:', err)
           })
       }
@@ -307,7 +306,7 @@ class NavBar extends React.PureComponent<{
     const availableDevices = this.props.devices.filter(isDeviceAvailable)
 
     const onChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-      const id = availableDevices.map(dev => GetDeviceId(dev)).find(id => id === e.currentTarget.value)
+      const id = availableDevices.map((dev) => GetDeviceId(dev)).find((id) => id === e.currentTarget.value)
       this.props.setDevice(id)
     }
 
@@ -316,7 +315,7 @@ class NavBar extends React.PureComponent<{
         <option value="-">-</option>
         {availableDevices.map((dev, i) => (
           <option key={i} value={GetDeviceId(dev)}>
-            {dev.info.name}
+            {dev.connected ? `*${dev.info.name}*` : dev.info.name}
           </option>
         ))}
       </FormControl>
