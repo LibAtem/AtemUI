@@ -3,6 +3,7 @@ import { Container } from 'react-bootstrap'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { RunButton, SelectInput, DecimalWithSliderInput } from '../components'
 import { LibAtemState, LibAtemEnums, VideoModeInfoSet } from '../generated'
+import { DownConvertModeOptions, VideoModeInfo } from '../generated/manual-types'
 
 const SDI3GLevelOptions = [
   {
@@ -60,6 +61,7 @@ interface VideoSettingsState {
   videoMode: LibAtemEnums.VideoMode | -1 | null
   multiViewMode: LibAtemEnums.VideoMode | null
   downConvertMode: LibAtemEnums.DownConvertMode | null
+  downConvertVideoModes: LibAtemEnums.VideoMode | null
   sdi3GLevel: LibAtemEnums.SDI3GOutputLevel | null
 }
 class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsState> {
@@ -70,6 +72,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
       videoMode: null,
       multiViewMode: null,
       downConvertMode: null,
+      downConvertVideoModes: null,
       sdi3GLevel: null,
     }
   }
@@ -99,14 +102,16 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
     }
 
     const videoModeInfo = this.props.info.supportedVideoModes.find((mode) => mode.mode === currentVideoMode)
+    const videoModeInfo2: VideoModeInfo | undefined = VideoModeInfoSet[currentVideoMode as LibAtemEnums.VideoMode]
     const multiviewerModes = videoModeInfo?.multiviewModes?.map((mode) => ({
       id: mode,
       label: VideoModeInfoSet[mode]?.name ?? mode,
     }))
-    const downConvertModes = videoModeInfo?.downConvertModes?.map((mode) => ({
-      id: (mode as any) as LibAtemEnums.DownConvertMode, // TODO - this is wrong..
-      label: mode + '',
-    }))
+    const downConvertVideoModes =
+      videoModeInfo?.downConvertModes?.map((mode) => ({
+        id: mode,
+        label: VideoModeInfoSet[mode]?.name ?? mode,
+      })) ?? []
 
     return (
       <>
@@ -116,7 +121,9 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           label="Set video standard to"
           value={currentVideoMode}
           options={videoModes}
-          onChange={(v) => this.setState({ videoMode: v, multiViewMode: null, downConvertMode: null })}
+          onChange={(v) =>
+            this.setState({ videoMode: v, multiViewMode: null, downConvertMode: null, downConvertVideoModes: null })
+          }
         />
 
         {/* TODO - is this correct and the lib has it named wrong? */}
@@ -132,18 +139,32 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           }}
         />
 
-        {/* TODO - this bit doesnt make sense... */}
         <SelectInput
           label="Down convert as"
-          disabled={!downConvertModes || downConvertModes.length <= 1}
+          disabled={DownConvertModeOptions.length <= 1}
           value={this.state.downConvertMode ?? this.props.state.downConvertMode}
-          options={downConvertModes ?? []}
+          options={DownConvertModeOptions}
           onChange={(v) => this.setState({ downConvertMode: v })}
         />
 
-        {/* TODO - this should be disabled for most modes... */}
+        <SelectInput
+          label="Down convert video standard to"
+          disabled={downConvertVideoModes.length <= 1}
+          value={
+            this.state.downConvertVideoModes ??
+            this.props.state.downConvertVideoModes[currentVideoMode as LibAtemEnums.VideoMode]
+          }
+          options={downConvertVideoModes}
+          onChange={(v) => this.setState({ downConvertVideoModes: v })}
+        />
+
         <SelectInput
           label="Set 3G SDI output to"
+          disabled={
+            videoModeInfo2?.width === 1920 &&
+            videoModeInfo2.height === 1080 &&
+            videoModeInfo2.framerate > 30 /* TODO - interlaced are picked up here */
+          }
           value={this.state.sdi3GLevel ?? this.props.state.sDI3GLevel}
           options={SDI3GLevelOptions}
           onChange={(v) => this.setState({ sdi3GLevel: v })}
@@ -184,6 +205,12 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
                   DownConvertMode: this.state.downConvertMode,
                 })
               }
+              if (this.state.downConvertVideoModes !== null) {
+                this.props.sendCommand('LibAtem.Commands.Settings.DownConvertVideoModeSetCommand', {
+                  CoreVideoMode: this.state.videoMode ?? this.props.state.videoMode,
+                  DownConvertedMode: this.state.downConvertVideoModes,
+                })
+              }
               if (this.state.sdi3GLevel !== null) {
                 this.props.sendCommand('LibAtem.Commands.Settings.SDI3GLevelOutputSetCommand', {
                   SDI3GOutputLevel: this.state.sdi3GLevel,
@@ -194,6 +221,7 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
                 videoMode: null,
                 multiViewMode: null,
                 downConvertMode: null,
+                downConvertVideoModes: null,
                 sdi3GLevel: null,
               })
             }}
