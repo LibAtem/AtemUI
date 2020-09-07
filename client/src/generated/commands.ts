@@ -261,15 +261,24 @@ export interface SuperSource_SuperSourcePropertiesSetV8Command {
   ArtInvertKey?: boolean
 }
 
-export interface Streaming_StreamingActiveSetCommand {
-  IsStreaming: boolean
+export interface Streaming_StreamingAudioBitratesCommand {
+  Bitrates: number
 }
 
-export interface Streaming_StreamingStateCommand {
-  StreamingStatus: Enums.StreamingStatus
+export interface Streaming_StreamingAuthenticationCommand {
+  Username: string
+  Password: string
 }
 
-export interface Streaming_SRSSCommand {
+export interface Streaming_StreamingDurationCommand {
+  Hour: number
+  Minute: number
+  Second: number
+  Frame: number
+  IsDropFrame: boolean
+}
+
+export interface Streaming_StreamingRequestDurationCommand {
 }
 
 export interface Streaming_StreamingServiceGetCommand {
@@ -287,12 +296,18 @@ export interface Streaming_StreamingServiceSetCommand {
   Bitrates?: number
 }
 
-export interface Streaming_StreamingTimecodeCommand {
-  Hour: number
-  Minute: number
-  Second: number
-  Frame: number
-  IsDropFrame: boolean
+export interface Streaming_StreamingStatsCommand {
+  EncodingBitrate: number
+  CacheUsed: number
+}
+
+export interface Streaming_StreamingStatusGetCommand {
+  Status: Enums.StreamingStatus
+  Error: Enums.StreamingError
+}
+
+export interface Streaming_StreamingStatusSetCommand {
+  IsStreaming: boolean
 }
 
 export interface Settings_AutoVideoModeCommand {
@@ -525,8 +540,55 @@ export interface Settings_HyperDeck_HyperDeckStorageSetCommand {
   CurrentClipId?: number
 }
 
-export interface Recording_RecordingRMSuCommand {
+export interface Recording_RecordingDiskInfoCommand {
+  DiskId: number
+  RecordingTimeAvailable: number
+  Status: Enums.RecordingDiskStatus
+  IsDelete: boolean
+  VolumeName: string
+}
+
+export interface Recording_RecordingDurationCommand {
+  Hour: number
+  Minute: number
+  Second: number
+  Frame: number
+  IsDropFrame: boolean
+}
+
+export interface Recording_RecordingISOCommand {
+  ISORecordAllInputs: boolean
+}
+
+export interface Recording_RecordingRequestDurationCommand {
+}
+
+export interface Recording_RecordingSettingsGetCommand {
   Filename: string
+  WorkingSet1DiskId: number
+  WorkingSet2DiskId: number
+  RecordInAllCameras: boolean
+}
+
+export interface Recording_RecordingSettingsSetCommand {
+  Mask: Recording_RecordingSettingsSetCommand_MaskFlags
+  Filename?: string
+  WorkingSet1DiskId?: number
+  WorkingSet2DiskId?: number
+  RecordInAllCameras?: boolean
+}
+
+export interface Recording_RecordingStatusGetCommand {
+  Status: Enums.RecordingStatus
+  Error: Enums.RecordingError
+  TotalRecordingTimeAvailable: number
+}
+
+export interface Recording_RecordingStatusSetCommand {
+  IsRecording: boolean
+}
+
+export interface Recording_RecordingSwitchDiskCommand {
 }
 
 export interface MixEffects_FadeToBlackAutoCommand {
@@ -1821,7 +1883,7 @@ export interface Audio_Fairlight_FairlightMixerSendLevelsCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceCompressorGetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   CompressorEnabled: boolean
   Threshold: number
   Ratio: number
@@ -1833,7 +1895,7 @@ export interface Audio_Fairlight_FairlightMixerSourceCompressorGetCommand {
 export interface Audio_Fairlight_FairlightMixerSourceCompressorSetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceCompressorSetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   CompressorEnabled?: boolean
   Threshold?: number
   Ratio?: number
@@ -1844,12 +1906,12 @@ export interface Audio_Fairlight_FairlightMixerSourceCompressorSetCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceDeleteCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceDynamicsResetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   Dynamics: boolean
   Expander: boolean
   Compressor: boolean
@@ -1858,7 +1920,7 @@ export interface Audio_Fairlight_FairlightMixerSourceDynamicsResetCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandGetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   Band: number
   BandEnabled: boolean
   SupportedShapes: Enums.FairlightEqualizerBandShape
@@ -1873,7 +1935,7 @@ export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandGetCommand {
 export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   Band: number
   BandEnabled?: boolean
   Shape?: Enums.FairlightEqualizerBandShape
@@ -1886,13 +1948,13 @@ export interface Audio_Fairlight_FairlightMixerSourceEqualizerBandSetCommand {
 export interface Audio_Fairlight_FairlightMixerSourceEqualizerResetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceEqualizerResetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   Band?: number
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceExpanderGetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   ExpanderEnabled: boolean
   GateEnabled: boolean
   Threshold: number
@@ -1906,7 +1968,7 @@ export interface Audio_Fairlight_FairlightMixerSourceExpanderGetCommand {
 export interface Audio_Fairlight_FairlightMixerSourceExpanderSetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceExpanderSetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   ExpanderEnabled?: boolean
   GateEnabled?: boolean
   Threshold?: number
@@ -1919,7 +1981,7 @@ export interface Audio_Fairlight_FairlightMixerSourceExpanderSetCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceGetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   SourceType: Enums.FairlightAudioSourceType
   MaxFramesDelay: number
   FramesDelay: number
@@ -1937,7 +1999,7 @@ export interface Audio_Fairlight_FairlightMixerSourceGetCommand {
 }
 
 export interface Audio_Fairlight_FairlightMixerSourceLevelsCommand {
-  SourceId: number
+  SourceId: string
   Index: Enums.AudioSource
   InputLeftLevel: number
   InputRightLevel: number
@@ -1958,7 +2020,7 @@ export interface Audio_Fairlight_FairlightMixerSourceLevelsCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceLimiterGetCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   LimiterEnabled: boolean
   Threshold: number
   Attack: number
@@ -1969,7 +2031,7 @@ export interface Audio_Fairlight_FairlightMixerSourceLimiterGetCommand {
 export interface Audio_Fairlight_FairlightMixerSourceLimiterSetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceLimiterSetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   LimiterEnabled?: boolean
   Threshold?: number
   Attack?: number
@@ -1979,7 +2041,7 @@ export interface Audio_Fairlight_FairlightMixerSourceLimiterSetCommand {
 
 export interface Audio_Fairlight_FairlightMixerSourceResetPeakLevelsCommand {
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   Output: boolean
   DynamicsInput: boolean
   DynamicsOutput: boolean
@@ -1988,7 +2050,7 @@ export interface Audio_Fairlight_FairlightMixerSourceResetPeakLevelsCommand {
 export interface Audio_Fairlight_FairlightMixerSourceSetCommand {
   Mask: Audio_Fairlight_FairlightMixerSourceSetCommand_MaskFlags
   Index: Enums.AudioSource
-  SourceId: number
+  SourceId: string
   FramesDelay?: number
   Gain?: number
   StereoSimulation?: number
@@ -2140,6 +2202,13 @@ export enum Settings_HyperDeck_HyperDeckSettingsSetCommand_MaskFlags {
 export enum Settings_HyperDeck_HyperDeckStorageSetCommand_MaskFlags {
   ActiveStorageMedia = 1,
   CurrentClipId = 2,
+}
+
+export enum Recording_RecordingSettingsSetCommand_MaskFlags {
+  Filename = 1,
+  WorkingSet1DiskId = 2,
+  WorkingSet2DiskId = 4,
+  RecordInAllCameras = 8,
 }
 
 export enum MixEffects_Transition_TransitionDipSetCommand_MaskFlags {
@@ -2539,12 +2608,15 @@ export type CommandTypes =
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesGetV8Command", SuperSource_SuperSourcePropertiesGetV8Command] |
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesSetCommand", SuperSource_SuperSourcePropertiesSetCommand] |
   ["LibAtem.Commands.SuperSource.SuperSourcePropertiesSetV8Command", SuperSource_SuperSourcePropertiesSetV8Command] |
-  ["LibAtem.Commands.Streaming.StreamingActiveSetCommand", Streaming_StreamingActiveSetCommand] |
-  ["LibAtem.Commands.Streaming.StreamingStateCommand", Streaming_StreamingStateCommand] |
-  ["LibAtem.Commands.Streaming.SRSSCommand", Streaming_SRSSCommand] |
+  ["LibAtem.Commands.Streaming.StreamingAudioBitratesCommand", Streaming_StreamingAudioBitratesCommand] |
+  ["LibAtem.Commands.Streaming.StreamingAuthenticationCommand", Streaming_StreamingAuthenticationCommand] |
+  ["LibAtem.Commands.Streaming.StreamingDurationCommand", Streaming_StreamingDurationCommand] |
+  ["LibAtem.Commands.Streaming.StreamingRequestDurationCommand", Streaming_StreamingRequestDurationCommand] |
   ["LibAtem.Commands.Streaming.StreamingServiceGetCommand", Streaming_StreamingServiceGetCommand] |
   ["LibAtem.Commands.Streaming.StreamingServiceSetCommand", Streaming_StreamingServiceSetCommand] |
-  ["LibAtem.Commands.Streaming.StreamingTimecodeCommand", Streaming_StreamingTimecodeCommand] |
+  ["LibAtem.Commands.Streaming.StreamingStatsCommand", Streaming_StreamingStatsCommand] |
+  ["LibAtem.Commands.Streaming.StreamingStatusGetCommand", Streaming_StreamingStatusGetCommand] |
+  ["LibAtem.Commands.Streaming.StreamingStatusSetCommand", Streaming_StreamingStatusSetCommand] |
   ["LibAtem.Commands.Settings.AutoVideoModeCommand", Settings_AutoVideoModeCommand] |
   ["LibAtem.Commands.Settings.DownConvertModeGetCommand", Settings_DownConvertModeGetCommand] |
   ["LibAtem.Commands.Settings.DownConvertModeSetCommand", Settings_DownConvertModeSetCommand] |
@@ -2580,7 +2652,15 @@ export type CommandTypes =
   ["LibAtem.Commands.Settings.HyperDeck.HyperDeckSettingsSetCommand", Settings_HyperDeck_HyperDeckSettingsSetCommand] |
   ["LibAtem.Commands.Settings.HyperDeck.HyperDeckStorageGetCommand", Settings_HyperDeck_HyperDeckStorageGetCommand] |
   ["LibAtem.Commands.Settings.HyperDeck.HyperDeckStorageSetCommand", Settings_HyperDeck_HyperDeckStorageSetCommand] |
-  ["LibAtem.Commands.Recording.RecordingRMSuCommand", Recording_RecordingRMSuCommand] |
+  ["LibAtem.Commands.Recording.RecordingDiskInfoCommand", Recording_RecordingDiskInfoCommand] |
+  ["LibAtem.Commands.Recording.RecordingDurationCommand", Recording_RecordingDurationCommand] |
+  ["LibAtem.Commands.Recording.RecordingISOCommand", Recording_RecordingISOCommand] |
+  ["LibAtem.Commands.Recording.RecordingRequestDurationCommand", Recording_RecordingRequestDurationCommand] |
+  ["LibAtem.Commands.Recording.RecordingSettingsGetCommand", Recording_RecordingSettingsGetCommand] |
+  ["LibAtem.Commands.Recording.RecordingSettingsSetCommand", Recording_RecordingSettingsSetCommand] |
+  ["LibAtem.Commands.Recording.RecordingStatusGetCommand", Recording_RecordingStatusGetCommand] |
+  ["LibAtem.Commands.Recording.RecordingStatusSetCommand", Recording_RecordingStatusSetCommand] |
+  ["LibAtem.Commands.Recording.RecordingSwitchDiskCommand", Recording_RecordingSwitchDiskCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackAutoCommand", MixEffects_FadeToBlackAutoCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackCutCommand", MixEffects_FadeToBlackCutCommand] |
   ["LibAtem.Commands.MixEffects.FadeToBlackPropertiesGetCommand", MixEffects_FadeToBlackPropertiesGetCommand] |

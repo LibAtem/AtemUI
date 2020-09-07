@@ -70,7 +70,7 @@ export interface HyperdeckState {
 
 export interface AudioState {
   programOut: AudioState_ProgramOutState
-  inputs: Record<number, AudioState_InputState>
+  inputs: Record<string, AudioState_InputState>
   monitorOutputs: AudioState_MonitorOutputState[]
   headphoneOutputs: AudioState_HeadphoneOutputState[]
   tally?: Record<Enums.AudioSource, boolean>
@@ -78,14 +78,14 @@ export interface AudioState {
 
 export interface FairlightAudioState {
   programOut: FairlightAudioState_ProgramOutState
-  inputs: Record<number, FairlightAudioState_InputState>
+  inputs: Record<string, FairlightAudioState_InputState>
   monitors: FairlightAudioState_MonitorOutputState[]
   tally?: unknown
 }
 
 export interface CameraControlState {
   periodicFlushInterval: number
-  cameras: Record<number, CameraControlState_CameraState>
+  cameras: Record<string, CameraControlState_CameraState>
 }
 
 export interface MacroState {
@@ -119,11 +119,17 @@ export interface SettingsState {
 
 export interface StreamingState {
   status: StreamingState_StatusState
+  stats: StreamingState_StatsState
   settings: StreamingState_SettingsState
+  authentication: StreamingState_AuthenticationState
 }
 
 export interface RecordingState {
-  disks: RecordingDiskState[]
+  canISORecordAllInputs: boolean
+  iSORecordAllInputs: boolean
+  properties: RecordingState_PropertiesState
+  status: RecordingState_StatusState
+  disks: Record<number, RecordingState_RecordingDiskState>
 }
 
 export interface InfoState {
@@ -409,26 +415,50 @@ export interface SettingsState_MixMinusOutputState {
 }
 
 export interface StreamingState_StatusState {
-  isStreaming: boolean
-  cacheUsed: number
-  encodingBitrate: number
   duration?: Timecode
   state: Enums.StreamingStatus
-  error: number
+  error: Enums.StreamingError
+}
+
+export interface StreamingState_StatsState {
+  cacheUsed: number
+  encodingBitrate: number
 }
 
 export interface StreamingState_SettingsState {
   serviceName: string
   url: string
   key: string
-  lowBitrate: number
-  highBitrate: number
+  lowVideoBitrate: number
+  highVideoBitrate: number
+  lowAudioBitrate: number
+  highAudioBitrate: number
 }
 
-export interface RecordingDiskState {
+export interface StreamingState_AuthenticationState {
+  username: string
+  password: string
+}
+
+export interface RecordingState_PropertiesState {
+  filename: string
+  workingSet1DiskId: number
+  workingSet2DiskId: number
+  recordInAllCameras: boolean
+}
+
+export interface RecordingState_StatusState {
+  totalRecordingTimeAvailable: number
+  duration?: Timecode
+  state: Enums.RecordingStatus
+  error: Enums.RecordingError
+}
+
+export interface RecordingState_RecordingDiskState {
   diskId: number
   volumeName: string
   recordingTimeAvailable: number
+  status: Enums.RecordingDiskStatus
 }
 
 export interface Timecode {
@@ -686,7 +716,7 @@ export interface FairlightAudioState_AnalogState {
 }
 
 export interface FairlightAudioState_InputSourceState {
-  sourceId: number
+  sourceId: string
   sourceType: Enums.FairlightAudioSourceType
   gain: number
   balance: number

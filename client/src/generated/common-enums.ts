@@ -746,26 +746,26 @@ export enum MacroPortType {
 }
 
 export enum RecordingError {
-  None = 0,
-  NoMedia = 1,
-  MediaFull = 2,
-  MediaError = 3,
-  MediaUnformatted = 4,
-  DroppingFrames = 5,
-  Unknown = 6,
+  NoMedia = 0,
+  None = 2,
+  MediaFull = 4,
+  MediaError = 8,
+  MediaUnformatted = 16,
+  DroppingFrames = 32,
+  Unknown = 32768,
 }
 
-export enum RecordingState {
+export enum RecordingStatus {
   Idle = 0,
   Recording = 1,
-  Stopping = 2,
+  Stopping = 128,
 }
 
 export enum RecordingDiskStatus {
-  Idle = 0,
-  Unformatted = 1,
-  Active = 2,
-  Recording = 3,
+  Idle = 1,
+  Unformatted = 2,
+  Active = 4,
+  Recording = 8,
 }
 
 export enum SDI3GOutputLevel {
@@ -799,15 +799,15 @@ export enum StingerSource {
 
 export enum StreamingError {
   None = 0,
-  InvalidState = 1,
-  Unknown = 2,
+  InvalidState = 16,
+  Unknown = 32768,
 }
 
 export enum StreamingStatus {
   Idle = 1,
   Connecting = 2,
   Streaming = 4,
-  Stopping = 8,
+  Stopping = 32,
 }
 
 export enum SuperSourceArtOption {

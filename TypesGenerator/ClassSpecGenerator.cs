@@ -95,9 +95,14 @@ namespace TypesGenerator
                 _pendingClasses.Add(t.FullName);
                 return SafeName(t.FullName);
             }
-            if (t == typeof(uint) || t == typeof(int) || t == typeof(long) || t == typeof(ulong) || t == typeof(byte) || t == typeof(float) || t == typeof(double))
+            if (t == typeof(uint) || t == typeof(int) || t == typeof(byte) || t == typeof(float) || t == typeof(double))
             {
                 return "number";
+            }
+
+            if (t == typeof(long) || t == typeof(ulong))
+            {
+                return "string";
             }
             if (t == typeof(bool))
             {

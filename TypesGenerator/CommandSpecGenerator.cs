@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using LibAtem.Commands;
 using LibAtem.Serialization;
+using LibAtem.State;
 
 namespace TypesGenerator
 {
@@ -115,6 +116,10 @@ namespace TypesGenerator
                             else if (prop.GetCustomAttribute<UInt16ListAttribute>() != null)
                             {
                                 _file.WriteLine(CompileProperty(prop.Name, isOptional, "number[]"));
+                            }
+                            else if (prop.GetCustomAttribute<Int64Attribute>() != null)
+                            {
+                                _file.WriteLine(CompileProperty(prop.Name, isOptional, "string"));
                             }
                             else
                             {
