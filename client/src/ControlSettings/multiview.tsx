@@ -3,10 +3,11 @@ import React from 'react'
 import { StickyPanelBase } from '../Control/Settings/base'
 import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemEnums, LibAtemCommands } from '../generated'
-import { SourcesMap, SourceSelectInput, AtemButtonBar } from '../components'
+import { SourcesMap, SourceSelectInput, AtemButtonBar, RunButton, DecimalWithSliderInput } from '../components'
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LayoutIcon } from './multiviewLayout'
+import { MultiViewerState_WindowState } from '../generated/state'
 
 interface MultiViewSettingsProps {
   sendCommand: SendCommandStrict
@@ -29,21 +30,12 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     }
   }
 
-  //   private renderQuadrant(mv: LibAtemState.MultiViewerState_PropertiesState, mask: LibAtemEnums.MultiViewLayoutV8) {
-  //     if ((mv.layout & mask) === mask) {
-  //         // Means small
-  //         return <div className="mutliViewItem programPreview">GRID HERE</div>
-  //     } else {
-  //         return <div className="mutliViewItem programPreview">Preview</div>
-  //     }
-  //   }
-
   private renderLegacyLargeWindow(mv: LibAtemState.MultiViewerState, index: number) {
     const window = mv.windows[index]
     const name = this.props.sources.get(window.source)?.longName ?? ''
 
     return (
-      <div className="mutliViewItem programPreview">
+      <div className="mutliViewItem programPreview" key={index}>
         <div className="name-row">{name}</div>
         {this.renderBoxButton(mv, index)}
       </div>
@@ -55,8 +47,11 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     mv: LibAtemState.MultiViewerState,
     boxIds: [number, number, number, number]
   ) {
-    const mvIndex = this.state.page
-    return <div className="multiViewSubGrid">{boxIds.map((i) => this.renderWindowBox(info, mv, i))}</div>
+    return (
+      <div key={boxIds[0] + boxIds[1] + boxIds[2] + boxIds[3]} className="multiViewSubGrid">
+        {boxIds.map((i) => this.renderWindowBox(info, mv, i))}
+      </div>
+    )
   }
 
   private renderWindowBox(
@@ -64,11 +59,11 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     mv: LibAtemState.MultiViewerState,
     boxId: number
   ) {
-    const win = mv.windows[boxId]
+    const win = mv.windows[boxId] as LibAtemState.MultiViewerState_WindowState | undefined
     return (
       <div key={boxId} className="mutliViewItem">
         <div>
-          {info.canRouteInputs ? (
+          {win && info.canRouteInputs ? (
             <SourceSelectInput
               label={null}
               sources={this.props.sources}
@@ -83,12 +78,30 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
               }}
             />
           ) : (
-            this.props.sources.get(win.source)?.longName ?? ''
+            this.atemWindowName(boxId, win)
           )}
         </div>
-        {this.renderBoxButton(mv, boxId)}
+        {win && this.renderBoxButton(mv, boxId)}
       </div>
     )
+  }
+
+  private atemWindowName(id: number, win: LibAtemState.MultiViewerState_WindowState | undefined) {
+    if (win) {
+      const name = this.props.sources.get(win.source)?.longName
+      if (name) return name
+    }
+
+    switch (id) {
+      case 7:
+        return 'Stream Status'
+      case 8:
+        return 'Record Status'
+      case 9:
+        return 'Audio Status'
+      default:
+        return ''
+    }
   }
 
   private renderBoxButton(mv: LibAtemState.MultiViewerState, box: number) {
@@ -136,7 +149,7 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
 
   private renderSwapButton(mv: LibAtemState.MultiViewerState) {
     return (
-      <div className="swap-preview-program">
+      <div className="swap-preview-program" key="swap">
         <Button
           bsPrefix="multiViewButton"
           variant="secondary"
@@ -239,8 +252,45 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     }
   }
 
-  private renderVuControls(mv: LibAtemState.MultiViewerState_PropertiesState) {
-    return ''
+  private renderVuControls(mv: LibAtemState.MultiViewerState) {
+    const canChangeOpacity = mv.windows.length > 8
+
+    const anyOff = mv.windows.find((w) => w.supportsVuMeter && !w.vuMeterEnabled)
+    const target = !!anyOff
+    return (
+      <div className="vu-controls">
+        <RunButton
+          label={anyOff ? 'All On' : 'All Off'}
+          onClick={() => {
+            mv.windows.forEach((window, i) => {
+              if (window.supportsVuMeter && window.vuMeterEnabled !== target) {
+                this.props.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewWindowVuMeterSetCommand', {
+                  MultiviewIndex: this.state.page,
+                  WindowIndex: i,
+                  VuEnabled: target,
+                })
+              }
+            })
+          }}
+        />
+
+        {canChangeOpacity && (
+          <DecimalWithSliderInput
+            label="Opacity"
+            step={1}
+            min={10}
+            max={100}
+            value={mv.vuMeterOpacity}
+            onChange={(val) => {
+              this.props.sendCommand('LibAtem.Commands.Settings.Multiview.MultiviewVuOpacityCommand', {
+                MultiviewIndex: this.state.page,
+                Opacity: val,
+              })
+            }}
+          />
+        )}
+      </div>
+    )
   }
 
   render() {
@@ -255,14 +305,17 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     return (
       <Container className="maxW" style={{ paddingTop: '1rem' }}>
         {this.props.multiViewers.length > 1 || this.state.page !== 0 ? (
-          <AtemButtonBar
-            selected={this.state.page}
-            options={this.props.multiViewers.map((mv, i) => ({
-              value: i,
-              label: `Multi View ${i + 1}`,
-            }))}
-            onChange={(newPage) => this.setState({ page: newPage })}
-          />
+          <div className="center">
+            <AtemButtonBar
+              style={{ display: 'inline-grid' }}
+              selected={this.state.page}
+              options={this.props.multiViewers.map((mv, i) => ({
+                value: i,
+                label: `Multi View ${i + 1}`,
+              }))}
+              onChange={(newPage) => this.setState({ page: newPage })}
+            />
+          </div>
         ) : (
           ''
         )}
@@ -279,7 +332,7 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
           {info.supportsVuMeters ? (
             <div className="vu-meters">
               <div className="atem-heading">Audio Meters</div>
-              {this.renderVuControls(mv.properties)}
+              {this.renderVuControls(mv)}
             </div>
           ) : (
             ''

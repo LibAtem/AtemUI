@@ -21,6 +21,15 @@
       justify-items: center;
     }
   }
+
+  .vu-meters {
+    .vu-controls {
+      display: grid;
+      column-gap: 0.5rem;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      justify-items: center;
+    }
+  }
 }
 
 .multiViewGrid {
@@ -134,6 +143,10 @@
 
   .button-row {
     text-align: left;
+  }
+
+  div:first-child {
+    text-align: center;
   }
 }
 
