@@ -76,7 +76,15 @@ namespace TypesGenerator
             }
             if (t.IsArray)
             {
-                return translateType(t.GetElementType(), additionalTypesSet) + "[]";
+                var t2 = t.GetElementType();
+                if (t2 == typeof(byte))
+                {
+                    return "string";
+                }
+                else
+                {
+                    return translateType(t2, additionalTypesSet) + "[]";
+                }
             }
             if (t == typeof(ProtocolVersion))
             {

@@ -378,7 +378,7 @@ export interface MacroState_RunStatusState {
 
 export interface MediaPoolState_StillState {
   isUsed: boolean
-  hash?: number[]
+  hash?: string
   filename: string
 }
 
@@ -774,13 +774,13 @@ export interface MacroState_MacroRunStatus {
 
 export interface MediaPoolState_FrameState {
   isUsed: boolean
-  hash: number[]
+  hash: string
 }
 
 export interface MediaPoolState_ClipState_AudioState {
   isUsed: boolean
   name: string
-  hash?: number[]
+  hash?: string
 }
 
 export interface MultiViewerState_PropertiesState {

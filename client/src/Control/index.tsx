@@ -2,7 +2,6 @@ import React from 'react'
 import './control.scss'
 import { AtemDeviceInfo } from '../Devices/types'
 import { SwitcherSettings } from './Settings/settings'
-import { videoIds } from '../ControlSettings/ids'
 import MediaQuery from 'react-responsive'
 import { DSKPanel } from './dsk'
 import { NextPanel } from './next'
@@ -86,7 +85,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
     this.state = {
       open: true,
       openMobile: false,
-      meIndex: 0
+      meIndex: 0,
     }
 
     this.sendCommand = this.sendCommand.bind(this)
@@ -106,14 +105,14 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
       <AtemButtonBar
         style={{
           margin: isMobile ? '10px' : '10px auto',
-          width: isMobile ? undefined : `${150 * mixEffects.length}px`
+          width: isMobile ? undefined : `${150 * mixEffects.length}px`,
         }}
         options={mixEffects.map((me, i) => ({
           label: `Mix Effects ${i + 1}`,
-          value: i
+          value: i,
         }))}
         selected={this.state.meIndex}
-        onChange={v => this.setState({ meIndex: v })}
+        onChange={(v) => this.setState({ meIndex: v })}
       />
     )
   }
@@ -127,10 +126,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
       const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
       if (newInputs) {
         for (const [k, v] of Object.entries(newInputs)) {
-          const id = videoIds[k]
-          if (id !== undefined) {
-            sources.set(id, v.properties)
-          }
+          sources.set(Number(k), v.properties)
         }
       }
 
@@ -146,7 +142,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
     return (
       <MediaQuery minWidth="950px">
-        {matches =>
+        {(matches) =>
           matches ? (
             <div
               className="control-page"
@@ -165,7 +161,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 />
               </div>
 
-              <OpenCloseButton open={this.state.open} change={v => this.setState({ open: v })} />
+              <OpenCloseButton open={this.state.open} change={(v) => this.setState({ open: v })} />
 
               {this.state.open ? (
                 <SwitcherSettings
@@ -176,9 +172,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   sources={sources}
                   sendCommand={this.sendCommand}
                 />
-              ) : (
-                undefined
-              )}
+              ) : undefined}
             </div>
           ) : (
             <div className="control-page">
@@ -189,15 +183,15 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 options={[
                   {
                     label: 'Control',
-                    value: false
+                    value: false,
                   },
                   {
                     label: 'Settings',
-                    value: true
-                  }
+                    value: true,
+                  },
                 ]}
                 selected={this.state.openMobile}
-                onChange={v => this.setState({ openMobile: v })}
+                onChange={(v) => this.setState({ openMobile: v })}
               />
 
               {this.state.openMobile ? (
@@ -245,7 +239,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
   constructor(props: MixEffectPanelProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected
+      hasConnected: props.device.connected,
     }
   }
 
@@ -257,7 +251,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true
+        hasConnected: true,
       })
       // now reload
     }
@@ -307,7 +301,7 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
         <NextPanel
           meIndex={this.props.meIndex}
           transition={currentME.transition.properties}
-          keyers={currentME.keyers.map(k => ({ onAir: k.onAir }))}
+          keyers={currentME.keyers.map((k) => ({ onAir: k.onAir }))}
           sendCommand={this.props.sendCommand}
         />
         <DSKPanel

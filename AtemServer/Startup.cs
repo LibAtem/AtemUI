@@ -24,7 +24,7 @@ namespace AtemServer
         {
             services.AddSignalR().AddNewtonsoftJsonProtocol((options) =>
             {
-                //
+                options.PayloadSerializerSettings.Converters.Add(new EnumDictionaryConverter());
             });
             
             services.AddSingleton<AtemRepository>();

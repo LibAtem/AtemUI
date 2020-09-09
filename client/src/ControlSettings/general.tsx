@@ -130,12 +130,14 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
         <SelectInput
           label="Set multi view video standard to"
           disabled={!multiviewerModes || multiviewerModes.length <= 1}
-          value={this.state.multiViewMode ?? ''}
+          value={
+            this.state.multiViewMode ??
+            this.props.state.multiviewVideoModes[currentVideoMode as LibAtemEnums.VideoMode] ??
+            ''
+          }
           options={multiviewerModes ?? []}
           onChange={(v) => {
-            if (v != '') {
-              this.setState({ multiViewMode: v })
-            }
+            this.setState({ multiViewMode: v })
           }}
         />
 
@@ -152,7 +154,8 @@ class VideoSettings extends React.Component<VideoSettingsProps, VideoSettingsSta
           disabled={downConvertVideoModes.length <= 1}
           value={
             this.state.downConvertVideoModes ??
-            this.props.state.downConvertVideoModes[currentVideoMode as LibAtemEnums.VideoMode]
+            this.props.state.downConvertVideoModes[currentVideoMode as LibAtemEnums.VideoMode] ??
+            ''
           }
           options={downConvertVideoModes}
           onChange={(v) => this.setState({ downConvertVideoModes: v })}

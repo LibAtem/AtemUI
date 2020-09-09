@@ -3,7 +3,6 @@ import './settings.scss'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import { Container, ButtonGroup, Button, Form, Row, Col } from 'react-bootstrap'
-import { videoIds } from './ids'
 import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
 import { sendCommandStrict } from '../device-page-wrapper'
 import { AtemButtonBar, SourcesMap } from '../components'
@@ -82,10 +81,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
       const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
       if (newInputs) {
         for (const [k, v] of Object.entries(newInputs)) {
-          const id = videoIds[k]
-          if (id !== undefined) {
-            sources.set(id, v.properties)
-          }
+          sources.set(Number(k), v.properties)
         }
       }
 
@@ -363,7 +359,7 @@ class InputLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var long = document.getElementById('long' + i) as HTMLInputElement
       var short = document.getElementById('short' + i) as HTMLInputElement
       console.log(outputs[i], index)
-      var id = videoIds[outputs[i]]
+      var id = outputs[i]
       if (long && short) {
       }
       if (
@@ -527,7 +523,7 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
       var long = document.getElementById('long' + i) as HTMLInputElement
       var short = document.getElementById('short' + i) as HTMLInputElement
-      var id = videoIds[outputs[i]]
+      var id = outputs[i]
       console.log(outputs[i], id)
       if (long && short) {
         if (
@@ -621,7 +617,7 @@ class MediaLabelSettings extends React.Component<LabelSettingsProps, LabelSettin
       var index = Object.keys(this.props.currentState.settings.inputs).indexOf(outputs[i].toString())
       var long = document.getElementById('long' + i) as HTMLInputElement
       var short = document.getElementById('short' + i) as HTMLInputElement
-      var id = videoIds[outputs[i]]
+      var id = outputs[i]
       if (long && short) {
       }
       if (
