@@ -38,7 +38,7 @@
   background: #555;
 }
 
-.center {
+.text-center {
   text-align: center;
 }
 
@@ -48,6 +48,7 @@
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
   height: 20px;
+  white-space: nowrap;
 
   .button-bar-inner {
     background: rgb(58, 58, 58);

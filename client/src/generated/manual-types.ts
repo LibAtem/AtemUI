@@ -18,3 +18,13 @@ export const DownConvertModeOptions = Object.entries(DownConvertModeNames).map((
   id: Number(id),
   label,
 }))
+
+export const SerialModeNames: { [key in Enums.SerialMode]: string } = {
+  [Enums.SerialMode.None]: 'Disabled',
+  [Enums.SerialMode.PtzVisca]: 'PTZ control via VISCA',
+  [Enums.SerialMode.Gvg100]: 'External control via GVG 100',
+}
+export const SerialModeOptions = Object.entries(SerialModeNames).map(([id, label]) => ({
+  id: Number(id),
+  label,
+}))

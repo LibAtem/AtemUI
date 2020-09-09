@@ -12,6 +12,8 @@ import { CommandTypes } from '../generated/commands'
 import { ErrorBoundary } from '../errorBoundary'
 import { MultiViewSettings } from './multiview'
 import { shallowEqualObjects } from 'shallow-equal'
+import { RemoteSettings } from './remote'
+import { ClassicAudioSettings } from './classicAudio'
 
 export class ControlSettingsPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -61,7 +63,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
     this.state = {
       hasConnected: this.props.device.connected,
-      page: 2,
+      page: 0,
     }
 
     this.sendCommand = this.sendCommand.bind(this)
@@ -177,7 +179,19 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
           </ErrorBoundary>
         ) : undefined}
 
-        {/* TODO Audio */}
+        {this.state.page === 1 ? (
+          <ErrorBoundary key={1}>
+            {currentState.audio ? (
+              <ClassicAudioSettings
+                sendCommand={this.sendCommand}
+                audio={currentState.audio}
+                talkback={currentState.settings.talkback}
+              />
+            ) : (
+              ''
+            )}
+          </ErrorBoundary>
+        ) : undefined}
 
         {this.state.page === 2 ? (
           <ErrorBoundary key={2}>
@@ -205,7 +219,11 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
         {/* TODO HyperDeck */}
 
-        {/* TODO Remote */}
+        {this.state.page === 5 ? (
+          <ErrorBoundary key={5}>
+            <RemoteSettings sendCommand={this.sendCommand} currentState={currentState} />
+          </ErrorBoundary>
+        ) : undefined}
       </div>
     )
   }

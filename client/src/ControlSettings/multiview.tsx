@@ -305,7 +305,7 @@ export class MultiViewSettings extends StickyPanelBase<MultiViewSettingsProps, M
     return (
       <Container className="maxW" style={{ paddingTop: '1rem' }}>
         {this.props.multiViewers.length > 1 || this.state.page !== 0 ? (
-          <div className="center">
+          <div className="text-center">
             <AtemButtonBar
               style={{ display: 'inline-grid' }}
               selected={this.state.page}
