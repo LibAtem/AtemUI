@@ -17,6 +17,15 @@ div#not-connected-overlay {
 .full {
   margin: 0;
   height: 100%;
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+
+
+}
+
+.full>div:nth-child(2) {
+  overflow-y: scroll;
 }
 
 div#not-connected-overlay p {
@@ -76,6 +85,7 @@ div#not-connected-overlay p {
   padding-top: 0;
   padding-bottom: 0;
 }
+
 #root {
   margin: 0;
   height: 100%;

@@ -1,0 +1,221 @@
+#mediaContainer {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  background-color: #2d2d2d;
+  color: #ccc2c2;
+
+  #player-list {
+    background: #2a2a2a;
+    border-left: 1px solid #000;
+
+    padding: 1rem;
+
+    display: grid;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    grid-template-rows: auto;
+    grid-auto-rows: 1fr;
+    row-gap: 25px;
+
+    .media-player {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      grid-template-rows: auto 1fr;
+      align-self: center;
+
+      row-gap: 10px;
+      column-gap: 10px;
+
+      .index {
+        border: 2px solid transparent;
+        border-radius: 50%;
+        width: 25px;
+        position: relative;
+        align-self: center;
+
+        &:after {
+          content: "";
+          display: block;
+          padding-bottom: 100%;
+        }
+
+        &.live {
+          border-color: red;
+        }
+
+        :first-child {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+
+          text-align: center;
+        }
+      }
+
+      .heading {
+        min-width: 0;
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .media-player-inner {
+        grid-column: span 3;
+
+        background: #000;
+        // margin: 20px;
+        border-radius: 5px;
+        -webkit-box-shadow: 0px 0px 9px -1px rgba(194, 194, 194, 1);
+        -moz-box-shadow: 0px 0px 9px -1px rgba(194, 194, 194, 1);
+        box-shadow: 0px 0px 9px -1px rgba(194, 194, 194, 1);
+        overflow: hidden;
+
+        position: relative;
+
+        &:after {
+          content: "";
+          display: block;
+          padding-bottom: 56.25%; // 16:9
+        }
+
+        :first-child {
+          position: absolute;
+        }
+      }
+    }
+  }
+
+}
+
+#pool-list {
+  overflow-y: scroll;
+}
+
+.stills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-rows: repeat(auto-fit, 112px);
+  padding: 20px;
+  row-gap: 45px;
+  column-gap: 20px;
+  justify-items: center;
+
+  .pool-tile {
+    height: 100%;
+    max-width: 100%;
+    width: 200px;
+    align-self: center;
+    position: relative;
+
+    .tile-label {
+      color: #777;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 0.9rem;
+      padding: 0.2rem;
+    }
+
+    /* Required to make elements draggable in old WebKit */
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
+
+    &:hover .x {
+      display: inherit;
+    }
+
+    .size {
+      position: relative;
+
+      &:after {
+        content: "";
+        display: block;
+        padding-bottom: 56.25%; // 16:9
+      }
+
+      .inner {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        padding: 15px;
+
+        overflow: hidden;
+        border: 1px solid #121212;
+        border-radius: 5px;
+        background: #262626;
+
+        &:hover .x {
+          display: inherit;
+        }
+      }
+    }
+
+    .x {
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      z-index: 10;
+      right: -5px;
+      top: -5px;
+      background: #ccc;
+      border-radius: 50%;
+      display: none;
+
+      &:hover {
+        background: #aaa;
+      }
+
+      .remove {
+        position: absolute;
+        top: 0px;
+      }
+    }
+
+    .player-icons {
+      position: absolute;
+      height: 22px;
+      width: 100%;
+      z-index: 10;
+      left: 5px;
+      top: -10px;
+
+      div {
+        height: 100%;
+        width: 22px;
+        display: inline-block;
+        margin-right: 5px;
+
+        background: #262626;
+        border: 1px solid #121212;
+        border-radius: 50%;
+
+        font-size: 14px;
+        line-height: 18px;
+        text-align: center;
+
+        &.program {
+          border: 2px solid red;
+        }
+
+      }
+    }
+
+  }
+}
+
+// .drag {
+//   border-radius: 5px;
+// }
+
+// .emptyInner {
+//   text-align: center;
+//   width: 60px;
+//   height: 60px;
+//   margin: auto;
+//   border-radius: 50%;
+//   border: 2px solid #c0c0c0;
+//   padding-top: 15px;
+//   margin-top: 25px;
+//   color: #c0c0c0;
+// }

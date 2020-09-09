@@ -1,11 +1,11 @@
 import React, { RefObject } from 'react'
-
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
 import remove from './assets/remove.svg'
-import './media.css'
-import { LibAtemState } from '../generated'
+import './media.scss'
+import { LibAtemEnums, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
+import { SendCommandStrict } from '../device-page-wrapper'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -17,27 +17,25 @@ export class UploadMediaPage extends React.Component {
     const device = GetActiveDevice(this.context)
 
     return (
-      <div>
-        <ErrorBoundary key={this.context.activeDeviceId || ''}>
-          {device ? (
-            <MediaPageInner
-              key={this.context.activeDeviceId || ''}
-              device={device}
-              currentState={this.context.currentState}
-              signalR={this.context.signalR}
-            />
-          ) : (
-            <p>No device selected</p>
-          )}
-        </ErrorBoundary>
-      </div>
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        {device && this.context.signalR ? (
+          <MediaPageInner
+            key={this.context.activeDeviceId || ''}
+            device={device}
+            currentState={this.context.currentState}
+            signalR={this.context.signalR}
+          />
+        ) : (
+          <p>No device selected</p>
+        )}
+      </ErrorBoundary>
     )
   }
 }
 
 interface MediaPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState | null
 }
 interface MediaPageInnerState {
@@ -49,8 +47,14 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     super(props)
     this.state = {
       hasConnected: this.props.device.connected,
-      images: {} as any
+      images: {} as any,
     }
+
+    this.drop = this.drop.bind(this)
+    this.allowDrop = this.allowDrop.bind(this)
+    this.drag = this.drag.bind(this)
+    this.changeImage = this.changeImage.bind(this)
+    this.sendCommand = this.sendCommand.bind(this)
   }
 
   // This function accepts three arguments, the URL of the image to be
@@ -58,7 +62,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   // callback function that will be called with the data URL as its argument
   // once processing is complete
 
-  convertToBase64 = function(url: string, imagetype: string, callback: any) {
+  convertToBase64 = function (url: string, imagetype: string, callback: any) {
     var img = document.createElement('IMG') as HTMLImageElement,
       canvas = document.createElement('CANVAS') as HTMLCanvasElement,
       ctx = canvas.getContext('2d'),
@@ -71,7 +75,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     img.crossOrigin = 'Anonymous'
 
     // Because image loading is asynchronous, we define an event listening function that will be called when the image has been loaded
-    img.onload = function() {
+    img.onload = function () {
       console.log('aa12')
       // When the image is loaded, this function is called with the image object as its context or 'this' value
       if (ctx) {
@@ -103,7 +107,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       var httpPost = new XMLHttpRequest(),
         path = 'http://127.0.0.1:5000/api2/' + id + '/' + name,
         data = JSON.stringify({ image: base64, index: index })
-      httpPost.onreadystatechange = function(err) {
+      httpPost.onreadystatechange = function (err) {
         if (httpPost.readyState == 4 && httpPost.status == 200) {
           console.log(httpPost.responseText)
         } else {
@@ -125,7 +129,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   uploadImage(src: string, name: string, type: string) {
     var parentThis = this
 
-    this.convertToBase64(src, type, function(data: string) {
+    this.convertToBase64(src, type, function (data: string) {
       console.log('button Pressed')
       parentThis.sendBase64ToServer(name, data, 0)
     })
@@ -145,7 +149,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     if (input.files && input.files[0]) {
       reader = new FileReader()
 
-      reader.onload = function(e: any) {
+      reader.onload = function (e: any) {
         var result = e.originalTarget.result
         if (result) {
           console.log(result)
@@ -181,13 +185,16 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
         path = 'http://127.0.0.1:5000/api2/download/' + id,
         data = JSON.stringify({ hash: name })
 
-      httpGet.onreadystatechange = function(err) {
+      httpGet.onreadystatechange = function (err) {
         if (httpGet.readyState == 4 && httpGet.status == 200) {
           // console.log(httpGet.responseText);
           if (httpGet.responseText != 'Not Downloaded' && httpGet.responseText != 'Not Present') {
             console.log('yes')
-            parentThis.state.images[name] = httpGet.responseText
-            console.log(parentThis.state.images)
+            const newImages = { ...parentThis.state.images }
+            newImages[name] = httpGet.responseText
+            parentThis.setState({ images: newImages })
+            // parentThis.state.images[name] = httpGet.responseText
+            // console.log(parentThis.state.images)
           } else if (httpGet.responseText == 'Not Downloaded') {
             console.log('not downloaded')
           } else if (httpGet.responseText != 'Not Present') {
@@ -213,12 +220,12 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
 
       signalR
         .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
+        .then((res) => {
           console.log(value)
           console.log('ManualCommands: sent')
           console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -236,7 +243,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       Index: mp,
       Mask: 3,
       SourceType: 1,
-      StillIndex: data
+      StillIndex: data,
     })
     //ev.target.appendChild(document.getElementById(data));
   }
@@ -260,166 +267,210 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     if (!this.props.currentState) {
       return <p>Waiting for state</p>
     }
-    var imgs = []
-    for (var i0 in this.props.currentState.mediaPool.stills) {
-      const i = Number(i0)
-      const mp = []
-      if (
-        this.props.currentState.mediaPlayers[0].source.sourceType == 1 &&
-        this.props.currentState.mediaPlayers[0].source.sourceIndex == i &&
-        this.props.currentState.mediaPlayers[1].source.sourceType == 1 &&
-        this.props.currentState.mediaPlayers[1].source.sourceIndex == i
-      ) {
-        if (this.props.currentState.mixEffects[0].sources.program == 3010) {
-          mp.push(<div className="mp1 mp-program">1</div>)
-        } else if (this.props.currentState.mixEffects[0].sources.preview == 3010) {
-          mp.push(<div className="mp1 mp-preview">1</div>)
-        } else {
-          mp.push(<div className="mp1">1</div>)
-        }
-        if (this.props.currentState.mixEffects[0].sources.program == 3020) {
-          mp.push(<div className="mp2 mp-program">2</div>)
-        } else if (this.props.currentState.mixEffects[0].sources.preview == 3020) {
-          mp.push(<div className="mp2 mp-preview">2</div>)
-        } else {
-          mp.push(<div className="mp2">2</div>)
-        }
-      } else if (
-        this.props.currentState.mediaPlayers[0].source.sourceType == 1 &&
-        this.props.currentState.mediaPlayers[0].source.sourceIndex == i
-      ) {
-        if (this.props.currentState.mixEffects[0].sources.program == 3010) {
-          mp.push(<div className="mp1 mp-program">1</div>)
-        } else if (this.props.currentState.mixEffects[0].sources.preview == 3010) {
-          mp.push(<div className="mp1 mp-preview">1</div>)
-        } else {
-          mp.push(<div className="mp1">1</div>)
-        }
-      } else if (
-        this.props.currentState.mediaPlayers[1].source.sourceType == 1 &&
-        this.props.currentState.mediaPlayers[1].source.sourceIndex == i
-      ) {
-        if (this.props.currentState.mixEffects[0].sources.program == 3020) {
-          mp.push(<div className="mp1 mp-program">2</div>)
-        } else if (this.props.currentState.mixEffects[0].sources.preview == 3020) {
-          mp.push(<div className="mp1 mp-preview">2</div>)
-        } else {
-          mp.push(<div className="mp1">2</div>)
-        }
-      }
-      if (this.props.currentState.mediaPool.stills[i].isUsed) {
-        if (this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]) {
-          const x = i
 
-          imgs.push(
-            <div className="image">
-              <div
-                className="x"
-                onClick={() => this.sendCommand('LibAtem.Commands.Media.MediaPoolClearStillCommand', { Index: x })}
-              >
-                <img className="remove" src={remove}></img>
-              </div>
-              {mp}
-              <div className="inner">
-                <img
-                  className="drag"
-                  onDragStart={event => this.drag(event, Number(x))}
-                  draggable={true}
-                  src={
-                    'data:image/jpg;base64,' +
-                    this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]
-                  }
-                  width="100%"
-                ></img>
-              </div>
-              <div className="nameTag">
-                {Number(i) + 1 + '  ' + this.props.currentState.mediaPool.stills[i].filename}
-              </div>
-            </div>
-          )
-        }
-      } else {
-        const x = i
-        imgs.push(
-          <div className="image" onDragStart={event => this.drag(event, Number(x))} draggable={true}>
-            {mp}
-            <div className="inner">
-              <div className="emptyInner">{Number(i) + 1}</div>
-              <input
-                type="file"
-                id="fileElem"
-                multiple
-                accept="image/*"
-                onChange={e => this.changeImage(e.currentTarget, x)}
-              ></input>
-            </div>
+    this.getImages() // TODO - this is a hack
+
+    const {
+      mediaPlayers,
+      mediaPool,
+      settings: { inputs },
+    } = this.props.currentState
+
+    const mediaInputs = Object.entries(inputs)
+      .filter(
+        ([id, inp]) =>
+          inp &&
+          (inp.properties.internalPortType === LibAtemEnums.InternalPortType.MediaPlayerFill ||
+            inp.properties.internalPortType === LibAtemEnums.InternalPortType.MediaPlayerKey)
+      )
+      .map(([id, inp]) => ({ id: Number(id), tally: inp.tally }))
+
+    const onAirPlayers = mediaPlayers.map((mp, index) => {
+      const theseInputs = mediaInputs.filter(
+        (v) => Math.floor((v.id - LibAtemEnums.VideoSource.MediaPlayer1) / 10) === index
+      )
+      return !!theseInputs.find((v) => v.tally.programTally)
+    })
+
+    return (
+      <div id="mediaContainer">
+        <div id="pool-list">
+          {/* TODO - clips */}
+
+          <div className="media-heading">Stills</div>
+          <div className="stills-grid">
+            {mediaPool.stills.map((still, index) => {
+              const inPlayers = mediaPlayers.map(
+                (mp) => mp.source.sourceType === LibAtemEnums.MediaPlayerSource.Still && mp.source.sourceIndex === index
+              )
+              return (
+                <MediaPoolStill
+                  sendCommand={this.sendCommand}
+                  key={index}
+                  index={index}
+                  still={still}
+                  onAirPlayers={onAirPlayers}
+                  inPlayers={inPlayers}
+                  images={this.state.images}
+                  drag={this.drag}
+                  changeImage={this.changeImage}
+                />
+              )
+            })}
           </div>
-        )
-      }
-    }
+        </div>
 
-    var mediaPlayers = []
-    for (var i in this.props.currentState.mediaPlayers) {
-      const x = i
-      if (
-        this.props.currentState.mediaPlayers[i].source.sourceType == 1 &&
-        this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex].isUsed &&
-        this.state.images[
-          this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
-            .hash as any
-        ]
-      ) {
-        mediaPlayers.push(
-          <div className="current">
-            <div className="heading">
-              {
-                this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
-                  .filename
-              }
-            </div>
-            <div
-              className="current-inner"
-              onDrop={event => this.drop(event, parseInt(x))}
-              onDragOver={event => this.allowDrop(event)}
-            >
-              <img
-                src={
-                  'data:image/jpg;base64,' +
-                  this.state.images[
-                    this.props.currentState.mediaPool.stills[this.props.currentState.mediaPlayers[i].source.sourceIndex]
-                      .hash as any
-                  ]
-                }
+        <div id="player-list">
+          <div className="media-heading">Media Players</div>
+          {mediaPlayers.map((mp, index) => {
+            return (
+              <MediaPlayer
+                key={index}
+                index={index}
+                player={mp}
+                pool={mediaPool}
+                isLive={onAirPlayers[index] ?? false}
+                images={this.state.images}
+                drop={this.drop}
+                allowDrop={this.allowDrop}
+              />
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+}
+
+interface MediaPoolStillProps {
+  sendCommand: SendCommandStrict
+
+  index: number
+  still: LibAtemState.MediaPoolState_StillState
+  onAirPlayers: boolean[] // TODO
+  inPlayers: boolean[]
+  images: any
+
+  drag: (evt: any, index: number) => void
+  changeImage: (input: any, id: number) => void
+}
+class MediaPoolStill extends React.Component<MediaPoolStillProps> {
+  render() {
+    const { index, still, images, inPlayers, onAirPlayers } = this.props
+
+    const mp: React.ReactNode[] = []
+
+    return (
+      <div className="pool-tile">
+        <div className="player-icons">
+          {inPlayers.map((active, index) => {
+            if (active) {
+              const onAir = onAirPlayers[index] ?? false
+              return (
+                <div key={index} className={onAir ? 'program' : ''}>
+                  {index + 1}
+                </div>
+              )
+            } else {
+              return ''
+            }
+          })}
+        </div>
+        {still.isUsed && (
+          <div
+            className="x"
+            onClick={() =>
+              this.props.sendCommand('LibAtem.Commands.Media.MediaPoolClearStillCommand', { Index: index })
+            }
+          >
+            <img className="remove" src={remove}></img>
+          </div>
+        )}
+        {mp}
+        <div className="size" onDragStart={(event) => this.props.drag(event, index)} draggable={true}>
+          <div className="inner">
+            <div className="emptyInner">{index + 1}</div>
+            {/* <img
+                className="drag"
+                onDragStart={(event) => this.props.drag(event, Number(index))}
+                draggable={true}
+                src={'data:image/jpg;base64,' + images[still.hash as any]}
                 width="100%"
-              ></img>
-            </div>
+              ></img> */}
+            <input
+              type="file"
+              id="fileElem"
+              multiple
+              accept="image/*"
+              onChange={(e) => this.props.changeImage(e.currentTarget, index)}
+            ></input>
           </div>
-        )
-      } else {
-        mediaPlayers.push(
-          <div className="current">
-            <div className="heading">No Media Assigned</div>
-            <div
-              className="current-inner"
-              onDrop={event => this.drop(event, parseInt(x))}
-              onDragOver={event => this.allowDrop(event)}
-            >
-              <div className="emptyInner lower">
-                {Number(this.props.currentState.mediaPlayers[i].source.sourceIndex) + 1}
-              </div>
-            </div>
-          </div>
-        )
+        </div>
+        <div className="tile-label">{still.isUsed ? `${index + 1} ${still.filename}` : ''}</div>
+      </div>
+    )
+  }
+}
+
+interface MediaPlayerProps {
+  index: number
+  player: LibAtemState.MediaPlayerState
+  pool: LibAtemState.MediaPoolState
+  isLive: boolean
+  images: any
+
+  drop: (evt: any, index: number) => void
+  allowDrop: (evt: any) => void
+}
+class MediaPlayer extends React.Component<MediaPlayerProps> {
+  render() {
+    const { index, player, pool, images, isLive } = this.props
+
+    let name = 'No media assigned'
+    let hash: string | undefined
+    let source = ''
+
+    switch (player.source.sourceType) {
+      case LibAtemEnums.MediaPlayerSource.Still: {
+        source = `Still ${player.source.sourceIndex + 1}`
+
+        const still = pool.stills[player.source.sourceIndex]
+        if (still?.isUsed) {
+          name = still.filename ?? ''
+          hash = still.hash
+        }
+        break
+      }
+      case LibAtemEnums.MediaPlayerSource.Clip: {
+        source = `Clip ${player.source.sourceIndex + 1}`
+
+        const clip = pool.clips[player.source.sourceIndex]
+        if (clip?.isUsed) {
+          name = clip.name ?? ''
+          const frame = clip.frames[0]
+          hash = frame?.hash
+        }
+        break
       }
     }
 
     return (
-      <div id="mediaContainer">
-        <div id="clips">{imgs}</div>
-
-        <div id="current">
-          <div id="media-heading">Media Players</div>
-          {mediaPlayers}
+      <div className="media-player">
+        <div className={`index ${isLive ? 'live' : ''}`}>
+          <div>{index + 1}</div>
+        </div>
+        <div className="heading">{name}</div>
+        <div className="source">{source}</div>
+        <div
+          className="media-player-inner"
+          onDrop={(event) => this.props.drop(event, index)}
+          onDragOver={(event) => this.props.allowDrop(event)}
+        >
+          {hash && images[hash] ? (
+            <img src={'data:image/jpg;base64,' + images[hash]} width="100%"></img>
+          ) : (
+            <div className="emptyInner"></div>
+          )}
         </div>
       </div>
     )
