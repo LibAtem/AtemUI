@@ -39,6 +39,7 @@
     "react-bootstrap": "^1.0.0-beta.14",
     "react-color": "^2.18.0",
     "react-dom": "^16.9.0",
+    "react-dropzone": "^11.1.0",
     "react-error-boundary": "^2.2.3",
     "react-rangeslider": "^2.2.0",
     "react-responsive": "^8.0.3",

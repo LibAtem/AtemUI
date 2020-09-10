@@ -1,16 +1,16 @@
-import React, { RefObject } from 'react'
+import React from 'react'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
-import remove from './assets/remove.svg'
 import './media.scss'
 import { LibAtemEnums, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
-import { SendCommandStrict } from '../device-page-wrapper'
+import { sendCommandStrict } from '../device-page-wrapper'
+import { MediaPoolStill } from './tile'
+import { CommandTypes } from '../generated/commands'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
 
-  fileInput = React.createRef() as RefObject<HTMLInputElement>
   static contextType = DeviceManagerContext
 
   render() {
@@ -39,15 +39,13 @@ interface MediaPageInnerProps {
   currentState: LibAtemState.AtemState | null
 }
 interface MediaPageInnerState {
-  hasConnected: boolean
-  images: any
+  dragging: boolean
 }
 class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInnerState> {
   constructor(props: MediaPageInnerProps) {
     super(props)
     this.state = {
-      hasConnected: this.props.device.connected,
-      images: {} as any,
+      dragging: false,
     }
 
     this.drop = this.drop.bind(this)
@@ -56,45 +54,6 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     this.changeImage = this.changeImage.bind(this)
     this.sendCommand = this.sendCommand.bind(this)
   }
-
-  // This function accepts three arguments, the URL of the image to be
-  // converted, the mime type of the Base64 image to be output, and a
-  // callback function that will be called with the data URL as its argument
-  // once processing is complete
-
-  convertToBase64 = function (url: string, imagetype: string, callback: any) {
-    var img = document.createElement('IMG') as HTMLImageElement,
-      canvas = document.createElement('CANVAS') as HTMLCanvasElement,
-      ctx = canvas.getContext('2d'),
-      data = ''
-    console.log('waaaa')
-    // Set the crossOrigin property of the image element to 'Anonymous',
-    // allowing us to load images from other domains so long as that domain
-    // has cross-origin headers properly set
-
-    img.crossOrigin = 'Anonymous'
-
-    // Because image loading is asynchronous, we define an event listening function that will be called when the image has been loaded
-    img.onload = function () {
-      console.log('aa12')
-      // When the image is loaded, this function is called with the image object as its context or 'this' value
-      if (ctx) {
-        canvas.height = img.height
-        canvas.width = img.width
-        ctx.drawImage(img, 0, 0)
-        data = canvas.toDataURL(imagetype)
-        callback(data)
-      }
-    }
-
-    // We set the source of the image tag to start loading its data. We define
-    // the event listener first, so that if the image has already been loaded
-    // on the page or is cached the event listener will still fire
-
-    img.src = url
-    console.log(img)
-  }
-  onDrop: any
 
   // Here we define the function that will send the request to the server.
   // It will accept the image name, and the base64 data as arguments
@@ -105,7 +64,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       var id = GetDeviceId(device)
 
       var httpPost = new XMLHttpRequest(),
-        path = 'http://127.0.0.1:5000/api2/' + id + '/' + name,
+        path = `/api/images/upload/${id}/${name}`,
         data = JSON.stringify({ image: base64, index: index })
       httpPost.onreadystatechange = function (err) {
         if (httpPost.readyState == 4 && httpPost.status == 200) {
@@ -122,25 +81,6 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       httpPost.send(data)
     }
   }
-
-  // This wrapper function will accept the name of the image, the url, and the
-  // image type and perform the request
-
-  uploadImage(src: string, name: string, type: string) {
-    var parentThis = this
-
-    this.convertToBase64(src, type, function (data: string) {
-      console.log('button Pressed')
-      parentThis.sendBase64ToServer(name, data, 0)
-    })
-  }
-
-  //   var fileTag = document.getElementById("filetag"),
-  //   preview = document.getElementById("preview");
-
-  // fileTag.addEventListener("change", function() {
-  //   changeImage(this);
-  // });
 
   changeImage(input: any, id: any) {
     var reader
@@ -163,72 +103,8 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     }
   }
 
-  getImages() {
-    if (this.props.currentState) {
-      for (var i in this.props.currentState.mediaPool.stills) {
-        if (this.props.currentState.mediaPool.stills[i].isUsed) {
-          if (!this.state.images[this.props.currentState.mediaPool.stills[i].hash as any]) {
-            console.log('image not found:' + this.props.currentState.mediaPool.stills[i].hash)
-            this.getImage(this.props.currentState.mediaPool.stills[i].hash as any)
-          }
-        }
-      }
-    }
-  }
-
-  getImage(name: string) {
-    var device = this.props.device
-    if (device) {
-      var id = GetDeviceId(device)
-      var parentThis = this
-      var httpGet = new XMLHttpRequest(),
-        path = 'http://127.0.0.1:5000/api2/download/' + id,
-        data = JSON.stringify({ hash: name })
-
-      httpGet.onreadystatechange = function (err) {
-        if (httpGet.readyState == 4 && httpGet.status == 200) {
-          // console.log(httpGet.responseText);
-          if (httpGet.responseText != 'Not Downloaded' && httpGet.responseText != 'Not Present') {
-            console.log('yes')
-            const newImages = { ...parentThis.state.images }
-            newImages[name] = httpGet.responseText
-            parentThis.setState({ images: newImages })
-            // parentThis.state.images[name] = httpGet.responseText
-            // console.log(parentThis.state.images)
-          } else if (httpGet.responseText == 'Not Downloaded') {
-            console.log('not downloaded')
-          } else if (httpGet.responseText != 'Not Present') {
-            console.log('not present')
-          } else {
-            console.log('No')
-          }
-        } else {
-          // console.log(err);
-        }
-      }
-
-      httpGet.open('POST', path, true)
-      httpGet.setRequestHeader('Content-Type', 'application/json')
-      httpGet.send(data)
-    }
-  }
-
-  public sendCommand(command: string, value: any) {
-    const { device, signalR } = this.props
-    if (device.connected && signalR) {
-      const devId = GetDeviceId(device)
-
-      signalR
-        .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then((res) => {
-          console.log(value)
-          console.log('ManualCommands: sent')
-          console.log(command)
-        })
-        .catch((e) => {
-          console.log('ManualCommands: Failed to send', e)
-        })
-    }
+  private sendCommand(...args: CommandTypes) {
+    sendCommandStrict(this.props, ...args)
   }
 
   allowDrop(ev: any) {
@@ -252,23 +128,10 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     ev.dataTransfer.setData('id', id)
   }
 
-  // Call the function with the provided values. The mime type could also be png
-  // or webp
-
-  /* <div>
-          <input onChange={(e)=>this.changeImage(e.currentTarget)}type="file" id="filetag"></input>
-          <img src="" id="preview"></img>
-          </div>
-          {imgs} */
-
-  //uploadImage(imgsrc, name, 'image/jpeg')
-  /* <button onClick={()=>this.uploadImage("/img1.png", "image", 'image/jpeg')}>UP</button> */
   render() {
     if (!this.props.currentState) {
       return <p>Waiting for state</p>
     }
-
-    this.getImages() // TODO - this is a hack
 
     const {
       mediaPlayers,
@@ -292,9 +155,16 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       return !!theseInputs.find((v) => v.tally.programTally)
     })
 
+    const deviceId = GetDeviceId(this.props.device)
+
     return (
       <div id="mediaContainer">
-        <div id="pool-list">
+        <div
+          id="pool-list"
+          // className={this.state.dragging ? 'dragover' : ''}
+          // onDragEnter={() => this.setState({ dragging: true })}
+          // onDragLeave={() =>this.setState({ dragging: false })}
+        >
           {/* TODO - clips */}
 
           <div className="media-heading">Stills</div>
@@ -308,10 +178,10 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
                   sendCommand={this.sendCommand}
                   key={index}
                   index={index}
+                  deviceId={deviceId}
                   still={still}
                   onAirPlayers={onAirPlayers}
                   inPlayers={inPlayers}
-                  images={this.state.images}
                   drag={this.drag}
                   changeImage={this.changeImage}
                 />
@@ -326,11 +196,11 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
             return (
               <MediaPlayer
                 key={index}
+                deviceId={deviceId}
                 index={index}
                 player={mp}
                 pool={mediaPool}
                 isLive={onAirPlayers[index] ?? false}
-                images={this.state.images}
                 drop={this.drop}
                 allowDrop={this.allowDrop}
               />
@@ -342,89 +212,19 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   }
 }
 
-interface MediaPoolStillProps {
-  sendCommand: SendCommandStrict
-
-  index: number
-  still: LibAtemState.MediaPoolState_StillState
-  onAirPlayers: boolean[] // TODO
-  inPlayers: boolean[]
-  images: any
-
-  drag: (evt: any, index: number) => void
-  changeImage: (input: any, id: number) => void
-}
-class MediaPoolStill extends React.Component<MediaPoolStillProps> {
-  render() {
-    const { index, still, images, inPlayers, onAirPlayers } = this.props
-
-    const mp: React.ReactNode[] = []
-
-    return (
-      <div className="pool-tile">
-        <div className="player-icons">
-          {inPlayers.map((active, index) => {
-            if (active) {
-              const onAir = onAirPlayers[index] ?? false
-              return (
-                <div key={index} className={onAir ? 'program' : ''}>
-                  {index + 1}
-                </div>
-              )
-            } else {
-              return ''
-            }
-          })}
-        </div>
-        {still.isUsed && (
-          <div
-            className="x"
-            onClick={() =>
-              this.props.sendCommand('LibAtem.Commands.Media.MediaPoolClearStillCommand', { Index: index })
-            }
-          >
-            <img className="remove" src={remove}></img>
-          </div>
-        )}
-        {mp}
-        <div className="size" onDragStart={(event) => this.props.drag(event, index)} draggable={true}>
-          <div className="inner">
-            <div className="emptyInner">{index + 1}</div>
-            {/* <img
-                className="drag"
-                onDragStart={(event) => this.props.drag(event, Number(index))}
-                draggable={true}
-                src={'data:image/jpg;base64,' + images[still.hash as any]}
-                width="100%"
-              ></img> */}
-            <input
-              type="file"
-              id="fileElem"
-              multiple
-              accept="image/*"
-              onChange={(e) => this.props.changeImage(e.currentTarget, index)}
-            ></input>
-          </div>
-        </div>
-        <div className="tile-label">{still.isUsed ? `${index + 1} ${still.filename}` : ''}</div>
-      </div>
-    )
-  }
-}
-
 interface MediaPlayerProps {
+  deviceId: string
   index: number
   player: LibAtemState.MediaPlayerState
   pool: LibAtemState.MediaPoolState
   isLive: boolean
-  images: any
 
   drop: (evt: any, index: number) => void
   allowDrop: (evt: any) => void
 }
 class MediaPlayer extends React.Component<MediaPlayerProps> {
   render() {
-    const { index, player, pool, images, isLive } = this.props
+    const { index, player, pool, deviceId, isLive } = this.props
 
     let name = 'No media assigned'
     let hash: string | undefined
@@ -466,8 +266,8 @@ class MediaPlayer extends React.Component<MediaPlayerProps> {
           onDrop={(event) => this.props.drop(event, index)}
           onDragOver={(event) => this.props.allowDrop(event)}
         >
-          {hash && images[hash] ? (
-            <img src={'data:image/jpg;base64,' + images[hash]} width="100%"></img>
+          {hash ? (
+            <img src={`/api/images/download/${deviceId}/${hash}`} width="100%"></img>
           ) : (
             <div className="emptyInner"></div>
           )}
