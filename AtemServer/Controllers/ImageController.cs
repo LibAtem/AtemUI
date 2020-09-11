@@ -21,8 +21,6 @@ namespace AtemServer.Controllers
     {
         private readonly AtemRepository _repo;
 
-        //private readonly Lazy<CommandsSpec> _cachedSpec;
-
         public ImagesController(AtemRepository repo)
         {
             _repo = repo;
@@ -38,7 +36,7 @@ namespace AtemServer.Controllers
             if (client == null)
                 return BadRequest("Device not found");
             
-            AtemMediaCacheItem image = client.GetImage(hash);
+            AtemMediaCacheItem image = client.GetImage(hash.ToUpper());
             if (image == null)
                 return NotFound();
 
@@ -48,16 +46,19 @@ namespace AtemServer.Controllers
             if (image.Job != null || image.RawFrame == null)
                 return Problem("Download was complete then not?");
 
-
             if (image.PreviewJpeg == null)
             {
                 AtemFrame frame = image.RawFrame;
                 
-                byte[] data = frame.GetRGBA(ColourSpace.BT709);
+               
+                // TODO - this makes a lot of assumptions about color space and resolution
+                byte[] data = frame.GetBGRA(ColourSpace.BT709);
                 Bitmap bmp = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
                 var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
                 Marshal.Copy(data, 0, bitmapData.Scan0, data.Length);
                 bmp.UnlockBits(bitmapData);
+
+                // TODO - it would be good to scale down this preview
                 
                 MemoryStream ms = new MemoryStream();
                 bmp.Save(ms, ImageFormat.Jpeg);

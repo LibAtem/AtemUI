@@ -5,7 +5,7 @@ import './media.scss'
 import { LibAtemEnums, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
 import { sendCommandStrict } from '../device-page-wrapper'
-import { MediaPoolStill } from './tile'
+import { getStillPreviewUrl, MediaPoolStill } from './tile'
 import { CommandTypes } from '../generated/commands'
 
 export class UploadMediaPage extends React.Component {
@@ -267,7 +267,7 @@ class MediaPlayer extends React.Component<MediaPlayerProps> {
           onDragOver={(event) => this.props.allowDrop(event)}
         >
           {hash ? (
-            <img src={`/api/images/download/${deviceId}/${hash}`} width="100%"></img>
+            <img src={getStillPreviewUrl(deviceId, hash)} width="100%"></img>
           ) : (
             <div className="emptyInner"></div>
           )}

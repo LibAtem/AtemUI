@@ -54,7 +54,7 @@ namespace AtemServer
                 {
                     if (still.IsUsed)
                     {
-                        string hashString = Convert.ToBase64String(still.Hash);
+                        string hashString = BitConverter.ToString(still.Hash).Replace("-", "");
                         usedHashes.Add(hashString);
                         
                         if (!_cache.ContainsKey(hashString))

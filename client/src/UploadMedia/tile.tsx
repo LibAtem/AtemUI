@@ -4,6 +4,11 @@ import { LibAtemState } from '../generated'
 import remove from './assets/remove.svg'
 import Dropzone, { DropzoneRef } from 'react-dropzone'
 
+export function getStillPreviewUrl(deviceId: string, hash: string): string {
+  const hash2 = Buffer.from(hash, 'base64').toString('hex')
+  return `/api/images/download/${deviceId}/${hash2}`
+}
+
 interface MediaPoolStillProps {
   sendCommand: SendCommandStrict
 
@@ -92,7 +97,7 @@ export class MediaPoolStill extends React.Component<MediaPoolStillProps, MediaPo
                   <div
                     className="empty-inner"
                     /** TODO - how can we try and reload this image if it errors? is there any reason to? */
-                    style={{ backgroundImage: `url(/api/images/download/${deviceId}/${still.hash})` }}
+                    style={{ backgroundImage: `url(${getStillPreviewUrl(deviceId, still.hash)})` }}
                   ></div>
                 ) : (
                   <div className="empty-inner">{index + 1}</div>
