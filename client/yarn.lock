@@ -7346,6 +7346,11 @@ lodash.templatesettings@^4.0.0:
   dependencies:
     lodash._reinterpolate "^3.0.0"
 
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
 lodash.uniq@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
@@ -9638,6 +9643,13 @@ react-error-overlay@^6.0.7:
   version "6.0.7"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.7.tgz#1dcfb459ab671d53f660a991513cb2f0a0553108"
   integrity sha512-TAv1KJFh3RhqxNvhzxj6LeT5NWklP6rDr2a0jaTfsZ5wSZWHOGeqQyejUp3xxLfPt2UpyJEcVQB/zyPcmonNFA==
+
+react-graceful-image@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-graceful-image/-/react-graceful-image-1.5.0.tgz#90c70648044cff8bb1ca865e3ffe983d5bb8ce40"
+  integrity sha512-u4zcHLWyvlO84TQj/nSZP2mQf0NqvnL4J2wna/d56bB1hzAGEb/7YXqQh2kqrSl1p5wLvCsnngXdNv+phWSrxw==
+  dependencies:
+    lodash.throttle "^4.1.1"
 
 react-input-autosize@^2.2.2:
   version "2.2.2"

@@ -3,6 +3,7 @@ import { SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState } from '../generated'
 import remove from './assets/remove.svg'
 import Dropzone, { DropzoneRef } from 'react-dropzone'
+import Image from 'react-graceful-image'
 
 export function getStillPreviewUrl(deviceId: string, hash: string): string {
   const hash2 = Buffer.from(hash, 'base64').toString('hex')
@@ -94,26 +95,46 @@ export class MediaPoolStill extends React.Component<MediaPoolStillProps, MediaPo
                 <div>
                   <input {...getInputProps()} />
                 </div>
+                <div className="inner-content text">{index + 1}</div>
 
-                <div className="drop-overlay">Drop to upload</div>
+                <div className="inner-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="ring-svg">
+                    <rect width="100%" height="100%" fill="none" rx="100" ry="100" stroke="#2f2f2f" strokeWidth="3" />
+                    {still.isUsed ? (
+                      <rect
+                        width="100%"
+                        height="100%"
+                        fill="none"
+                        rx="100"
+                        ry="100"
+                        stroke="#D86704FF"
+                        strokeWidth="3"
+                        strokeDasharray="8,7.5"
+                        strokeDashoffset="86"
+                        strokeLinecap="butt"
+                      />
+                    ) : (
+                      ''
+                    )}
+                  </svg>
+                </div>
 
                 {still.isUsed && still.hash ? (
-                  <div
-                    className="empty-inner"
-                    /** TODO - how can we try and reload this image if it errors? is there any reason to? */
-                    style={{ backgroundImage: `url(${getStillPreviewUrl(deviceId, still.hash)})` }}
-                  ></div>
+                  <div className="inner-content">
+                    <Image
+                      src={getStillPreviewUrl(deviceId, still.hash)}
+                      width="100%"
+                      height="100%"
+                      alt=""
+                      placeholderColor="transparent"
+                      retry={{ count: Number.MAX_SAFE_INTEGER, delay: 2 }}
+                    />
+                  </div>
                 ) : (
-                  <div className="empty-inner">{index + 1}</div>
+                  ''
                 )}
 
-                {/* <input
-              type="file"
-              id="fileElem"
-              multiple
-              accept="image/*"
-              onChange={(e) => this.props.changeImage(e.currentTarget, index)}
-            ></input> */}
+                <div className="drop-overlay">Drop to upload</div>
               </div>
             )}
           </Dropzone>

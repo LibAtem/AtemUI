@@ -7,6 +7,7 @@ import { ErrorBoundary } from '../errorBoundary'
 import { sendCommandStrict } from '../device-page-wrapper'
 import { getStillPreviewUrl, MediaPoolStill } from './tile'
 import { CommandTypes } from '../generated/commands'
+import Image from 'react-graceful-image'
 
 export class UploadMediaPage extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -252,7 +253,14 @@ class MediaPlayer extends React.Component<MediaPlayerProps> {
           onDragOver={(event) => this.props.allowDrop(event)}
         >
           {hash ? (
-            <img src={getStillPreviewUrl(deviceId, hash)} width="100%"></img>
+            <Image
+              src={getStillPreviewUrl(deviceId, hash)}
+              width="100%"
+              height="100%"
+              alt=""
+              placeholderColor="transparent"
+              retry={{ count: Number.MAX_SAFE_INTEGER, delay: 2 }}
+            />
           ) : (
             <div className="emptyInner"></div>
           )}
