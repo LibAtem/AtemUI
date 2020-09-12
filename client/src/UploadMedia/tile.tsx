@@ -42,6 +42,10 @@ export class MediaPoolStill extends React.Component<MediaPoolStillProps, MediaPo
   private dropFile(acceptedFiles: File[]) {
     this.setState({ dragging: false })
 
+    if (acceptedFiles && acceptedFiles.length === 1) {
+      this.props.changeImage(acceptedFiles[0], this.props.index)
+    }
+
     console.log(acceptedFiles)
   }
   render() {

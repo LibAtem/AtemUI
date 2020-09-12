@@ -1,18 +1,14 @@
 using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using LibAtem.Commands.MixEffects;
 using LibAtem.Common;
-using LibAtem.DeviceProfile;
 using LibAtem.Net.DataTransfer;
 using LibAtem.Util.Media;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Newtonsoft.Json;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace AtemServer.Controllers
 {
@@ -50,125 +46,79 @@ namespace AtemServer.Controllers
             {
                 AtemFrame frame = image.RawFrame;
                 
-               
                 // TODO - this makes a lot of assumptions about color space and resolution
-                byte[] data = frame.GetBGRA(ColourSpace.BT709);
-                Bitmap bmp = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, bmp.PixelFormat);
-                Marshal.Copy(data, 0, bitmapData.Scan0, data.Length);
-                bmp.UnlockBits(bitmapData);
+                using Image image2 = Image.LoadPixelData<Rgba32>(frame.GetRGBA(ColourSpace.BT709), 1920, 1080);
+                
+                // TODO - is this a good resolution?
+                image2.Mutate(x => x.Resize(640, 0));
 
-                // TODO - it would be good to scale down this preview
+                var outStream = new MemoryStream();
+                await image2.SaveAsJpegAsync(outStream);
                 
-                MemoryStream ms = new MemoryStream();
-                bmp.Save(ms, ImageFormat.Jpeg);
-                
-                image.PreviewJpeg = ms.ToArray();
+                image.PreviewJpeg = outStream.ToArray();
             }
 
             return File(image.PreviewJpeg, "image/jpeg");
         }
-/*
-        [HttpPost]
-        [Route("{id}/{name}")]
-        public String Post(string id,string name, [FromBody] imageData data)
+        
+        
+        public class ImageUploadeData
         {
-    
-            var client = _repo.GetConnection(id);
+            public string Image { get; set; }
+            public string Name { get; set; }
+        }
+
+        private byte[] GetBytes(Image<Rgba32> image)
+        {
+            if (!image.TryGetSinglePixelSpan(out Span<Rgba32> span))
+                throw new Exception("Failed to get image as converted byte array");
+            
+            return MemoryMarshal.AsBytes(span).ToArray();
+        }
+
+        [HttpPost]
+        [Route("upload/{deviceId}/still/{id}")]
+        public async Task<String> UploadStill(string deviceId, uint stillId, [FromBody] ImageUploadeData data)
+        {
+            AtemClientExt client = _repo.GetConnection(deviceId);
             if (client == null)
-            {
                 throw new Exception("Device not found");
-            }
 
-            if (data.image!=null)
+            if (data.Image == null || data.Name == null)
+                throw new Exception("Missing image body");
+
+            var resolution = VideoModeResolution._1080;
+            var resolutionSize = resolution.GetSize();
+            
+            byte[] rawBytes = Convert.FromBase64String(data.Image);
+            using Image<Rgba32> image = Image.Load(rawBytes);
+
+            image.Mutate(x => x.Resize(new ResizeOptions
             {
-                string base64 = data.image.Split(',')[1];
-                byte[] bytes = Convert.FromBase64String(base64);
-                using (Bitmap image = (Bitmap)Image.FromStream(new MemoryStream(bytes)))
+                Size = new Size((int) resolutionSize.Item1, (int) resolutionSize.Item2),
+                Mode = ResizeMode.Pad
+            }));
+
+            byte[] rgbaBytes = GetBytes(image);
+            var frame = AtemFrame.FromRGBA(data.Name, rgbaBytes, ColourSpace.BT709); // TODO - colorspace
+
+            var completion = new TaskCompletionSource<bool>();
+            var job = new UploadMediaStillJob(stillId, frame,
+                (success) =>
                 {
-                    int sourceWidth = image.Width;
-                    int sourceHeight = image.Height;
-                    int sourceX = 0;
-                    int sourceY = 0;
-                    int destX = 0;
-                    int destY = 0;
+                    Console.WriteLine("Still upload {0} completed with {1}", stillId, success);
+                    completion.SetResult(success);
+                });
+            
+            Console.WriteLine("Still upload {0} queued");
+            client.Client.DataTransfer.QueueJob(job);
 
-                    int Width = 1920;
-                    int Height = 1080;
+            // Wait for the upload before returning
+            await completion.Task;
 
-                    float nPercent = 0;
-                    float nPercentW = 0;
-                    float nPercentH = 0;
-
-                    nPercentW = ((float)Width / (float)sourceWidth);
-                    nPercentH = ((float)Height / (float)sourceHeight);
-                    if (nPercentH < nPercentW)
-                    {
-                        nPercent = nPercentH;
-                        destX = System.Convert.ToInt16((Width -
-                                      (sourceWidth * nPercent)) / 2);
-                    }
-                    else
-                    {
-                        nPercent = nPercentW;
-                        destY = System.Convert.ToInt16((Height -
-                                      (sourceHeight * nPercent)) / 2);
-                    }
-
-                    int destWidth = (int)(sourceWidth * nPercent);
-                    int destHeight = (int)(sourceHeight * nPercent);
-
-                    Bitmap bmPhoto = new Bitmap(Width, Height);
-                    bmPhoto.SetResolution(image.HorizontalResolution,
-                                     image.VerticalResolution);
-
-                    Graphics grPhoto = Graphics.FromImage(bmPhoto);
-                    grPhoto.Clear(Color.Black);
-                    grPhoto.InterpolationMode =
-                            InterpolationMode.HighQualityBicubic;
-
-                    grPhoto.DrawImage(image,
-                        new Rectangle(destX, destY, destWidth, destHeight),
-                        new Rectangle(sourceX, sourceY, sourceWidth, sourceHeight),
-                        GraphicsUnit.Pixel);
-
-
-                    byte[] pixelData = new byte[1080 * 1920 * 4];
-                    for (int j = 0; j < (1920 * 1080 * 4); j++)
-                    {
-                        pixelData[j] = 0;
-                    }
-                    for (int i = 0; i < bmPhoto.Width; i++)
-                    {
-                        for (int j = 0; j < bmPhoto.Height; j++)
-                        {
-                            Color pixel = bmPhoto.GetPixel(i, j);
-                                pixelData[((i + (1920 * j)) * 4)] = pixel.R;
-                                pixelData[((i + (1920 * j)) * 4) + 1] = pixel.G;
-                                pixelData[((i + (1920 * j)) * 4) + 2] = pixel.B;
-                                pixelData[((i + (1920 * j)) * 4) + 3] = pixel.A;
-                            
-                        }
-                    }
-                    grPhoto.Dispose();
-                    image.Dispose();
-                    var job = new UploadMediaStillJob(data.index, AtemFrame.FromRGBA(name, pixelData, ColourSpace.BT709), uploadResult);
-                    Console.WriteLine("sending image");
-                    client.Client.DataTransfer.QueueJob(job);
-                    //image.Save("output.jpg", ImageFormat.Jpeg);  // Or Png
-                }
-            }
-
-
+            // TOOD - report failure
             return "success";
         }
 
-        public void uploadResult(bool result)
-        {
-            
-            //... do something
-            Console.WriteLine("Sucess? {0}", result);
-        }
-*/
     }
 }

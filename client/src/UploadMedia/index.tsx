@@ -55,52 +55,42 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     this.sendCommand = this.sendCommand.bind(this)
   }
 
-  // Here we define the function that will send the request to the server.
-  // It will accept the image name, and the base64 data as arguments
-
-  sendBase64ToServer(name: string, base64: string, index: any) {
-    var device = this.props.device
+  sendBase64ToServer(name: string, base64: string, index: number) {
+    const device = this.props.device
     if (device) {
-      var id = GetDeviceId(device)
-
-      var httpPost = new XMLHttpRequest(),
-        path = `/api/images/upload/${id}/${name}`,
-        data = JSON.stringify({ image: base64, index: index })
-      httpPost.onreadystatechange = function (err) {
+      const httpPost = new XMLHttpRequest()
+      httpPost.onreadystatechange = (err) => {
         if (httpPost.readyState == 4 && httpPost.status == 200) {
           console.log(httpPost.responseText)
         } else {
           console.log(err)
         }
       }
-      // Set the content type of the request to json since that's what's being sent
 
-      // httpPost.setHeader('Content-Type', 'application/json');
-      httpPost.open('POST', path, true)
+      httpPost.open('POST', `/api/images/upload/${GetDeviceId(device)}/still/${index}`, true)
       httpPost.setRequestHeader('Content-Type', 'application/json')
-      httpPost.send(data)
+      httpPost.send(JSON.stringify({ image: base64, name: name }))
     }
   }
 
-  changeImage(input: any, id: any) {
-    var reader
-    var parentThis = this
-    console.log(input)
-    if (input.files && input.files[0]) {
-      reader = new FileReader()
+  changeImage(file: File, index: number) {
+    console.log(file)
+    var reader = new FileReader()
 
-      reader.onload = function (e: any) {
-        var result = e.originalTarget.result
-        if (result) {
-          console.log(result)
-          parentThis.sendBase64ToServer('Test', result, id)
-        }
-        // console.log(result.readAsDataURL())
-        // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      console.log('loaded', e)
+
+      const result = e.target?.result
+      console.log(result, typeof result)
+      if (typeof result === 'object' && result) {
+        const b64 = Buffer.from(result).toString('base64')
+        this.sendBase64ToServer(file.name, b64, index)
       }
-
-      reader.readAsDataURL(input.files[0])
+      // console.log(result.readAsDataURL())
+      // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
     }
+
+    reader.readAsArrayBuffer(file)
   }
 
   private sendCommand(...args: CommandTypes) {
