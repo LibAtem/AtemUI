@@ -74,20 +74,15 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   }
 
   changeImage(file: File, index: number) {
-    console.log(file)
-    var reader = new FileReader()
-
+    const reader = new FileReader()
     reader.onload = (e: ProgressEvent<FileReader>) => {
-      console.log('loaded', e)
+      console.log('loaded', file, e)
 
       const result = e.target?.result
-      console.log(result, typeof result)
       if (typeof result === 'object' && result) {
         const b64 = Buffer.from(result).toString('base64')
         this.sendBase64ToServer(file.name, b64, index)
       }
-      // console.log(result.readAsDataURL())
-      // parentThis.sendBase64ToServer("Test",e.originalTarget.result)
     }
 
     reader.readAsArrayBuffer(file)

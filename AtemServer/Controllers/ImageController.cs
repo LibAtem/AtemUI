@@ -77,7 +77,7 @@ namespace AtemServer.Controllers
         }
 
         [HttpPost]
-        [Route("upload/{deviceId}/still/{id}")]
+        [Route("upload/{deviceId}/still/{stillId}")]
         public async Task<String> UploadStill(string deviceId, uint stillId, [FromBody] ImageUploadeData data)
         {
             AtemClientExt client = _repo.GetConnection(deviceId);
@@ -110,7 +110,7 @@ namespace AtemServer.Controllers
                     completion.SetResult(success);
                 });
             
-            Console.WriteLine("Still upload {0} queued");
+            Console.WriteLine("Still upload {0} queued", stillId);
             client.Client.DataTransfer.QueueJob(job);
 
             // Wait for the upload before returning
