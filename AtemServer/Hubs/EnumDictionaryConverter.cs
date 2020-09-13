@@ -8,7 +8,7 @@ namespace AtemServer.Hubs
 {
     public class EnumDictionaryConverter : JsonConverter
     {
-        private static IEnumerable<KeyValuePair<object?, object?>> Zip(ICollection first, ICollection second)
+        private static IEnumerable<KeyValuePair<object, object>> Zip(ICollection first, ICollection second)
         {
             IEnumerator firstEnumerator = first.GetEnumerator();
             IEnumerator secondEnumerator = second.GetEnumerator();
@@ -17,7 +17,7 @@ namespace AtemServer.Hubs
             {
                 if (secondEnumerator.MoveNext())
                 {
-                    yield return new KeyValuePair<object?, object?>(firstEnumerator.Current, secondEnumerator.Current);
+                    yield return new KeyValuePair<object, object>(firstEnumerator.Current, secondEnumerator.Current);
                 }
             }
         }
