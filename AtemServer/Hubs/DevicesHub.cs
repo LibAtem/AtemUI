@@ -22,7 +22,6 @@ namespace AtemServer.Hubs
         
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            //await Groups.RemoveFromGroupAsync(Context.ConnectionId, "SignalR Users");
             _repo.DisconnectClient(Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
@@ -94,26 +93,20 @@ namespace AtemServer.Hubs
 
         public void CommandSend(string deviceId, string commandName, string propertiesStr)
         {
-
             Console.WriteLine("Attempting to send {0} to {1} ({2})", commandName, deviceId, propertiesStr);
-            // TODO
-            //return SendMutateResponse(repo_.AddDevice(address, port), "Add");
+
+            var client = _repo.GetConnection(deviceId);
+            if (client == null)
+                throw new Exception("Bad deviceId");
+            
             Type type = TranslateToType(commandName);
             if (type == null)
-            {
                 throw new Exception("Bad type");
-            }
 
             ICommand cmd = (ICommand)JsonConvert.DeserializeObject(propertiesStr, type);
             Console.WriteLine("Got obj {0}", cmd);
 
             // Now try to send this command
-            var client = _repo.GetConnection(deviceId);
-            if (client == null)
-            {
-                throw new Exception("Bad deviceId");
-            }
-
             client.Client.SendCommand(cmd);
             //updateLabel(deviceId);
         }
@@ -122,9 +115,7 @@ namespace AtemServer.Hubs
         {
             var client = _repo.GetConnection(deviceId);
             if (client == null)
-            {
                 throw new Exception("Bad deviceId");
-            }
             
             var job = new UploadMultiViewJob(id, AtemFrame.FromYCbCr(name, MultiViewImage.Make(name)), uploadResult);
 
@@ -151,9 +142,7 @@ namespace AtemServer.Hubs
         {
             var client = _repo.GetConnection(deviceId);
             if (client == null)
-            {
                 throw new Exception("Bad deviceId");
-            }
 
             return client.GetProfile();
         }

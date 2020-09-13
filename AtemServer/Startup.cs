@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AtemServer.Hubs;
+using AtemServer.Services;
 using ElectronNET.API;
 using Microsoft.Extensions.Hosting;
 
@@ -27,6 +28,7 @@ namespace AtemServer
                 options.PayloadSerializerSettings.Converters.Add(new EnumDictionaryConverter());
             });
             
+            services.AddSingleton<TransferJobMonitor>();
             services.AddSingleton<AtemRepository>();
 
             services.AddMvc().AddNewtonsoftJson().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);

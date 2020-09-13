@@ -10,7 +10,7 @@ using LibAtem.State;
 using LibAtem.Util;
 using LibAtem.Util.Media;
 
-namespace AtemServer
+namespace AtemServer.Services
 {
     public class AtemMediaCacheItem
     {

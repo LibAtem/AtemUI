@@ -18,6 +18,7 @@ using LibAtem.Common;
 using LibAtem.Util.Media;
 using System.Drawing;
 using System.IO;
+using AtemServer.Services;
 using LibAtem.Util;
 
 namespace AtemServer
