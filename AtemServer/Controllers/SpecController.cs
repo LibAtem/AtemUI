@@ -1,4 +1,5 @@
 using System;
+using AtemServer.Services;
 using LibAtem.Commands.MixEffects;
 using LibAtem.Common;
 using LibAtem.DeviceProfile;
@@ -40,7 +41,7 @@ namespace AtemServer.Controllers
             var settings = JsonSerializerSettingsProvider.CreateSerializerSettings();
             settings.NullValueHandling = NullValueHandling.Ignore;
             
-            return new JsonResult(SpecGenerator.CompileData(client.Profile), settings);
+            return new JsonResult(SpecGenerator.CompileData(client.GetProfile()), settings);
         }
         
     }

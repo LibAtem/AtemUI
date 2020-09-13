@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AtemServer.Services;
 
 namespace AtemServer.Hubs
 {

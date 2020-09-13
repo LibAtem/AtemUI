@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AtemServer.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AtemServer.Controllers
