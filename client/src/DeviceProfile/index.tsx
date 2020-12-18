@@ -1,36 +1,21 @@
 import React from 'react'
-import { Container } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext } from '../DeviceManager'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
-import { isObject } from 'util'
 import { LibAtemProfile } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
+import { DevicePageWrapper } from '../device-page-wrapper'
 
-export class DeviceProfileViewerPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
+export class DeviceProfileViewerPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
-      <Container>
-        <h2>Device DeviceProfile</h2>
-
-        <ErrorBoundary key={this.context.activeDeviceId || ''}>
-          {device ? (
-            <DeviceProfileViewerPageInner
-              key={this.context.activeDeviceId || ''}
-              device={device}
-              currentDeviceProfile={this.context.currentProfile}
-              signalR={this.context.signalR}
-            />
-          ) : (
-            <p>No device selected</p>
-          )}
-        </ErrorBoundary>
-      </Container>
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        <DeviceProfileViewerPageInner
+          device={device}
+          signalR={signalR}
+          currentDeviceProfile={this.context.currentProfile}
+        />
+      </ErrorBoundary>
     )
   }
 }
@@ -52,7 +37,7 @@ class DeviceProfileViewerPageInner extends React.Component<
     super(props)
 
     this.state = {
-      hasConnected: props.device.connected
+      hasConnected: props.device.connected,
     }
   }
 
@@ -64,7 +49,7 @@ class DeviceProfileViewerPageInner extends React.Component<
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true
+        hasConnected: true,
       })
     }
   }
@@ -84,12 +69,12 @@ class DeviceProfileViewerPageInner extends React.Component<
         <TreeMenu
           data={transformStateToTree(currentDeviceProfile, [])}
           onClickItem={() => {}}
-          matchSearch={props => {
+          matchSearch={(props) => {
             // This is bad and doesnt show the parents of the results, so it is hard to read..
             // TODO fix and enable it
             const path = (props.path || []) as string[]
             const { searchTerm } = props
-            return !!path.find(p => p.indexOf(searchTerm) !== -1)
+            return !!path.find((p) => p.indexOf(searchTerm) !== -1)
           }}
         >
           {({ search, items }) => (
@@ -99,7 +84,7 @@ class DeviceProfileViewerPageInner extends React.Component<
                 {items.map(({ key, onClick, toggleNode, ...props }) => (
                   <ItemComponent
                     key={key}
-                    onClick={e => {
+                    onClick={(e) => {
                       onClick(e)
                       if (toggleNode) toggleNode()
                     }}
@@ -122,13 +107,13 @@ function transformStateToTree(state: object, parents: string[]): TreeNodeObject 
     if (state.hasOwnProperty(key)) {
       const path = [...parents, key]
       const value = (state as any)[key]
-      const children = isObject(value) ? transformStateToTree(value, path) : undefined
+      const children = value !== null && typeof value === 'object' ? transformStateToTree(value, path) : undefined
 
       res[key] = literal<TreeNode>({
         label: children ? key : `${key}: ${value}`,
         index: i,
         nodes: children,
-        path: path
+        path: path,
       })
     }
   })

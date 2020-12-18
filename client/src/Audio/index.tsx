@@ -1,34 +1,20 @@
 import React from 'react'
 import './Audio.css'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetDeviceId } from '../DeviceManager'
 import Slider from 'react-rangeslider'
 import { LibAtemEnums } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
+import { DevicePageWrapper } from '../device-page-wrapper'
 
-export class AudioPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
+export class AudioPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
-      <div className="page-audio">
-        <ErrorBoundary key={this.context.activeDeviceId || ''}>
-          <div></div>
-          {device ? (
-            <AudioPageInner
-              key={this.context.activeDeviceId || ''}
-              device={device}
-              currentState={this.context.currentState}
-              signalR={this.context.signalR}
-            />
-          ) : (
-            <p>No device selected</p>
-          )}
-        </ErrorBoundary>
-      </div>
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        <div className="page-audio">
+          <AudioPageInner device={device} currentState={this.context.currentState} signalR={signalR} />
+        </div>
+      </ErrorBoundary>
     )
   }
 }
@@ -86,10 +72,10 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         2001: { videoID: 'mediaPlayer1', audioID: 'mP1' },
         2002: { videoID: 'mediaPlayer2', audioID: 'mP2' },
         2003: { videoID: 'mediaPlayer3', audioID: 'mP3' },
-        2004: { videoID: 'mediaPlayer4', audioID: 'mP4' }
+        2004: { videoID: 'mediaPlayer4', audioID: 'mP4' },
       },
       peaks: {},
-      peaksRight: {}
+      peaksRight: {},
     }
 
     if (props.device.connected) {
@@ -104,25 +90,25 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
       signalR
         .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
+        .then((res) => {
           // console.log(value)
           // console.log('ManualCommands: sent')
           // console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
   }
 
   render() {
-    if (this.props.currentState == null || this.props.currentState.audio.inputs == undefined) {
+    if (!this.props.currentState?.audio?.inputs) {
       return <p>Waiting for Profile</p>
     }
 
     var audioInputs = Object.keys(this.props.currentState.audio.inputs)
-    var mainInputs = audioInputs.filter(x => parseInt(x) <= 20 || parseInt(x) >= 2000)
-    var externInputs = audioInputs.filter(x => parseInt(x) > 20 && parseInt(x) < 2000)
+    var mainInputs = audioInputs.filter((x) => parseInt(x) <= 20 || parseInt(x) >= 2000)
+    var externInputs = audioInputs.filter((x) => parseInt(x) > 20 && parseInt(x) < 2000)
 
     var channels2 = []
     var external = []
@@ -164,7 +150,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
         className="page-wrapper"
         style={{
           gridTemplateColumns:
-            'repeat(' + mainInputs.length + ', 80px) 1px repeat(' + externInputs.length + ', 80px) 1px 80px'
+            'repeat(' + mainInputs.length + ', 80px) 1px repeat(' + externInputs.length + ', 80px) 1px 80px',
         }}
       >
         {channels2}
@@ -220,8 +206,8 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
       ids: {},
       peaks: [
         [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
-        [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
-      ]
+        [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
+      ],
     }
   }
 
@@ -240,12 +226,12 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
 
       signalR
         .invoke('CommandSend', devId, command, JSON.stringify(value))
-        .then(res => {
+        .then((res) => {
           // console.log(value)
           // console.log('ManualCommands: sent')
           // console.log(command)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -290,7 +276,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 0
+                  MixOption: 0,
                 })
               }
               className="button-inner left button-inner-selected"
@@ -302,7 +288,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 2
+                  MixOption: 2,
                 })
               }
               className="button-inner right"
@@ -320,7 +306,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 1
+                  MixOption: 1,
                 })
               }
               className="button-inner left"
@@ -332,7 +318,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 0
+                  MixOption: 0,
                 })
               }
               className="button-inner right button-inner-selected"
@@ -349,7 +335,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 1
+                  MixOption: 1,
                 })
               }
               className="button-inner left"
@@ -361,7 +347,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 2
+                  MixOption: 2,
                 })
               }
               className="button-inner right"
@@ -382,7 +368,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 0
+                  MixOption: 0,
                 })
               }
               className="button-inner full button-inner-selected"
@@ -399,7 +385,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 2
+                  MixOption: 2,
                 })
               }
               className="button-inner full"
@@ -420,7 +406,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 0
+                  MixOption: 0,
                 })
               }
               className="button-inner full button-inner-selected"
@@ -437,7 +423,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: id,
                   Mask: 1,
-                  MixOption: 1
+                  MixOption: 1,
                 })
               }
               className="button-inner full"
@@ -584,7 +570,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
               this.sendCommand('LibAtem.Commands.Audio.AudioMixerMonitorSetCommand', {
                 Solo: true,
                 Mask: 24,
-                SoloSource: this.props.id
+                SoloSource: this.props.id,
               })
             }
           >
@@ -633,7 +619,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
           style={{
             left: '50%',
             background: color,
-            width: (35 * this.props.currentInput.properties.balance) / 50 + 'px'
+            width: (35 * this.props.currentInput.properties.balance) / 50 + 'px',
           }}
           className="pan-slider-inner"
         ></div>
@@ -644,7 +630,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
           style={{
             right: '50%',
             background: color,
-            width: (35 * this.props.currentInput.properties.balance) / -50 + 'px'
+            width: (35 * this.props.currentInput.properties.balance) / -50 + 'px',
           }}
           className="pan-slider-inner"
         ></div>
@@ -664,7 +650,7 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
               this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                 Index: this.props.id,
                 Balance: (x / 70) * 110 - 55,
-                Mask: 4
+                Mask: 4,
               })
               console.log(x)
             }}
@@ -674,11 +660,11 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
           </div>
         </div>
         <div
-          onClick={e =>
+          onClick={(e) =>
             this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
               Index: this.props.id,
               Balance: 0,
-              Mask: 4
+              Mask: 4,
             })
           }
           className="pan-input"
@@ -737,13 +723,13 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
                   : this.props.currentInput.properties.gain) / 40
               )}
               orientation="vertical"
-              onChange={e => {
+              onChange={(e) => {
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
                   Index: this.props.id,
                   MixOption: 0,
                   Gain: Math.log2(e) * 40,
                   RcaToXlrEnabled: false,
-                  Mask: 2
+                  Mask: 2,
                 })
               }}
             ></Slider>
@@ -787,8 +773,8 @@ class OutputAudioChannel extends InputAudioChannel {
       ids: {},
       peaks: [
         [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
-        [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60]
-      ]
+        [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
+      ],
     }
   }
 
@@ -816,7 +802,7 @@ class OutputAudioChannel extends InputAudioChannel {
             onClick={() =>
               this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
                 FollowFadeToBlack: false,
-                Mask: 4
+                Mask: 4,
               })
             }
             className="button-inner full button-inner-selected"
@@ -832,7 +818,7 @@ class OutputAudioChannel extends InputAudioChannel {
             onClick={() =>
               this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
                 FollowFadeToBlack: true,
-                Mask: 4
+                Mask: 4,
               })
             }
             className="button-inner full "
@@ -888,11 +874,11 @@ class OutputAudioChannel extends InputAudioChannel {
                 (this.props.currentInput.gain === '-Infinty' ? -60 : this.props.currentInput.gain) / 40
               )}
               orientation="vertical"
-              onChange={e => {
+              onChange={(e) => {
                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
                   Index: this.props.id,
                   Gain: Math.log2(e) * 40,
-                  Mask: 1
+                  Mask: 1,
                 })
               }}
             ></Slider>

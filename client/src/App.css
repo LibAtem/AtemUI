@@ -1,3 +1,12 @@
+
+.page-content {
+  background: #2d2d2d;
+  color: #858585;
+}
+.splash-page {
+  margin-top: 50px;
+}
+
 div#not-connected-overlay {
   z-index: 99999999;
   float: left;

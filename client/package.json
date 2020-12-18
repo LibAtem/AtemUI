@@ -42,6 +42,7 @@
     "react-dropzone": "^11.2.4",
     "react-error-boundary": "^3.1.0",
     "react-graceful-image": "^1.5.0",
+    "react-moment": "^1.0.0",
     "react-rangeslider": "^2.2.0",
     "react-responsive": "^8.2.0",
     "react-router-bootstrap": "^0.25.0",

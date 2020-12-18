@@ -1,7 +1,7 @@
 import React from 'react'
-import { Container, Form, Col, Row, Button } from 'react-bootstrap'
+import { Form, Col, Row, Button } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetDeviceId } from '../DeviceManager'
 import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from './types'
 import Select from 'react-select'
 import update from 'immutability-helper'
@@ -9,29 +9,14 @@ import ToggleSwitch from 'bootstrap-switch-button-react'
 import Slider from 'react-rangeslider'
 import { prettyDecimal } from '../util'
 import { ErrorBoundary } from '../errorBoundary'
+import { DevicePageWrapper } from '../device-page-wrapper'
 
-export class ManualCommandsPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
+export class ManualCommandsPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
-      <Container>
-        <h2>Manual Commands</h2>
-
-        <ErrorBoundary key={this.context.activeDeviceId || ''}>
-          {device ? (
-            <ManualCommandsPageInner
-              key={this.context.activeDeviceId || ''}
-              device={device}
-              signalR={this.context.signalR}
-            />
-          ) : (
-            <p>No device selected</p>
-          )}
-        </ErrorBoundary>
-      </Container>
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        <ManualCommandsPageInner device={device} signalR={signalR} />
+      </ErrorBoundary>
     )
   }
 }
@@ -54,7 +39,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
     this.state = {
       hasConnected: props.device.connected,
       commandsSpec: null,
-      selectedCommand: null
+      selectedCommand: null,
     }
 
     if (props.device.connected) {
@@ -64,17 +49,17 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
 
   loadCommandsSpec(props: ManualCommandsPageInnerProps) {
     fetch(`/api/spec/${GetDeviceId(props.device)}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((data: CommandSpecSet) => {
         console.log('Commands: Got new spec', data.commands)
         this.setState({
-          commandsSpec: data.commands
+          commandsSpec: data.commands,
         })
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Commands: Failed to load spec:', err)
         this.setState({
-          commandsSpec: null
+          commandsSpec: null,
         })
       })
   }
@@ -88,7 +73,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
         commandsSpec: null,
-        hasConnected: true
+        hasConnected: true,
       })
       // now reload it
       this.loadCommandsSpec(this.props)
@@ -105,9 +90,9 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
       return <p>Loading spec...</p>
     }
 
-    const options = Object.values(commandsSpec).map(cmd => ({
+    const options = Object.values(commandsSpec).map((cmd) => ({
       value: cmd.fullName,
-      label: cmd.name
+      label: cmd.name,
     }))
 
     const selectedCommandSpec = selectedCommand ? commandsSpec[selectedCommand.value] : undefined
@@ -116,7 +101,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
       <div>
         <Select
           value={selectedCommand}
-          onChange={v => this.setState({ selectedCommand: v as any })}
+          onChange={(v) => this.setState({ selectedCommand: v as any })}
           options={options}
         />
 
@@ -149,7 +134,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
     const defaultValues: { [propName: string]: any } = {}
 
     if (props.spec) {
-      props.spec.properties.forEach(prop => {
+      props.spec.properties.forEach((prop) => {
         switch (prop.type) {
           case CommandPropertyType.Enum:
             const first = prop.options && prop.options[0] ? prop.options[0].id : undefined
@@ -169,7 +154,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
     }
 
     this.state = {
-      values: defaultValues
+      values: defaultValues,
     }
   }
 
@@ -191,7 +176,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
     return (
       <div>
         <Form>
-          {spec.properties.map(prop => {
+          {spec.properties.map((prop) => {
             return (
               <Form.Group key={prop.name} as={Row}>
                 <Form.Label column sm={2}>
@@ -222,11 +207,11 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
       console.log(this.state.values)
       signalR
         .invoke('CommandSend', devId, spec.fullName, JSON.stringify(this.state.values))
-        .then(res => {
+        .then((res) => {
           console.log('ManualCommands: sent')
           console.log(res)
         })
-        .catch(e => {
+        .catch((e) => {
           console.log('ManualCommands: Failed to send', e)
         })
     }
@@ -267,7 +252,7 @@ class CommandBuilderEnumProperty extends React.Component<CommandBuilderPropertyP
         as="select"
         placeholder={spec.name}
         value={this.props.value + ''}
-        onChange={e => {
+        onChange={(e) => {
           this.props.change(spec.name, parseInt(e.currentTarget.value || '', 10))
         }}
       >
@@ -303,8 +288,8 @@ class CommandBuilderFlagsProperty extends React.Component<CommandBuilderProperty
     }
 
     return spec.options
-      .filter(v => v.id !== 0)
-      .map(v => {
+      .filter((v) => v.id !== 0)
+      .map((v) => {
         return (
           <div key={v.id}>
             <span>{v.name}: </span>
@@ -383,7 +368,7 @@ class CommandBuilderSliderProperty extends React.Component<CommandBuilderPropert
         onChange={(e: React.FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
           change(parseInt(e.currentTarget.value || '', 10))
         }}
-      />
+      />,
     ]
   }
 }

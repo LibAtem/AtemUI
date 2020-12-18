@@ -145,7 +145,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
         {(matches) =>
           matches ? (
             <div
-              className="control-page"
+              className="control-page page-content"
               style={{ gridTemplateColumns: this.state.open ? '1fr 20px 310px' : '1fr 20px' }}
             >
               <div>
@@ -175,7 +175,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
               ) : undefined}
             </div>
           ) : (
-            <div className="control-page">
+            <div className="control-page page-content">
               {this.renderMeSelection(true)}
 
               <AtemButtonBar
@@ -231,39 +231,33 @@ interface MixEffectPanelProps {
   open: boolean
   meIndex: number
 }
-interface MixEffectPanelState {
-  hasConnected: boolean
-}
+interface MixEffectPanelState {}
 
 class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanelState> {
   constructor(props: MixEffectPanelProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
+      // hasConnected: props.device.connected,
     }
   }
 
-  componentDidUpdate(prevProps: MixEffectPanelProps) {
-    // Should we reload the commandsSpec
-    if (
-      !this.state.hasConnected &&
-      this.props.device.connected // Device first connection
-    ) {
-      this.setState({
-        // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true,
-      })
-      // now reload
-    }
-  }
+  // componentDidUpdate(prevProps: MixEffectPanelProps) {
+  //   // Should we reload the commandsSpec
+  //   if (
+  //     !this.state.hasConnected &&
+  //     this.props.device.connected // Device first connection
+  //   ) {
+  //     this.setState({
+  //       // TODO - should this be delayed as old data is good enough to get us started
+  //       hasConnected: true,
+  //     })
+  //     // now reload
+  //   }
+  // }
 
   render() {
     const { currentState, profile } = this.props
-    const { hasConnected } = this.state
-
-    if (!hasConnected) {
-      return <p>Device is not connected</p>
-    } else if (!currentState || !profile) {
+    if (!currentState || !profile) {
       return <p>Loading state...</p>
     }
 

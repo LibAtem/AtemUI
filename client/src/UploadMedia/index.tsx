@@ -1,34 +1,19 @@
 import React from 'react'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetDeviceId } from '../DeviceManager'
 import './media.scss'
 import { LibAtemEnums, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
-import { sendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
 import { getStillPreviewUrl, MediaPoolStill } from './tile'
 import { CommandTypes } from '../generated/commands'
 import Image from 'react-graceful-image'
 
-export class UploadMediaPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
-
+export class UploadMediaPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        {device && this.context.signalR ? (
-          <MediaPageInner
-            key={this.context.activeDeviceId || ''}
-            device={device}
-            currentState={this.context.currentState}
-            signalR={this.context.signalR}
-          />
-        ) : (
-          <p>No device selected</p>
-        )}
+        <MediaPageInner device={device} currentState={this.context.currentState} signalR={signalR} />
       </ErrorBoundary>
     )
   }

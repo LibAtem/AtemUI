@@ -1,10 +1,10 @@
 import React from 'react'
 import './settings.scss'
 import { AtemDeviceInfo } from '../Devices/types'
-import { GetActiveDevice, DeviceManagerContext, GetDeviceId } from '../DeviceManager'
+import { GetDeviceId } from '../DeviceManager'
 import { Container, ButtonGroup, Button, Form, Row, Col } from 'react-bootstrap'
 import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
-import { sendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
 import { AtemButtonBar, SourcesMap } from '../components'
 import { GeneralSettings } from './general'
 import { CommandTypes } from '../generated/commands'
@@ -14,32 +14,17 @@ import { shallowEqualObjects } from 'shallow-equal'
 import { RemoteSettings } from './remote'
 import { ClassicAudioSettings } from './classicAudio'
 
-export class ControlSettingsPage extends React.Component {
-  context!: React.ContextType<typeof DeviceManagerContext>
-
-  static contextType = DeviceManagerContext
-
-  render() {
-    const device = GetActiveDevice(this.context)
-
+export class ControlSettingsPage extends DevicePageWrapper {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
     return (
-      <div className="settings-page">
-        <Container>
-          <ErrorBoundary key={this.context.activeDeviceId || ''}>
-            {device && this.context.signalR ? (
-              <ControlSettingsPageInner
-                key={this.context.activeDeviceId || ''}
-                device={device}
-                currentState={this.context.currentState}
-                currentProfile={this.context.currentProfile}
-                signalR={this.context.signalR}
-              />
-            ) : (
-              <p>No device selected</p>
-            )}
-          </ErrorBoundary>
-        </Container>
-      </div>
+      <ErrorBoundary key={this.context.activeDeviceId || ''}>
+        <ControlSettingsPageInner
+          device={device}
+          currentState={this.context.currentState}
+          currentProfile={this.context.currentProfile}
+          signalR={signalR}
+        />
+      </ErrorBoundary>
     )
   }
 }

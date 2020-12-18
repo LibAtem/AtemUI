@@ -3,6 +3,7 @@ import { DeviceManagerContext, GetActiveDevice, GetDeviceId } from './DeviceMana
 import { AtemDeviceInfo } from './Devices/types'
 import { Row, Col, Container } from 'react-bootstrap'
 import { CommandTypes } from './generated/commands'
+import Moment from 'react-moment'
 
 export abstract class DevicePageWrapper extends React.Component {
   context!: React.ContextType<typeof DeviceManagerContext>
@@ -15,7 +16,7 @@ export abstract class DevicePageWrapper extends React.Component {
       if (device.connected && this.context.signalR) {
         return <div key={this.context.activeDeviceId || ''}>{this.renderContent(device, this.context.signalR)}</div>
       } else {
-        return <NotConnected />
+        return <NotConnected device={device} />
       }
     } else {
       return <NoDevice />
@@ -27,25 +28,32 @@ export abstract class DevicePageWrapper extends React.Component {
 
 function NoDevice(props: {}) {
   return (
-    <Container>
-      <Row>
-        <Col sm={12}>
-          <h1>No device is selected</h1>
-        </Col>
-      </Row>
-    </Container>
+    <div className="page-content">
+      <Container>
+        <Row className="splash-page">
+          <Col sm={12}>
+            <h1>No device is selected</h1>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   )
 }
 
-function NotConnected(props: {}) {
+function NotConnected(props: { device: AtemDeviceInfo }) {
   return (
-    <Container>
-      <Row>
-        <Col sm={12}>
-          <h1>Device is not connected</h1>
-        </Col>
-      </Row>
-    </Container>
+    <div className="page-content">
+      <Container>
+        <Row className="splash-page">
+          <Col sm={12}>
+            <h3>Device is not connected</h3>
+            <p>
+              Last seen <Moment fromNow date={props.device.info.lastSeen} />
+            </p>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   )
 }
 
@@ -69,7 +77,7 @@ export function sendCommand(props: PropsBase, command: string, value: SendComman
         console.log('Control: sent')
         console.log(command)
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Control: Failed to send', e)
       })
   }
@@ -80,7 +88,7 @@ export function sendCommandStrict(props: PropsBase, ...rawArgs: CommandTypes): v
   const { device, signalR } = props
   if (device.connected) {
     const devId = GetDeviceId(device)
-    
+
     const [command, args] = rawArgs
     signalR
       .invoke<void>('CommandSend', devId, command, JSON.stringify(args))
@@ -89,7 +97,7 @@ export function sendCommandStrict(props: PropsBase, ...rawArgs: CommandTypes): v
         console.log('Control: sent')
         console.log(command)
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Control: Failed to send', e)
       })
   }
