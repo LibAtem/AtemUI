@@ -17,20 +17,20 @@ namespace AtemServer.Services
         private readonly AtemState _state;
         private readonly IHubContext<DevicesHub> _context;
         private readonly HashSet<string> _subscriptions;
-        
-        public readonly AtemMediaCache MediaCache = new AtemMediaCache();
+        private readonly AtemMediaCache _mediaCache;
         
         public delegate void DeviceChange(object sender);
 
         public event DeviceChange OnChange;
 
-        public AtemClientExt(string deviceId, AtemClient client, IHubContext<DevicesHub> context, HashSet<string> subscriptions)
+        public AtemClientExt(string deviceId, AtemClient client, IHubContext<DevicesHub> context, TransferJobMonitor transfers, HashSet<string> subscriptions)
         {
             _deviceId = deviceId;
             _profile = new DeviceProfileHandler();
             _subscriptions = subscriptions;
             _state = new AtemState();
             _context = context;
+            _mediaCache = new AtemMediaCache(transfers);
             
             Client = client;
             Client.OnReceive += _profile.HandleCommands;
@@ -82,8 +82,12 @@ namespace AtemServer.Services
 
                 SendStateDiff(GetState(), changedPaths);
                 
-                MediaCache.EnsureMediaIsDownloaded(Client, newState);
+                _mediaCache.EnsureMediaIsDownloaded(Client, newState);
             };
+
+
+            Client.DataTransfer.OnJobStarted += (sender, job) => transfers.JobStarted(deviceId, job);
+            Client.DataTransfer.OnJobQueued += (sender, job) => transfers.JobQueued(deviceId, job);
         }
 
         public DeviceProfile GetProfile()
@@ -129,7 +133,7 @@ namespace AtemServer.Services
         
         public AtemMediaCacheItem GetImage(string hash)
         {
-            return MediaCache.Get(hash);
+            return _mediaCache.Get(hash);
         }
 
         public AtemClient Client { get; }

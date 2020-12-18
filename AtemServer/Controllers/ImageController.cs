@@ -7,6 +7,7 @@ using LibAtem.Common;
 using LibAtem.Net.DataTransfer;
 using LibAtem.Util.Media;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -37,15 +38,9 @@ namespace AtemServer.Controllers
             if (image == null)
                 return NotFound();
 
-            if (image.Job != null)
-                await image.Completion.Task;
-
-            if (image.Job != null || image.RawFrame == null)
-                return Problem("Download was complete then not?");
-
             if (image.PreviewJpeg == null)
             {
-                AtemFrame frame = image.RawFrame;
+                AtemFrame frame = await GetFrameFromJob(image);
                 
                 // TODO - this makes a lot of assumptions about color space and resolution
                 using Image image2 = Image.LoadPixelData<Rgba32>(frame.GetRGBA(ColourSpace.BT709), 1920, 1080);
@@ -60,6 +55,20 @@ namespace AtemServer.Controllers
             }
 
             return File(image.PreviewJpeg, "image/jpeg");
+        }
+
+        private Task<AtemFrame> GetFrameFromJob(AtemMediaCacheItem image)
+        {
+            Task<AtemFrame> frameTask = null;
+            lock (image.JobLock)
+            {
+                 frameTask = image.RawFrame;
+            }
+
+            if (frameTask == null)
+                throw new Exception("Download of still not queued...");
+
+            return frameTask;
         }
         
         

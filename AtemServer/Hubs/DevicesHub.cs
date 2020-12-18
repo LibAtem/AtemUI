@@ -15,10 +15,12 @@ namespace AtemServer.Hubs
     public class DevicesHub : Hub
     {
         private readonly AtemRepository _repo;
+        private readonly TransferJobMonitor _transfers;
 
-        public DevicesHub(AtemRepository repo)
+        public DevicesHub(AtemRepository repo,TransferJobMonitor transfers)
         {
             _repo = repo;
+            _transfers = transfers;
         }
         
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -30,8 +32,9 @@ namespace AtemServer.Hubs
         public override async Task OnConnectedAsync()
         {
             await DeviceList();
+            await Clients.Caller.SendAsync("transfers", _transfers.ListTransfers());
         }
-
+       
         #region Devices
         private Task SendDevices(IReadOnlyList<AtemDevice> devices)
         {
@@ -51,7 +54,7 @@ namespace AtemServer.Hubs
             }
             else
             {
-                await DeviceList();
+                await SendDevices(res.Item2);
             }
         }
 

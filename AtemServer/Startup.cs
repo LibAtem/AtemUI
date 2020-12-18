@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AtemServer.Hubs;
 using AtemServer.Services;
+using AtemServer.Util;
 using ElectronNET.API;
 using Microsoft.Extensions.Hosting;
 

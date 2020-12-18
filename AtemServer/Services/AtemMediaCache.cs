@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Threading.Tasks;
 using LibAtem.Common;
 using LibAtem.Net;
@@ -14,25 +12,31 @@ namespace AtemServer.Services
 {
     public class AtemMediaCacheItem
     {
-        public TaskCompletionSource<AtemFrame> Completion { get; }
+        public object JobLock { get; } = new object();
+        
         public uint Index { get; }
         
-        public DataTransferJob Job;
+        public DownloadMediaStillJob3 Job;
+        public Task<AtemFrame> RawFrame;
 
-        public AtemFrame RawFrame;
+        // public AtemFrame RawFrame;
         public byte[] PreviewJpeg;
         
         public AtemMediaCacheItem(uint index)
         {
             Index = index;
-            Completion = new TaskCompletionSource<AtemFrame>();
         }
     }
     
     public class AtemMediaCache
     {
         private readonly Dictionary<string, AtemMediaCacheItem> _cache = new Dictionary<string,AtemMediaCacheItem>();
-
+        private readonly TransferJobMonitor _monitor;
+        public AtemMediaCache(TransferJobMonitor monitor)
+        {
+            _monitor = monitor;
+        }
+        
         public AtemMediaCacheItem Get(string hash)
         {
             lock (_cache)
@@ -69,7 +73,11 @@ namespace AtemServer.Services
                 {
                     if (!usedHashes.Contains(entry.Key))
                     {
-                        entry.Value.Job?.SetExpired();
+                        lock (entry.Value.JobLock)
+                        {
+                            entry.Value.Job?.Invalidate();
+                        }
+
                         _cache.Remove(entry.Key);
                     }
                 }
@@ -77,35 +85,41 @@ namespace AtemServer.Services
                 // Ensure each entry has been/is being loaded
                 foreach (KeyValuePair<string, AtemMediaCacheItem> entry in _cache)
                 {
-                    if (entry.Value.RawFrame == null && entry.Value.Job == null)
+                    lock (entry.Value.JobLock)
                     {
-                        // TODO - dynamic resolution
-                        entry.Value.Job = DownloadStillJob(entry.Value);
-                        client.DataTransfer.QueueJob(entry.Value.Job);
+                        if (entry.Value.RawFrame == null && entry.Value.Job == null)
+                        {
+                            // TODO - dynamic resolution
+                            entry.Value.Job = DownloadStillJob(entry.Value);
+                            client.DataTransfer.QueueJob(entry.Value.Job);
+                        }
                     }
                 }
             }
         }
 
-        private DataTransferJob DownloadStillJob(AtemMediaCacheItem item)
+        private DownloadMediaStillJob3 DownloadStillJob(AtemMediaCacheItem item)
         {
-            return new DownloadMediaStillJob(item.Index, VideoModeResolution._1080,
-                ((AtemFrame frame) =>
+            var job = new DownloadMediaStillJob3(item.Index, VideoModeResolution._1080.GetByteCount());
+            item.RawFrame = job.Result.ContinueWith<AtemFrame>(t =>
+            {
+                lock (item.JobLock)
                 {
-                    Console.WriteLine("Got job complete for {0} with {1}", item.Index, frame != null);
-                    // TODO - why does it get fulfilled multiple times?
-                    if (!item.Completion.Task.IsCompleted)
-                    {
-                        item.RawFrame = frame;
-                        item.Job = null;
-                        Task.Run(() =>
-                        {
-                            // Make sure the transfer thread isnt blocked 
-                            item.Completion.SetResult(frame);
-                        });
-                    }
+                    item.Job = null;
 
-                }));
+                    if (t.IsCompletedSuccessfully)
+                        return t.Result;
+                }
+
+                if (t.IsFaulted)
+                {
+                    Console.WriteLine("Still download failed {0}", t.Exception);
+                    return null;
+                }
+                
+                return null;
+            });
+            return job;
         }
     }
 }

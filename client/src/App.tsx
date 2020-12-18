@@ -21,6 +21,8 @@ import { AudioPage } from './Audio'
 import { LibAtemProfile } from './generated'
 import * as objectPath from 'object-path'
 import camelcase from 'camelcase'
+import { AtemTransferStatus } from './Transfers/types'
+import { TransfersPage } from './Transfers'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
@@ -54,7 +56,8 @@ export default class App extends React.Component<{}, AppState> {
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect(new SignalRRetryPolicy())
       .build(),
-    devices: [] as AtemDeviceInfo[],
+    devices: [],
+    transfers: [],
     activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
     currentState: null,
     currentProfile: null,
@@ -96,6 +99,11 @@ export default class App extends React.Component<{}, AppState> {
         }
 
         this.setState({ devices: devices })
+      })
+
+      connection.on('transfers', (transfers: AtemTransferStatus[]) => {
+        console.log('Transfers update:', transfers)
+        this.setState({ transfers: transfers })
       })
 
       connection.on('state', (state: any) => {
@@ -267,6 +275,9 @@ export default class App extends React.Component<{}, AppState> {
                 <Route path="/devices">
                   <DevicesPage />
                 </Route>
+                <Route path="/transfers">
+                  <TransfersPage />
+                </Route>
                 <Route path="/state">
                   <StateViewerPage />
                 </Route>
@@ -357,6 +368,9 @@ class NavBar extends React.PureComponent<{
             </LinkContainer>
           </Nav>
           <Nav className="justify-content-end">
+            <LinkContainer to="/transfers">
+              <Nav.Link>Transfers</Nav.Link>
+            </LinkContainer>
             <LinkContainer to="/devices">
               <Nav.Link>Devices</Nav.Link>
             </LinkContainer>

@@ -29,6 +29,7 @@ namespace AtemServer.Services
 
         private readonly AtemDiscoveryService _discovery;
         private readonly IHubContext<DevicesHub> _context;
+        private readonly TransferJobMonitor _transfers;
 
         static AtemRepository()
         {
@@ -40,13 +41,14 @@ namespace AtemServer.Services
             );
         }
 
-        public AtemRepository(IHubContext<DevicesHub> context)
+        public AtemRepository(IHubContext<DevicesHub> context, TransferJobMonitor transfers)
         {
             _db = new LiteDatabase(@"MyData.db");
             _dbDevices = _db.GetCollection<AtemDevice>("devices");
             _devices = new Dictionary<string, AtemDevice>();
 
             _context = context;
+            _transfers = transfers;
 
             // Load up old devices
             foreach (AtemDevice device in _dbDevices.FindAll())
@@ -120,7 +122,8 @@ namespace AtemServer.Services
         {
             if (device.Enabled && device.Client == null)
             {
-                device.Client = new AtemClientExt(device.Info.Id(), new AtemClient(device.Info.Address, false), _context, device.Subscriptions);
+                device.Client = new AtemClientExt(device.Info.Id(), new AtemClient(device.Info.Address, false),
+                    _context, _transfers, device.Subscriptions);
                 device.Client.OnChange += sender =>
                 {
                     if (sender is AtemClientExt client)
