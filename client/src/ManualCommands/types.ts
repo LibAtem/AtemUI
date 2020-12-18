@@ -11,6 +11,9 @@ export enum CommandPropertyType {
   Flags = 'Flags',
   String = 'String',
   ByteArray = 'ByteArray',
+  IntArray = 'IntArray',
+  Timestamp = 'Timestamp',
+  IpAddress = 'IpAddress',
 }
 
 export interface CommandProperty {
@@ -29,6 +32,9 @@ export interface CommandProperty {
 export interface CommandSpec {
   fullName: string
   name: string
+
+  toServer: boolean
+  toClient: boolean
 
   isValid: boolean
   initialVersion?: number // TODO - type?

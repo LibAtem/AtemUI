@@ -31,8 +31,9 @@ namespace AtemServer.Controllers
         Flags,
         String,
         ByteArray,
-        IntArray
-
+        IntArray,
+        Timestamp,
+        IpAddress,
     }
 
     public class CommandSpec
@@ -46,6 +47,9 @@ namespace AtemServer.Controllers
         public string Name { get; set; }
         
         public ProtocolVersion? InitialVersion { get; set; }
+        
+        public bool ToServer { get; set; }
+        public bool ToClient { get; set; }
         
         public bool IsValid { get; set; }
         
@@ -65,8 +69,8 @@ namespace AtemServer.Controllers
         
         public CommandPropertyType Type { get; set; }
         
-        public int? Min { get; set; }
-        public int? Max { get; set; }
+        public long? Min { get; set; }
+        public long? Max { get; set; }
         public double? Scale { get; set; }
         
         public IReadOnlyList<CommandEnumOption> Options { get; set; }
@@ -99,8 +103,17 @@ namespace AtemServer.Controllers
                     {
                         FullName = cmd.Item2.FullName,
                         Name = cmd.Item2.Name,
-                        InitialVersion = cmd.Item1
+                        InitialVersion = cmd.Item1,
+                        ToServer = false,
+                        ToClient = false
                     };
+                    
+                    var nameAttr = cmd.Item2.GetCustomAttribute<CommandNameAttribute>();
+                    if (nameAttr != null)
+                    {
+                        spec.ToClient = nameAttr.Direction.HasFlag(CommandDirection.ToClient);
+                        spec.ToServer = nameAttr.Direction.HasFlag(CommandDirection.ToServer);
+                    }
 
                     if (typeof(SerializableCommandBase).GetTypeInfo().IsAssignableFrom(cmd.Item2))
                     {
@@ -168,6 +181,19 @@ namespace AtemServer.Controllers
                             {
                                 resProp.Type = CommandPropertyType.IntArray;
                                 //resProp.Count = (int)prop.GetCustomAttribute<UInt16ListAttribute>().Count;
+                            }
+                            else if (prop.GetCustomAttribute<UInt32ListAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.IntArray;
+                                //resProp.Count = (int)prop.GetCustomAttribute<UInt32ListAttribute>().Count;
+                            }
+                            else if (prop.GetCustomAttribute<HyperDeckTimeAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.Timestamp;
+                            }
+                            else if (prop.GetCustomAttribute<IpAddressAttribute>() != null)
+                            {
+                                resProp.Type = CommandPropertyType.IpAddress;
                             }
                             else
                             {
@@ -264,8 +290,33 @@ namespace AtemServer.Controllers
                 field.Max = (int) (GetDefaultForField<uint?>(profile, cmdType, field) ?? (uint) Math.Pow(2, 8) - 1);
                 return;
             }
+            var uint32 = prop.GetCustomAttribute<UInt32Attribute>();
+            if (uint32 != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = 0;
+                field.Max = (long) UInt32.MaxValue;
+                return;
+            }
+            var int16 = prop.GetCustomAttribute<Int16Attribute>();
+            if (int16 != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = Int16.MinValue;
+                field.Max = Int16.MaxValue;
+                return;
+            }
+
             var int32 = prop.GetCustomAttribute<Int32Attribute>();
             if (int32 != null)
+            {
+                field.Type = CommandPropertyType.Int;
+                field.Min = Int32.MinValue;
+                field.Max = Int32.MaxValue;
+                return;
+            }
+            var dint32 = prop.GetCustomAttribute<DirectionInt32Attribute>();
+            if (dint32 != null)
             {
                 field.Type = CommandPropertyType.Int;
                 field.Min = Int32.MinValue;

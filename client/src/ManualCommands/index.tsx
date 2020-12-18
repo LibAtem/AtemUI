@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Col, Row, Button } from 'react-bootstrap'
+import { Form, Col, Row, Button, Container } from 'react-bootstrap'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetDeviceId } from '../DeviceManager'
 import { CommandSpecSet, CommandSpec, CommandProperty, CommandPropertyType } from './types'
@@ -88,15 +88,18 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
       return <p>Loading spec...</p>
     }
 
-    const options = Object.values(commandsSpec).map((cmd) => ({
-      value: cmd.fullName,
-      label: cmd.name,
-    }))
+    const options = Object.values(commandsSpec)
+      .filter((cmd) => cmd.toServer)
+      .map((cmd) => ({
+        value: cmd.fullName,
+        label: cmd.name,
+      }))
 
     const selectedCommandSpec = selectedCommand ? commandsSpec[selectedCommand.value] : undefined
 
     return (
-      <div>
+      <Container>
+        <h1>Manual Commands</h1>
         <Select
           value={selectedCommand}
           onChange={(v) => this.setState({ selectedCommand: v as any })}
@@ -109,7 +112,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
           signalR={signalR}
           spec={selectedCommandSpec}
         />
-      </div>
+      </Container>
     )
   }
 }
