@@ -5,6 +5,7 @@ import { literal } from '../util'
 import { LibAtemProfile } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
 import { DevicePageWrapper } from '../device-page-wrapper'
+import { Container } from 'react-bootstrap'
 
 export class DeviceProfileViewerPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -44,7 +45,8 @@ class DeviceProfileViewerPageInner extends React.Component<
     }
 
     return (
-      <div>
+      <Container>
+        <h1>Device Profile</h1>
         <TreeMenu
           data={transformStateToTree(currentDeviceProfile, [])}
           onClickItem={() => {}}
@@ -74,7 +76,7 @@ class DeviceProfileViewerPageInner extends React.Component<
             </>
           )}
         </TreeMenu>
-      </div>
+      </Container>
     )
   }
 }

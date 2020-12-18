@@ -101,7 +101,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     const sources = this.getSourcesMap()
 
     return (
-      <div className="settings-content">
+      <div className="settings-content page-content">
         <AtemButtonBar
           selected={this.state.page}
           options={[

@@ -5,6 +5,7 @@ import { literal } from '../util'
 import { LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
 import { DevicePageWrapper } from '../device-page-wrapper'
+import { Container } from 'react-bootstrap'
 
 export class StateViewerPage extends DevicePageWrapper {
   renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
@@ -37,7 +38,8 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
     }
 
     return (
-      <div>
+      <Container>
+        <h1>Device State</h1>
         <TreeMenu
           data={transformStateToTree(currentState, [])}
           onClickItem={() => {}}
@@ -67,7 +69,7 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
             </>
           )}
         </TreeMenu>
-      </div>
+      </Container>
     )
   }
 }
