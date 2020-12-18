@@ -3,6 +3,7 @@ import { DeviceManagerContext, GetActiveDevice, GetDeviceId } from './DeviceMana
 import { AtemDeviceInfo } from './Devices/types'
 import { Row, Col, Container } from 'react-bootstrap'
 import { CommandTypes } from './generated/commands'
+import { LibAtemState, LibAtemProfile } from './generated'
 import Moment from 'react-moment'
 
 export abstract class DevicePageWrapper extends React.Component {
@@ -14,7 +15,15 @@ export abstract class DevicePageWrapper extends React.Component {
     const device = GetActiveDevice(this.context)
     if (device) {
       if (device.connected && this.context.signalR) {
-        return <div key={this.context.activeDeviceId || ''}>{this.renderContent(device, this.context.signalR)}</div>
+        if (this.context.currentState && this.context.currentProfile) {
+          return (
+            <div key={this.context.activeDeviceId || ''}>
+              {this.renderContent(device, this.context.signalR, this.context.currentState, this.context.currentProfile)}
+            </div>
+          )
+        } else {
+          return <NoState device={device} />
+        }
       } else {
         return <NotConnected device={device} />
       }
@@ -23,7 +32,27 @@ export abstract class DevicePageWrapper extends React.Component {
     }
   }
 
-  abstract renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection): JSX.Element
+  abstract renderContent(
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection,
+    deviceState: LibAtemState.AtemState,
+    deviceProfile: LibAtemProfile.DeviceProfile
+  ): JSX.Element
+}
+
+function NoState(props: { device: AtemDeviceInfo }) {
+  return (
+    <div className="page-content">
+      <Container>
+        <Row className="splash-page">
+          <Col sm={12}>
+            <h3>Waiting for device state</h3>
+            <p>For device "{props.device.info.name}"</p>
+          </Col>
+        </Row>
+      </Container>
+    </div>
+  )
 }
 
 function NoDevice(props: {}) {
@@ -32,7 +61,7 @@ function NoDevice(props: {}) {
       <Container>
         <Row className="splash-page">
           <Col sm={12}>
-            <h1>No device is selected</h1>
+            <h3>No device is selected</h3>
           </Col>
         </Row>
       </Container>

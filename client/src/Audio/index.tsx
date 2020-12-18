@@ -3,16 +3,16 @@ import './Audio.css'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetDeviceId } from '../DeviceManager'
 import Slider from 'react-rangeslider'
-import { LibAtemEnums } from '../generated'
+import { LibAtemEnums, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
 import { DevicePageWrapper } from '../device-page-wrapper'
 
 export class AudioPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection, deviceState: LibAtemState.AtemState) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
         <div className="page-audio">
-          <AudioPageInner device={device} currentState={this.context.currentState} signalR={signalR} />
+          <AudioPageInner device={device} currentState={deviceState} signalR={signalR} />
         </div>
       </ErrorBoundary>
     )
@@ -21,7 +21,7 @@ export class AudioPage extends DevicePageWrapper {
 
 interface AudioPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   currentState: any // LibAtem.AtemState | null
 }
 interface AudioPageInnerState {
@@ -82,7 +82,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
   private sendCommand(command: string, value: any) {
     const { device, signalR } = this.props
-    if (device.connected && signalR) {
+    if (device.connected) {
       const devId = GetDeviceId(device)
 
       signalR
@@ -174,7 +174,7 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
 
 interface InputAudioChannelProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
 
   currentInput: any
 

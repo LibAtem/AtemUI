@@ -15,13 +15,18 @@ import { RemoteSettings } from './remote'
 import { ClassicAudioSettings } from './classicAudio'
 
 export class ControlSettingsPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection,
+    deviceState: LibAtemState.AtemState,
+    deviceProfile: LibAtemProfile.DeviceProfile
+  ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
         <ControlSettingsPageInner
           device={device}
-          currentState={this.context.currentState}
-          currentProfile={this.context.currentProfile}
+          currentState={deviceState}
+          currentProfile={deviceProfile}
           signalR={signalR}
         />
       </ErrorBoundary>
@@ -32,8 +37,8 @@ export class ControlSettingsPage extends DevicePageWrapper {
 interface ControlSettingsPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtemState.AtemState | null
-  currentProfile: LibAtemProfile.DeviceProfile | null
+  currentState: LibAtemState.AtemState
+  currentProfile: LibAtemProfile.DeviceProfile
 }
 interface ControlSettingsPageInnerState {
   page: number
@@ -57,7 +62,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
   private lastSourcesMap: ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState> = new Map()
   private lastSourcesInput: { [key: string]: LibAtemState.InputState } = {}
   private getSourcesMap(): SourcesMap {
-    const newInputs = this.props.currentState?.settings?.inputs
+    const newInputs = this.props.currentState.settings.inputs
 
     if (!shallowEqualObjects(newInputs ?? {}, this.lastSourcesInput)) {
       const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
@@ -94,10 +99,6 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
   render() {
     const { device, currentState } = this.props
-    if (!currentState) {
-      return <p className="mt-5">Loading state...</p>
-    }
-
     const sources = this.getSourcesMap()
 
     return (
@@ -116,7 +117,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
             {
               value: 2,
               label: 'Multi View',
-              disabled: !this.props.currentState?.info.multiViewers,
+              disabled: !this.props.currentState.info.multiViewers,
             },
             {
               value: 3,
@@ -192,7 +193,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
 interface LabelSettingsProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
   currentState: any
   currentProfile: any
   sendCommand: any

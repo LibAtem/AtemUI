@@ -16,15 +16,15 @@ import { shallowEqualObjects } from 'shallow-equal'
 import { ErrorBoundary } from '../errorBoundary'
 
 export class ControlPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection,
+    deviceState: LibAtemState.AtemState,
+    deviceProfile: LibAtemProfile.DeviceProfile
+  ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <ControlPageInnerInner
-          device={device}
-          currentState={this.context.currentState}
-          signalR={signalR}
-          profile={this.context.currentProfile}
-        />
+        <ControlPageInnerInner device={device} currentState={deviceState} signalR={signalR} profile={deviceProfile} />
       </ErrorBoundary>
     )
   }
@@ -33,8 +33,8 @@ export class ControlPage extends DevicePageWrapper {
 interface ControlPageInnerInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtemState.AtemState | null
-  profile: LibAtemProfile.DeviceProfile | null
+  currentState: LibAtemState.AtemState
+  profile: LibAtemProfile.DeviceProfile
 }
 interface ControlPageInnerInnerState {
   open: boolean
@@ -96,7 +96,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   }
 
   private renderMeSelection(isMobile: boolean) {
-    const mixEffects = this.props.currentState?.mixEffects ?? []
+    const mixEffects = this.props.currentState.mixEffects
     if (mixEffects.length <= 1) {
       return null
     }
@@ -120,7 +120,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
   private lastSourcesMap: ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState> = new Map()
   private lastSourcesInput: { [key: string]: LibAtemState.InputState } = {}
   private getSourcesMap(): SourcesMap {
-    const newInputs = this.props.currentState?.settings?.inputs
+    const newInputs = this.props.currentState.settings.inputs
 
     if (!shallowEqualObjects(newInputs ?? {}, this.lastSourcesInput)) {
       const sources = new Map<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState>()
@@ -225,8 +225,8 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 interface MixEffectPanelProps {
   sendCommand: SendCommandStrict
   device: AtemDeviceInfo
-  currentState: LibAtemState.AtemState | null
-  profile: LibAtemProfile.DeviceProfile | null
+  currentState: LibAtemState.AtemState
+  profile: LibAtemProfile.DeviceProfile
   sources: SourcesMap
   open: boolean
   meIndex: number
@@ -241,9 +241,6 @@ class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanel
 
   render() {
     const { currentState, profile } = this.props
-    if (!currentState || !profile) {
-      return <p>Loading state...</p>
-    }
 
     const currentME = currentState.mixEffects[this.props.meIndex] as LibAtemState.MixEffectState | undefined
     if (!currentME) {

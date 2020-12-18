@@ -2,20 +2,21 @@ import React from 'react'
 import { AtemDeviceInfo } from '../Devices/types'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
-import { LibAtemProfile } from '../generated'
+import { LibAtemProfile, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
 import { DevicePageWrapper } from '../device-page-wrapper'
 import { Container } from 'react-bootstrap'
 
 export class DeviceProfileViewerPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(
+    device: AtemDeviceInfo,
+    _signalR: signalR.HubConnection,
+    _deviceState: LibAtemState.AtemState,
+    deviceProfile: LibAtemProfile.DeviceProfile
+  ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <DeviceProfileViewerPageInner
-          device={device}
-          signalR={signalR}
-          currentDeviceProfile={this.context.currentProfile}
-        />
+        <DeviceProfileViewerPageInner device={device} currentDeviceProfile={deviceProfile} />
       </ErrorBoundary>
     )
   }
@@ -23,8 +24,7 @@ export class DeviceProfileViewerPage extends DevicePageWrapper {
 
 interface DeviceProfileViewerPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentDeviceProfile: LibAtemProfile.DeviceProfile | null
+  currentDeviceProfile: LibAtemProfile.DeviceProfile
 }
 interface DeviceProfileViewerPageInnerState {}
 
@@ -40,9 +40,6 @@ class DeviceProfileViewerPageInner extends React.Component<
 
   render() {
     const { currentDeviceProfile } = this.props
-    if (!currentDeviceProfile) {
-      return <p>Loading state...</p>
-    }
 
     return (
       <Container>

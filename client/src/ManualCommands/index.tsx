@@ -23,7 +23,7 @@ export class ManualCommandsPage extends DevicePageWrapper {
 
 interface ManualCommandsPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
 }
 interface ManualCommandsPageInnerState {
   commandsSpec: CommandSpecSet['commands'] | null
@@ -116,7 +116,7 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
 
 interface CommandBuilderProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
+  signalR: signalR.HubConnection
 
   spec: CommandSpec | undefined
 }
@@ -185,11 +185,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
             )
           })}
 
-          <Button
-            variant="primary"
-            onClick={() => this.sendCommand()}
-            disabled={!this.props.device.connected || !this.props.signalR || !spec}
-          >
+          <Button variant="primary" onClick={() => this.sendCommand()} disabled={!this.props.device.connected || !spec}>
             Send
           </Button>
         </Form>
@@ -199,7 +195,7 @@ class CommandBuilder extends React.Component<CommandBuilderProps, CommandBuilder
 
   private sendCommand() {
     const { device, signalR, spec } = this.props
-    if (device.connected && signalR && spec) {
+    if (device.connected && spec) {
       const devId = GetDeviceId(device)
       console.log(spec.fullName)
       console.log(this.state.values)

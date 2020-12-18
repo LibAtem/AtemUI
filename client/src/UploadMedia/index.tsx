@@ -10,10 +10,10 @@ import { CommandTypes } from '../generated/commands'
 import Image from 'react-graceful-image'
 
 export class UploadMediaPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection, deviceState: LibAtemState.AtemState) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <MediaPageInner device={device} currentState={this.context.currentState} signalR={signalR} />
+        <MediaPageInner device={device} currentState={deviceState} signalR={signalR} />
       </ErrorBoundary>
     )
   }
@@ -22,7 +22,7 @@ export class UploadMediaPage extends DevicePageWrapper {
 interface MediaPageInnerProps {
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
-  currentState: LibAtemState.AtemState | null
+  currentState: LibAtemState.AtemState
 }
 interface MediaPageInnerState {
   dragging: boolean
@@ -100,10 +100,6 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
   }
 
   render() {
-    if (!this.props.currentState) {
-      return <p>Waiting for state</p>
-    }
-
     const {
       mediaPlayers,
       mediaPool,

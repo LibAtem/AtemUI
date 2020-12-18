@@ -8,10 +8,10 @@ import { DevicePageWrapper } from '../device-page-wrapper'
 import { Container } from 'react-bootstrap'
 
 export class StateViewerPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(device: AtemDeviceInfo, _signalR: signalR.HubConnection, deviceState: LibAtemState.AtemState) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <StateViewerPageInner device={device} signalR={signalR} currentState={this.context.currentState} />
+        <StateViewerPageInner device={device} currentState={deviceState} />
       </ErrorBoundary>
     )
   }
@@ -19,8 +19,7 @@ export class StateViewerPage extends DevicePageWrapper {
 
 interface StateViewerPageInnerProps {
   device: AtemDeviceInfo
-  signalR: signalR.HubConnection | undefined
-  currentState: LibAtemState.AtemState | null
+  currentState: LibAtemState.AtemState
 }
 interface StateViewerPageInnerState {}
 
@@ -33,9 +32,6 @@ class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, St
 
   render() {
     const { currentState } = this.props
-    if (!currentState) {
-      return <p>Loading state...</p>
-    }
 
     return (
       <Container>
