@@ -36,9 +36,7 @@ interface ControlSettingsPageInnerProps {
   currentProfile: LibAtemProfile.DeviceProfile | null
 }
 interface ControlSettingsPageInnerState {
-  hasConnected: boolean
   page: number
-  // currentState: any
 }
 
 class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerProps, ControlSettingsPageInnerState> {
@@ -46,7 +44,6 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     super(props)
 
     this.state = {
-      hasConnected: this.props.device.connected,
       page: 0,
     }
 
@@ -95,26 +92,9 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     }
   }
 
-  componentDidUpdate(prevProps: ControlSettingsPageInnerProps) {
-    // Should we reload the commandsSpec
-    if (
-      !this.state.hasConnected &&
-      this.props.device.connected // Device first connection
-    ) {
-      this.setState({
-        // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true,
-      })
-    }
-  }
-
   render() {
     const { device, currentState } = this.props
-    const { hasConnected } = this.state
-
-    if (!hasConnected) {
-      return <p className="mt-5">Device is not connected</p>
-    } else if (!currentState) {
+    if (!currentState) {
       return <p className="mt-5">Loading state...</p>
     }
 
@@ -492,8 +472,6 @@ class OutputLabelSettings extends React.Component<LabelSettingsProps, LabelSetti
   constructor(props: LabelSettingsProps) {
     super(props)
     this.state = {
-      // hasConnected: this.props.device.connected,
-      // currentState: this.props.currentState,
       page: 0,
     }
   }

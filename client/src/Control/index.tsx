@@ -236,24 +236,8 @@ interface MixEffectPanelState {}
 class MixEffectPanel extends React.Component<MixEffectPanelProps, MixEffectPanelState> {
   constructor(props: MixEffectPanelProps) {
     super(props)
-    this.state = {
-      // hasConnected: props.device.connected,
-    }
+    this.state = {}
   }
-
-  // componentDidUpdate(prevProps: MixEffectPanelProps) {
-  //   // Should we reload the commandsSpec
-  //   if (
-  //     !this.state.hasConnected &&
-  //     this.props.device.connected // Device first connection
-  //   ) {
-  //     this.setState({
-  //       // TODO - should this be delayed as old data is good enough to get us started
-  //       hasConnected: true,
-  //     })
-  //     // now reload
-  //   }
-  // }
 
   render() {
     const { currentState, profile } = this.props

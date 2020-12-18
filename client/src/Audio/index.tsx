@@ -25,8 +25,6 @@ interface AudioPageInnerProps {
   currentState: any // LibAtem.AtemState | null
 }
 interface AudioPageInnerState {
-  hasConnected: boolean
-  // state: any
   value: number
   ids: any
   idsSet: boolean
@@ -39,7 +37,6 @@ class AudioPageInner extends React.Component<AudioPageInnerProps, AudioPageInner
   constructor(props: AudioPageInnerProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
       value: 0,
       ids: {},
       idsSet: false,
@@ -189,8 +186,6 @@ interface InputAudioChannelProps {
   followFadeToBlack?: Boolean
 }
 interface InputAudioChannelState {
-  hasConnected: boolean
-
   value: number
   ids: any
   peaks: any
@@ -200,8 +195,6 @@ class InputAudioChannel extends React.Component<InputAudioChannelProps, InputAud
   constructor(props: InputAudioChannelProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
-
       value: 0,
       ids: {},
       peaks: [
@@ -767,8 +760,6 @@ class OutputAudioChannel extends InputAudioChannel {
   constructor(props: InputAudioChannelProps) {
     super(props)
     this.state = {
-      hasConnected: props.device.connected,
-
       value: 0,
       ids: {},
       peaks: [

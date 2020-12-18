@@ -26,7 +26,6 @@ interface ManualCommandsPageInnerProps {
   signalR: signalR.HubConnection | undefined
 }
 interface ManualCommandsPageInnerState {
-  hasConnected: boolean
   commandsSpec: CommandSpecSet['commands'] | null
 
   selectedCommand: { label: string; value: string } | null
@@ -37,7 +36,6 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
     super(props)
 
     this.state = {
-      hasConnected: props.device.connected,
       commandsSpec: null,
       selectedCommand: null,
     }
@@ -64,16 +62,18 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
       })
   }
 
+  componentDidMount() {
+    this.loadCommandsSpec(this.props)
+  }
+
   componentDidUpdate(prevProps: ManualCommandsPageInnerProps) {
     // Should we reload the commandsSpec?
     if (
-      prevProps.device.version !== this.props.device.version || // Firmware is now different
-      (!this.state.hasConnected && this.props.device.connected) // Device first connection
+      prevProps.device.version !== this.props.device.version // Firmware is now different
     ) {
       this.setState({
         // TODO - should this be delayed as old data is good enough to get us started
         commandsSpec: null,
-        hasConnected: true,
       })
       // now reload it
       this.loadCommandsSpec(this.props)
@@ -82,11 +82,9 @@ class ManualCommandsPageInner extends React.Component<ManualCommandsPageInnerPro
 
   render() {
     const { device, signalR } = this.props
-    const { hasConnected, commandsSpec, selectedCommand } = this.state
+    const { commandsSpec, selectedCommand } = this.state
 
-    if (!hasConnected) {
-      return <p>Device is not connected</p>
-    } else if (!commandsSpec) {
+    if (!commandsSpec) {
       return <p>Loading spec...</p>
     }
 

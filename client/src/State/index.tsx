@@ -21,40 +21,18 @@ interface StateViewerPageInnerProps {
   signalR: signalR.HubConnection | undefined
   currentState: LibAtemState.AtemState | null
 }
-interface StateViewerPageInnerState {
-  hasConnected: boolean
-}
+interface StateViewerPageInnerState {}
 
 class StateViewerPageInner extends React.Component<StateViewerPageInnerProps, StateViewerPageInnerState> {
   constructor(props: StateViewerPageInnerProps) {
     super(props)
 
-    this.state = {
-      hasConnected: props.device.connected,
-    }
-  }
-
-  componentDidUpdate(prevProps: StateViewerPageInnerProps) {
-    // Should we reload the commandsSpec
-    if (
-      !this.state.hasConnected &&
-      this.props.device.connected // Device first connection
-    ) {
-      this.setState({
-        // TODO - should this be delayed as old data is good enough to get us started
-        // currentState: null,
-        hasConnected: true,
-      })
-    }
+    this.state = {}
   }
 
   render() {
     const { currentState } = this.props
-    const { hasConnected } = this.state
-
-    if (!hasConnected) {
-      return <p>Device is not connected</p>
-    } else if (!currentState) {
+    if (!currentState) {
       return <p>Loading state...</p>
     }
 

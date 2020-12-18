@@ -25,9 +25,7 @@ interface DeviceProfileViewerPageInnerProps {
   signalR: signalR.HubConnection | undefined
   currentDeviceProfile: LibAtemProfile.DeviceProfile | null
 }
-interface DeviceProfileViewerPageInnerState {
-  hasConnected: boolean
-}
+interface DeviceProfileViewerPageInnerState {}
 
 class DeviceProfileViewerPageInner extends React.Component<
   DeviceProfileViewerPageInnerProps,
@@ -36,31 +34,12 @@ class DeviceProfileViewerPageInner extends React.Component<
   constructor(props: DeviceProfileViewerPageInnerProps) {
     super(props)
 
-    this.state = {
-      hasConnected: props.device.connected,
-    }
-  }
-
-  componentDidUpdate(prevProps: DeviceProfileViewerPageInnerProps) {
-    // Should we reload the commandsSpec
-    if (
-      !this.state.hasConnected &&
-      this.props.device.connected // Device first connection
-    ) {
-      this.setState({
-        // TODO - should this be delayed as old data is good enough to get us started
-        hasConnected: true,
-      })
-    }
+    this.state = {}
   }
 
   render() {
     const { currentDeviceProfile } = this.props
-    const { hasConnected } = this.state
-
-    if (!hasConnected) {
-      return <p>Device is not connected</p>
-    } else if (!currentDeviceProfile) {
+    if (!currentDeviceProfile) {
       return <p>Loading state...</p>
     }
 
