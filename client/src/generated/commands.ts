@@ -1529,7 +1529,7 @@ export interface DataTransfer_DataTransferDownloadRequestCommand {
 
 export interface DataTransfer_DataTransferErrorCommand {
   TransferId: number
-  ErrorCode: number
+  ErrorCode: unknown
 }
 
 export interface DataTransfer_DataTransferFileDescriptionCommand {
