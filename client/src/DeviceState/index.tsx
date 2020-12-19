@@ -4,21 +4,20 @@ import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-
 import { literal } from '../util'
 import { LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
-import { DevicePageWrapper } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict } from '../device-page-wrapper'
 import { Container } from 'react-bootstrap'
 
 export class StateViewerPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, _signalR: signalR.HubConnection, deviceState: LibAtemState.AtemState) {
+  renderContent(_sendCommand: SendCommandStrict, deviceState: LibAtemState.AtemState) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <StateViewerPageInner device={device} currentState={deviceState} />
+        <StateViewerPageInner currentState={deviceState} />
       </ErrorBoundary>
     )
   }
 }
 
 interface StateViewerPageInnerProps {
-  device: AtemDeviceInfo
   currentState: LibAtemState.AtemState
 }
 interface StateViewerPageInnerState {}

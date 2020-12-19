@@ -2,26 +2,30 @@ import React from 'react'
 import { AtemDeviceInfo } from '../Devices/types'
 import { GetDeviceId } from '../DeviceManager'
 import './media.scss'
-import { LibAtemEnums, LibAtemState } from '../generated'
+import { LibAtemEnums, LibAtemProfile, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
-import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict } from '../device-page-wrapper'
 import { getStillPreviewUrl, MediaPoolStill } from './tile'
-import { CommandTypes } from '../generated/commands'
 import Image from 'react-graceful-image'
 
 export class UploadMediaPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection, deviceState: LibAtemState.AtemState) {
+  renderContent(
+    sendCommand: SendCommandStrict,
+    deviceState: LibAtemState.AtemState,
+    _deviceProfile: LibAtemProfile.DeviceProfile,
+    device: AtemDeviceInfo
+  ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <MediaPageInner device={device} currentState={deviceState} signalR={signalR} />
+        <MediaPageInner sendCommand={sendCommand} currentState={deviceState} deviceId={GetDeviceId(device)} />
       </ErrorBoundary>
     )
   }
 }
 
 interface MediaPageInnerProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
+  deviceId: string
   currentState: LibAtemState.AtemState
 }
 interface MediaPageInnerState {
@@ -38,12 +42,11 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     this.allowDrop = this.allowDrop.bind(this)
     this.drag = this.drag.bind(this)
     this.changeImage = this.changeImage.bind(this)
-    this.sendCommand = this.sendCommand.bind(this)
   }
 
   sendBase64ToServer(name: string, base64: string, index: number) {
-    const device = this.props.device
-    if (device) {
+    const deviceId = this.props.deviceId
+    if (deviceId) {
       const httpPost = new XMLHttpRequest()
       httpPost.onreadystatechange = (err) => {
         if (httpPost.readyState == 4 && httpPost.status == 200) {
@@ -53,7 +56,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
         }
       }
 
-      httpPost.open('POST', `/api/images/upload/${GetDeviceId(device)}/still/${index}`, true)
+      httpPost.open('POST', `/api/images/upload/${deviceId}/still/${index}`, true)
       httpPost.setRequestHeader('Content-Type', 'application/json')
       httpPost.send(JSON.stringify({ image: base64, name: name }))
     }
@@ -74,10 +77,6 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     reader.readAsArrayBuffer(file)
   }
 
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
-  }
-
   allowDrop(ev: any) {
     ev.preventDefault()
   }
@@ -86,7 +85,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
     ev.preventDefault()
     var data = ev.dataTransfer.getData('id')
     console.log(data)
-    this.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
+    this.props.sendCommand('LibAtem.Commands.Media.MediaPlayerSourceSetCommand', {
       Index: mp,
       Mask: 3,
       SourceType: 1,
@@ -122,7 +121,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
       return !!theseInputs.find((v) => v.tally.programTally)
     })
 
-    const deviceId = GetDeviceId(this.props.device)
+    const deviceId = this.props.deviceId
 
     return (
       <div id="mediaContainer">
@@ -142,7 +141,7 @@ class MediaPageInner extends React.Component<MediaPageInnerProps, MediaPageInner
               )
               return (
                 <MediaPoolStill
-                  sendCommand={this.sendCommand}
+                  sendCommand={this.props.sendCommand}
                   key={index}
                   index={index}
                   deviceId={deviceId}

@@ -1,29 +1,26 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../Devices/types'
 import TreeMenu, { TreeNodeObject, TreeNode, ItemComponent } from 'react-simple-tree-menu'
 import { literal } from '../util'
 import { LibAtemProfile, LibAtemState } from '../generated'
 import { ErrorBoundary } from '../errorBoundary'
-import { DevicePageWrapper } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict } from '../device-page-wrapper'
 import { Container } from 'react-bootstrap'
 
 export class DeviceProfileViewerPage extends DevicePageWrapper {
   renderContent(
-    device: AtemDeviceInfo,
-    _signalR: signalR.HubConnection,
+    _sendCommand: SendCommandStrict,
     _deviceState: LibAtemState.AtemState,
     deviceProfile: LibAtemProfile.DeviceProfile
   ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <DeviceProfileViewerPageInner device={device} currentDeviceProfile={deviceProfile} />
+        <DeviceProfileViewerPageInner currentDeviceProfile={deviceProfile} />
       </ErrorBoundary>
     )
   }
 }
 
 interface DeviceProfileViewerPageInnerProps {
-  device: AtemDeviceInfo
   currentDeviceProfile: LibAtemProfile.DeviceProfile
 }
 interface DeviceProfileViewerPageInnerState {}

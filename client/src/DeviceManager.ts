@@ -1,11 +1,11 @@
 import React from 'react'
-import { AtemDeviceInfo } from './Devices/types'
+import { AtemDeviceInfo, AtemDeviceMap } from './Devices/types'
 import { LibAtemState, LibAtemProfile } from './generated'
 import { AtemTransferStatus } from './Transfers/types'
 
 export interface DeviceContext {
   signalR: signalR.HubConnection | undefined
-  devices: AtemDeviceInfo[]
+  devices: AtemDeviceMap
   transfers: AtemTransferStatus[]
   activeDeviceId: string | null
   currentState: LibAtemState.AtemState | null
@@ -14,7 +14,7 @@ export interface DeviceContext {
 
 export const DeviceManagerContext = React.createContext<DeviceContext>({
   signalR: undefined,
-  devices: [],
+  devices: {},
   transfers: [],
   activeDeviceId: null,
   currentState: null,
@@ -26,9 +26,5 @@ export function GetDeviceId(dev: AtemDeviceInfo): string {
 }
 
 export function GetActiveDevice(context: DeviceContext): AtemDeviceInfo | undefined {
-  if (context.activeDeviceId) {
-    return context.devices.find((dev) => GetDeviceId(dev) === context.activeDeviceId)
-  } else {
-    return undefined
-  }
+  return context.activeDeviceId ? context.devices[context.activeDeviceId] : undefined
 }

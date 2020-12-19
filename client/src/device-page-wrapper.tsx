@@ -11,6 +11,21 @@ export abstract class DevicePageWrapper extends React.Component {
 
   static contextType = DeviceManagerContext
 
+  constructor(props: {}) {
+    super(props)
+
+    this.sendCommand = this.sendCommand.bind(this)
+  }
+
+  private sendCommand(...args: CommandTypes) {
+    const device = GetActiveDevice(this.context)
+    if (device && this.context.signalR) {
+      sendCommandStrict({ device, signalR: this.context.signalR }, ...args)
+    } else {
+      // TODO - error
+    }
+  }
+
   render() {
     const device = GetActiveDevice(this.context)
     if (device) {
@@ -18,7 +33,13 @@ export abstract class DevicePageWrapper extends React.Component {
         if (this.context.currentState && this.context.currentProfile) {
           return (
             <div key={this.context.activeDeviceId || ''}>
-              {this.renderContent(device, this.context.signalR, this.context.currentState, this.context.currentProfile)}
+              {this.renderContent(
+                this.sendCommand,
+                this.context.currentState,
+                this.context.currentProfile,
+                device,
+                this.context.signalR
+              )}
             </div>
           )
         } else {
@@ -33,10 +54,11 @@ export abstract class DevicePageWrapper extends React.Component {
   }
 
   abstract renderContent(
-    device: AtemDeviceInfo,
-    signalR: signalR.HubConnection,
+    sendCommand: SendCommandStrict,
     deviceState: LibAtemState.AtemState,
-    deviceProfile: LibAtemProfile.DeviceProfile
+    deviceProfile: LibAtemProfile.DeviceProfile,
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection
   ): JSX.Element
 }
 

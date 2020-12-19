@@ -13,7 +13,7 @@ import { ControlPage } from './Control'
 import { ControlSettingsPage } from './ControlSettings'
 import { DeviceManagerContext, DeviceContext, GetDeviceId } from './DeviceManager'
 import * as signalR from '@microsoft/signalr'
-import { AtemDeviceInfo } from './Devices/types'
+import { AtemDeviceInfo, AtemDeviceMap } from './Devices/types'
 import { StateViewerPage } from './DeviceState'
 import { DeviceProfileViewerPage } from './DeviceProfile'
 import { UploadMediaPage } from './UploadMedia'
@@ -23,6 +23,7 @@ import * as objectPath from 'object-path'
 import camelcase from 'camelcase'
 import { AtemTransferStatus } from './Transfers/types'
 import { TransfersPage } from './Transfers'
+import _ from 'underscore'
 
 const LOCAL_STORAGE_ACTIVE_DEVICE_ID = 'AtemUI.MainContext.ActiveDeviceId'
 
@@ -56,7 +57,7 @@ export default class App extends React.Component<{}, AppState> {
       .configureLogging(signalR.LogLevel.Information)
       .withAutomaticReconnect(new SignalRRetryPolicy())
       .build(),
-    devices: [],
+    devices: {},
     transfers: [],
     activeDeviceId: window.localStorage.getItem(LOCAL_STORAGE_ACTIVE_DEVICE_ID),
     currentState: null,
@@ -90,7 +91,13 @@ export default class App extends React.Component<{}, AppState> {
 
       connection.on('devices', (devices: AtemDeviceInfo[]) => {
         console.log('Devices update:', devices)
-        const currentDevice = devices.find((dev) => GetDeviceId(dev) === this.state.activeDeviceId)
+
+        const devicesObj: AtemDeviceMap = {}
+        for (const device of devices) {
+          devicesObj[GetDeviceId(device)] = device
+        }
+
+        const currentDevice = this.state.activeDeviceId ? devicesObj[this.state.activeDeviceId] : undefined
         if (currentDevice && !isDeviceAvailable(currentDevice)) {
           console.log('Forget activeDevice')
           // Selected device is now invalid
@@ -98,7 +105,7 @@ export default class App extends React.Component<{}, AppState> {
           // TODO - is this desired behaviour?
         }
 
-        this.setState({ devices: devices })
+        this.setState({ devices: devicesObj })
       })
 
       connection.on('transfers', (transfers: AtemTransferStatus[]) => {
@@ -302,7 +309,7 @@ export default class App extends React.Component<{}, AppState> {
 }
 
 class NavBar extends React.PureComponent<{
-  devices: AtemDeviceInfo[]
+  devices: AtemDeviceMap
   setDevice: (_: string | undefined) => void
   activeDeviceId: string | null
 }> {
@@ -314,7 +321,7 @@ class NavBar extends React.PureComponent<{
   // }
 
   renderDeviceSelection() {
-    const availableDevices = this.props.devices.filter(isDeviceAvailable)
+    const availableDevices = _.compact(Object.values(this.props.devices)).filter(isDeviceAvailable)
 
     const onChange = (e: FormEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const id = availableDevices.map((dev) => GetDeviceId(dev)).find((id) => id === e.currentTarget.value)

@@ -4,7 +4,7 @@ import { AtemDeviceInfo } from '../Devices/types'
 import { GetDeviceId } from '../DeviceManager'
 import { Container, ButtonGroup, Button, Form, Row, Col } from 'react-bootstrap'
 import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
-import { DevicePageWrapper, sendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict, sendCommandStrict } from '../device-page-wrapper'
 import { AtemButtonBar, SourcesMap } from '../components'
 import { GeneralSettings } from './general'
 import { CommandTypes } from '../generated/commands'
@@ -16,17 +16,19 @@ import { ClassicAudioSettings } from './classicAudio'
 
 export class ControlSettingsPage extends DevicePageWrapper {
   renderContent(
-    device: AtemDeviceInfo,
-    signalR: signalR.HubConnection,
+    sendCommand: SendCommandStrict,
     deviceState: LibAtemState.AtemState,
-    deviceProfile: LibAtemProfile.DeviceProfile
+    deviceProfile: LibAtemProfile.DeviceProfile,
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection
   ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
         <ControlSettingsPageInner
-          device={device}
+          sendCommand={sendCommand}
           currentState={deviceState}
           currentProfile={deviceProfile}
+          device={device}
           signalR={signalR}
         />
       </ErrorBoundary>
@@ -35,6 +37,7 @@ export class ControlSettingsPage extends DevicePageWrapper {
 }
 
 interface ControlSettingsPageInnerProps {
+  sendCommand: SendCommandStrict
   device: AtemDeviceInfo
   signalR: signalR.HubConnection
   currentState: LibAtemState.AtemState
@@ -51,12 +54,6 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
     this.state = {
       page: 0,
     }
-
-    this.sendCommand = this.sendCommand.bind(this)
-  }
-
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
   }
 
   private lastSourcesMap: ReadonlyMap<LibAtemEnums.VideoSource, LibAtemState.InputState_PropertiesState> = new Map()
@@ -137,7 +134,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
         {this.state.page === 0 ? (
           <ErrorBoundary key={0}>
-            <GeneralSettings sendCommand={this.sendCommand} currentState={currentState} />
+            <GeneralSettings sendCommand={this.props.sendCommand} currentState={currentState} />
           </ErrorBoundary>
         ) : undefined}
 
@@ -145,7 +142,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
           <ErrorBoundary key={1}>
             {currentState.audio ? (
               <ClassicAudioSettings
-                sendCommand={this.sendCommand}
+                sendCommand={this.props.sendCommand}
                 audio={currentState.audio}
                 talkback={currentState.settings.talkback}
               />
@@ -158,7 +155,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
         {this.state.page === 2 ? (
           <ErrorBoundary key={2}>
             <MultiViewSettings
-              sendCommand={this.sendCommand}
+              sendCommand={this.props.sendCommand}
               sources={sources}
               info={currentState.info.multiViewers}
               multiViewers={currentState.settings.multiViewers}
@@ -173,7 +170,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
               currentState={currentState}
               signalR={this.props.signalR}
               currentProfile={this.props.currentProfile}
-              sendCommand={this.sendCommand}
+              sendCommand={this.props.sendCommand}
               updateLabel={this.updateLabel}
             />
           </ErrorBoundary>
@@ -183,7 +180,7 @@ class ControlSettingsPageInner extends React.Component<ControlSettingsPageInnerP
 
         {this.state.page === 5 ? (
           <ErrorBoundary key={5}>
-            <RemoteSettings sendCommand={this.sendCommand} currentState={currentState} />
+            <RemoteSettings sendCommand={this.props.sendCommand} currentState={currentState} />
           </ErrorBoundary>
         ) : undefined}
       </div>

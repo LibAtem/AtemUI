@@ -1,6 +1,5 @@
 import React from 'react'
 import './control.scss'
-import { AtemDeviceInfo } from '../Devices/types'
 import { SwitcherSettings } from './Settings/settings'
 import MediaQuery from 'react-responsive'
 import { DSKPanel } from './dsk'
@@ -8,31 +7,28 @@ import { NextPanel } from './next'
 import { FTBPanel } from './ftb'
 import { TransitionStylePanel } from './style'
 import { BankPanel } from './bank'
-import { DevicePageWrapper, sendCommandStrict, SendCommandStrict } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict } from '../device-page-wrapper'
 import { LibAtemState, LibAtemProfile, LibAtemEnums } from '../generated'
 import { AtemButtonBar, SourcesMap } from '../components'
-import { CommandTypes } from '../generated/commands'
 import { shallowEqualObjects } from 'shallow-equal'
 import { ErrorBoundary } from '../errorBoundary'
 
 export class ControlPage extends DevicePageWrapper {
   renderContent(
-    device: AtemDeviceInfo,
-    signalR: signalR.HubConnection,
+    sendCommand: SendCommandStrict,
     deviceState: LibAtemState.AtemState,
     deviceProfile: LibAtemProfile.DeviceProfile
   ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
-        <ControlPageInnerInner device={device} currentState={deviceState} signalR={signalR} profile={deviceProfile} />
+        <ControlPageInnerInner sendCommand={sendCommand} currentState={deviceState} profile={deviceProfile} />
       </ErrorBoundary>
     )
   }
 }
 
 interface ControlPageInnerInnerProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState
   profile: LibAtemProfile.DeviceProfile
 }
@@ -87,12 +83,6 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
       openMobile: false,
       meIndex: 0,
     }
-
-    this.sendCommand = this.sendCommand.bind(this)
-  }
-
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
   }
 
   private renderMeSelection(isMobile: boolean) {
@@ -153,11 +143,10 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                 <MixEffectPanel
                   open={this.state.open}
                   profile={this.props.profile}
-                  device={this.props.device}
                   currentState={this.props.currentState}
                   sources={sources}
                   meIndex={this.state.meIndex}
-                  sendCommand={this.sendCommand}
+                  sendCommand={this.props.sendCommand}
                 />
               </div>
 
@@ -170,7 +159,7 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   meIndex={this.state.meIndex}
                   profile={this.props.profile}
                   sources={sources}
-                  sendCommand={this.sendCommand}
+                  sendCommand={this.props.sendCommand}
                 />
               ) : undefined}
             </div>
@@ -201,17 +190,16 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
                   meIndex={this.state.meIndex}
                   profile={this.props.profile}
                   sources={sources}
-                  sendCommand={this.sendCommand}
+                  sendCommand={this.props.sendCommand}
                 />
               ) : (
                 <MixEffectPanel
                   profile={this.props.profile}
-                  device={this.props.device}
                   currentState={this.props.currentState}
                   sources={sources}
                   meIndex={this.state.meIndex}
                   open={this.state.open}
-                  sendCommand={this.sendCommand}
+                  sendCommand={this.props.sendCommand}
                 />
               )}
             </div>
@@ -224,7 +212,6 @@ class ControlPageInnerInner extends React.Component<ControlPageInnerInnerProps, 
 
 interface MixEffectPanelProps {
   sendCommand: SendCommandStrict
-  device: AtemDeviceInfo
   currentState: LibAtemState.AtemState
   profile: LibAtemProfile.DeviceProfile
   sources: SourcesMap

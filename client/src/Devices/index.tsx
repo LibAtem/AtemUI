@@ -5,6 +5,7 @@ import moment from 'moment'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash, faCheck, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { DeviceManagerContext } from '../DeviceManager'
+import _ from 'underscore'
 
 interface DevicesTableProps {
   connection: signalR.HubConnection
@@ -43,7 +44,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
           </tr>
         </thead>
         <tbody>
-          {this.props.devices.map(dev => (
+          {this.props.devices.map((dev) => (
             <tr key={`${dev.info.address}:${dev.info.port}`}>
               <td>{dev.info.name}</td>
               <td>
@@ -105,7 +106,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
       .then(() => {
         console.log('Devices: add')
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Devices: Failed to remember', e)
       })
   }
@@ -117,7 +118,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
       .then(() => {
         console.log('Devices: enabled')
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Devices: Failed to enable', e)
       })
   }
@@ -129,7 +130,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
       .then(() => {
         console.log('Devices: disabled')
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Devices: Failed to disable', e)
       })
   }
@@ -141,7 +142,7 @@ class DevicesTable extends React.Component<DevicesTableProps> {
       .then(() => {
         console.log('Devices: forget')
       })
-      .catch(e => {
+      .catch((e) => {
         console.log('Devices: Failed to forget', e)
       })
   }
@@ -167,15 +168,15 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
       // devices: [],
       showAddModal: false,
       addAddress: '',
-      addPort: 9910
+      addPort: 9910,
     }
   }
 
   render() {
     const { devices, signalR } = this.context
 
-    const discoveredDevices = devices.filter(d => !d.remember)
-    const mainDevices = devices.filter(d => d.remember)
+    const allDevices = _.compact(Object.values(devices))
+    const [mainDevices, discoveredDevices] = _.partition(allDevices, (d) => d.remember)
 
     if (!signalR) {
       return (
@@ -232,7 +233,7 @@ export class DevicesPage extends React.Component<{}, DevicesState> {
           .then(() => {
             console.log('Devices: added')
           })
-          .catch(e => {
+          .catch((e) => {
             console.log('Devices: Failed to add', e)
           })
       }

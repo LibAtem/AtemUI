@@ -9,10 +9,17 @@ import ToggleSwitch from 'bootstrap-switch-button-react'
 import Slider from 'react-rangeslider'
 import { prettyDecimal } from '../util'
 import { ErrorBoundary } from '../errorBoundary'
-import { DevicePageWrapper } from '../device-page-wrapper'
+import { DevicePageWrapper, SendCommandStrict } from '../device-page-wrapper'
+import { LibAtemState, LibAtemProfile } from '../generated'
 
 export class ManualCommandsPage extends DevicePageWrapper {
-  renderContent(device: AtemDeviceInfo, signalR: signalR.HubConnection) {
+  renderContent(
+    _sendCommand: SendCommandStrict,
+    _deviceState: LibAtemState.AtemState,
+    _deviceProfile: LibAtemProfile.DeviceProfile,
+    device: AtemDeviceInfo,
+    signalR: signalR.HubConnection
+  ) {
     return (
       <ErrorBoundary key={this.context.activeDeviceId || ''}>
         <ManualCommandsPageInner device={device} signalR={signalR} />

@@ -1,15 +1,14 @@
 import React from 'react'
 import { AtemDeviceInfo } from '../../Devices/types'
 import { LibAtemEnums, LibAtemState } from '../../generated'
-import { sendCommandStrict } from '../../device-page-wrapper'
+import { SendCommandStrict, sendCommandStrict } from '../../device-page-wrapper'
 import { CommandTypes } from '../../generated/commands'
 import * as _ from 'underscore'
 import { audioSourceToVideoSource } from '../../util/audio'
 import { InputChannelStrip } from './channel-strip'
 
 interface ClassicAudioPageInnerProps {
-  device: AtemDeviceInfo
-  signalR: signalR.HubConnection
+  sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState
 }
 
@@ -17,14 +16,8 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
   constructor(props: ClassicAudioPageInnerProps) {
     super(props)
 
-    this.sendCommand = this.sendCommand.bind(this)
-
     // TODO - we should simply tell the server that we want audio levels, and it should intelligently subscribe/unsubscribe based on all clients
-    this.sendCommand('LibAtem.Commands.Audio.AudioMixerSendLevelsCommand', { SendLevels: true })
-  }
-
-  private sendCommand(...args: CommandTypes) {
-    sendCommandStrict(this.props, ...args)
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerSendLevelsCommand', { SendLevels: true })
   }
 
   render() {
@@ -46,7 +39,7 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
 
       return (
         <InputChannelStrip
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           currentInput={input}
           id={id}
           audioTally={tally}
@@ -64,7 +57,7 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
 
       return (
         <InputChannelStrip
-          sendCommand={this.sendCommand}
+          sendCommand={this.props.sendCommand}
           currentInput={input}
           id={idMain}
           audioTally={tally}

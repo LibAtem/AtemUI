@@ -14,3 +14,5 @@ export interface AtemDeviceInfo {
   connected: boolean
   version?: string
 }
+
+export type AtemDeviceMap = { [deviceId: string]: AtemDeviceInfo | undefined }
