@@ -31,6 +31,8 @@ namespace AtemServer.Services
         private readonly IHubContext<DevicesHub> _context;
         private readonly TransferJobMonitor _transfers;
 
+        private readonly Action SendDevicesDebounce;
+
         static AtemRepository()
         {
             // Workaround due to AtemDeviceInfo not having property setters
@@ -57,6 +59,9 @@ namespace AtemServer.Services
                 SetupConnection(device);
                 _devices[device.Info.Id()] = device;
             }
+
+            SendDevicesDebounce =
+                Util.Util.Debounce(() => _context.Clients.All.SendAsync("devices", ListDevices()), 500);
             
             _discovery = new AtemDiscoveryService(5000);
             _discovery.OnDeviceSeen += OnDeviceSeen;
@@ -160,7 +165,7 @@ namespace AtemServer.Services
                     Log.InfoFormat("Discovered device: {0}", info.ToString());
                 }
 
-                _context.Clients.All.SendAsync("devices", ListDevices());
+                SendDevicesDebounce();
             }
         }
         private void OnDeviceLost(object sender, AtemDeviceInfo info)
@@ -183,7 +188,7 @@ namespace AtemServer.Services
                     // Ensure device is in expected state
                     SetupConnection(device);
                     
-                    _context.Clients.All.SendAsync("devices", ListDevices());
+                    SendDevicesDebounce();
                 }
             }
         }
