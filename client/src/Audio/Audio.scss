@@ -408,46 +408,47 @@ input[type='range']:focus::-ms-fill-upper {
 .button-holder {
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  .button-inner {
+    background: rgb(37, 37, 37);
+    background: linear-gradient(0deg, rgba(37, 37, 37, 1) 49%, rgba(50, 50, 50, 1) 90%, rgba(59, 59, 59, 1) 100%);
+    border: solid 1px #131313;
+    text-align: center;
+    font-size: 12px;
+    color: #5e5e5e;
+    line-height: 18px;
+    user-select: none;
+    padding-top: 2px;
+
+    &:active {
+      box-shadow: inset 1px 1px 5px #000000b9;
+    }
+
+    &:first-child {
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+  
+    &:last-child {
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+  
+    &:not(:last-child) {
+      border-right: none;
+    }
+  
+    &:first-child:last-child {
+      grid-column: span 2;
+    }
+  }
+
+  .button-inner-selected {
+    background: linear-gradient(0deg, rgba(18, 18, 18, 1) 49%, rgba(23, 23, 23, 1) 90%, rgba(34, 34, 34, 1) 100%);
+    color: #c06d00;
+  }
 }
 
-.button-inner {
-  background: rgb(37, 37, 37);
-  background: linear-gradient(0deg, rgba(37, 37, 37, 1) 49%, rgba(50, 50, 50, 1) 90%, rgba(59, 59, 59, 1) 100%);
-  border: solid 1px #131313;
-  text-align: center;
-  font-size: 12px;
-  color: #5e5e5e;
-  line-height: 18px;
-  user-select: none;
-  padding-top: 2px;
-}
-
-.button-inner:active {
-  box-shadow: inset 1px 1px 5px #000000b9;
-}
-
-.full {
-  border-radius: 10px;
-
-  grid-column-start: 1;
-  grid-column-end: 3;
-}
-
-.left {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-  border-right: none;
-}
-
-.right {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-.button-inner-selected {
-  background: linear-gradient(0deg, rgba(18, 18, 18, 1) 49%, rgba(23, 23, 23, 1) 90%, rgba(34, 34, 34, 1) 100%);
-  color: #c06d00;
-}
 
 .phones {
   position: relative;
@@ -465,7 +466,7 @@ input[type='range']:focus::-ms-fill-upper {
 }
 
 .phones-active {
-  background: linear-gradient(0deg, rgb(26, 26, 26) 60%, rgb(22, 22, 22) 95%, rgba(26, 26, 26) 100%);
+  background: linear-gradient(0deg, rgb(26, 26, 26) 60%, rgb(22, 22, 22) 95%, rgba(26, 26, 26, 1) 100%);
 }
 
 .phones-press:active {
