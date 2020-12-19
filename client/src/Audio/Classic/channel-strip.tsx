@@ -1,8 +1,10 @@
 import React from 'react'
 import Slider from 'react-rangeslider'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../generated'
-import { SendCommandStrict } from '../../device-page-wrapper'
+import { sendCommand, SendCommandStrict } from '../../device-page-wrapper'
 import * as _ from 'underscore'
+import { AudioDialControl } from '../components'
+import { send } from 'process'
 
 interface InputChannelStripProps {
   sendCommand: SendCommandStrict
@@ -27,6 +29,8 @@ export class InputChannelStrip extends React.Component<InputChannelStripProps, I
         [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
       ],
     }
+
+    this.balanceChanged = this.balanceChanged.bind(this)
   }
 
   shouldComponentUpdate(nextProps: InputChannelStripProps) {
@@ -261,74 +265,24 @@ export class InputChannelStrip extends React.Component<InputChannelStripProps, I
     }
   }
 
+  private balanceChanged(value: number): void {
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
+      Index: this.props.id,
+      Mask: LibAtemCommands.Audio_AudioMixerInputSetCommand_MaskFlags.Balance,
+      Balance: value,
+    })
+  }
+
   getPan() {
-    var slider = []
-    var color = '#5e5e5e'
-    if (this.props.currentInput.properties.mixOption !== 0) {
-      color = '#ff7b00'
-    }
-    if (this.props.currentInput.properties.balance > 0) {
-      slider.push(
-        <div
-          style={{
-            left: '50%',
-            background: color,
-            width: (35 * this.props.currentInput.properties.balance) / 50 + 'px',
-          }}
-          className="pan-slider-inner"
-        ></div>
-      )
-    } else {
-      slider.push(
-        <div
-          style={{
-            right: '50%',
-            background: color,
-            width: (35 * this.props.currentInput.properties.balance) / -50 + 'px',
-          }}
-          className="pan-slider-inner"
-        ></div>
-      )
-    }
+    const { currentInput } = this.props
     return (
-      <div className="pan">
-        <div className="pan-inner">
-          <div className="pan-labels">
-            <div className="pan-L">L</div>
-            <div className="pan-R">R</div>
-          </div>
-          <div
-            onMouseDown={(event: any) => {
-              var rect = event.target.getBoundingClientRect()
-              var x = event.clientX - rect.left
-              this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
-                Index: this.props.id,
-                Balance: (x / 70) * 110 - 55,
-                Mask: 4,
-              })
-              console.log(x)
-            }}
-            className="pan-slider"
-          >
-            {slider}
-          </div>
-        </div>
-        <div
-          onClick={(e) =>
-            this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerInputSetCommand', {
-              Index: this.props.id,
-              Balance: 0,
-              Mask: 4,
-            })
-          }
-          className="pan-input"
-        >
-          {' '}
-          {this.props.currentInput.properties.balance === 0
-            ? ''
-            : this.props.currentInput.properties.balance.toFixed(0)}
-        </div>
-      </div>
+      <AudioDialControl
+        onChange={this.balanceChanged}
+        currentValue={currentInput.properties.balance}
+        minValue={-50}
+        maxValue={50}
+        isActive={currentInput.properties.mixOption !== LibAtemEnums.AudioMixOption.Off}
+      />
     )
   }
 
