@@ -1,7 +1,7 @@
-import { ConsoleLogger } from '@microsoft/signalr/dist/esm/Utils'
 import React from 'react'
 import { Form } from 'react-bootstrap'
 import * as _ from 'underscore'
+import { LibAtemEnums } from '../generated'
 
 interface AudioNumericControlProps {
   onChange: (value: number) => void
@@ -179,6 +179,68 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
             <div>R</div>
           </div>
         </div>
+      </div>
+    )
+  }
+}
+
+interface AudioSoloButtonProps {
+  disabled: boolean
+  isSolo: boolean
+  onChange: (solo: boolean) => void
+}
+
+export class AudioSoloButton extends React.Component<AudioSoloButtonProps> {
+  render() {
+    const { disabled, isSolo, onChange } = this.props
+
+    const classes = ['phones']
+    let fillColor = '#444444'
+
+    if (!disabled) {
+      classes.push('phones-enabled')
+      fillColor = '#707070'
+      if (isSolo) {
+        classes.push('phones-active')
+        fillColor = '#34c9eb'
+      }
+    }
+
+    return (
+      <div className={classes.join(' ')} onClick={() => (!disabled ? onChange(!isSolo) : null)}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill={fillColor} width="18px" height="18px">
+          <path d="M0 0h24v24H0z" fill="none" opacity=".1" />
+          <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z" />
+        </svg>
+      </div>
+    )
+  }
+}
+
+interface AudioStripHeadingProps {
+  name: string
+  isLive: boolean
+  mixOption: LibAtemEnums.AudioMixOption
+}
+
+export class AudioStripHeading extends React.Component<AudioStripHeadingProps> {
+  render() {
+    const { name, isLive, mixOption } = this.props
+
+    const live = isLive || mixOption === LibAtemEnums.AudioMixOption.On
+    const afv = mixOption === LibAtemEnums.AudioMixOption.AudioFollowVideo
+
+    let tallyClass = ''
+    if (live) {
+      tallyClass = 'tally-red'
+    } else if (afv) {
+      tallyClass = 'tally-yellow'
+    }
+
+    return (
+      <div className="strip-heading">
+        <div className={`name ${live || afv ? 'name-active' : ''}`}>{name}</div>
+        <div className={`tally ${tallyClass}`}></div>
       </div>
     )
   }

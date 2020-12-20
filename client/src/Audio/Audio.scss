@@ -26,44 +26,9 @@ body {
 
 .channel {
   display: grid;
-  grid-template-rows: 30px 10px 1fr auto 20px 40px;
+  grid-template-rows: auto 1fr auto auto auto;
   row-gap: 10px;
-}
-
-.name {
-  text-align: center;
-  color: #5c5c5c;
-  font-size: 16px;
-  padding-top: 10px;
-}
-
-.name-active {
-  text-align: center;
-  color: #dbdbdb;
-  font-size: 16px;
-  padding-top: 10px;
-}
-
-.tally {
-  background: #202020;
-  background: linear-gradient(0deg, rgba(45, 43, 43, 1) 88%, rgba(89, 89, 89, 1) 99%);
-  border-radius: 5px;
-  margin-left: 8px;
-  margin-right: 8px;
-  border: solid 2px #202020;
-}
-
-.tally-red {
-  background: red;
-  background: linear-gradient(0deg, rgba(255, 0, 0, 1) 58%, rgba(255, 130, 130, 1) 99%);
-  -webkit-box-shadow: 0px 0px 4px 0px rgba(255, 10, 10, 1);
-  -moz-box-shadow: 0px 0px 4px 0px rgba(255, 10, 10, 1);
-  box-shadow: 0px 0px 3px 0px rgba(255, 10, 10, 1);
-}
-
-.tally-yellow {
-  background: rgb(255, 196, 0);
-  background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%);
+  margin: 10px 0;
 }
 
 .slider-holder {
@@ -458,28 +423,61 @@ input[type='range']:focus::-ms-fill-upper {
   width: 30px;
   height: 30px;
   border-radius: 15px;
-  background: linear-gradient(0deg, rgba(37, 37, 37, 1) 60%, rgba(50, 50, 50, 1) 95%, rgba(59, 59, 59, 1) 100%);
-  border: solid 2px #141414;
   margin-left: 25px;
-}
-
-.phones-disabled {
   background: linear-gradient(0deg, rgba(37, 37, 37, 1) 60%, rgba(50, 50, 50, 1) 95%, rgba(59, 59, 59, 1) 100%);
   border: solid 2px #1f1f1f;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+
+  &.phones-active {
+    background: linear-gradient(0deg, rgb(26, 26, 26) 60%, rgb(22, 22, 22) 95%, rgba(26, 26, 26, 1) 100%);
+  }
+
+  &.phones-enabled {
+    background: linear-gradient(0deg, rgba(37, 37, 37, 1) 60%, rgba(50, 50, 50, 1) 95%, rgba(59, 59, 59, 1) 100%);
+    border: solid 2px #141414;
+
+    &:active {
+      box-shadow: inset 1px 1px 5px #000000b9;
+    }
+  }
 }
 
-.phones-active {
-  background: linear-gradient(0deg, rgb(26, 26, 26) 60%, rgb(22, 22, 22) 95%, rgba(26, 26, 26, 1) 100%);
-}
+.strip-heading {
+  .name {
+    text-align: center;
+    color: #5c5c5c;
+    font-size: 16px;
 
-.phones-press:active {
-  box-shadow: inset 1px 1px 5px #000000b9;
-}
+    margin-bottom: 5px;
 
-.phones-svg {
-  position: absolute;
-  top: 5px;
-  left: 4px;
+    &.name-active {
+      color: #dbdbdb;
+    }
+  }
+
+  .tally {
+    background: #202020;
+    background: linear-gradient(0deg, rgba(45, 43, 43, 1) 88%, rgba(89, 89, 89, 1) 99%);
+    border-radius: 5px;
+    margin-left: 8px;
+    margin-right: 8px;
+    border: solid 2px #202020;
+
+    height: 10px;
+
+    &.tally-red {
+      background: red;
+      background: linear-gradient(0deg, rgba(255, 0, 0, 1) 58%, rgba(255, 130, 130, 1) 99%);
+      // box-shadow: 0px 0px 3px 0px rgba(255, 10, 10, 1);
+    }
+
+    &.tally-yellow {
+      background: rgb(255, 196, 0);
+      background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%);
+    }
+  }
 }
 
 .level-holder {
