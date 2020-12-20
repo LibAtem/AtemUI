@@ -3,7 +3,7 @@ import Slider from 'react-rangeslider'
 import { LibAtemCommands, LibAtemEnums, LibAtemState } from '../../generated'
 import { sendCommand, SendCommandStrict } from '../../device-page-wrapper'
 import * as _ from 'underscore'
-import { AudioDialControl } from '../components'
+import { AudioDialControl, AudioNumericControl } from '../components'
 import { send } from 'process'
 
 interface InputChannelStripProps {
@@ -273,20 +273,9 @@ export class InputChannelStrip extends React.Component<InputChannelStripProps, I
     })
   }
 
-  getPan() {
-    const { currentInput } = this.props
-    return (
-      <AudioDialControl
-        onChange={this.balanceChanged}
-        currentValue={currentInput.properties.balance}
-        minValue={-50}
-        maxValue={50}
-        isActive={currentInput.properties.mixOption !== LibAtemEnums.AudioMixOption.Off}
-      />
-    )
-  }
-
   render() {
+    const { currentInput } = this.props
+
     var mixOption = this.props.currentInput.properties.mixOption
     var levels = this.props.currentInput.levels
     this.updatePeaks(levels)
@@ -301,7 +290,6 @@ export class InputChannelStrip extends React.Component<InputChannelStripProps, I
     var peakBoxesRight = this.getPeakBoxes(1, levels, mixOption)
     var topBarPeak = this.getTopBarPeak(levels)
     var phonesButton = this.getPhonesButton()
-    var pan = this.getPan()
     var levelsClass = mixOption == 0 ? 'level' : 'level level-rainbow'
     return (
       <div className="channel">
@@ -363,7 +351,15 @@ export class InputChannelStrip extends React.Component<InputChannelStripProps, I
             className="gain-input"
           ></input>
         </div>
-        {pan}
+        <AudioNumericControl onChange={this.balanceChanged} currentValue={currentInput.properties.balance}>
+          <AudioDialControl
+            onChange={this.balanceChanged}
+            currentValue={currentInput.properties.balance}
+            minValue={-50}
+            maxValue={50}
+            isActive={currentInput.properties.mixOption !== LibAtemEnums.AudioMixOption.Off}
+          />
+        </AudioNumericControl>
         {lowerButton}
         {phonesButton}
       </div>
