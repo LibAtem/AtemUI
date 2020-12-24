@@ -71,6 +71,11 @@ interface AudioDialControlProps {
   maxValue: number
   currentValue: number
   isActive: boolean
+
+  borderType: 'normal' | 'split'
+  activeDialColor: string
+  labelL: string
+  labelR: string
 }
 interface AudioDialControlState {
   downStart: { x: number; value: number } | null
@@ -117,7 +122,7 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
   }
 
   render() {
-    const { minValue, maxValue, currentValue, isActive } = this.props
+    const { minValue, maxValue, currentValue, isActive, labelL, labelR, activeDialColor, borderType } = this.props
 
     const range = maxValue - minValue
     const pct = (currentValue - minValue) / range
@@ -126,7 +131,13 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
     return (
       <div className="dial">
         <div className="dial-value">
-          <DialValueBorder deg={deg} isActive={isActive} valueRangeDegrees={this.valueRangeDegrees} />
+          <DialValueBorder
+            deg={deg}
+            isActive={isActive}
+            valueRangeDegrees={this.valueRangeDegrees}
+            activeDialColor={activeDialColor}
+            borderType={borderType}
+          />
         </div>
         <div
           className="dial-spinner"
@@ -146,9 +157,8 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
           {/* TODO - replace this with an svg */}
         </div>
         <div className="dial-labels">
-          <div>L</div>
-          <div></div>
-          <div>R</div>
+          <div>{labelL}</div>
+          <div>{labelR}</div>
         </div>
       </div>
     )
@@ -159,10 +169,14 @@ function DialValueBorder({
   isActive,
   valueRangeDegrees,
   deg,
+  activeDialColor,
+  borderType,
 }: {
   isActive: boolean
   valueRangeDegrees: number
   deg: number
+  activeDialColor: string
+  borderType: 'normal' | 'split'
 }) {
   const size = 47
   const center = size / 2
@@ -175,14 +189,16 @@ function DialValueBorder({
     return [x, y]
   }
 
-  function getCurve(deg: number, color: string) {
-    const [x1, y1] = getPoint(0)
-    const [x2, y2] = getPoint(deg)
+  function getCurve(fromDeg: number, toDeg: number, color: string) {
+    const [x1, y1] = getPoint(fromDeg)
+    const [x2, y2] = getPoint(toDeg)
+
+    const longArc = Math.abs(fromDeg - toDeg) >= 180 ? 1 : 0
     return (
       <path
         d={`
           M ${x1}, ${y1}
-          a ${radius},${radius} 0 0,${deg <= 0 ? 0 : 1} ${x2 - x1} ${y2 - y1}
+          a ${radius},${radius} 0 ${longArc},${toDeg <= fromDeg ? 0 : 1} ${x2 - x1} ${y2 - y1}
           L ${center}, ${center}
           `}
         stroke="black"
@@ -191,12 +207,12 @@ function DialValueBorder({
       />
     )
   }
+
   return (
     <svg width={size} height={size}>
-      {getCurve(valueRangeDegrees, 'black')}
-      {getCurve(-valueRangeDegrees, 'black')}
+      {getCurve(-valueRangeDegrees, valueRangeDegrees, 'black')}
 
-      {getCurve(deg, isActive ? '#ff7b00' : '#5e5e5e')}
+      {getCurve(borderType === 'split' ? 0 : -valueRangeDegrees, deg, isActive ? activeDialColor : '#5e5e5e')}
     </svg>
   )
 }
@@ -238,11 +254,12 @@ interface AudioStripHeadingProps {
   name: string
   isLive: boolean
   mixOption: LibAtemEnums.AudioMixOption
+  afvFlash: boolean
 }
 
-export class AudioStripHeading extends React.Component<AudioStripHeadingProps> {
+export class AudioStripHeading extends React.PureComponent<AudioStripHeadingProps> {
   render() {
-    const { name, isLive, mixOption } = this.props
+    const { name, isLive, mixOption, afvFlash } = this.props
 
     const live = isLive || mixOption === LibAtemEnums.AudioMixOption.On
     const afv = mixOption === LibAtemEnums.AudioMixOption.AudioFollowVideo
@@ -251,7 +268,7 @@ export class AudioStripHeading extends React.Component<AudioStripHeadingProps> {
     if (live) {
       tallyClass = 'tally-red'
     } else if (afv) {
-      tallyClass = 'tally-yellow'
+      tallyClass = afvFlash ? 'tally-yellow flash' : 'tally-yellow'
     }
 
     return (

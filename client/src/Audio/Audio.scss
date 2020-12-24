@@ -9,6 +9,38 @@
   grid-template-rows: auto 1fr auto auto auto;
   row-gap: 10px;
   margin: 10px 0;
+
+  .monitor-output {
+    grid-row: span 2;
+
+    border: solid 1px #0c0c0c;
+    border-radius: 5px;
+    background: #232323;
+
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: auto;
+    height: 100%;
+    overflow: hidden;
+
+    padding: 5px;
+    row-gap: 5px;
+
+    .title {
+      color: #888;
+      font-size: 0.7rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .audio-numeric-control {
+      border: none;
+      border-radius: 0px;
+
+      .control-input {
+      }
+    }
+  }
 }
 
 .page-channel-strip {
@@ -17,7 +49,7 @@
 
   display: grid;
   grid-auto-flow: column;
-  column-gap: 10px;
+  column-gap: 20px;
   user-select: none;
   grid-template-columns: 1fr auto auto;
 }
@@ -285,10 +317,13 @@
 
   .dial-labels {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr 1fr;
     color: #444;
     font-size: 0.6em;
-    padding: 0px 20%;
+    column-gap: 10px;
+    // padding: 0px 20%;
+
+    text-align: center;
   }
 }
 
@@ -311,9 +346,6 @@
     background: #0c0c0c;
     padding: 0;
     border: none;
-    /* border-radius: 2px; */
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
 
     text-align: center;
     color: #979797;
@@ -434,38 +466,20 @@
       background: rgb(255, 196, 0);
       background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%);
     }
+
+    &.flash {
+      animation: audio-flash linear 0.7s infinite;
+    }
   }
 }
 
-.audio-flashit {
-  -webkit-animation: audio-flash linear 1s infinite;
-  animation: audio-flash linear 0.7s infinite;
-}
-@-webkit-keyframes audio-flash {
-  0% {
-    background: #202020;
-    background: linear-gradient(0deg, rgba(45, 43, 43, 1) 88%, rgba(89, 89, 89, 1) 99%);
-    border-radius: 5px;
-    margin-left: 8px;
-    margin-right: 8px;
-    border: solid 2px #202020;
-  }
-  50% {
-    background: rgb(255, 196, 0);
-    background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%);
-  }
-}
 @keyframes audio-flash {
   0% {
     background: #202020;
     background: linear-gradient(0deg, rgba(45, 43, 43, 1) 88%, rgba(89, 89, 89, 1) 99%);
-    border-radius: 5px;
-    margin-left: 8px;
-    margin-right: 8px;
     border: solid 2px #202020;
   }
-  50% {
-    background: rgb(255, 196, 0);
-    background: linear-gradient(0deg, rgb(202, 131, 0) 58%, rgb(255, 216, 108) 99%);
+  100% {
+    // Fall back to the defined colour
   }
 }

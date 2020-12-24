@@ -3,7 +3,7 @@ import { LibAtemEnums, LibAtemState } from '../../generated'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import * as _ from 'underscore'
 import { audioSourceToVideoSource } from '../../util/audio'
-import { InputChannelStrip } from './channel-strip'
+import { InputChannelStrip, OutputChannelStrip } from './channel-strip'
 import { CLASSIC_AUDIO_MIN_LEVEL, sanitisePeakValue } from '../components'
 import { useMediaQuery } from 'react-responsive'
 
@@ -14,6 +14,7 @@ interface ClassicAudioPageInnerProps {
 
 interface ClassicAudioPageInnerState {
   inputPeaks: { [sourceId: number]: number[] }
+  outputPeaks: number[]
 }
 
 export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageInnerProps, ClassicAudioPageInnerState> {
@@ -30,6 +31,7 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
 
     this.state = {
       inputPeaks: {},
+      outputPeaks: [],
     }
 
     // TODO - we should simply tell the server that we want audio levels, and it should intelligently subscribe/unsubscribe based on all clients
@@ -87,7 +89,9 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
       return <p>Classic Audio not supported</p>
     }
 
-    const { inputPeaks } = this.state
+    const isFadedToBlack = this.props.currentState.mixEffects[0]?.fadeToBlack?.status?.isFullyBlack ?? false
+
+    const { inputPeaks, outputPeaks } = this.state
 
     const allAudioInputs: Array<[LibAtemEnums.AudioSource, LibAtemState.AudioState_InputState]> = Object.entries(
       audioState.inputs
@@ -140,19 +144,18 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
       <PageChannelStrip stickyChannels={stickyChannels.length}>
         <div className="channel-strip-group scrollable">{externalChannels}</div>
         <div className="channel-strip-group">{stickyChannels}</div>
-        {/* <OutputAudioChannel
-          device={this.props.device}
-          signalR={this.props.signalR}
-          id={'Master'}
-          audioId={'Master'}
-          audioTally={
-            audioState.programOut.followFadeToBlack &&
-            (this.props.currentState.mixEffects[0].fadeToBlack.status.inTransition ||
-              this.props.currentState.mixEffects[0].fadeToBlack.status.isFullyBlack)
-          }
-          followFadeToBlack={audioState.programOut.followFadeToBlack}
-          currentInput={audioState.programOut}
-        ></OutputAudioChannel> */}
+        <div className="channel-strip-group">
+          <OutputChannelStrip
+            sendCommand={this.props.sendCommand}
+            gain={audioState.programOut.gain}
+            balance={audioState.programOut.balance}
+            followFadeToBlack={audioState.programOut.followFadeToBlack}
+            isFadedToBlack={isFadedToBlack}
+            rawLevels={audioState.programOut.levels}
+            averagePeaks={outputPeaks ?? []}
+            monitorOutput={audioState.monitorOutputs[0]}
+          />
+        </div>
       </PageChannelStrip>
     )
   }
@@ -165,143 +168,3 @@ function PageChannelStrip(props: PropsWithChildren<{ stickyChannels: number }>) 
 
   return <div className={`page-channel-strip ${isNarrow ? '' : 'channels-inner-scroll'}`}>{props.children}</div>
 }
-
-// class OutputAudioChannel extends InputAudioChannel {
-//   constructor(props: InputAudioChannelProps) {
-//     super(props)
-//     this.state = {
-//       peaks: [
-//         [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
-//         [-60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60, -60],
-//       ],
-//     }
-//   }
-
-//   shouldComponentUpdate(nextProps: InputAudioChannelProps) {
-//     const differentInput = JSON.stringify(this.props.currentInput) !== JSON.stringify(nextProps.currentInput)
-//     const differentFollow = JSON.stringify(this.props.followFadeToBlack) != JSON.stringify(nextProps.followFadeToBlack)
-//     const differentTally = JSON.stringify(this.props.audioTally) != JSON.stringify(nextProps.audioTally)
-//     // return differentName || differentInput || differentMonitors;
-//     return differentInput || differentFollow || differentTally
-//   }
-
-//   getMasterTally() {
-//     if (this.props.audioTally) {
-//       return <div className="tally audio-flashit"></div>
-//     } else {
-//       return <div className="tally tally-red"></div>
-//     }
-//   }
-
-//   getMasterButtons() {
-//     if (this.props.followFadeToBlack) {
-//       return (
-//         <div className="button-holder">
-//           <div
-//             onClick={() =>
-//               this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-//                 FollowFadeToBlack: false,
-//                 Mask: 4,
-//               })
-//             }
-//             className="button-inner full button-inner-selected"
-//           >
-//             AFV
-//           </div>
-//         </div>
-//       )
-//     } else {
-//       return (
-//         <div className="button-holder">
-//           <div
-//             onClick={() =>
-//               this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-//                 FollowFadeToBlack: true,
-//                 Mask: 4,
-//               })
-//             }
-//             className="button-inner full "
-//           >
-//             AFV
-//           </div>
-//         </div>
-//       )
-//     }
-//   }
-
-//   render() {
-//     var lowerButton = this.getMasterButtons()
-//     var levels = this.props.currentInput.levels
-//     this.updatePeaks(levels)
-//     var tally = this.getMasterTally()
-//     var topBarPeak = this.getTopBarPeak(levels)
-//     var levelsLeft = this.getLevel(0, levels)
-//     var levelsRight = this.getLevel(1, levels)
-//     // peakBoxesLeft
-//     // var levelsLeft = (this.getLevel(this.props.id, 0))
-//     // var levelsRight = (this.getLevel(this.props.id, 1))
-//     var floatingPeaksLeft = this.getFloatingPeaks(0, levels, 1)
-//     var floatingPeaksRight = this.getFloatingPeaks(1, levels, 1)
-//     var peakBoxesLeft = this.getPeakBoxes(0, levels, 1)
-//     var peakBoxesRight = this.getPeakBoxes(1, levels, 1)
-
-//     // var topBarPeak=(this.getTopBarPeak(this.props.id))
-
-//     return (
-//       <div className="channel" style={{ gridTemplateRows: '30px 10px 1fr 20px 60px' }}>
-//         <div className="name-active">Master</div>
-//         {tally}
-//         <div className="slider-holder">
-//           {topBarPeak}
-//           <div className="scale">
-//             <div className="scale-1">+6-</div>
-//             <div className="scale-2">0-</div>
-//             <div className="scale-3">-6-</div>
-//             <div className="scale-4">-9-</div>
-//             <div className="scale-5">-20-</div>
-//             <div className="scale-6">-60-</div>
-//           </div>
-//           <div className="slider">
-//             <div className="fake-slider"></div>
-//             <Slider
-//               tooltip={false}
-//               max={1.1095}
-//               min={0.3535}
-//               step={0.001}
-//               value={Math.pow(
-//                 2,
-//                 (this.props.currentInput.gain === '-Infinty' ? -60 : this.props.currentInput.gain) / 40
-//               )}
-//               orientation="vertical"
-//               onChange={(e) => {
-//                 this.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
-//                   Index: this.props.id,
-//                   Gain: Math.log2(e) * 40,
-//                   Mask: 1,
-//                 })
-//               }}
-//             ></Slider>
-//           </div>
-//           <div className="level-holder">
-//             <div className="level level-rainbow">
-//               {levelsLeft}
-//               {floatingPeaksLeft}
-//             </div>
-//             {peakBoxesLeft}
-//             {peakBoxesRight}
-//             <div className="level level-right level-rainbow">
-//               {levelsRight}
-//               {floatingPeaksRight}
-//             </div>
-//           </div>
-//           <input
-//             placeholder={this.props.currentInput.gain === '-Infinity' ? -60 : this.props.currentInput.gain.toFixed(2)}
-//             className="gain-input"
-//           ></input>
-//         </div>
-
-//         {lowerButton}
-//       </div>
-//     )
-//   }
-// }

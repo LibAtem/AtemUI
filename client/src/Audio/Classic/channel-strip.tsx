@@ -9,6 +9,7 @@ import {
   AudioSoloButton,
   AudioStripHeading,
   CLASSIC_AUDIO_MIN_LEVEL,
+  sanitisePeakValue,
 } from '../components'
 
 interface InputChannelStripProps {
@@ -20,7 +21,7 @@ interface InputChannelStripProps {
 
   audioTally: boolean
   id: LibAtemEnums.AudioSource
-  monitorOutput: any
+  monitorOutput: LibAtemState.AudioState_MonitorOutputState
   name: string
 }
 
@@ -33,14 +34,6 @@ export class InputChannelStrip extends React.PureComponent<InputChannelStripProp
     this.soloChanged = this.soloChanged.bind(this)
     this.resetPeaks = this.resetPeaks.bind(this)
   }
-
-  // shouldComponentUpdate(nextProps: InputChannelStripProps) {
-  //   const differentInput = !_.isEqual(this.props.currentInput, nextProps.currentInput)
-  //   const differentName = this.props.name !== nextProps.name
-  //   const differentMonitors = !_.isEqual(this.props.monitorOutput, nextProps.monitorOutput)
-  //   // return differentName || differentInput || differentMonitors;
-  //   return differentInput || differentName || differentMonitors
-  // }
 
   private getLowerButtons(mixOption: number, sourceType: LibAtemEnums.AudioSourceType) {
     const { id } = this.props
@@ -116,7 +109,7 @@ export class InputChannelStrip extends React.PureComponent<InputChannelStripProp
 
     return (
       <div className="channel">
-        <AudioStripHeading name={name} isLive={audioTally} mixOption={inputProperties.mixOption} />
+        <AudioStripHeading name={name} afvFlash={false} isLive={audioTally} mixOption={inputProperties.mixOption} />
         <div className="audio-fader">
           <AudioNumericControl
             onChange={this.gainChanged}
@@ -145,6 +138,10 @@ export class InputChannelStrip extends React.PureComponent<InputChannelStripProp
             minValue={-50}
             maxValue={50}
             isActive={inputProperties.mixOption !== LibAtemEnums.AudioMixOption.Off}
+            activeDialColor="#ff7b00"
+            labelL="L"
+            labelR="R"
+            borderType="split"
           />
         </AudioNumericControl>
         {this.getLowerButtons(inputProperties.mixOption, inputProperties.sourceType)}
@@ -153,6 +150,186 @@ export class InputChannelStrip extends React.PureComponent<InputChannelStripProp
           isSolo={monitorOutput.solo && monitorOutput.soloSource === id}
           onChange={this.soloChanged}
         />
+      </div>
+    )
+  }
+}
+
+interface OutputChannelStripProps {
+  sendCommand: SendCommandStrict
+
+  gain: number
+  balance: number
+  followFadeToBlack: boolean
+  isFadedToBlack: boolean
+
+  rawLevels: LibAtemState.AudioState_LevelsState | undefined
+  averagePeaks: number[]
+
+  monitorOutput: LibAtemState.AudioState_MonitorOutputState
+}
+export class OutputChannelStrip extends React.PureComponent<OutputChannelStripProps> {
+  constructor(props: OutputChannelStripProps) {
+    super(props)
+
+    this.balanceChanged = this.balanceChanged.bind(this)
+    this.gainChanged = this.gainChanged.bind(this)
+    this.resetPeaks = this.resetPeaks.bind(this)
+  }
+
+  private getLowerButtons() {
+    const { followFadeToBlack } = this.props
+    return (
+      <div className="button-holder">
+        <div
+          onClick={() =>
+            this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
+              Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.FollowFadeToBlack,
+              FollowFadeToBlack: !followFadeToBlack,
+            })
+          }
+          className={`button-inner ${followFadeToBlack ? 'button-inner-selected' : ''}`}
+        >
+          AFV
+        </div>
+      </div>
+    )
+  }
+
+  private balanceChanged(value: number): void {
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
+      Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.Balance,
+      Balance: value,
+    })
+  }
+  private gainChanged(value: number): void {
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMasterSetCommand', {
+      Mask: LibAtemCommands.Audio_AudioMixerMasterSetCommand_MaskFlags.Gain,
+      Gain: value,
+    })
+  }
+  private resetPeaks(): void {
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerResetPeaksCommand', {
+      Mask: LibAtemCommands.Audio_AudioMixerResetPeaksCommand_MaskFlags.Master,
+    })
+  }
+
+  render() {
+    const { gain, sendCommand, rawLevels, monitorOutput, isFadedToBlack, averagePeaks, followFadeToBlack } = this.props
+
+    return (
+      <div className="channel">
+        <AudioStripHeading
+          name="Master"
+          afvFlash={true}
+          isLive={!isFadedToBlack}
+          mixOption={followFadeToBlack ? LibAtemEnums.AudioMixOption.AudioFollowVideo : LibAtemEnums.AudioMixOption.On}
+        />
+        <div className="audio-fader">
+          <AudioNumericControl
+            onChange={this.gainChanged}
+            currentValue={gain}
+            fixedPoint={2}
+            negativeInfinity={CLASSIC_AUDIO_MIN_LEVEL}
+          >
+            <AudioFaderControl
+              maxValue={6}
+              minValue={CLASSIC_AUDIO_MIN_LEVEL}
+              decibels={true}
+              isActive={true}
+              currentValue={gain}
+              onChange={this.gainChanged}
+              resetPeaks={this.resetPeaks}
+              rawLevels={rawLevels}
+              averagePeaks={averagePeaks}
+            />
+          </AudioNumericControl>
+        </div>
+
+        {this.getLowerButtons()}
+
+        <MonitorOutputControl sendCommand={sendCommand} {...monitorOutput} />
+      </div>
+    )
+  }
+}
+
+interface MonitorOutputControlProps extends LibAtemState.AudioState_MonitorOutputState {
+  sendCommand: SendCommandStrict
+}
+export class MonitorOutputControl extends React.PureComponent<MonitorOutputControlProps> {
+  constructor(props: MonitorOutputControlProps) {
+    super(props)
+
+    this.gainChanged = this.gainChanged.bind(this)
+    // this.resetPeaks = this.resetPeaks.bind(this)
+  }
+
+  private getLowerButtons() {
+    const { dim } = this.props
+    return (
+      <div className="button-holder">
+        <div
+          onClick={() =>
+            this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMonitorSetCommand', {
+              Mask: LibAtemCommands.Audio_AudioMixerMonitorSetCommand_MaskFlags.Dim,
+              Dim: false,
+            })
+          }
+          className={`button-inner ${dim ? '' : 'button-inner-selected'}`}
+        >
+          ON
+        </div>
+        <div
+          onClick={() =>
+            this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMonitorSetCommand', {
+              Mask: LibAtemCommands.Audio_AudioMixerMonitorSetCommand_MaskFlags.Dim,
+              Dim: true,
+            })
+          }
+          className={`button-inner ${dim ? 'button-inner-selected' : ''}`}
+        >
+          DIM
+        </div>
+      </div>
+    )
+  }
+
+  private gainChanged(value: number): void {
+    this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerMonitorSetCommand', {
+      Mask: LibAtemCommands.Audio_AudioMixerMonitorSetCommand_MaskFlags.Gain,
+      Gain: value,
+    })
+  }
+
+  render() {
+    const { gain } = this.props
+
+    const gainSafe = sanitisePeakValue(gain, CLASSIC_AUDIO_MIN_LEVEL)
+
+    return (
+      <div className="monitor-output">
+        <div className="title">Monitor</div>
+        <AudioNumericControl
+          onChange={this.gainChanged}
+          currentValue={gainSafe}
+          fixedPoint={2}
+          negativeInfinity={CLASSIC_AUDIO_MIN_LEVEL}
+        >
+          <AudioDialControl
+            onChange={this.gainChanged}
+            currentValue={gainSafe}
+            minValue={CLASSIC_AUDIO_MIN_LEVEL}
+            maxValue={6}
+            borderType="normal"
+            isActive={true}
+            activeDialColor="#007bff"
+            labelL="MIN"
+            labelR="MAX"
+          />
+        </AudioNumericControl>
+
+        {this.getLowerButtons()}
       </div>
     )
   }
