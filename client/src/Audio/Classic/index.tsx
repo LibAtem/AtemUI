@@ -1,23 +1,83 @@
 import React from 'react'
-import { AtemDeviceInfo } from '../../Devices/types'
 import { LibAtemEnums, LibAtemState } from '../../generated'
-import { SendCommandStrict, sendCommandStrict } from '../../device-page-wrapper'
-import { CommandTypes } from '../../generated/commands'
+import { SendCommandStrict } from '../../device-page-wrapper'
 import * as _ from 'underscore'
 import { audioSourceToVideoSource } from '../../util/audio'
 import { InputChannelStrip } from './channel-strip'
+import { CLASSIC_AUDIO_MIN_LEVEL, sanitisePeakValue } from '../components'
 
 interface ClassicAudioPageInnerProps {
   sendCommand: SendCommandStrict
   currentState: LibAtemState.AtemState
 }
 
-export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInnerProps> {
+interface ClassicAudioPageInnerState {
+  inputPeaks: { [sourceId: number]: number[] }
+}
+
+export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageInnerProps, ClassicAudioPageInnerState> {
+  private readonly PEAK_UPDATE_PERIOD = 50 // ms
+  private readonly PEAK_STORED_VALUES = 15
+  private readonly PEAK_SAMPLE_VALUES = 5
+
+  private updateInterval: NodeJS.Timeout | undefined
+
+  private inputPeakSamples: { [sourceId: number]: number[][] } = {}
+
   constructor(props: ClassicAudioPageInnerProps) {
     super(props)
 
+    this.state = {
+      inputPeaks: {},
+    }
+
     // TODO - we should simply tell the server that we want audio levels, and it should intelligently subscribe/unsubscribe based on all clients
     this.props.sendCommand('LibAtem.Commands.Audio.AudioMixerSendLevelsCommand', { SendLevels: true })
+  }
+
+  componentDidMount() {
+    if (this.updateInterval === undefined) {
+      this.updateInterval = setInterval(this.updatePeaks.bind(this), this.PEAK_UPDATE_PERIOD)
+    }
+  }
+  componentWillUnmount() {
+    if (this.updateInterval !== undefined) {
+      clearInterval(this.updateInterval)
+      this.updateInterval = undefined
+    }
+  }
+
+  private updatePeaks(): void {
+    const audioState = this.props.currentState.audio
+    if (audioState) {
+      const newPeaks: ClassicAudioPageInner['inputPeakSamples'] = {}
+      const newState: ClassicAudioPageInnerState['inputPeaks'] = {}
+      for (const [id0, props] of Object.entries(audioState.inputs)) {
+        const id = (id0 as any) as number
+        if (props.levels) {
+          const newInputPeaks = props.levels.levels.map((val, index) => {
+            const safePeak = sanitisePeakValue(val, CLASSIC_AUDIO_MIN_LEVEL)
+            const oldValues = (this.inputPeakSamples[id] ?? [])[index] ?? []
+
+            const oldAverage = _.reduce(oldValues, (memo, num) => memo + num, 0) / oldValues.length
+            if (oldValues.length === 0 || oldAverage < safePeak) {
+              return new Array(this.PEAK_STORED_VALUES).fill(safePeak) // TODO - verify
+            } else {
+              return [safePeak, ...oldValues].slice(0, this.PEAK_STORED_VALUES)
+            }
+          })
+
+          newPeaks[id] = newInputPeaks
+          newState[id] = newInputPeaks.map((p) => {
+            const sampleValues = p.slice(-this.PEAK_SAMPLE_VALUES)
+            return _.reduce(sampleValues, (memo, num) => memo + num, 0) / sampleValues.length
+          })
+        }
+      }
+
+      this.inputPeakSamples = newPeaks
+      this.setState({ inputPeaks: newState })
+    }
   }
 
   render() {
@@ -25,6 +85,8 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
     if (!audioState) {
       return <p>Classic Audio not supported</p>
     }
+
+    const { inputPeaks } = this.state
 
     const allAudioInputs: Array<[LibAtemEnums.AudioSource, LibAtemState.AudioState_InputState]> = Object.entries(
       audioState.inputs
@@ -40,10 +102,12 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
       return (
         <InputChannelStrip
           sendCommand={this.props.sendCommand}
-          currentInput={input}
+          inputProperties={input.properties}
+          rawLevels={input.levels}
+          averagePeaks={inputPeaks[id] ?? []}
           id={id}
           audioTally={tally}
-          monitors={audioState.monitorOutputs[0]}
+          monitorOutput={audioState.monitorOutputs[0]}
           name={LibAtemEnums.AudioSource[id]}
         />
       )
@@ -58,10 +122,12 @@ export class ClassicAudioPageInner extends React.Component<ClassicAudioPageInner
       return (
         <InputChannelStrip
           sendCommand={this.props.sendCommand}
-          currentInput={input}
+          inputProperties={input.properties}
+          rawLevels={input.levels}
+          averagePeaks={inputPeaks[idMain] ?? []}
           id={idMain}
           audioTally={tally}
-          monitors={audioState.monitorOutputs[0]}
+          monitorOutput={audioState.monitorOutputs[0]}
           name={inputProps?.properties?.shortName ?? 'Unknown'}
         />
       )

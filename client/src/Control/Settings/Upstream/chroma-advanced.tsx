@@ -452,6 +452,7 @@ class ChromaSample extends StickyPanelBase<ChromaSampleProps, { open: boolean }>
 
             <Slider
               tooltip={false}
+              className={'slider-default'}
               orientation={'vertical'}
               value={this.props.props.cursorSize}
               onChange={(v) => {
