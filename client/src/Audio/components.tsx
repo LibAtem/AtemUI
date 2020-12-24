@@ -116,48 +116,8 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
     }
   }
 
-  private renderValueBorder(valueDegrees: number) {
-    const { isActive } = this.props
-
-    const size = 47
-    const center = size / 2
-    const radius = (size - 1) / 2
-
-    function getPoint(deg: number): [number, number] {
-      const angle = (deg - 90) * (Math.PI / 180)
-      const x = center + radius * Math.cos(angle)
-      const y = center + radius * Math.sin(angle)
-      return [x, y]
-    }
-
-    function getCurve(deg: number, color: string) {
-      const [x1, y1] = getPoint(0)
-      const [x2, y2] = getPoint(deg)
-      return (
-        <path
-          d={`
-          M ${x1}, ${y1}
-          a ${radius},${radius} 0 0,${deg <= 0 ? 0 : 1} ${x2 - x1} ${y2 - y1}
-          L ${center}, ${center}
-          `}
-          stroke="black"
-          fill={color}
-          stroke-width="0.5"
-        />
-      )
-    }
-    return (
-      <svg width={size} height={size}>
-        {getCurve(this.valueRangeDegrees, 'black')}
-        {getCurve(-this.valueRangeDegrees, 'black')}
-
-        {getCurve(valueDegrees, isActive ? '#ff7b00' : '#5e5e5e')}
-      </svg>
-    )
-  }
-
   render() {
-    const { minValue, maxValue, currentValue } = this.props
+    const { minValue, maxValue, currentValue, isActive } = this.props
 
     const range = maxValue - minValue
     const pct = (currentValue - minValue) / range
@@ -165,7 +125,9 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
 
     return (
       <div className="dial">
-        <div className="dial-value">{this.renderValueBorder(deg)}</div>
+        <div className="dial-value">
+          <DialValueBorder deg={deg} isActive={isActive} valueRangeDegrees={this.valueRangeDegrees} />
+        </div>
         <div
           className="dial-spinner"
           style={{
@@ -191,6 +153,52 @@ export class AudioDialControl extends React.Component<AudioDialControlProps, Aud
       </div>
     )
   }
+}
+
+function DialValueBorder({
+  isActive,
+  valueRangeDegrees,
+  deg,
+}: {
+  isActive: boolean
+  valueRangeDegrees: number
+  deg: number
+}) {
+  const size = 47
+  const center = size / 2
+  const radius = (size - 1) / 2
+
+  function getPoint(deg: number): [number, number] {
+    const angle = (deg - 90) * (Math.PI / 180)
+    const x = center + radius * Math.cos(angle)
+    const y = center + radius * Math.sin(angle)
+    return [x, y]
+  }
+
+  function getCurve(deg: number, color: string) {
+    const [x1, y1] = getPoint(0)
+    const [x2, y2] = getPoint(deg)
+    return (
+      <path
+        d={`
+          M ${x1}, ${y1}
+          a ${radius},${radius} 0 0,${deg <= 0 ? 0 : 1} ${x2 - x1} ${y2 - y1}
+          L ${center}, ${center}
+          `}
+        stroke="black"
+        fill={color}
+        strokeWidth="0.5"
+      />
+    )
+  }
+  return (
+    <svg width={size} height={size}>
+      {getCurve(valueRangeDegrees, 'black')}
+      {getCurve(-valueRangeDegrees, 'black')}
+
+      {getCurve(deg, isActive ? '#ff7b00' : '#5e5e5e')}
+    </svg>
+  )
 }
 
 interface AudioSoloButtonProps {
@@ -370,7 +378,7 @@ export class AudioFaderControl extends React.PureComponent<AudioFaderControlProp
                 const percent = this.calculatePercent(dbToFader(minValue), dbToFader(0), dbToFader(level))
                 const roundedPercent = Math.round(percent * 10) / 10 // Minimise data updates
                 return (
-                  <div className="level-bar-holder" style={{ gridTemplateRows: `1fr auto ${levelBarHeight}%` }}>
+                  <div key={i} className="level-bar-holder" style={{ gridTemplateRows: `1fr auto ${levelBarHeight}%` }}>
                     <div></div>
                     {this.getPeakClippingBox(rawLevels.peaks[i])}
 

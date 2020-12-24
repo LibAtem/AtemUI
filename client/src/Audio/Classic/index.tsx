@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { LibAtemEnums, LibAtemState } from '../../generated'
 import { SendCommandStrict } from '../../device-page-wrapper'
 import * as _ from 'underscore'
 import { audioSourceToVideoSource } from '../../util/audio'
 import { InputChannelStrip } from './channel-strip'
 import { CLASSIC_AUDIO_MIN_LEVEL, sanitisePeakValue } from '../components'
+import { useMediaQuery } from 'react-responsive'
 
 interface ClassicAudioPageInnerProps {
   sendCommand: SendCommandStrict
@@ -96,11 +97,12 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
       ([x, v]) => v.properties.sourceType === LibAtemEnums.AudioSourceType.ExternalAudio
     )
 
-    const channels2 = audioInputs.map(([id, input]) => {
+    const stickyChannels = audioInputs.map(([id, input]) => {
       const tally = audioState.tally ? audioState.tally[id] ?? false : false
 
       return (
         <InputChannelStrip
+          key={id}
           sendCommand={this.props.sendCommand}
           inputProperties={input.properties}
           rawLevels={input.levels}
@@ -113,7 +115,7 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
       )
     })
 
-    const external = videoInputs.map(([idMain, input]) => {
+    const externalChannels = videoInputs.map(([idMain, input]) => {
       const tally = audioState.tally ? audioState.tally[idMain] ?? false : false
 
       const videoId = audioSourceToVideoSource(idMain)
@@ -121,6 +123,7 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
 
       return (
         <InputChannelStrip
+          key={idMain}
           sendCommand={this.props.sendCommand}
           inputProperties={input.properties}
           rawLevels={input.levels}
@@ -134,17 +137,9 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
     })
 
     return (
-      <div
-        className="page-wrapper"
-        style={{
-          gridTemplateColumns:
-            'repeat(' + external.length + ', 80px) 1px repeat(' + channels2.length + ', 80px) 1px 80px',
-        }}
-      >
-        {external}
-        <div></div>
-        {channels2}
-        <div></div>
+      <PageChannelStrip stickyChannels={stickyChannels.length}>
+        <div className="channel-strip-group scrollable">{externalChannels}</div>
+        <div className="channel-strip-group">{stickyChannels}</div>
         {/* <OutputAudioChannel
           device={this.props.device}
           signalR={this.props.signalR}
@@ -158,9 +153,17 @@ export class ClassicAudioPageInner extends React.PureComponent<ClassicAudioPageI
           followFadeToBlack={audioState.programOut.followFadeToBlack}
           currentInput={audioState.programOut}
         ></OutputAudioChannel> */}
-      </div>
+      </PageChannelStrip>
     )
   }
+}
+
+function PageChannelStrip(props: PropsWithChildren<{ stickyChannels: number }>) {
+  const WIDTH_PER_CHANENL = 90
+  const stickyWidth = props.stickyChannels * WIDTH_PER_CHANENL
+  const isNarrow = useMediaQuery({ query: `(max-width: ${stickyWidth * 3}px)` })
+
+  return <div className={`page-channel-strip ${isNarrow ? '' : 'channels-inner-scroll'}`}>{props.children}</div>
 }
 
 // class OutputAudioChannel extends InputAudioChannel {
